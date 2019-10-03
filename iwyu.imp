@@ -1,0 +1,6 @@
+[
+  {include: ["<ext/new_allocator.h>", "private", "<cstddef>",  "public"]},
+  {include: ["<features.h>", "public", "<stdio.h>", "public"]},
+  {include: ["<features.h>", "public", "<stddef.h>", "public"]},
+  {include: ["<features.h>", "public", "<unistd.h>", "public"]}
+]

@@ -1,0 +1,31 @@
+# Build Directories
+build/
+build-*/
+cmake-build/
+cmake-build-*/
+
+# Dependencies
+/third-party/artifacts
+
+# Python Artifacts
+dist/
+dist-*/
+__pycache__/
+*.pyc
+*.so
+*.so.debug
+*.dll
+*.lib
+*.pdb
+*.dSYM/
+*.egg-info/
+
+# Tools and IDEs
+tags
+.idea/
+.vs/
+.venv/
+.python-version
+
+# Misc
+.DS_Store
