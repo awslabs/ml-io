@@ -1,0 +1,40 @@
+Checks: "*,\
+    -android-*,\
+    -clang-analyzer-*,\
+    -cppcoreguidelines-avoid-c-arrays,\
+    -cppcoreguidelines-avoid-magic-numbers,\
+    -cppcoreguidelines-macro-usage,\
+    -cppcoreguidelines-non-private-member-variables-in-classes,\
+    -cppcoreguidelines-owning-memory,\
+    -cppcoreguidelines-pro-bounds-array-to-pointer-decay,\
+    -cppcoreguidelines-pro-bounds-pointer-arithmetic,\
+    -cppcoreguidelines-pro-type-reinterpret-cast,\
+    -cppcoreguidelines-pro-type-static-cast-downcast,\
+    -cppcoreguidelines-pro-type-vararg,\
+    -fuchsia-*,\
+    -google-build-using-namespace,\
+    -google-runtime-references,\
+    -hicpp-*,\
+    -llvm-*,\
+    -misc-non-private-member-variables-in-classes,\
+    -modernize-avoid-c-arrays,\
+    -modernize-use-nodiscard,\
+    -modernize-use-trailing-return-type,\
+    -readability-magic-numbers,\
+    -readability-named-parameter"
+
+HeaderFilterRegex: "mlio"
+
+CheckOptions:
+    # Some types such as std::span<> do not have user-declared move
+    # functions.
+  - key:   cppcoreguidelines-special-member-functions.AllowMissingMoveFunctions
+    value: 1
+
+    # An std::optional<> with a trivial template argument is itself
+    # trivially move constructible/assignable.
+    #
+    # TODO: Use a proper regex once you figure out the correct type name
+    # LLVM uses.
+  - key:   performance-unnecessary-value-param.AllowedTypes
+    value: "optional"

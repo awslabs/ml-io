@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+
+set -o errexit
+
+function _print_usage
+{
+    printf "Usage: %s [--extract] PATHNAME\n" "$(basename "$0")"
+}
+
+function _exit_usage
+{
+    _print_usage
+
+    exit 0
+}
+
+function _exit_usage_error
+{
+    _print_usage >&2
+
+    exit 1
+}
+
+function _main
+{
+    local _target
+    local _should_extract
+
+    if [[ $# -eq 0 || $# -gt 2 ]]; then
+        _exit_usage_error
+    fi
+
+    if [[ $# -eq 1 ]]; then
+        if [[ $1 == -h || $1 == --help ]]; then
+            _exit_usage
+        fi
+    else
+        if [[ $1 != --extract ]]; then
+            _exit_usage_error
+        fi
+
+        _should_extract=true
+
+        shift
+    fi
+
+    _target=$1
+
+    if [[ $(uname -s) == Darwin ]]; then
+        if [[ $_should_extract == true ]]; then
+            dsymutil --minimize -o "$_target.dSYM" "$_target"
+        fi
+
+        strip -r -x "$_target"
+    else
+        if [[ $_should_extract == true ]]; then
+            objcopy --only-keep-debug "$_target" "$_target.debug"
+            objcopy --strip-unneeded "$_target"
+            objcopy --add-gnu-debuglink="$_target.debug" "$_target"
+        else
+            objcopy --strip-unneeded "$_target"
+        fi
+    fi
+}
+
+_main "$@"
