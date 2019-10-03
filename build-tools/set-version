@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+
+set -o errexit
+
+function _print_usage
+{
+    printf "Usage: %s [VERSION|SEMANTIC_VERSION PEP_VERSION]\n" "$(basename "$0")"
+}
+
+function _exit_usage
+{
+    _print_usage
+
+    exit 0
+}
+
+function _exit_usage_error
+{
+    _print_usage >&2
+
+    exit 1
+}
+
+function _replace_versions
+{
+    echo "$_sem_version" > "$_src_dir/VERSION"
+
+    # CMake
+    sed -i.bak\
+        -e "s/^project(ML-IO VERSION .* LANGUAGES/project(ML-IO VERSION ${_sem_version%%-*} LANGUAGES/"\
+        "$_src_dir/CMakeLists.txt"
+
+    # Setuptools
+    sed -i.bak\
+        -e "s/^      version=stamp_dev_version('.*'),$/      version=stamp_dev_version('$_pep_version'),/"\
+        "$_src_dir/src/mlio-py/setup.py"
+
+    # Conda
+    sed -i.bak\
+        -e "s/^{% set version = '.*' %}$/{% set version = '$_pep_version' %}/"\
+        "$_src_dir/packaging/conda/recipe/meta.yaml"
+
+    # Delete backups.
+    rm "$_src_dir/CMakeLists.txt.bak"\
+       "$_src_dir/src/mlio-py/setup.py.bak"\
+       "$_src_dir/packaging/conda/recipe/meta.yaml.bak"
+}
+
+function _main
+{
+    if [[ $# -eq 0 || $# -gt 2 ]]; then
+        _exit_usage_error
+    fi
+
+    if [[ $# -eq 1 ]]; then
+        if [[ $1 == -h || $1 == --help ]]; then
+            _exit_usage
+        fi
+
+        _sem_version=$1
+        _pep_version=$1
+    else
+        _sem_version=$1
+        _pep_version=$2
+    fi
+
+    _src_dir=$(cd "$(dirname "$0")" && pwd)/..
+
+    _replace_versions
+}
+
+_main "$@"

@@ -1,0 +1,45 @@
+c_compiler:
+  - gcc      # [linux]
+  - clang    # [osx]
+c_compiler_version:
+  - 7        # [linux]
+  - 9        # [osx]
+cxx_compiler:
+  - gxx      # [linux]
+  - clangxx  # [osx]
+cxx_compiler_version:
+  - 7        # [linux]
+  - 9        # [osx]
+
+# macOS related settings
+macos_min_version:
+  - 10.14                      # [osx]
+macos_machine:
+  - x86_64-apple-darwin18.7.0  # [osx]
+MACOSX_DEPLOYMENT_TARGET:
+  - 10.14                      # [osx]
+CONDA_BUILD_SYSROOT:
+  - /opt/MacOSX10.14.sdk       # [osx]
+SDKROOT:
+  - /opt/MacOSX10.14.sdk       # [osx]
+
+# Pinned versions
+arrow_cpp:
+  - 0.15.1
+cmake:
+  - 3.13
+doxygen:
+  - 1.8
+libiconv:
+  - 1.15
+libprotobuf:
+  - 3.8
+numpy:
+  - 1.14
+python:
+  - 3.6
+  - 3.7
+tbb_devel:
+  - 2019.8
+zlib:
+  - 1.2
