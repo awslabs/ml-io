@@ -1,1 +1,7 @@
 Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+This software includes portions based on the cpp-HyperLogLog library (https://github.com/hideo55/cpp-HyperLogLog).
+See contrib/insights/src/hll. Copyright 2013 Hideaki Ohno <hide.o.j55{at}gmail.com>.
+
+This software includes portions based on the xxHash library (https://github.com/Cyan4973/xxHash).
+See contrib/insights/src/hll. Copyright (C) 2012-2016, Yann Collet.

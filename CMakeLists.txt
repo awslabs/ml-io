@@ -39,6 +39,7 @@ option(BUILD_SHARED_LIBS "If set, builds as a shared library." ON)
 
 option(MLIO_INCLUDE_LIB "If set, generates build target for the library." ON)
 option(MLIO_INCLUDE_PYTHON_EXTENSION "If set, generates build target for the Python C extension.")
+option(MLIO_INCLUDE_CONTRIB "If set, generates build target for the contrib extensions.")
 
 cmake_dependent_option(
     MLIO_INCLUDE_ARROW_INTEGRATION "If set, generates build target for the Apache Arrow integration." ON
@@ -331,6 +332,10 @@ endif()
 
 if(MLIO_INCLUDE_PYTHON_EXTENSION)
     add_subdirectory(src/mlio-py)
+endif()
+
+if(MLIO_INCLUDE_CONTRIB)
+    add_subdirectory(contrib)
 endif()
 
 # ------------------------------------------------------------

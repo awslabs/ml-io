@@ -48,5 +48,15 @@ trim(std::string_view s) noexcept
     return s;
 }
 
+bool
+is_only_whitespace(std::string_view s) noexcept
+{
+    auto pos = std::find_if_not(s.cbegin(), s.cend(), [](int ch) {
+        return std::isspace(ch);
+    });
+
+    return pos == s.cend();
+}
+
 }  // namespace v1
 }  // namespace mlio
