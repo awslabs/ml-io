@@ -15,21 +15,36 @@
 
 #pragma once
 
-#include <optional>
+#include <stdexcept>
 
-#include "mlio/fwd.h"
+#include "mlio/config.h"
 
 namespace mlio {
 inline namespace v1 {
-namespace detail {
 
-static const std::size_t MAX_DATA_IN_EXCEPTION = 1024;
+/// @addtogroup records Records
+/// @{
 
-std::optional<record>
-read_line(memory_slice &chunk,
-          bool ignore_leftover,
-          std::optional<size_t> max_line_length);
+class MLIO_API record_too_large_error : public std::runtime_error {
+public:
+    using std::runtime_error::runtime_error;
 
-}  // namespace detail
+public:
+    record_too_large_error(record_too_large_error const &) = default;
+
+    record_too_large_error(record_too_large_error &&) = default;
+
+    ~record_too_large_error() override;
+
+public:
+    record_too_large_error &
+    operator=(record_too_large_error const &) = default;
+
+    record_too_large_error &
+    operator=(record_too_large_error &&) = default;
+};
+
+/// @}
+
 }  // namespace v1
 }  // namespace mlio

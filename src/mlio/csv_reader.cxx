@@ -98,7 +98,8 @@ csv_reader::read_names_from_header(data_store const &ds, record_reader &rdr)
             return;
         }
 
-        csv_record_tokenizer tk{hdr->payload(), params_.delimiter};
+        csv_record_tokenizer tk{
+            hdr->payload(), params_.delimiter, params_.max_field_length};
         while (tk.next()) {
             std::string name;
             if (params_.name_prefix.empty()) {
@@ -152,7 +153,8 @@ void
 csv_reader::infer_column_types(instance const &ins)
 {
     try {
-        csv_record_tokenizer tk{ins.bits(), params_.delimiter};
+        csv_record_tokenizer tk{
+            ins.bits(), params_.delimiter, params_.max_field_length};
         while (tk.next()) {
             data_type dt;
             if (params_.default_data_type == std::nullopt) {
@@ -390,16 +392,44 @@ csv_reader::decode(instance_batch const &batch) const
 
             auto tsr_pos = tensors.begin();
 
-            csv_record_tokenizer tk{ins.bits(), params_.delimiter};
+            csv_record_tokenizer tk{
+                ins.bits(), params_.delimiter, params_.max_field_length};
             while (tk.next()) {
                 if (col_pos == col_end) {
                     break;
                 }
 
-                // Check if we should skip this column.
+                // Check if we truncated the field.
+                if (tk.is_truncated()) {
+                    if (params_.max_field_length_hnd ==
+                            max_field_length_handling::warn ||
+                        params_.max_field_length_hnd ==
+                            max_field_length_handling::error) {
+                        std::string const &name = std::get<1>(*col_pos);
+
+                        auto msg = fmt::format(
+                            "The column '{2}' of the row {1:n} in the data "
+                            "store "
+                            "{0} was truncated. Its truncated string value is "
+                            "'{3:.64}'.",
+                            ins.get_data_store(),
+                            ins.index() + 1,
+                            name,
+                            tk.value());
+
+                        if (params_.max_field_length_hnd ==
+                            max_field_length_handling::error) {
+                            throw field_too_large_error{msg};
+                        }
+
+                        logger::warn(msg);
+                    }
+                }
+
+                // Check if we should skip this column (because it's set to
+                // skip).
                 if (std::get<3>(*col_pos) != 0) {
                     ++col_pos;
-
                     continue;
                 }
 
@@ -540,6 +570,8 @@ csv_reader::reset() noexcept
 
     should_read_header = true;
 }
+
+field_too_large_error::~field_too_large_error() = default;
 
 }  // namespace v1
 }  // namespace mlio

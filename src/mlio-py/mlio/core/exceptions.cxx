@@ -46,6 +46,12 @@ register_exceptions(py::module &m)
 
     py::register_exception<mlio::not_supported_error>(
         m, "NotSupportedError", ::PyExc_RuntimeError);
+
+    py::register_exception<mlio::record_too_large_error>(
+        m, "RecordTooLargeError", ::PyExc_RuntimeError);
+
+    py::register_exception<mlio::field_too_large_error>(
+        m, "FieldTooLargeError", ::PyExc_RuntimeError);
 }
 
 }  // namespace mliopy

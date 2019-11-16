@@ -132,6 +132,9 @@ make_csv_reader(
     bool skip_blank_lines,
     std::string encoding,
     std::unordered_set<std::string> nan_values,
+    std::optional<size_t> max_field_length,
+    mlio::max_field_length_handling max_field_length_hnd,
+    std::optional<size_t> max_line_length,
     int base)
 {
     mlio::data_reader_params rdr_prm{};
@@ -171,6 +174,9 @@ make_csv_reader(
         csv_prm.encoding = mlio::text_encoding{std::move(encoding)};
     }
     csv_prm.parser_prm.nan_values = std::move(nan_values);
+    csv_prm.max_field_length = max_field_length;  // NOLINT
+    csv_prm.max_field_length_hnd = max_field_length_hnd;
+    csv_prm.max_line_length = max_line_length;  // NOLINT
     csv_prm.parser_prm.base = base;
 
     return mlio::make_intrusive<mlio::csv_reader>(std::move(rdr_prm),
@@ -253,6 +259,21 @@ register_data_readers(py::module &m)
         .value("WARN",
                mlio::bad_batch_handling::warn,
                "Skip the batch and log a warning message.");
+
+    py::enum_<mlio::max_field_length_handling>(
+        m,
+        "MaxFieldLengthHandling",
+        "Specifies how field and columns should be handled when breached.")
+        .value("ERROR",
+               mlio::max_field_length_handling::error,
+               "Throw an exception.")
+        .value("TRUNCATE",
+               mlio::max_field_length_handling::truncate,
+               "Truncate any excess columns or characters.")
+        .value("WARN",
+               mlio::max_field_length_handling::warn,
+               "Truncate excess columns or characters and log a warning "
+               "message.");
 
     py::class_<detail::py_data_iterator>(m, "DataIterator")
         .def("__iter__",
@@ -338,6 +359,10 @@ register_data_readers(py::module &m)
              "skip_blank_lines"_a = true,
              "encoding"_a = "",
              "nan_values"_a = std::unordered_set<std::string>{},
+             "max_field_length"_a = std::nullopt,
+             "max_field_length_handling"_a =
+                 mlio::max_field_length_handling::error,
+             "max_line_length"_a = std::nullopt,
              "number_base"_a = 10,
              R"(
             Parameters
@@ -452,6 +477,17 @@ register_data_readers(py::module &m)
             nan_values : list of strs
                 For a floating-point parse operations holds the list of strings
                 that should be treated as NaN.
+            max_field_length : int, optional
+                The maximum number of characters that will be read in each field
+                in the CSV file. The behaviour when a field longer than this is
+                read is configured using max_field_length_handling. If this is not
+                set then no field length limit is enforced.
+            max_field_length_handling : MaxFieldLengthHandling, optional
+                See ``MaxFieldLengthHandling``.
+            max_line_length : int, optional
+                The maximum size of a line in bytes that will be read. If a line
+                exceeds this threshold an error will be returned. If no limit
+                is set then it will read up until it encounters a memory limit.
             number_base : int
                 For a number parse operation specified the base of the number
                 in its string representation.

@@ -18,12 +18,15 @@
 #include <cassert>
 #include <cstddef>
 
+#include <fmt/format.h>
+
 #include "mlio/config.h"
 #include "mlio/csv_reader.h"
 #include "mlio/memory/memory_slice.h"
 #include "mlio/record_readers/corrupt_record_error.h"
 #include "mlio/record_readers/detail/text_line.h"
 #include "mlio/record_readers/record.h"
+#include "mlio/record_readers/record_too_large_error.h"
 #include "mlio/span.h"
 #include "mlio/util/cast.h"
 
@@ -37,7 +40,9 @@ csv_record_reader::decode_text_record(memory_slice &chunk,
 {
     while (!chunk.empty()) {
         if (is_comment_line(chunk)) {
-            if (detail::read_line(chunk, ignore_leftover) == std::nullopt) {
+            if (detail::read_line(chunk,
+                                  ignore_leftover,
+                                  params_->max_line_length) == std::nullopt) {
                 break;
             }
         }
@@ -47,7 +52,8 @@ csv_record_reader::decode_text_record(memory_slice &chunk,
                 rec = read_line(chunk, ignore_leftover);
             }
             else {
-                rec = detail::read_line(chunk, ignore_leftover);
+                rec = detail::read_line(
+                    chunk, ignore_leftover, params_->max_line_length);
             }
 
             if (rec == std::nullopt) {
@@ -92,6 +98,18 @@ csv_record_reader::read_line(memory_slice &chunk, bool ignore_leftover)
 
     for (auto pos = chrs.begin(); pos != chrs.end(); ++pos) {
         auto chr = *pos;
+
+        // Check that we are within the size limit for a row.
+        auto bytes_read = sizeof(char) * as_size(pos - chrs.begin());
+        if (params_->max_line_length &&
+            bytes_read > *params_->max_line_length) {
+            throw record_too_large_error{fmt::format(
+                "Line exceeds the maximum line length of {1:n}. "
+                "Line begins: '{0}'",
+                std::string(chrs.data(),
+                            std::max(bytes_read, MAX_DATA_IN_EXCEPTION)),
+                *params_->max_line_length)};
+        }
 
         switch (state) {
         case parser_state::new_line:

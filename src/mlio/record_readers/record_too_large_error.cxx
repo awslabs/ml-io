@@ -13,23 +13,12 @@
  * language governing permissions and limitations under the License.
  */
 
-#pragma once
-
-#include <optional>
-
-#include "mlio/fwd.h"
+#include "mlio/record_readers/record_too_large_error.h"
 
 namespace mlio {
 inline namespace v1 {
-namespace detail {
 
-static const std::size_t MAX_DATA_IN_EXCEPTION = 1024;
+record_too_large_error::~record_too_large_error() = default;
 
-std::optional<record>
-read_line(memory_slice &chunk,
-          bool ignore_leftover,
-          std::optional<size_t> max_line_length);
-
-}  // namespace detail
 }  // namespace v1
 }  // namespace mlio

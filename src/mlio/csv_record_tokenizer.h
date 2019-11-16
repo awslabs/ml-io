@@ -15,6 +15,7 @@
 
 #pragma once
 
+#include <optional>
 #include <string>
 
 #include "mlio/span.h"
@@ -35,8 +36,13 @@ private:
     };
 
 public:
-    explicit csv_record_tokenizer(memory_span blob, char delimiter) noexcept
-        : text_{as_span<char const>(blob)}, delimiter_{delimiter}
+    explicit csv_record_tokenizer(
+        memory_span blob,
+        char delimiter,
+        std::optional<size_t> max_field_length) noexcept
+        : text_{as_span<char const>(blob)}
+        , delimiter_{delimiter}
+        , max_field_length_{std::move(max_field_length)}
     {}
 
 public:
@@ -55,6 +61,19 @@ public:
         return eof_;
     }
 
+    bool
+    is_truncated() const noexcept
+    {
+        return is_truncated_;
+    }
+
+private:
+    inline void
+    reset();
+
+    inline void
+    push_char(char chr);
+
 private:
     stdx::span<char const> text_;
     stdx::span<char const>::iterator pos_ = text_.begin();
@@ -62,6 +81,8 @@ private:
     char delimiter_;
     parser_state state_ = parser_state::new_field;
     bool eof_{};
+    bool is_truncated_{};
+    std::optional<size_t> max_field_length_;
 };
 
 }  // namespace detail

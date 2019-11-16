@@ -33,6 +33,7 @@ add_library(mlio
     record_readers/recordio_record_reader.cxx
     record_readers/record_reader_base.cxx
     record_readers/record_reader.cxx
+    record_readers/record_too_large_error.cxx
     record_readers/stream_record_reader.cxx
     record_readers/text_line_record_reader.cxx
     record_readers/text_record_reader.cxx

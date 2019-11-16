@@ -56,6 +56,7 @@
 #include "mlio/record_readers/record.h"                // IWYU pragma: export
 #include "mlio/record_readers/record_reader.h"         // IWYU pragma: export
 #include "mlio/record_readers/record_reader_base.h"    // IWYU pragma: export
+#include "mlio/record_readers/record_too_large_error.h"  // IWYU pragma: export
 #include "mlio/record_readers/stream_record_reader.h"  // IWYU pragma: export
 #include "mlio/record_readers/text_record_reader.h"    // IWYU pragma: export
 #include "mlio/recordio_protobuf_reader.h"             // IWYU pragma: export

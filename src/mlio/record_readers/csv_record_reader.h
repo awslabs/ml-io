@@ -43,6 +43,8 @@ public:
         : text_record_reader{std::move(strm)}, params_{&prm}
     {}
 
+    static const std::size_t MAX_DATA_IN_EXCEPTION = 1024;
+
 private:
     std::optional<record>
     decode_text_record(memory_slice &chunk, bool ignore_leftover) final;

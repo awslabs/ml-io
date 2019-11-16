@@ -27,7 +27,7 @@ namespace detail {
 bool
 csv_record_tokenizer::next()
 {
-    value_.clear();
+    reset();
 
     if (state_ == parser_state::finished) {
         eof_ = true;
@@ -51,7 +51,7 @@ csv_record_tokenizer::next()
                 state_ = parser_state::in_quoted_field;
             }
             else {
-                value_.push_back(chr);
+                push_char(chr);
                 state_ = parser_state::in_field;
             }
             break;
@@ -61,7 +61,7 @@ csv_record_tokenizer::next()
                 state_ = parser_state::end_field;
             }
             else {
-                value_.push_back(chr);
+                push_char(chr);
             }
             break;
 
@@ -70,7 +70,7 @@ csv_record_tokenizer::next()
                 state_ = parser_state::quote_in_quoted_field;
             }
             else {
-                value_.push_back(chr);
+                push_char(chr);
             }
             break;
 
@@ -79,11 +79,11 @@ csv_record_tokenizer::next()
                 state_ = parser_state::end_field;
             }
             else if (chr == '"') {
-                value_.push_back(chr);
+                push_char(chr);
                 state_ = parser_state::in_quoted_field;
             }
             else {
-                value_.push_back(chr);
+                push_char(chr);
                 state_ = parser_state::in_field;
             }
             break;
@@ -115,6 +115,29 @@ csv_record_tokenizer::next()
     }
 
     return true;
+}
+
+inline void
+csv_record_tokenizer::reset()
+{
+    value_.clear();
+    is_truncated_ = false;
+}
+
+inline void
+csv_record_tokenizer::push_char(char chr)
+{
+    if (max_field_length_) {
+        if (value_.length() < *max_field_length_) {
+            value_.push_back(chr);
+        }
+        else {
+            is_truncated_ = true;
+        }
+    }
+    else {
+        value_.push_back(chr);
+    }
 }
 
 }  // namespace detail

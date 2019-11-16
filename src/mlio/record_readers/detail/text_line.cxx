@@ -18,9 +18,12 @@
 #include <cstddef>
 #include <utility>
 
+#include <fmt/format.h>
+
 #include "mlio/memory/memory_slice.h"
 #include "mlio/record_readers/corrupt_record_error.h"
 #include "mlio/record_readers/record.h"
+#include "mlio/record_readers/record_too_large_error.h"
 #include "mlio/span.h"
 #include "mlio/util/cast.h"
 
@@ -29,7 +32,9 @@ inline namespace v1 {
 namespace detail {
 
 std::optional<record>
-read_line(memory_slice &chunk, bool ignore_leftover)
+read_line(memory_slice &chunk,
+          bool ignore_leftover,
+          std::optional<size_t> max_line_length)
 {
     // Assumes chunk is not empty.
     auto chrs = as_span<char const>(chunk);
@@ -68,6 +73,16 @@ read_line(memory_slice &chunk, bool ignore_leftover)
     }
 
     auto offset = sizeof(char) * as_size(pos - chrs.begin());
+
+    if (max_line_length && offset > *max_line_length) {
+        throw record_too_large_error{fmt::format(
+            "Line exceeds maximum line length: {0:n} > {1:n}. "
+            "Line begins: '{2}'.",
+            offset,
+            *max_line_length,
+            std::string_view(chrs.data(),
+                             std::max(offset, MAX_DATA_IN_EXCEPTION)))};
+    }
 
     memory_slice payload;
     if (has_carriage) {

@@ -30,8 +30,11 @@ namespace detail {
 class text_line_record_reader final : public text_record_reader {
 public:
     explicit text_line_record_reader(intrusive_ptr<input_stream> strm,
-                                     bool skip_blank)
-        : text_record_reader{std::move(strm)}, skip_blank_{skip_blank}
+                                     bool skip_blank,
+                                     std::optional<size_t> max_line_length)
+        : text_record_reader{std::move(strm)}
+        , skip_blank_{skip_blank}
+        , max_line_length_{std::move(max_line_length)}
     {}
 
 private:
@@ -40,6 +43,7 @@ private:
 
 private:
     bool skip_blank_;
+    std::optional<size_t> max_line_length_;
 };
 
 }  // namespace detail

@@ -37,7 +37,8 @@ text_line_record_reader::decode_text_record(memory_slice &chunk,
 
     if (skip_blank_) {
         while (!chunk.empty()) {
-            std::optional<record> rec = read_line(chunk, ignore_leftover);
+            std::optional<record> rec =
+                read_line(chunk, ignore_leftover, max_line_length_);
             if (rec == std::nullopt || !rec->payload().empty()) {
                 return rec;
             }
@@ -46,7 +47,7 @@ text_line_record_reader::decode_text_record(memory_slice &chunk,
         return {};
     }
 
-    return detail::read_line(chunk, ignore_leftover);
+    return detail::read_line(chunk, ignore_leftover, max_line_length_);
 }
 
 }  // namespace detail

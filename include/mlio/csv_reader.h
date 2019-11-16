@@ -37,6 +37,13 @@ inline namespace v1 {
 /// @addtogroup data_readers Data Readers
 /// @{
 
+/// Specifies how field limits should be enforced.
+enum class max_field_length_handling {
+    error,     ///< Throw an exception.
+    truncate,  ///< Truncate the field.
+    warn       ///< Truncate and log a warning message.
+};
+
 /// Holds the parameters for @ref csv_reader.
 struct MLIO_API csv_params final {
     /// The index of the row that should be treated as the header of the
@@ -91,6 +98,18 @@ struct MLIO_API csv_params final {
     /// be inferred from the preamble of the text; otherwise falls back
     /// to UTF-8.
     std::optional<text_encoding> encoding{};
+    /// The maximum number of characters that will be read in a field
+    /// if set. Any characters beyond this limit will be handled using
+    /// the strategy in max_field_length_hnd.
+    std::optional<size_t> max_field_length{};
+    /// How fields with more than max_field_length will be handled.
+    /// See @ref max_field_length_handling.
+    max_field_length_handling max_field_length_hnd =
+        max_field_length_handling::error;
+    /// The maximum size of a row to read in bytes before failing
+    /// gracefully. Enables robust error handling and prevention of
+    /// out-of-memory errors.
+    std::optional<size_t> max_line_length{};
     /// Additional parameters relevant for field parsing.
     parser_params parser_prm{};
 };
@@ -159,6 +178,25 @@ private:
     std::vector<parser> column_parsers_{};
     intrusive_ptr<schema> schema_{};
     bool should_read_header = true;
+};
+
+class MLIO_API field_too_large_error : public std::runtime_error {
+public:
+    using std::runtime_error::runtime_error;
+
+public:
+    field_too_large_error(field_too_large_error const &) = default;
+
+    field_too_large_error(field_too_large_error &&) = default;
+
+    ~field_too_large_error() override;
+
+public:
+    field_too_large_error &
+    operator=(field_too_large_error const &) = default;
+
+    field_too_large_error &
+    operator=(field_too_large_error &&) = default;
 };
 
 /// @}

@@ -33,6 +33,7 @@ from mlio.core import\
     DeviceKind,\
     Example,\
     FeatureDesc,\
+    FieldTooLargeError,\
     File,\
     InflateError,\
     InMemoryStore,\
@@ -41,6 +42,7 @@ from mlio.core import\
     LastBatchHandling,\
     list_files,\
     LogLevel,\
+    MaxFieldLengthHandling,\
     MemorySlice,\
     NotSupportedError,\
     ParquetRecordReader,\
@@ -48,6 +50,7 @@ from mlio.core import\
     RecordIOProtobufReader,\
     RecordKind,\
     RecordReader,\
+    RecordTooLargeError,\
     SageMakerPipe,\
     Schema,\
     SchemaError,\
@@ -72,6 +75,7 @@ __all__ = [
     'DeviceKind',
     'Example',
     'FeatureDesc',
+    'FieldTooLargeError',
     'File',
     'InflateError',
     'InMemoryStore',
@@ -80,6 +84,7 @@ __all__ = [
     'LastBatchHandling',
     'list_files',
     'LogLevel',
+    'MaxFieldLengthHandling',
     'MemorySlice',
     'NotSupportedError',
     'ParquetRecordReader',
@@ -87,6 +92,7 @@ __all__ = [
     'RecordIOProtobufReader',
     'RecordKind',
     'RecordReader',
+    'RecordTooLargeError',
     'SageMakerPipe',
     'Schema',
     'SchemaError',
