@@ -1,0 +1,41 @@
+# ------------------------------------------------------------
+# Target: hyperloglog
+# ------------------------------------------------------------
+
+add_library(hyperloglog OBJECT
+    hll/hyperloglog.cxx
+    hll/xxhash.c
+)
+
+set_target_properties(hyperloglog PROPERTIES
+    CXX_CLANG_TIDY
+        ""
+    CXX_INCLUDE_WHAT_YOU_USE
+        ""
+)
+
+target_compile_options(hyperloglog
+    PRIVATE
+        -w
+)
+
+# ------------------------------------------------------------
+# Target: mlio-py-contrib
+# ------------------------------------------------------------
+
+add_python_extension(mlio-contrib-insights insights
+    $<TARGET_OBJECTS:hyperloglog>
+    column_analyzer.cxx
+    utils.cxx
+    module.cxx
+)
+
+target_link_libraries(mlio-contrib-insights
+    PRIVATE
+        hyperloglog mlio::mlio
+)
+
+target_include_directories(mlio-contrib-insights SYSTEM
+    PRIVATE
+        hll
+)
