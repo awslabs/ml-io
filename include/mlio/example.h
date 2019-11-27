@@ -87,7 +87,8 @@ private:
     std::vector<intrusive_ptr<tensor>> features_;
 };
 
-MLIO_API inline std::ostream &
+MLIO_API
+inline std::ostream &
 operator<<(std::ostream &strm, example const &exm)
 {
     return strm << exm.repr();

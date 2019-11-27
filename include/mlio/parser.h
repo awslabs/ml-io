@@ -57,7 +57,8 @@ using parser = std::function<parse_result(
 ///
 /// @param dt
 ///     The data type for which to construct a parser.
-MLIO_API parser
+MLIO_API
+parser
 make_parser(data_type dt, parser_params const &prm);
 
 }  // namespace v1

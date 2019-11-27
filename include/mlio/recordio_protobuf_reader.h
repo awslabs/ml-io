@@ -60,34 +60,41 @@ public:
     operator=(recordio_protobuf_reader &&) = delete;
 
 private:
-    MLIO_HIDDEN intrusive_ptr<record_reader>
+    MLIO_HIDDEN
+    intrusive_ptr<record_reader>
     make_record_reader(data_store const &ds) final;
 
-    MLIO_HIDDEN void
+    MLIO_HIDDEN
+    void
     infer_schema(instance const &ins) final;
 
-    MLIO_HIDDEN feature_desc
+    MLIO_HIDDEN
+    feature_desc
     make_feature_desc(instance const &ins,
                       std::string const &name,
                       aialgs::data::Value const &value);
 
     template<data_type dt, typename ProtobufTensor>
-    MLIO_HIDDEN feature_desc
+    MLIO_HIDDEN
+    feature_desc
     make_feature_desc(instance const &ins,
                       std::string const &name,
                       ProtobufTensor const &tsr);
 
     template<typename ProtobufTensor>
-    MLIO_HIDDEN void
+    MLIO_HIDDEN
+    void
     copy_shape(instance const &ins,
                std::string const &name,
                size_vector &shp,
                ProtobufTensor const &tsr);
 
-    MLIO_HIDDEN intrusive_ptr<example>
+    MLIO_HIDDEN
+    intrusive_ptr<example>
     decode(instance_batch const &batch) const final;
 
-    MLIO_HIDDEN static aialgs::data::Record const *
+    MLIO_HIDDEN
+    static aialgs::data::Record const *
     parse_proto(instance const &ins);
 
 private:

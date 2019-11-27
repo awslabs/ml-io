@@ -530,10 +530,11 @@ typedef struct XXH3_state_s XXH3_state_t;
 struct XXH3_state_s {
     XXH_ALIGN(64) XXH64_hash_t acc[8];
     XXH_ALIGN(64)
-    unsigned char customSecret
-        [XXH3_SECRET_DEFAULT_SIZE]; /* used to store a custom secret generated
-                                       from the seed. Makes state larger.
-                                       Design might change */
+    unsigned char
+        customSecret[XXH3_SECRET_DEFAULT_SIZE]; /* used to store a custom
+                                                   secret generated from the
+                                                   seed. Makes state larger.
+                                                   Design might change */
     XXH_ALIGN(64) unsigned char buffer[XXH3_INTERNALBUFFER_SIZE];
     XXH32_hash_t bufferedSize;
     XXH32_hash_t nbStripesPerBlock;

@@ -46,20 +46,25 @@ public:
     {}
 
 private:
-    MLIO_HIDDEN std::optional<record>
+    MLIO_HIDDEN
+    std::optional<record>
     decode_record(memory_slice &chunk, bool ignore_leftover) final;
 
-    MLIO_HIDDEN static bool
+    MLIO_HIDDEN
+    static bool
     is_magic_number(memory_block::iterator pos) noexcept;
 
-    MLIO_HIDDEN static bool
+    MLIO_HIDDEN
+    static bool
     is_footer(memory_slice const &chunk, memory_block::iterator pos) noexcept;
 
-    MLIO_HIDDEN static bool
+    MLIO_HIDDEN
+    static bool
     is_file_metadata_begin(memory_block::iterator pos) noexcept;
 
     template<typename T>
-    MLIO_HIDDEN static T
+    MLIO_HIDDEN
+    static T
     as(memory_block::iterator pos) noexcept;
 };
 

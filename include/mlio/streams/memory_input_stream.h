@@ -51,10 +51,12 @@ public:
     close() noexcept final;
 
 private:
-    MLIO_HIDDEN void
+    MLIO_HIDDEN
+    void
     advance_position(std::size_t dist) noexcept;
 
-    MLIO_HIDDEN void
+    MLIO_HIDDEN
+    void
     check_if_closed() const;
 
 public:

@@ -54,13 +54,15 @@ private:
     std::string name_;
 };
 
-MLIO_API inline bool
+MLIO_API
+inline bool
 operator==(text_encoding const &lhs, text_encoding const &rhs) noexcept
 {
     return lhs.name() == rhs.name();
 }
 
-MLIO_API inline bool
+MLIO_API
+inline bool
 operator!=(text_encoding const &lhs, text_encoding const &rhs) noexcept
 {
     return lhs.name() != rhs.name();

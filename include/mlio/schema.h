@@ -94,16 +94,19 @@ private:
     bool sparse_{};
 };
 
-MLIO_API bool
+MLIO_API
+bool
 operator==(feature_desc const &lhs, feature_desc const &rhs) noexcept;
 
-MLIO_API inline bool
+MLIO_API
+inline bool
 operator!=(feature_desc const &lhs, feature_desc const &rhs) noexcept
 {
     return !(lhs == rhs);
 }
 
-MLIO_API inline std::ostream &
+MLIO_API
+inline std::ostream &
 operator<<(std::ostream &strm, feature_desc const &desc)
 {
     return strm << desc.repr();
@@ -174,16 +177,19 @@ private:
     std::unordered_map<std::string, std::size_t> name_index_map_;
 };
 
-MLIO_API bool
+MLIO_API
+bool
 operator==(schema const &lhs, schema const &rhs) noexcept;
 
-MLIO_API inline bool
+MLIO_API
+inline bool
 operator!=(schema const &lhs, schema const &rhs) noexcept
 {
     return !(lhs == rhs);
 }
 
-MLIO_API inline std::ostream &
+MLIO_API
+inline std::ostream &
 operator<<(std::ostream &strm, schema const &shm)
 {
     return strm << shm.repr();

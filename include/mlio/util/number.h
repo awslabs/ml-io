@@ -32,11 +32,13 @@ struct MLIO_API float_parse_params {
 };
 
 template<typename T>
-MLIO_API parse_result
+MLIO_API
+parse_result
 try_parse_float(float_parse_params const &prm, T &result);
 
 template<typename T>
-MLIO_API inline parse_result
+MLIO_API
+inline parse_result
 try_parse_float(std::string_view s, T &result)
 {
     return try_parse_float(float_parse_params{s}, result);
@@ -54,7 +56,8 @@ struct MLIO_API int_parse_params {
 };
 
 template<typename T>
-MLIO_API parse_result
+MLIO_API
+parse_result
 try_parse_int(int_parse_params const &prm, T &result) noexcept;
 
 // clang-format off
@@ -86,7 +89,8 @@ try_parse_int<std::uint64_t>(int_parse_params const &prm, std::uint64_t &result)
 // clang-format on
 
 template<typename T>
-MLIO_API inline parse_result
+MLIO_API
+inline parse_result
 try_parse_int(std::string_view s, T &result) noexcept
 {
     return try_parse_int(int_parse_params{s}, result);

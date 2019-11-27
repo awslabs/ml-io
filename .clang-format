@@ -86,6 +86,6 @@ SpacesInContainerLiterals: false
 SpacesInParentheses: false
 SpacesInSquareBrackets: false
 Standard: Auto
-StatementMacros: [PYBIND11_OVERLOAD, PYBIND11_OVERLOAD_PURE]
+StatementMacros: [MLIO_API, MLIO_HIDDEN, PYBIND11_OVERLOAD, PYBIND11_OVERLOAD_PURE]
 TabWidth: 4
 UseTab: Never

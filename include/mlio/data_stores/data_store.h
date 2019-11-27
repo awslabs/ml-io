@@ -62,19 +62,22 @@ public:
     id() const noexcept = 0;
 };
 
-MLIO_API inline bool
+MLIO_API
+inline bool
 operator==(data_store const &lhs, data_store const &rhs) noexcept
 {
     return lhs.id() == rhs.id();
 }
 
-MLIO_API inline bool
+MLIO_API
+inline bool
 operator!=(data_store const &lhs, data_store const &rhs) noexcept
 {
     return lhs.id() != rhs.id();
 }
 
-MLIO_API inline std::ostream &
+MLIO_API
+inline std::ostream &
 operator<<(std::ostream &strm, data_store const &ds)
 {
     return strm << ds.repr();

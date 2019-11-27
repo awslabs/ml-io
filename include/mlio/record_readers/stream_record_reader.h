@@ -52,7 +52,8 @@ public:
     operator=(stream_record_reader &&) = delete;
 
 private:
-    MLIO_HIDDEN std::optional<record>
+    MLIO_HIDDEN
+    std::optional<record>
     read_record_core() final;
 
     /// When implemented in a derived class, tries to decode a record

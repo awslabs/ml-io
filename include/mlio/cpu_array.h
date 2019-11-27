@@ -121,7 +121,8 @@ namespace detail {
 
 struct cpu_array_access {
     template<typename Container>
-    MLIO_API static inline auto
+    MLIO_API
+    static inline auto
     wrap(data_type dt, Container &&cont)
     {
         auto *ptr =
@@ -139,7 +140,8 @@ struct cpu_array_access {
 /// @param cont
 ///     An object that conforms with the STL sequence container API.
 template<data_type dt, typename Container>
-MLIO_API inline std::unique_ptr<device_array>
+MLIO_API
+inline std::unique_ptr<device_array>
 wrap_cpu_array(Container &&cont)
 {
     using T = typename Container::value_type;
@@ -156,7 +158,8 @@ wrap_cpu_array(Container &&cont)
 
 /// Allocates a new @ref cpu_array with the specified data type and
 /// size.
-MLIO_API std::unique_ptr<device_array>
+MLIO_API
+std::unique_ptr<device_array>
 make_cpu_array(data_type dt, std::size_t size);
 
 /// @}

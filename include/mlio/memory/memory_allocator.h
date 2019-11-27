@@ -51,11 +51,13 @@ public:
 };
 
 /// Gets the default memory allocator.
-MLIO_API memory_allocator &
+MLIO_API
+memory_allocator &
 get_memory_allocator() noexcept;
 
 /// Sets the default memory allocator.
-MLIO_API void
+MLIO_API
+void
 set_memory_allocator(std::unique_ptr<memory_allocator> &&alloc) noexcept;
 
 /// @}

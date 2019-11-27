@@ -24,7 +24,8 @@ inline namespace v1 {
 namespace detail {
 
 template<typename T>
-MLIO_API inline void
+MLIO_API
+inline void
 hash_combine(std::size_t &seed, T const &v)
 {
     // Taken from the Boost hash_combine function.
@@ -32,7 +33,8 @@ hash_combine(std::size_t &seed, T const &v)
 }
 
 template<typename Cont>
-MLIO_API inline void
+MLIO_API
+inline void
 hash_range(std::size_t &seed, Cont const &cont)
 {
     for (auto const &e : cont) {
@@ -41,7 +43,8 @@ hash_range(std::size_t &seed, Cont const &cont)
 }
 
 template<typename Cont>
-MLIO_API inline std::size_t
+MLIO_API
+inline std::size_t
 hash_range(Cont const &cont)
 {
     std::size_t seed = 0;

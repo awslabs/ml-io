@@ -216,7 +216,8 @@ private:
 };
 
 template<typename T>
-MLIO_API inline stdx::span<T>
+MLIO_API
+inline stdx::span<T>
 as_span(memory_slice const &ms) noexcept
 {
     return as_span<T>(memory_span{ms});

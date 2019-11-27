@@ -93,13 +93,15 @@ private:
     int fd_ = invalid_fd_;
 };
 
-MLIO_API inline bool
+MLIO_API
+inline bool
 operator==(file_descriptor const &lhs, file_descriptor const &rhs) noexcept
 {
     return lhs.get() == rhs.get();
 }
 
-MLIO_API inline bool
+MLIO_API
+inline bool
 operator!=(file_descriptor const &lhs, file_descriptor const &rhs) noexcept
 {
     return lhs.get() != rhs.get();

@@ -23,7 +23,8 @@ inline namespace v1 {
 /// Initializes the internal data structures needed for the proper
 /// operation of the library. This function should be called before
 /// using any type or function.
-MLIO_API void
+MLIO_API
+void
 initialize();
 
 }  // namespace v1

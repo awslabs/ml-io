@@ -81,14 +81,16 @@ public:
 ///     array; otherwise any operation on the returned span will likely
 ///     cause memory corruption.
 template<typename T>
-MLIO_API stdx::span<T>
+MLIO_API
+stdx::span<T>
 as_span(device_array &arr) noexcept
 {
     return {static_cast<T *>(arr.data()), arr.size()};
 }
 
 template<typename T>
-MLIO_API stdx::span<T const>
+MLIO_API
+stdx::span<T const>
 as_span(device_array const &arr) noexcept
 {
     return {static_cast<T const *>(arr.data()), arr.size()};

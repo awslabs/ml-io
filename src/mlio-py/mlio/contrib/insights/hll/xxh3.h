@@ -1109,8 +1109,7 @@ XXH3_hashLong_internal(const xxh_u8 *XXH_RESTRICT input,
 XXH_NO_INLINE XXH64_hash_t /* It's important for performance that XXH3_hashLong
                               is not inlined. Not sure why (uop cache maybe ?),
                               but difference is large and easily measurable */
-                           XXH3_hashLong_64b_defaultSecret(
-                               const xxh_u8 *XXH_RESTRICT input, size_t len)
+XXH3_hashLong_64b_defaultSecret(const xxh_u8 *XXH_RESTRICT input, size_t len)
 {
     return XXH3_hashLong_internal(input, len, kSecret, sizeof(kSecret));
 }
@@ -1118,11 +1117,10 @@ XXH_NO_INLINE XXH64_hash_t /* It's important for performance that XXH3_hashLong
 XXH_NO_INLINE XXH64_hash_t /* It's important for performance that XXH3_hashLong
                               is not inlined. Not sure why (uop cache maybe ?),
                               but difference is large and easily measurable */
-                           XXH3_hashLong_64b_withSecret(
-                               const xxh_u8 *XXH_RESTRICT input,
-                               size_t len,
-                               const xxh_u8 *XXH_RESTRICT secret,
-                               size_t secretSize)
+XXH3_hashLong_64b_withSecret(const xxh_u8 *XXH_RESTRICT input,
+                             size_t len,
+                             const xxh_u8 *XXH_RESTRICT secret,
+                             size_t secretSize)
 {
     return XXH3_hashLong_internal(input, len, secret, secretSize);
 }
@@ -1164,9 +1162,7 @@ XXH3_initCustomSecret(xxh_u8 *customSecret, xxh_u64 seed64)
 XXH_NO_INLINE XXH64_hash_t /* It's important for performance that XXH3_hashLong
                               is not inlined. Not sure why (uop cache maybe ?),
                               but difference is large and easily measurable */
-                           XXH3_hashLong_64b_withSeed(const xxh_u8 *input,
-                                                      size_t len,
-                                                      XXH64_hash_t seed)
+XXH3_hashLong_64b_withSeed(const xxh_u8 *input, size_t len, XXH64_hash_t seed)
 {
     XXH_ALIGN(8) xxh_u8 secret[XXH_SECRET_DEFAULT_SIZE];
     if (seed == 0)
@@ -1731,34 +1727,31 @@ XXH3_hashLong_128b_internal(const xxh_u8 *XXH_RESTRICT input,
 }
 
 XXH_NO_INLINE
-    XXH128_hash_t /* It's important for performance that XXH3_hashLong is not
-                     inlined. Not sure why (uop cache maybe ?), but difference
-                     is large and easily measurable */
-                  XXH3_hashLong_128b_defaultSecret(const xxh_u8 *input,
-                                                   size_t len)
+XXH128_hash_t /* It's important for performance that XXH3_hashLong is not
+                 inlined. Not sure why (uop cache maybe ?), but difference
+                 is large and easily measurable */
+XXH3_hashLong_128b_defaultSecret(const xxh_u8 *input, size_t len)
 {
     return XXH3_hashLong_128b_internal(input, len, kSecret, sizeof(kSecret));
 }
 
 XXH_NO_INLINE
-    XXH128_hash_t /* It's important for performance that XXH3_hashLong is not
-                     inlined. Not sure why (uop cache maybe ?), but difference
-                     is large and easily measurable */
-                  XXH3_hashLong_128b_withSecret(const xxh_u8 *input,
-                                                size_t len,
-                                                const xxh_u8 *secret,
-                                                size_t secretSize)
+XXH128_hash_t /* It's important for performance that XXH3_hashLong is not
+                 inlined. Not sure why (uop cache maybe ?), but difference
+                 is large and easily measurable */
+XXH3_hashLong_128b_withSecret(const xxh_u8 *input,
+                              size_t len,
+                              const xxh_u8 *secret,
+                              size_t secretSize)
 {
     return XXH3_hashLong_128b_internal(input, len, secret, secretSize);
 }
 
 XXH_NO_INLINE
-    XXH128_hash_t /* It's important for performance that XXH3_hashLong is not
-                     inlined. Not sure why (uop cache maybe ?), but difference
-                     is large and easily measurable */
-                  XXH3_hashLong_128b_withSeed(const xxh_u8 *input,
-                                              size_t len,
-                                              XXH64_hash_t seed)
+XXH128_hash_t /* It's important for performance that XXH3_hashLong is not
+                 inlined. Not sure why (uop cache maybe ?), but difference
+                 is large and easily measurable */
+XXH3_hashLong_128b_withSeed(const xxh_u8 *input, size_t len, XXH64_hash_t seed)
 {
     XXH_ALIGN(8) xxh_u8 secret[XXH_SECRET_DEFAULT_SIZE];
     if (seed == 0)

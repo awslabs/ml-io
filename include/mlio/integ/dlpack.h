@@ -27,10 +27,12 @@ namespace mlio {
 inline namespace v1 {
 
 /// Wraps the specified @ref tensor as a DLManagedTensor.
-MLIO_API ::DLManagedTensor *
+MLIO_API
+::DLManagedTensor *
 as_dlpack(tensor &tsr, std::size_t version);
 
-MLIO_API intrusive_ptr<tensor>
+MLIO_API
+intrusive_ptr<tensor>
 as_tensor(::DLManagedTensor *mt, std::size_t version);
 
 }  // namespace v1

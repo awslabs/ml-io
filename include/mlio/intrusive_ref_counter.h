@@ -58,13 +58,15 @@ public:
     }
 
 public:
-    MLIO_API friend inline void
+    MLIO_API
+    friend inline void
     intrusive_ptr_inc_ref(intrusive_ref_counter const *ptr) noexcept
     {
         ptr->ref_count_.fetch_add(1, std::memory_order_acq_rel);
     }
 
-    MLIO_API friend inline void
+    MLIO_API
+    friend inline void
     intrusive_ptr_dec_ref(intrusive_ref_counter const *ptr) noexcept
     {
         if (ptr->ref_count_.fetch_sub(1, std::memory_order_acq_rel) == 1) {

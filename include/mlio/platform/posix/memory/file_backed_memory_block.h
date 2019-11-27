@@ -53,13 +53,16 @@ public:
     resize(size_type size) final;
 
 private:
-    MLIO_HIDDEN void
+    MLIO_HIDDEN
+    void
     make_temporary_file();
 
-    MLIO_HIDDEN std::byte *
+    MLIO_HIDDEN
+    std::byte *
     init_memory_map(std::size_t size);
 
-    MLIO_HIDDEN static void
+    MLIO_HIDDEN
+    static void
     validate_mapped_address(void *addr);
 
 public:

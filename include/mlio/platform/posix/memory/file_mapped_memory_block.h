@@ -48,7 +48,8 @@ public:
     operator=(file_mapped_memory_block &&) = delete;
 
 private:
-    MLIO_HIDDEN void
+    MLIO_HIDDEN
+    void
     init_memory_map();
 
 public:

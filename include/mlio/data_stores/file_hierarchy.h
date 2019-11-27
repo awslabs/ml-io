@@ -49,10 +49,12 @@ struct MLIO_API list_files_params {
 };
 
 /// Recursively list all files residing under the specified pathnames.
-MLIO_API std::vector<intrusive_ptr<data_store>>
+MLIO_API
+std::vector<intrusive_ptr<data_store>>
 list_files(list_files_params const &prm);
 
-MLIO_API std::vector<intrusive_ptr<data_store>>
+MLIO_API
+std::vector<intrusive_ptr<data_store>>
 list_files(std::string const &pathname, std::string const &pattern = {});
 
 /// @}

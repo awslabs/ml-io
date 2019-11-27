@@ -64,19 +64,24 @@ private:
     virtual intrusive_ptr<record_reader>
     make_record_reader(data_store const &ds) = 0;
 
-    MLIO_HIDDEN intrusive_ptr<example>
+    MLIO_HIDDEN
+    intrusive_ptr<example>
     read_example_core() final;
 
-    MLIO_HIDDEN void
+    MLIO_HIDDEN
+    void
     ensure_pipeline_running();
 
-    MLIO_HIDDEN void
+    MLIO_HIDDEN
+    void
     run_pipeline();
 
-    MLIO_HIDDEN void
+    MLIO_HIDDEN
+    void
     init_graph();
 
-    MLIO_HIDDEN void
+    MLIO_HIDDEN
+    void
     ensure_schema_inferred();
 
     /// When implemented in a derived class, infers the schema of the

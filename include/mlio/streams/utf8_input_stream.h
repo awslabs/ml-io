@@ -71,19 +71,24 @@ public:
     close() noexcept final;
 
 private:
-    MLIO_HIDDEN std::size_t
+    MLIO_HIDDEN
+    std::size_t
     convert(mutable_memory_span dest);
 
-    MLIO_HIDDEN void
+    MLIO_HIDDEN
+    void
     fill_buffer();
 
-    MLIO_HIDDEN std::size_t
+    MLIO_HIDDEN
+    std::size_t
     copy_from_remainder(mutable_memory_span dest) noexcept;
 
-    MLIO_HIDDEN void
+    MLIO_HIDDEN
+    void
     set_preamble(memory_span value) noexcept;
 
-    MLIO_HIDDEN void
+    MLIO_HIDDEN
+    void
     check_if_closed() const;
 
 public:
@@ -106,7 +111,8 @@ private:
 /// input_stream. If no encoding is specified, the encoding is inferred
 /// from the preamble of the underlying stream. If no preamble is found,
 /// falls back to UTF-8.
-MLIO_API intrusive_ptr<input_stream>
+MLIO_API
+intrusive_ptr<input_stream>
 make_utf8_stream(intrusive_ptr<input_stream> strm,
                  std::optional<text_encoding> enc);
 

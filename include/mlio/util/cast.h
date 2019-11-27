@@ -29,27 +29,31 @@ struct is_same_signedness
 
 }  // namespace detail
 
-MLIO_API inline constexpr std::size_t
+MLIO_API
+inline constexpr std::size_t
 as_size(std::ptrdiff_t d) noexcept
 {
     return static_cast<std::size_t>(d);
 }
 
-MLIO_API inline constexpr std::ptrdiff_t
+MLIO_API
+inline constexpr std::ptrdiff_t
 as_ssize(std::size_t s) noexcept
 {
     return static_cast<std::ptrdiff_t>(s);
 }
 
 template<typename T, typename U>
-MLIO_API inline constexpr T
+MLIO_API
+inline constexpr T
 narrow_cast(U &&u) noexcept
 {
     return static_cast<T>(std::forward<U>(u));
 }
 
 template<typename T, typename U>
-MLIO_API inline constexpr bool
+MLIO_API
+inline constexpr bool
 try_narrow(U u, T &t) noexcept
 {
     t = narrow_cast<T>(u);

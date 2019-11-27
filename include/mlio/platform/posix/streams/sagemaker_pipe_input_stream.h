@@ -69,16 +69,20 @@ public:
     close() noexcept final;
 
 private:
-    MLIO_HIDDEN void
+    MLIO_HIDDEN
+    void
     open_fifo();
 
-    MLIO_HIDDEN static void
+    MLIO_HIDDEN
+    static void
     sleep() noexcept;
 
-    MLIO_HIDDEN void
+    MLIO_HIDDEN
+    void
     wait_for_data();
 
-    MLIO_HIDDEN void
+    MLIO_HIDDEN
+    void
     check_if_closed() const;
 
 public:
@@ -94,7 +98,8 @@ private:
     detail::file_descriptor fifo_fd_{};
 };
 
-MLIO_API intrusive_ptr<sagemaker_pipe_input_stream>
+MLIO_API
+intrusive_ptr<sagemaker_pipe_input_stream>
 make_sagemaker_pipe_input_stream(std::string pathname,
                                  std::optional<std::size_t> fifo_id = {});
 

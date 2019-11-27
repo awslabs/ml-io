@@ -7,10 +7,12 @@
 namespace mlio {
 inline namespace v1 {
 
-MLIO_API std::string_view
+MLIO_API
+std::string_view
 trim(std::string_view s) noexcept;
 
-MLIO_API bool
+MLIO_API
+bool
 is_only_whitespace(std::string_view s) noexcept;
 
 }  // namespace v1

@@ -211,56 +211,64 @@ private:
 };
 
 template<typename T>
-MLIO_API inline constexpr bool
+MLIO_API
+inline constexpr bool
 operator==(intrusive_ptr<T> const &lhs, intrusive_ptr<T> const &rhs)
 {
     return lhs.get() == rhs.get();
 }
 
 template<typename T>
-MLIO_API inline constexpr bool
+MLIO_API
+inline constexpr bool
 operator!=(intrusive_ptr<T> const &lhs, intrusive_ptr<T> const &rhs)
 {
     return lhs.get() != rhs.get();
 }
 
 template<typename T>
-MLIO_API inline constexpr bool
+MLIO_API
+inline constexpr bool
 operator==(intrusive_ptr<T> const &lhs, std::nullptr_t)
 {
     return lhs.get() == nullptr;
 }
 
 template<typename T>
-MLIO_API inline constexpr bool
+MLIO_API
+inline constexpr bool
 operator!=(intrusive_ptr<T> const &lhs, std::nullptr_t)
 {
     return lhs.get() != nullptr;
 }
 
 template<typename T>
-MLIO_API inline constexpr bool
+MLIO_API
+inline constexpr bool
 operator==(std::nullptr_t, intrusive_ptr<T> const &rhs)
 {
     return rhs.get() == nullptr;
 }
 
 template<typename T>
-MLIO_API inline constexpr bool
+MLIO_API
+inline constexpr bool
 operator!=(std::nullptr_t, intrusive_ptr<T> const &rhs)
 {
     return rhs.get() != nullptr;
 }
 
 template<typename T, typename... Args>
-MLIO_API inline intrusive_ptr<T>
+MLIO_API
+inline intrusive_ptr<T>
 make_intrusive(Args &&... args)
 {
     return intrusive_ptr<T>{new T{std::forward<Args>(args)...}, true};
 }
 
 template<typename T>
-MLIO_API inline intrusive_ptr<T>
+MLIO_API
+inline intrusive_ptr<T>
 wrap_intrusive(T *t, bool inc_ref = true)
 {
     return intrusive_ptr<T>{t, inc_ref};

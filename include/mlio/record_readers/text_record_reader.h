@@ -35,7 +35,8 @@ protected:
     explicit text_record_reader(intrusive_ptr<input_stream> strm);
 
 private:
-    MLIO_HIDDEN std::optional<record>
+    MLIO_HIDDEN
+    std::optional<record>
     decode_record(memory_slice &chunk, bool ignore_leftover) final;
 
     /// When implemented in a derived class, tries to decode a record
@@ -51,7 +52,8 @@ private:
     virtual std::optional<record>
     decode_text_record(memory_slice &chunk, bool ignore_leftover) = 0;
 
-    MLIO_HIDDEN static bool
+    MLIO_HIDDEN
+    static bool
     skip_utf8_bom(memory_slice &chunk, bool ignore_leftover) noexcept;
 };
 

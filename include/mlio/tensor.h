@@ -107,7 +107,8 @@ private:
     ssize_vector strides_;
 };
 
-MLIO_API inline std::ostream &
+MLIO_API
+inline std::ostream &
 operator<<(std::ostream &strm, tensor const &tsr)
 {
     return strm << tsr.repr();

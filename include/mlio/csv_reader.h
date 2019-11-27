@@ -132,37 +132,48 @@ public:
     operator=(csv_reader &&) = delete;
 
 private:
-    MLIO_HIDDEN intrusive_ptr<record_reader>
+    MLIO_HIDDEN
+    intrusive_ptr<record_reader>
     make_record_reader(data_store const &ds) final;
 
-    MLIO_HIDDEN void
+    MLIO_HIDDEN
+    void
     read_names_from_header(data_store const &ds, record_reader &rdr);
 
-    MLIO_HIDDEN void
+    MLIO_HIDDEN
+    void
     skip_to_header_row(record_reader &rdr);
 
-    MLIO_HIDDEN void
+    MLIO_HIDDEN
+    void
     infer_schema(instance const &ins) final;
 
-    MLIO_HIDDEN void
+    MLIO_HIDDEN
+    void
     infer_column_types(instance const &ins);
 
-    MLIO_HIDDEN void
+    MLIO_HIDDEN
+    void
     set_or_validate_names(instance const &ins);
 
-    MLIO_HIDDEN void
+    MLIO_HIDDEN
+    void
     apply_column_type_overrides();
 
-    MLIO_HIDDEN void
+    MLIO_HIDDEN
+    void
     init_parsers_and_schema();
 
-    MLIO_HIDDEN bool
+    MLIO_HIDDEN
+    bool
     should_skip(std::size_t index, std::string const &name) const noexcept;
 
-    MLIO_HIDDEN intrusive_ptr<example>
+    MLIO_HIDDEN
+    intrusive_ptr<example>
     decode(instance_batch const &batch) const final;
 
-    MLIO_HIDDEN std::vector<intrusive_ptr<tensor>>
+    MLIO_HIDDEN
+    std::vector<intrusive_ptr<tensor>>
     make_tensors(std::size_t batch_size) const;
 
 public:

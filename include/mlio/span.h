@@ -204,14 +204,16 @@ private:
 };
 
 template<class T>
-MLIO_API inline constexpr span<std::byte const>
+MLIO_API
+inline constexpr span<std::byte const>
 as_bytes(span<T> s) noexcept
 {
     return {reinterpret_cast<std::byte const *>(s.data()), s.size_bytes()};
 }
 
 template<class T>
-MLIO_API inline constexpr span<std::byte>
+MLIO_API
+inline constexpr span<std::byte>
 as_writable_bytes(span<T> s) noexcept
 {
     static_assert(!std::is_const<T>::value,
@@ -223,7 +225,8 @@ as_writable_bytes(span<T> s) noexcept
 }  // namespace stdx
 
 template<typename T, typename U>
-MLIO_API inline constexpr stdx::span<T>
+MLIO_API
+inline constexpr stdx::span<T>
 as_span(stdx::span<U> s) noexcept
 {
     static_assert(
@@ -235,7 +238,8 @@ as_span(stdx::span<U> s) noexcept
 }
 
 template<typename Container>
-MLIO_API inline constexpr decltype(auto)
+MLIO_API
+inline constexpr decltype(auto)
 make_span(Container &cont) noexcept
 {
     static_assert(detail::is_container<Container>::value,
