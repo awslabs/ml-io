@@ -78,22 +78,15 @@ as_arrow_file(record const &rec)
     return make_py_arrow_native_file(std::move(strm));
 }
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmissing-prototypes"
-
 PYBIND11_MODULE(arrow, m)
 {
     m.def("as_arrow_file",
           py::overload_cast<data_store const &>(&as_arrow_file),
-          "store"_a,
-          "BALIOGLU");
+          "store"_a);
 
     m.def("as_arrow_file",
           py::overload_cast<record const &>(&as_arrow_file),
-          "record"_a,
-          "BALIOGLU");
+          "record"_a);
 }
-
-#pragma clang diagnostic pop
 
 }  // namespace mlio

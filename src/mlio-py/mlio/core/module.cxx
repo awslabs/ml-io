@@ -19,9 +19,6 @@ using namespace mlio;
 
 namespace mliopy {
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmissing-prototypes"
-
 PYBIND11_MODULE(core, m)
 {
     initialize();
@@ -39,7 +36,5 @@ PYBIND11_MODULE(core, m)
     register_example(m);
     register_data_readers(m);
 }
-
-#pragma clang diagnostic pop
 
 }  // namespace mliopy

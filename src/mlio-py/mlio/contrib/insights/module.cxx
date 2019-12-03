@@ -92,9 +92,6 @@ analyze_dataset(mlio::data_reader &reader,
 
 }  // namespace
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmissing-prototypes"
-
 PYBIND11_MODULE(insights, m)
 {
     std::vector<std::pair<const char *, double column_analysis::*>>
@@ -186,7 +183,5 @@ PYBIND11_MODULE(insights, m)
           "max_capture_count"_a = 1000,
           "Analyzes a dataset");
 }
-
-#pragma clang diagnostic pop
 
 }  // namespace insights
