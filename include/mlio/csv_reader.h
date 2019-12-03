@@ -116,7 +116,7 @@ struct MLIO_API csv_params final {
 /// Represents a @ref data_reader for reading CSV datasets.
 class MLIO_API csv_reader final : public parallel_data_reader {
 public:
-    explicit csv_reader(data_reader_params rdr_prm, csv_params csv_prm);
+    explicit csv_reader(data_reader_params rdr_prm, csv_params csv_prm = {});
 
     csv_reader(csv_reader const &) = delete;
 
