@@ -20,22 +20,22 @@ target_compile_options(hyperloglog
 )
 
 # ------------------------------------------------------------
-# Target: mlio-py-contrib
+# Target: mlio-contrib
 # ------------------------------------------------------------
 
-add_python_extension(mlio-contrib-insights insights
+add_python_extension(mlio-contrib insights
     $<TARGET_OBJECTS:hyperloglog>
     column_analyzer.cxx
     utils.cxx
     module.cxx
 )
 
-target_link_libraries(mlio-contrib-insights
+target_link_libraries(mlio-contrib
     PRIVATE
         hyperloglog mlio::mlio
 )
 
-target_include_directories(mlio-contrib-insights SYSTEM
+target_include_directories(mlio-contrib SYSTEM
     PRIVATE
         hll
 )

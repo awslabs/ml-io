@@ -42,14 +42,14 @@ option(MLIO_INCLUDE_CONTRIB "If set, generates build target for the contrib libr
 option(MLIO_INCLUDE_PYTHON_EXTENSION "If set, generates build target for the Python C extension.")
 
 cmake_dependent_option(
-    MLIO_INCLUDE_ARROW_INTEGRATION "If set, generates build target for the Apache Arrow integration." ON
+    MLIO_INCLUDE_ARROW_INTEGRATION "If set, generates build target for the Apache Arrow integration." OFF
     MLIO_INCLUDE_PYTHON_EXTENSION OFF
 )
 
 option(MLIO_INCLUDE_TESTS "If set, generates build target for the tests." ON)
 option(MLIO_INCLUDE_DOC "If set, generates build target for the documentation.")
 
-option(MLIO_TREAT_WARNINGS_AS_ERRORS "If set, treats build warnings as errors.")
+option(MLIO_TREAT_WARNINGS_AS_ERRORS "If set, treats compilation warnings as errors.")
 
 # Optimizations
 option(MLIO_BUILD_FOR_NATIVE_ARCH "If set, builds for the processor type of the compiling machine.")

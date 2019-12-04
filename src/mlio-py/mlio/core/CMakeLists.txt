@@ -2,7 +2,7 @@
 # Target: mlio-py-core
 # ------------------------------------------------------------
 
-add_python_extension(mlio-py-core core
+add_python_extension(mlio-py core
     data_readers.cxx
     data_stores.cxx
     example.cxx
@@ -20,7 +20,7 @@ add_python_extension(mlio-py-core core
     tensor.cxx
 )
 
-target_link_libraries(mlio-py-core
+target_link_libraries(mlio-py
     PRIVATE
         dlpack::dlpack fmt::fmt mlio::mlio
 )
