@@ -311,7 +311,23 @@ csv_reader::init_parsers_and_schema()
         }
     }
 
-    schema_ = make_intrusive<schema>(std::move(descs));
+    try {
+        schema_ = make_intrusive<schema>(descs);
+    }
+    catch (std::invalid_argument const &) {
+        std::unordered_set<std::string_view> tmp{};
+        for (auto &desc : descs) {
+            auto pr = tmp.emplace(desc.name());
+            if (!pr.second) {
+                throw schema_error{
+                    fmt::format("The dataset contains more than "
+                                "one column with the name '{0}'.",
+                                *pr.first)};
+            }
+        }
+
+        throw;
+    }
 }
 
 bool

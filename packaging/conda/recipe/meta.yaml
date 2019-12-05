@@ -61,7 +61,7 @@ outputs:
       commands:
         - test -f "$PREFIX/include/mlio.h"  # [unix]
     about:
-      summary: ML-IO C++ Header Files and Documentation
+      summary: ML-IO C++ Header Files and Development Artifacts
 
   - name: libmlio-dbg
     script: build-mlio-dbg.sh
