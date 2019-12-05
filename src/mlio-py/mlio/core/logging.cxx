@@ -20,8 +20,7 @@ namespace py = pybind11;
 using namespace mlio;
 using namespace pybind11::literals;
 
-namespace mliopy {
-namespace detail {
+namespace pymlio {
 namespace {
 
 class py_log_message_handler {
@@ -71,7 +70,6 @@ py_set_log_message_handler(py::function hdl)
 }
 
 }  // namespace
-}  // namespace detail
 
 void
 register_logging(py::module &m)
@@ -83,7 +81,7 @@ register_logging(py::module &m)
         .value("DEBUG", log_level::debug);
 
     m.def("set_log_message_handler",
-          &detail::py_set_log_message_handler,
+          &py_set_log_message_handler,
           "hdl"_a,
           "Sets the logging handler.");
 
@@ -94,4 +92,4 @@ register_logging(py::module &m)
     m.def("set_log_level", &set_log_level, "lvl"_a, "Sets the log level.");
 }
 
-}  // namespace mliopy
+}  // namespace pymlio

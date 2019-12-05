@@ -19,7 +19,7 @@ namespace py = pybind11;
 
 using namespace mlio;
 
-namespace mliopy {
+namespace pymlio {
 
 void
 register_exceptions(py::module &m)
@@ -56,4 +56,4 @@ register_exceptions(py::module &m)
         m, "NotSupportedError", ::PyExc_RuntimeError);
 }
 
-}  // namespace mliopy
+}  // namespace pymlio

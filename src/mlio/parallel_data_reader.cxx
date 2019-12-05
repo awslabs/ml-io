@@ -282,7 +282,7 @@ parallel_data_reader::ensure_schema_inferred()
         return;
     }
 
-    std::optional<instance> const &ins = reader_->peek_instance();
+    std::optional<instance> ins = reader_->peek_instance();
     if (ins == std::nullopt) {
         return;
     }
@@ -306,6 +306,8 @@ parallel_data_reader::reset() noexcept
     graph_->obj.reset();
 
     exception_ptr_ = nullptr;
+
+    data_reader_base::reset();
 }
 
 void

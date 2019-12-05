@@ -23,7 +23,9 @@
 #include "arrow_buffer.h"
 #include "arrow_util.h"
 
-namespace mlio {
+using namespace mlio;
+
+namespace pymlio {
 
 arrow_file::arrow_file(intrusive_ptr<input_stream> strm)
     : stream_{std::move(strm)}
@@ -127,4 +129,4 @@ arrow_file::closed() const noexcept
     return stream_->closed();
 }
 
-}  // namespace mlio
+}  // namespace pymlio

@@ -1,12 +1,12 @@
 # ------------------------------------------------------------
-# Target: mlio-py-core
+# Target: mlio-py
 # ------------------------------------------------------------
 
-add_python_extension(mlio-py core
-    data_readers.cxx
-    data_stores.cxx
+add_python_extension(mlio-py _core
+    data_reader.cxx
+    data_store.cxx
+    error.cxx
     example.cxx
-    exceptions.cxx
     integ.cxx
     logging.cxx
     memory.cxx
@@ -14,9 +14,9 @@ add_python_extension(mlio-py core
     py_buffer.cxx
     py_device_array.cxx
     py_memory_block.cxx
-    record_readers.cxx
+    record_reader.cxx
     schema.cxx
-    streams.cxx
+    stream.cxx
     tensor.cxx
 )
 

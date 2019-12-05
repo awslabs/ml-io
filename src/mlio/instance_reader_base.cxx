@@ -28,7 +28,7 @@ instance_reader_base::read_instance()
     return read_instance_core();
 }
 
-std::optional<instance> const &
+std::optional<instance>
 instance_reader_base::peek_instance()
 {
     if (peeked_instance_ == std::nullopt) {

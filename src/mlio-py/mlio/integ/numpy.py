@@ -13,7 +13,7 @@
 
 import numpy as np
 
-from mlio.core import DenseTensor
+from mlio._core import DenseTensor
 
 
 def as_numpy(tensor):

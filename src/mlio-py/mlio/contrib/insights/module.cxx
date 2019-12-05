@@ -35,7 +35,7 @@ namespace py = pybind11;
 
 using namespace pybind11::literals;
 
-namespace insights {
+namespace pymlio {
 namespace {
 
 data_analysis
@@ -94,6 +94,8 @@ analyze_dataset(mlio::data_reader &reader,
 
 PYBIND11_MODULE(insights, m)
 {
+    m.attr("__module__") = "mlio";
+
     std::vector<std::pair<const char *, double column_analysis::*>>
         double_stat_names = {
             {"numeric_finite_mean", &column_analysis::numeric_finite_mean},
@@ -184,4 +186,4 @@ PYBIND11_MODULE(insights, m)
           "Analyzes a dataset");
 }
 
-}  // namespace insights
+}  // namespace pymlio

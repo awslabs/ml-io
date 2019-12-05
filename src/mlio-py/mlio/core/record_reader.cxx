@@ -22,8 +22,7 @@ namespace py = pybind11;
 using namespace mlio;
 using namespace pybind11::literals;
 
-namespace mliopy {
-namespace detail {
+namespace pymlio {
 namespace {
 
 class py_record_iterator {
@@ -50,7 +49,6 @@ private:
 };
 
 }  // namespace
-}  // namespace detail
 
 void
 register_record_readers(py::module &m)
@@ -76,13 +74,12 @@ register_record_readers(py::module &m)
             return py::buffer_info(data, 1, "B", size);
         });
 
-    py::class_<detail::py_record_iterator>(m, "RecordIterator")
+    py::class_<py_record_iterator>(m, "RecordIterator")
         .def("__iter__",
-             [](detail::py_record_iterator &it)
-                 -> detail::py_record_iterator & {
+             [](py_record_iterator &it) -> py_record_iterator & {
                  return it;
              })
-        .def("__next__", &detail::py_record_iterator::next);
+        .def("__next__", &py_record_iterator::next);
 
     py::class_<record_reader, intrusive_ptr<record_reader>>(m, "RecordReader")
         .def("read_record",
@@ -92,8 +89,7 @@ register_record_readers(py::module &m)
              &record_reader::peek_record,
              py::call_guard<py::gil_scoped_release>())
         .def("__iter__", [](py::object &rdr) {
-            return detail::py_record_iterator(rdr.cast<record_reader &>(),
-                                              rdr);
+            return py_record_iterator(rdr.cast<record_reader &>(), rdr);
         });
 
     py::class_<mlio::detail::parquet_record_reader,
@@ -105,4 +101,4 @@ register_record_readers(py::module &m)
         .def(py::init<intrusive_ptr<input_stream>>(), "strm"_a);
 }
 
-}  // namespace mliopy
+}  // namespace pymlio

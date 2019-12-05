@@ -23,7 +23,7 @@
 
 #include <mlio.h>
 
-namespace mliopy {
+namespace pymlio {
 
 class py_device_array {
 public:
@@ -83,4 +83,4 @@ private:
     std::vector<PyObject *> string_buf_{};
 };
 
-}  // namespace mliopy
+}  // namespace pymlio

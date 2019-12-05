@@ -22,8 +22,7 @@ namespace py = pybind11;
 using namespace mlio;
 using namespace pybind11::literals;
 
-namespace mliopy {
-namespace detail {
+namespace pymlio {
 namespace {
 
 feature_desc
@@ -43,7 +42,6 @@ make_feature_desc(std::string name,
 }
 
 }  // namespace
-}  // namespace detail
 
 void
 register_schema(py::module &m)
@@ -52,7 +50,7 @@ register_schema(py::module &m)
                              "FeatureDesc",
                              "Describes a feature which defines a "
                              "measurable property of a dataset.")
-        .def(py::init(&detail::make_feature_desc),
+        .def(py::init(&make_feature_desc),
              "name"_a,
              "dtype"_a,
              "shape"_a,
@@ -106,4 +104,4 @@ register_schema(py::module &m)
         .def_property_readonly("descriptors", &schema::descriptors);
 }
 
-}  // namespace mliopy
+}  // namespace pymlio

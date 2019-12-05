@@ -45,13 +45,19 @@ data_reader_base::read_example()
     return read_example_core();
 }
 
-intrusive_ptr<example> const &
+intrusive_ptr<example>
 data_reader_base::peek_example()
 {
     if (peeked_example_ == nullptr) {
         peeked_example_ = read_example_core();
     }
     return peeked_example_;
+}
+
+void
+data_reader_base::reset() noexcept
+{
+    peeked_example_ = nullptr;
 }
 
 }  // namespace v1

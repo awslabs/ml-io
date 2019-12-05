@@ -26,9 +26,10 @@ PYBIND11_DECLARE_HOLDER_TYPE(T, mlio::intrusive_ptr<T>, true);
 
 namespace py = pybind11;
 
+using namespace mlio;
 using namespace pybind11::literals;
 
-namespace mlio {
+namespace pymlio {
 
 // The memory layout of Arrow's Cython NativeFile type.
 struct py_arrow_native_file {
@@ -80,6 +81,8 @@ as_arrow_file(record const &rec)
 
 PYBIND11_MODULE(arrow, m)
 {
+    m.attr("__module__") = "mlio";
+
     m.def("as_arrow_file",
           py::overload_cast<data_store const &>(&as_arrow_file),
           "store"_a);
@@ -89,4 +92,4 @@ PYBIND11_MODULE(arrow, m)
           "record"_a);
 }
 
-}  // namespace mlio
+}  // namespace pymlio

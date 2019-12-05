@@ -22,8 +22,7 @@ namespace py = pybind11;
 using namespace mlio;
 using namespace pybind11::literals;
 
-namespace mliopy {
-namespace detail {
+namespace pymlio {
 namespace {
 
 py::capsule
@@ -47,16 +46,15 @@ to_dlpack_capsule(tensor &tsr, std::size_t version)
 }
 
 }  // namespace
-}  // namespace detail
 
 void
 register_integ(py::module &m)
 {
     m.def("as_dlpack",
-          &detail::to_dlpack_capsule,
+          &to_dlpack_capsule,
           "tensor"_a,
           "version"_a,
-          "Wraps the specified `tensor` as a DLManagedTensor.");
+          "Wraps the specified ``Tensor`` as a DLManagedTensor.");
 }
 
-}  // namespace mliopy
+}  // namespace pymlio

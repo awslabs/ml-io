@@ -24,7 +24,7 @@
 
 #include "column_statistics.h"
 
-namespace insights {
+namespace pymlio {
 
 class column_analyzer {
 public:
@@ -44,4 +44,4 @@ private:
     std::size_t max_capture_count_;
 };
 
-}  // namespace insights
+}  // namespace pymlio

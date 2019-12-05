@@ -48,7 +48,7 @@ public:
     virtual std::optional<record>
     read_record() = 0;
 
-    virtual std::optional<record> const &
+    virtual std::optional<record>
     peek_record() = 0;
 };
 

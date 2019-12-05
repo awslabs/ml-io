@@ -22,8 +22,7 @@ namespace py = pybind11;
 using namespace mlio;
 using namespace pybind11::literals;
 
-namespace mliopy {
-namespace detail {
+namespace pymlio {
 namespace {
 
 intrusive_ptr<tensor>
@@ -32,7 +31,7 @@ get_feature(example &exm, std::string const &name)
     intrusive_ptr<tensor> tsr = exm.find_feature(name);
     if (tsr == nullptr) {
         throw py::key_error{
-            "The example does not contain a feature with the specified name"};
+            "The example does not contain a feature with the specified name."};
     }
 
     return tsr;
@@ -49,7 +48,6 @@ get_feature(example &exm, std::size_t index)
 }
 
 }  // namespace
-}  // namespace detail
 
 void
 register_example(py::module &m)
@@ -57,7 +55,7 @@ register_example(py::module &m)
     py::class_<example, intrusive_ptr<example>>(
         m,
         "Example",
-        "Represents an example that holds a ``schema`` and a set of features.")
+        "Represents an example that holds a ``Schema`` and a set of features.")
         .def(py::init<intrusive_ptr<schema>,
                       std::vector<intrusive_ptr<tensor>>>(),
              "schema"_a,
@@ -76,10 +74,9 @@ register_example(py::module &m)
                  return self.features().size();
              })
         .def("__getitem__",
-             py::overload_cast<example &, std::string const &>(
-                 &detail::get_feature))
+             py::overload_cast<example &, std::string const &>(&get_feature))
         .def("__getitem__",
-             py::overload_cast<example &, std::size_t>(&detail::get_feature))
+             py::overload_cast<example &, std::size_t>(&get_feature))
         .def("__contains__",
              [](example &self, std::string const &name) {
                  return self.get_schema().get_index(name) != std::nullopt;
@@ -107,4 +104,4 @@ register_example(py::module &m)
             )");
 }
 
-}  // namespace mliopy
+}  // namespace pymlio

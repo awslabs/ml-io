@@ -15,7 +15,7 @@
 
 #include "py_memory_block.h"
 
-namespace mliopy {
+namespace pymlio {
 
 py_memory_block::~py_memory_block()
 {
@@ -27,4 +27,4 @@ py_mutable_memory_block::~py_mutable_memory_block()
     ::PyBuffer_Release(&buffer_);
 }
 
-}  // namespace mliopy
+}  // namespace pymlio

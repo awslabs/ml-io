@@ -24,8 +24,7 @@ namespace py = pybind11;
 using namespace mlio;
 using namespace pybind11::literals;
 
-namespace mliopy {
-namespace detail {
+namespace pymlio {
 namespace {
 
 class py_input_stream : public input_stream {
@@ -161,18 +160,15 @@ read_input_stream(input_stream &strm, py::buffer const &buf)
 }
 
 }  // namespace
-}  // namespace detail
 
 void
 register_streams(py::module &m)
 {
-    py::class_<input_stream,
-               detail::py_input_stream,
-               intrusive_ptr<input_stream>>(
+    py::class_<input_stream, py_input_stream, intrusive_ptr<input_stream>>(
         m, "InputStream", "Represents an input stream of bytes.")
         .def(py::init<>())
         .def("read",
-             &detail::read_input_stream,
+             &read_input_stream,
              "buf"_a,
              "Fills the specified buffer with data read from the stream.")
         .def("read",
@@ -211,4 +207,4 @@ register_streams(py::module &m)
             "Gets a boolean value indicating whether the stream is closed.");
 }
 
-}  // namespace mliopy
+}  // namespace pymlio

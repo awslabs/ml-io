@@ -148,7 +148,7 @@ public:
 
     /// Returns the next @ref example read from the dataset without
     /// consuming it.
-    virtual intrusive_ptr<example> const &
+    virtual intrusive_ptr<example>
     peek_example() = 0;
 
     /// Resets the state of the reader. Calling @ref read_example()

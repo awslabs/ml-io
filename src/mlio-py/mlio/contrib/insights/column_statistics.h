@@ -26,7 +26,7 @@
 
 #include <hyperloglog.h>
 
-namespace insights {
+namespace pymlio {
 
 class column_analysis {
     friend class column_analyzer;
@@ -78,4 +78,4 @@ struct data_analysis {
     std::vector<column_analysis> columns{};
 };
 
-}  // namespace insights
+}  // namespace pymlio

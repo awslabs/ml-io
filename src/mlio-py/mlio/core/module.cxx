@@ -17,10 +17,12 @@
 
 using namespace mlio;
 
-namespace mliopy {
+namespace pymlio {
 
-PYBIND11_MODULE(core, m)
+PYBIND11_MODULE(_core, m)
 {
+    m.attr("__module__") = "mlio";
+
     initialize();
 
     register_exceptions(m);
@@ -37,4 +39,4 @@ PYBIND11_MODULE(core, m)
     register_data_readers(m);
 }
 
-}  // namespace mliopy
+}  // namespace pymlio

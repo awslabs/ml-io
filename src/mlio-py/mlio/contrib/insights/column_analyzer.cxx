@@ -20,7 +20,7 @@
 
 #include "utils.h"
 
-namespace insights {
+namespace pymlio {
 
 column_analyzer::column_analyzer(
     std::vector<column_analysis> &columns,
@@ -51,7 +51,7 @@ column_analyzer::analyze(mlio::example const &exm) const
         // potential numerical problems updating the mean a single entry at a
         // time.
         double numeric_column_sum = 0.0;
-        double numeric_column_count = 0.0;
+        std::size_t numeric_column_count = 0.0;
 
         for (std::string const &cell : cells) {
             // Capture the first example.
@@ -135,11 +135,14 @@ column_analyzer::analyze(mlio::example const &exm) const
 
         // Update the mean of numeric values based on the entire range of
         // values.
+        auto ncc = static_cast<double>(numeric_column_count);
+        auto nfc = static_cast<double>(stats.numeric_finite_count);
+
+        double numeric_column_mean = numeric_column_sum / ncc;
+
         stats.numeric_finite_mean +=
-            ((numeric_column_sum / numeric_column_count) -
-             stats.numeric_finite_mean) *
-            numeric_column_count / stats.numeric_finite_count;
+            (numeric_column_mean - stats.numeric_finite_mean) * ncc / nfc;
     }
 };
 
-}  // namespace insights
+}  // namespace pymlio

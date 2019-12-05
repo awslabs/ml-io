@@ -32,7 +32,7 @@ public:
     std::optional<record>
     read_record() final;
 
-    std::optional<record> const &
+    std::optional<record>
     peek_record() final;
 
 private:

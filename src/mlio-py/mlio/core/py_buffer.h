@@ -21,9 +21,9 @@
 
 #include <mlio.h>
 
-namespace mliopy {
+namespace pymlio {
 
 std::unique_ptr<mlio::device_array>
 make_device_array(pybind11::buffer &buf, bool cpy);
 
-}  // namespace mliopy
+}  // namespace pymlio

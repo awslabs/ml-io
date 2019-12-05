@@ -19,10 +19,10 @@
 #include <string_view>
 #include <vector>
 
-namespace insights {
+namespace pymlio {
 
 bool
 match_nan_values(std::string_view s,
                  std::vector<std::string> const &match_values) noexcept;
 
-}  // namespace insights
+}  // namespace pymlio

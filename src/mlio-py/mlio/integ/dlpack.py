@@ -11,7 +11,7 @@
 # ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
 
-import mlio.core
+import mlio._core
 
 
 def as_dlpack(tensor, version=0x10):
@@ -22,4 +22,4 @@ def as_dlpack(tensor, version=0x10):
     -------
         A Python capsule instance.
     """
-    return mlio.core.as_dlpack(tensor, version)
+    return mlio._core.as_dlpack(tensor, version)

@@ -29,7 +29,7 @@ public:
     std::optional<instance>
     read_instance() final;
 
-    std::optional<instance> const &
+    std::optional<instance>
     peek_instance() final;
 
 private:

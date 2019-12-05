@@ -1,5 +1,5 @@
 # ------------------------------------------------------------
-# Target: mlio-py-arrow
+# Target: mlio-arrow
 # ------------------------------------------------------------
 
 add_python_extension(mlio-arrow arrow

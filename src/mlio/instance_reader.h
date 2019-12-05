@@ -45,7 +45,7 @@ public:
     virtual std::optional<instance>
     read_instance() = 0;
 
-    virtual std::optional<instance> const &
+    virtual std::optional<instance>
     peek_instance() = 0;
 
     virtual void

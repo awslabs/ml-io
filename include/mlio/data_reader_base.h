@@ -35,7 +35,7 @@ public:
     intrusive_ptr<example>
     read_example() final;
 
-    intrusive_ptr<example> const &
+    intrusive_ptr<example>
     peek_example() final;
 
 private:
@@ -43,6 +43,10 @@ private:
     /// example read from the dataset.
     virtual intrusive_ptr<example>
     read_example_core() = 0;
+
+public:
+    void
+    reset() noexcept override;
 
 public:
     data_reader_params const &

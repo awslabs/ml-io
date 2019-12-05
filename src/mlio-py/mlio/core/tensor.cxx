@@ -27,8 +27,7 @@ namespace py = pybind11;
 using namespace mlio;
 using namespace pybind11::literals;
 
-namespace mliopy {
-namespace detail {
+namespace pymlio {
 namespace {
 
 intrusive_ptr<dense_tensor>
@@ -92,7 +91,6 @@ to_py_buffer(dense_tensor &tsr)
 }
 
 }  // namespace
-}  // namespace detail
 
 void
 register_tensors(py::module &m)
@@ -143,7 +141,7 @@ register_tensors(py::module &m)
         py::buffer_protocol(),
         "Represents a tensor that stores its data in a contiguous memory "
         "block.")
-        .def(py::init<>(&detail::make_dense_tensor),
+        .def(py::init<>(&make_dense_tensor),
              "shape"_a,
              "data"_a,
              "strides"_a = std::nullopt,
@@ -154,13 +152,13 @@ register_tensors(py::module &m)
                 return py_device_array{wrap_intrusive(&self), self.data()};
             },
             "Gets the data of the tensor.")
-        .def_buffer(&detail::to_py_buffer);
+        .def_buffer(&to_py_buffer);
 
     py::class_<coo_tensor, tensor, intrusive_ptr<coo_tensor>>(
         m,
         "CooTensor",
         "Represents a tensor that stores its data in coordinate format.")
-        .def(py::init<>(&detail::make_coo_tensor),
+        .def(py::init<>(&make_coo_tensor),
              "shape"_a,
              "data"_a,
              "coords"_a,
@@ -181,4 +179,4 @@ register_tensors(py::module &m)
             "Gets the indices for the specified dimension.");
 }
 
-}  // namespace mliopy
+}  // namespace pymlio

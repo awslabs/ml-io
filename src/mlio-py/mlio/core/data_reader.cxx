@@ -24,8 +24,7 @@ namespace py = pybind11;
 using namespace mlio;
 using namespace pybind11::literals;
 
-namespace mliopy {
-namespace detail {
+namespace pymlio {
 namespace {
 
 class py_data_iterator {
@@ -56,7 +55,7 @@ public:
     intrusive_ptr<example>
     read_example() override;
 
-    intrusive_ptr<example> const &
+    intrusive_ptr<example>
     peek_example() override;
 
     void
@@ -74,12 +73,11 @@ py_data_reader::read_example()
     PYBIND11_OVERLOAD_PURE(intrusive_ptr<example>, data_reader, read_example, )
 }
 
-intrusive_ptr<example> const &
+intrusive_ptr<example>
 py_data_reader::peek_example()
 {
     // NOLINTNEXTLINE
-    PYBIND11_OVERLOAD_PURE(
-        intrusive_ptr<example> const &, data_reader, peek_example, )
+    PYBIND11_OVERLOAD_PURE(intrusive_ptr<example>, data_reader, peek_example, )
 }
 
 void
@@ -229,7 +227,6 @@ make_recordio_protobuf_reader(std::vector<intrusive_ptr<data_store>> dataset,
 }
 
 }  // namespace
-}  // namespace detail
 
 void
 register_data_readers(py::module &m)
@@ -276,16 +273,14 @@ register_data_readers(py::module &m)
                max_field_length_handling::warn,
                "Truncate the field and log a warning message.");
 
-    py::class_<detail::py_data_iterator>(m, "DataIterator")
+    py::class_<py_data_iterator>(m, "DataIterator")
         .def("__iter__",
-             [](detail::py_data_iterator &it) -> detail::py_data_iterator & {
+             [](py_data_iterator &it) -> py_data_iterator & {
                  return it;
              })
-        .def("__next__", &detail::py_data_iterator::next);
+        .def("__next__", &py_data_iterator::next);
 
-    py::class_<data_reader,
-               detail::py_data_reader,
-               intrusive_ptr<data_reader>>(
+    py::class_<data_reader, py_data_reader, intrusive_ptr<data_reader>>(
         m,
         "DataReader",
         "Represents an interface for classes that read examples from a "
@@ -307,8 +302,7 @@ register_data_readers(py::module &m)
              "next time will start reading from the beginning of the dataset.")
         .def("__iter__",
              [](py::object &rdr) {
-                 return detail::py_data_iterator(rdr.cast<data_reader &>(),
-                                                 rdr);
+                 return py_data_iterator(rdr.cast<data_reader &>(), rdr);
              })
         .def_property_readonly("num_bytes_read",
                                &data_reader::num_bytes_read,
@@ -325,7 +319,7 @@ register_data_readers(py::module &m)
         m,
         "CsvReader",
         "Represents a ``data_reader`` for reading CSV datasets.")
-        .def(py::init<>(&detail::make_csv_reader),
+        .def(py::init<>(&make_csv_reader),
              "dataset"_a,
              "batch_size"_a,
              "num_prefetched_batches"_a = 0,
@@ -494,7 +488,7 @@ register_data_readers(py::module &m)
                data_reader,
                intrusive_ptr<recordio_protobuf_reader>>(
         m, "RecordIOProtobufReader")
-        .def(py::init<>(&detail::make_recordio_protobuf_reader),
+        .def(py::init<>(&make_recordio_protobuf_reader),
              "dataset"_a,
              "batch_size"_a,
              "num_prefetched_batches"_a = 0,
@@ -567,4 +561,4 @@ register_data_readers(py::module &m)
             )");
 }
 
-}  // namespace mliopy
+}  // namespace pymlio

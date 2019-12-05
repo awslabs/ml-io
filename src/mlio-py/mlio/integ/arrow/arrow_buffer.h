@@ -18,11 +18,11 @@
 #include <arrow/buffer.h>
 #include <mlio.h>
 
-namespace mlio {
+namespace pymlio {
 
 class arrow_buffer final : public arrow::Buffer {
 public:
-    explicit arrow_buffer(memory_slice s) noexcept;
+    explicit arrow_buffer(mlio::memory_slice s) noexcept;
 
     arrow_buffer(arrow_buffer const &) = delete;
 
@@ -38,7 +38,7 @@ public:
     operator=(arrow_buffer &&) = delete;
 
 private:
-    memory_slice slice_;
+    mlio::memory_slice slice_;
 };
 
-}  // namespace mlio
+}  // namespace pymlio

@@ -24,7 +24,7 @@ namespace py = pybind11;
 using namespace mlio;
 using namespace pybind11::literals;
 
-namespace mliopy {
+namespace pymlio {
 
 py_device_array::~py_device_array()
 {
@@ -56,7 +56,6 @@ py_device_array::make_or_get_string_buffer()
     return string_buf_.data();
 }
 
-namespace detail {
 namespace {
 
 py::buffer_info
@@ -134,7 +133,6 @@ to_py_buffer(py_device_array &arr)
 }
 
 }  // namespace
-}  // namespace detail
 
 void
 register_device_array(py::module &m)
@@ -195,7 +193,7 @@ register_device_array(py::module &m)
         .def_property_readonly("device",
                                &py_device_array::get_device,
                                "Gets the device on which the array is stored.")
-        .def_buffer(&detail::to_py_buffer);
+        .def_buffer(&to_py_buffer);
 }
 
-}  // namespace mliopy
+}  // namespace pymlio

@@ -13,7 +13,7 @@
 
 import numpy as np
 
-from mlio.core import CooTensor
+from mlio._core import CooTensor
 from scipy.sparse import coo_matrix
 
 

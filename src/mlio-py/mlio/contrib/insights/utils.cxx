@@ -20,7 +20,7 @@
 
 #include <mlio.h>
 
-namespace insights {
+namespace pymlio {
 
 bool
 match_nan_values(std::string_view s,
@@ -44,4 +44,4 @@ match_nan_values(std::string_view s,
     return false;
 }
 
-}  // namespace insights
+}  // namespace pymlio

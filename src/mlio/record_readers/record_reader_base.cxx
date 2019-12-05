@@ -29,7 +29,7 @@ record_reader_base::read_record()
     return read_record_core();
 }
 
-std::optional<record> const &
+std::optional<record>
 record_reader_base::peek_record()
 {
     if (peeked_record_ == std::nullopt) {

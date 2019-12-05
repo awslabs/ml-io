@@ -21,11 +21,11 @@
 #include <arrow/io/interfaces.h>
 #include <mlio.h>
 
-namespace mlio {
+namespace pymlio {
 
 class arrow_file final : public arrow::io::RandomAccessFile {
 public:
-    explicit arrow_file(intrusive_ptr<input_stream> strm);
+    explicit arrow_file(mlio::intrusive_ptr<mlio::input_stream> strm);
 
     arrow_file(arrow_file const &) = delete;
 
@@ -74,7 +74,7 @@ public:
     closed() const noexcept final;
 
 private:
-    intrusive_ptr<input_stream> stream_;
+    mlio::intrusive_ptr<mlio::input_stream> stream_;
 };
 
-}  // namespace mlio
+}  // namespace pymlio

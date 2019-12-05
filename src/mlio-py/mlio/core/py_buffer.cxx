@@ -25,8 +25,7 @@ namespace py = pybind11;
 
 using namespace mlio;
 
-namespace mliopy {
-namespace detail {
+namespace pymlio {
 namespace {
 
 template<typename T>
@@ -272,7 +271,6 @@ struct make_cpu_array_op<data_type::string> {
         auto **obj_buffer = static_cast<PyObject **>(info.ptr);
 
         for (std::size_t i = 0; i < size; i++) {
-            // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
             lst.emplace_back(py::cast<std::string>(obj_buffer[i]));
         }
 
@@ -294,7 +292,6 @@ struct make_cpu_array_op<data_type::string> {
 };
 
 }  // namespace
-}  // namespace detail
 
 std::unique_ptr<device_array>
 make_device_array(py::buffer &buf, bool cpy)
@@ -303,13 +300,13 @@ make_device_array(py::buffer &buf, bool cpy)
 
     py::buffer_info info = buf.request(writable);
 
-    std::optional<data_type> dt = detail::get_data_type(info);
+    std::optional<data_type> dt = get_data_type(info);
     if (dt == std::nullopt) {
         throw std::invalid_argument{
             "The Python buffer contains an unsupported data type."};
     }
 
-    return dispatch<detail::make_cpu_array_op>(*dt, std::move(info), cpy);
+    return dispatch<make_cpu_array_op>(*dt, std::move(info), cpy);
 }
 
-}  // namespace mliopy
+}  // namespace pymlio

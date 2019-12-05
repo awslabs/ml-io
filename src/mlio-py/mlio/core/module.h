@@ -27,7 +27,7 @@ PYBIND11_DECLARE_HOLDER_TYPE(T, mlio::intrusive_ptr<T>, true);
 
 PYBIND11_MAKE_OPAQUE(std::vector<mlio::feature_desc>);
 
-namespace mliopy {
+namespace pymlio {
 
 void
 register_exceptions(pybind11::module &m);
@@ -65,4 +65,4 @@ register_example(pybind11::module &m);
 void
 register_data_readers(pybind11::module &m);
 
-}  // namespace mliopy
+}  // namespace pymlio

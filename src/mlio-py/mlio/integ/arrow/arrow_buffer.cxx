@@ -18,7 +18,9 @@
 #include <cstdint>
 #include <utility>
 
-namespace mlio {
+using namespace mlio;
+
+namespace pymlio {
 
 arrow_buffer::arrow_buffer(memory_slice s) noexcept
     : arrow::Buffer{nullptr, 0}, slice_{std::move(s)}
@@ -32,4 +34,4 @@ arrow_buffer::arrow_buffer(memory_slice s) noexcept
 
 arrow_buffer::~arrow_buffer() = default;
 
-}  // namespace mlio
+}  // namespace pymlio

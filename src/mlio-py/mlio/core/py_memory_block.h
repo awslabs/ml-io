@@ -19,7 +19,7 @@
 
 #include <mlio.h>
 
-namespace mliopy {
+namespace pymlio {
 
 class py_memory_block final : public mlio::memory_block {
 public:
@@ -124,4 +124,4 @@ private:
     Py_buffer buffer_{};
 };
 
-}  // namespace mliopy
+}  // namespace pymlio

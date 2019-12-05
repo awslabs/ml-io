@@ -24,8 +24,7 @@ namespace py = pybind11;
 using namespace mlio;
 using namespace pybind11::literals;
 
-namespace mliopy {
-namespace detail {
+namespace pymlio {
 namespace {
 
 class py_data_store : public data_store {
@@ -90,7 +89,6 @@ py_list_files(std::vector<std::string> const &pathnames,
 }
 
 }  // namespace
-}  // namespace detail
 
 void
 register_data_stores(py::module &m)
@@ -103,7 +101,7 @@ register_data_stores(py::module &m)
         .value("BZIP2", compression::bzip2)
         .value("ZIP", compression::zip);
 
-    py::class_<data_store, detail::py_data_store, intrusive_ptr<data_store>>(
+    py::class_<data_store, py_data_store, intrusive_ptr<data_store>>(
         m, "DataStore", "Represents a repository of data.")
         .def(py::init<>())
         .def("open_read",
@@ -145,7 +143,7 @@ register_data_stores(py::module &m)
 
     py::class_<in_memory_store, data_store, intrusive_ptr<in_memory_store>>(
         m, "InMemoryStore", "Represents a memory block as a ``data_store``.")
-        .def(py::init(&detail::make_in_memory_store),
+        .def(py::init(&make_in_memory_store),
              "buf"_a,
              "compression"_a = compression::none,
              R"(
@@ -177,7 +175,7 @@ register_data_stores(py::module &m)
             )");
 
     m.def("list_files",
-          &detail::py_list_files,
+          &py_list_files,
           "pathnames"_a,
           "pattern"_a = "",
           "predicate"_a = nullptr,
@@ -221,4 +219,4 @@ register_data_stores(py::module &m)
         )");
 }
 
-}  // namespace mliopy
+}  // namespace pymlio

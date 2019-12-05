@@ -13,9 +13,10 @@
 
 import atexit
 import logging
-import mlio.core
 
-from mlio.core import\
+import mlio._core
+
+from mlio._core import\
     BadBatchHandling,\
     Compression,\
     CooTensor,\
@@ -35,12 +36,11 @@ from mlio.core import\
     FeatureDesc,\
     FieldTooLargeError,\
     File,\
-    InflateError,\
     InMemoryStore,\
+    InflateError,\
     InputStream,\
     InvalidInstanceError,\
     LastBatchHandling,\
-    list_files,\
     LogLevel,\
     MaxFieldLengthHandling,\
     MemorySlice,\
@@ -55,7 +55,9 @@ from mlio.core import\
     Schema,\
     SchemaError,\
     StreamError,\
-    Tensor
+    Tensor,\
+    list_files
+
 
 __all__ = [
     'BadBatchHandling',
@@ -77,12 +79,11 @@ __all__ = [
     'FeatureDesc',
     'FieldTooLargeError',
     'File',
-    'InflateError',
     'InMemoryStore',
+    'InflateError',
     'InputStream',
     'InvalidInstanceError',
     'LastBatchHandling',
-    'list_files',
     'LogLevel',
     'MaxFieldLengthHandling',
     'MemorySlice',
@@ -97,7 +98,9 @@ __all__ = [
     'Schema',
     'SchemaError',
     'StreamError',
-    'Tensor']
+    'Tensor',
+    'list_files']
+
 
 _logger = logging.getLogger("mlio")
 
@@ -119,11 +122,11 @@ def _log_message(lvl, msg):
 
 # We write all log messages coming from the library to the the Python
 # 'mlio' logger.
-mlio.core.set_log_message_handler(_log_message)
+mlio._core.set_log_message_handler(_log_message)
 
 # Make sure that we remove our Python handler once the module gets
 # unloaded.
-atexit.register(mlio.core.clear_log_message_handler)
+atexit.register(mlio._core.clear_log_message_handler)
 
 
 def set_log_level(lvl):
@@ -135,7 +138,7 @@ def set_log_level(lvl):
     lvl : LogLevel
         The new log level.
     """
-    mlio.core.set_log_level(lvl)
+    mlio._core.set_log_level(lvl)
 
     _logger.setLevel(_map_log_level(lvl))
 

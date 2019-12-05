@@ -24,7 +24,7 @@
 
 #include <mlio.h>
 
-namespace mlio {
+namespace pymlio {
 
 template<typename Function, typename... Args>
 arrow::Status
@@ -39,10 +39,10 @@ arrow_boundary(Function &&f, Args &&... args) noexcept
     catch (std::invalid_argument const &e) {
         return arrow::Status::Invalid(e.what());
     }
-    catch (stream_error const &e) {
+    catch (mlio::stream_error const &e) {
         return arrow::Status::IOError(e.what());
     }
-    catch (not_supported_error const &e) {
+    catch (mlio::not_supported_error const &e) {
         return arrow::Status::NotImplemented(e.what());
     }
     catch (std::exception const &e) {
@@ -55,4 +55,4 @@ arrow_boundary(Function &&f, Args &&... args) noexcept
     return arrow::Status::OK();
 }
 
-}  // namespace mlio
+}  // namespace pymlio

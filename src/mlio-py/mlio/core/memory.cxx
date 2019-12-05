@@ -19,7 +19,7 @@ namespace py = pybind11;
 
 using namespace mlio;
 
-namespace mliopy {
+namespace pymlio {
 
 void
 register_memory_slice(py::module &m)
@@ -36,4 +36,4 @@ register_memory_slice(py::module &m)
         });
 }
 
-}  // namespace mliopy
+}  // namespace pymlio
