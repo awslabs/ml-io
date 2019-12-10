@@ -6,13 +6,15 @@ ML-IO is a high performance data access library for machine learning tasks with 
 
 ML-IO is already being leveraged by various components of the [Amazon SageMaker](https://aws.amazon.com/sagemaker/) platform such as its first-party algorithms and the [Autopilot](https://aws.amazon.com/sagemaker/autopilot/) feature. The open-source Amazon SageMaker [XGBoost](https://github.com/aws/sagemaker-xgboost-container) and [Scikit-learn](https://github.com/aws/sagemaker-scikit-learn-container) container images also use ML-IO for consuming datasets.
 
-* [Installation](#installation)
-    * [Binaries](#binaries)
-    * [From Source](#from-source)
-* [Getting Started](#getting-started)
-* [Reference](#reference)
-* [Support](#support)
-* [How to Contribute](#how-to-contribute)
+* [Installation](#Installation)
+    * [Binaries](#Binaries)
+    * [From Source](#From-Source)
+* [Getting Started](#Getting-Started)
+* [Reference](#Reference)
+    * [Python](#Python)
+    * [C++](#C++)
+* [Support](#Support)
+* [How to Contribute](#How-to-Contribute)
 
 ## Installation
 > As of today ML-IO is only available for Linux and macOS operating systems. Windows support is planned for a future release.
@@ -83,7 +85,7 @@ for epoch in range(num_epochs):
         ...
     reader.reset() # Return to the beginning of dataset.
  ```
- 
+
 ### Reading CSV Files over Amazon SageMaker Pipe Mode as pandas DataFrames
 ML-IO can read datasets from various sources including local file system, in-memory buffers, Amazon S3 (in development), and Amazon SageMaker Pipe mode. Below we show how you can read a CSV dataset over Amazon SageMaker Pipe mode.
 
@@ -107,7 +109,6 @@ for epoch in range(num_epochs):
         df = to_pandas(example)
         ...
     reader.reset() # Return to the beginning of dataset.
-....
 ```
 
 ### Reading RecordIO-protobuf Files as PyTorch Tensors
@@ -134,7 +135,7 @@ for epoch in range(num_epochs):
         # expected to have two features: 'label_values', 'values'
         lbl_tensor = example['label_values']
         val_tensor = example['values']
-        
+
         # Zero-copy convert the features to PyTorch tensors.
         lbl_tensor = as_torch(lbl_tensor)
         val_tensor = as_torch(val_tensor)
@@ -160,7 +161,7 @@ with pipe.open_read() as strm:
     # Construct an ``mlio.ParquetRecordReader`` that extracts each
     # Parquet file from the pipe stream.
     reader = mlio.ParquetRecordReader(strm)
-    
+
     for record in reader:
         # Wrap each record (Parquet file) as an Arrow file and read into
         # an Arrow table.
@@ -179,39 +180,53 @@ Below we show the same `CsvReader` sample code; this time exporting columns as D
 int main(int argc, char *argv[])
 {
     auto dataset = mlio::list_files(/"/path/to/csv_data", /*pattern=*/"*.csv");
-    
+
     // csv_reader supports an extensive set of constructor parameters.
     // Here we just specify the two required arguments.
     mlio::data_reader_params prm{dataset, /*batch_size=*/200};
-    
+
     auto reader = mlio::make_intrusive<mlio::csv_reader>(prm);
-    
+
     // Read the dataset five times (five epochs).
     for (auto i = 0; i < /*num_epochs*/ 5; i++) {
         // An example instance acts like a dictionary of ML-IO tensors
         // mapped by column name according to the CSV header.
         mlio::intrusive_ptr<mlio::example> exm;
-        
+
         // csv_reader is simply an iterator over mini-batches of data.
         while ((exm = reader->read_example()) != nullptr) {
             // Get the ML-IO tensor of the column called 'label'.
             auto lbl = exm->find_feature("label");
-            
+
             // Zero-copy convert it to DLPack.
             DLManagedTensor *dl = mlio::as_dlpack(*lbl);
-            
+
             // Share the DLPack with other frameworks (i.e. Torch, MXNet)
             ...
         }
-        
+
         reader->reset();
     }
 }
 ```
 
 ## Reference
-* [Python](doc/reference_py.md)
-* [C++](doc/reference_cxx.md)
+
+ML-IO uses a layered architecture as shown in the following figure. Check out the Python and C++ reference links below to learn more about ML-IO's API.
+
+<p align="center"><image src="doc/architecture.svg"></p>
+
+### Python
+* [Data Stores](doc/python/data_store.md)
+* [Streams](doc/python/stream.md)
+* [Record Readers](doc/python/record_reader.md)
+* Data Readers
+* Tensors
+* Framework/Library Integration
+* Logging
+
+### C++
+* TBD
 
 ## Support
 Please submit your questions, feature requests, and bug reports on [GitHub issues](https://github.com/awslabs/ml-io/issues) page.

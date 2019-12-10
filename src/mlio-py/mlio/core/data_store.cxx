@@ -137,7 +137,7 @@ register_data_stores(py::module &m)
                 A boolean value indicating whether the file should be
                 memory-mapped.
             compression : Compression
-                The compression type of the file. If set to `infer`, the
+                The compression type of the file. If set to `INFER`, the
                 compression will be inferred from the filename.
             )");
 
@@ -196,7 +196,7 @@ register_data_stores(py::module &m)
             A boolean value indicating whether the files should be
             memory-mapped.
         compression : Compression
-            The compression type of the files. If set to `infer`, the
+            The compression type of the files. If set to `INFER`, the
             compression will be inferred from the filenames.
         )");
 

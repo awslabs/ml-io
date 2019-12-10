@@ -62,7 +62,7 @@ register_record_readers(py::module &m)
     py::class_<record>(m,
                        "Record",
                        py::buffer_protocol(),
-                       "Represents an encoded record read from a dataset.")
+                       "Represents an encoded record read from a data store.")
         .def_property_readonly("kind", &record::kind)
         .def_buffer([](record &r) {
             // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
