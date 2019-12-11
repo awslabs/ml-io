@@ -1,5 +1,19 @@
 # Building ML-IO
 
+* [Runtime Requirements](#Runtime-Requirements)
+* [Build Requirements](#Build-Requirements)
+* [Installing System Dependencies](#Installing-System-Dependencies)
+* [Building the Library](#Building-the-Library)
+* [Build Options](#Build-Options)
+* [Installing the Library](#Installing-the-Library)
+* [Building the Python Package](#Building-the-Python-Package)
+* [Building the Apache Arrow Integration](#Building-the-Apache-Arrow-Integration)
+* [Development Guidelines](#Development-Guidelines)
+    * [Compiler Warnings](#Compiler-Warnings)
+    * [Sanitizers](#Sanitizers)
+    * [Static Analyzer](#Static-Analyzer)
+    * [Code Style and Formatting](#Code-Style-and-Formatting)
+
 ## Runtime Requirements
 * On Linux libc 2.12 or higher
 * Intel TBB 2019.0 or higher
@@ -40,7 +54,7 @@ $ cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_PREFIX_PATH="$(pwd)/../third-p
 $ cmake --build . -- -j $(nproc)
 ```
 
-## Options
+## Build Options
 | Name                           | Description                                                          | Default |
 |--------------------------------|----------------------------------------------------------------------|---------|
 | MLIO_INCLUDE_LIB               | Generates build target 'mlio' for the runtime library                | ON      |
