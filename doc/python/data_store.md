@@ -12,7 +12,7 @@
 A data store, as its name suggests, represents an entity that is used for storing binary or textual data. As of today ML-IO supports local files, in-memory buffers, and Amazon SageMaker pipe channels as data stores. 
 
 ## DataStore
-All data store types inherit from the abstract `DataStore` class and expose the same interface.
+Represents an abstract base class for all data store types.
 
 ### Methods
 #### open_read
@@ -24,12 +24,12 @@ Returns an [`InputStream`](stream.md#InputStream) instance for reading from the 
 
 ### Properties
 #### id
-Gets an `str` that uniquely identifies the data store instance.
+Gets a `str` that uniquely identifies the data store instance.
 
 Note also that all data store instances are hashable and can be used in dictionaries and sets.
 
 ## File
-A data store representing a local file. Inherits from [DataStore](#DataStore).
+Represents a local file as a data store. Inherits from [DataStore](#DataStore).
 
 ```python
 File(pathname : str, mmap : bool = True, compression : Compression = Compression.INFER)
@@ -40,7 +40,7 @@ File(pathname : str, mmap : bool = True, compression : Compression = Compression
 - `compression`: The [compression](#Compression) format of the file. If set to `INFER`, the compression will be inferred from the filename.
 
 ## InMemoryStore
-A data store representing a block of memory. Inherits from [DataStore](#DataStore).
+Represents a block of memory as a data store. Inherits from [DataStore](#DataStore).
 
 ```python
 InMemoryStore(buf : buffer, compression : Compression = Compression.INFER)
@@ -50,7 +50,7 @@ InMemoryStore(buf : buffer, compression : Compression = Compression.INFER)
 - `compression`: The [compression](#Compression) format of the data.
 
 ## SageMakerPipe
-A data store representing an Amazon SageMaker pipe channel. Inherits from [DataStore](#DataStore).
+Represents an Amazon SageMaker pipe channel as a data store. Inherits from [DataStore](#DataStore).
 
 ```python
 SageMakerPipe(pathname : str, fifo_id : int = None, compression : Compression = Compression.INFER)
@@ -62,7 +62,7 @@ SageMakerPipe(pathname : str, fifo_id : int = None, compression : Compression = 
 
 ## Enumerations
 #### Compression
-Used for the initialization of a data store and can have one of the following values:
+Specifies the compression type used for the initialization of a data store.
 
 | Value   | Description                                                                                           |
 |---------|-------------------------------------------------------------------------------------------------------|

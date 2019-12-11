@@ -7,7 +7,7 @@
 Input and output streams are exposed by [`DataStore`](data_store.md#DataStore) instances via [`open_read`](data_store.md#open_read) and `open_write` functions. They allow data to be read from or written to a data store in binary form. Depending on the data store a stream can be seekable and can support zero-copy reading/writing.
 
 ## InputStream
-An input stream is used for reading data from an underlying [`DataStore`](data_store.md#DataStore) instance. An `InputStream` instance is usually retrieved by calling the [`open_read`](data_store.md#open_read) method of a data store.
+Reads data from an underlying [`DataStore`](data_store.md#DataStore) instance. An `InputStream` instance is usually retrieved by calling the [`open_read`](data_store.md#open_read) method of a data store.
 
 ### Methods
 #### read

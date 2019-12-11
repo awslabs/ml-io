@@ -50,8 +50,6 @@ Instructions on how to build ML-IO locally can be found [here](doc/build.md).
 ## Getting Started
 ML-IO currently supports reading three data formats: CSV, Parquet, and RecordIO-Protobuf.
 
-> The project is still in early stage development. The number of supported data formats will increase in later releases.
-
 Datasets read with ML-IO can be converted into NumPy arrays, SciPy COO matrices, pandas DataFrames, TensorFlow tensors, PyTorch tensors, and MXNet arrays. Below we show some examples on how to read and convert data with ML-IO.
 
 ### Reading CSV Files as NumPy Arrays
@@ -221,9 +219,9 @@ ML-IO uses a layered architecture as shown in the following figure. Check out th
 * [Streams](doc/python/stream.md)
 * [Record Readers](doc/python/record_reader.md)
 * Data Readers
-* Tensors
+* [Tensors](doc/python/tensor.md)
 * Framework/Library Integration
-* Logging
+* [Logging](doc/python/logging.md)
 
 ### C++
 * TBD
