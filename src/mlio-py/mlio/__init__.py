@@ -24,8 +24,10 @@ from mlio._core import\
     CorruptHeaderError,\
     CorruptRecordError,\
     CsvReader,\
+    CsvReaderParams,\
     DataReader,\
     DataReaderError,\
+    DataReaderParams,\
     DataStore,\
     DataType,\
     DenseTensor,\
@@ -67,8 +69,10 @@ __all__ = [
     'CorruptHeaderError',
     'CorruptRecordError',
     'CsvReader',
+    'CsvReaderParams',
     'DataReader',
     'DataReaderError',
+    'DataReaderParams'
     'DataStore',
     'DataType',
     'DenseTensor',
