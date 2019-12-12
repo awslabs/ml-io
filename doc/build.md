@@ -65,8 +65,9 @@ $ cd mlio
 $ build-tools/build-dependency build/third-party all
 $ mkdir build/release
 $ cd build/release
-$ cmake -DCMAKE_C_COMPILER=/usr/local/opt/llvm/bin/clang -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_PREFIX_PATH="$(pwd)/../third-party" ../..
-$ cmake --build . -- -j $(sysctl -n hw.physicalcpu)
+$ cmake -DCMAKE_C_COMPILER=/usr/local/opt/llvm/bin/clang -DCMAKE_CXX_COMPILER=/usr/local/opt/llvm/bin/clang++ -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_PREFIX_PATH="$(pwd)/../third-party" ../..
+$ cmake --build . -- -j $(sysctl -n hw.ncpu)
+```
 
 ## Build Options
 | Name                           | Description                                                          | Default |
