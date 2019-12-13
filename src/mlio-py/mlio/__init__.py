@@ -48,6 +48,7 @@ from mlio._core import\
     MemorySlice,\
     NotSupportedError,\
     ParquetRecordReader,\
+    ParserParams,\
     Record,\
     RecordIOProtobufReader,\
     RecordKind,\
@@ -93,6 +94,7 @@ __all__ = [
     'MemorySlice',
     'NotSupportedError',
     'ParquetRecordReader',
+    'ParserParams',
     'Record',
     'RecordIOProtobufReader',
     'RecordKind',
