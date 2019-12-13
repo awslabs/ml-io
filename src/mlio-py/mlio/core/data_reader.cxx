@@ -104,43 +104,22 @@ py_data_reader::num_bytes_read() const noexcept
     }
 }
 
-intrusive_ptr<csv_reader>
-make_csv_reader(
-    std::vector<intrusive_ptr<data_store>> dataset,
-    std::size_t batch_size,
-    std::size_t num_prefetched_batches,
-    std::size_t num_parallel_reads,
-    last_batch_handling last_batch_hnd,
-    bad_batch_handling bad_batch_hnd,
-    std::size_t num_instances_to_skip,
-    std::optional<std::size_t> num_instances_to_read,
-    std::size_t shard_index,
-    std::size_t num_shards,
-    bool shuffle_instances,
-    std::size_t shuffle_window,
-    std::optional<std::size_t> shuffle_seed,
-    bool reshuffle_each_epoch,
-    std::optional<float> subsample_ratio,
-    std::vector<std::string> column_names,
-    std::string name_prefix,
-    std::unordered_set<std::string> use_columns,
-    std::unordered_set<std::size_t> use_columns_by_index,
-    std::optional<data_type> default_data_type,
-    std::unordered_map<std::string, data_type> column_types,
-    std::unordered_map<std::size_t, data_type> column_types_by_index,
-    std::optional<std::size_t> header_row_index,
-    bool has_single_header,
-    char delimiter,
-    char quote_char,
-    std::optional<char> comment_char,
-    bool allow_quoted_new_lines,
-    bool skip_blank_lines,
-    std::string encoding,
-    std::optional<std::size_t> max_field_length,
-    max_field_length_handling max_field_length_hnd,
-    std::optional<std::size_t> max_line_length,
-    std::unordered_set<std::string> nan_values,
-    int base)
+data_reader_params
+make_data_reader_params(std::vector<intrusive_ptr<data_store>> dataset,
+                        std::size_t batch_size,
+                        std::size_t num_prefetched_batches,
+                        std::size_t num_parallel_reads,
+                        last_batch_handling last_batch_hnd,
+                        bad_batch_handling bad_batch_hnd,
+                        std::size_t num_instances_to_skip,
+                        std::optional<std::size_t> num_instances_to_read,
+                        std::size_t shard_index,
+                        std::size_t num_shards,
+                        bool shuffle_instances,
+                        std::size_t shuffle_window,
+                        std::optional<std::size_t> shuffle_seed,
+                        bool reshuffle_each_epoch,
+                        std::optional<float> subsample_ratio)
 {
     data_reader_params rdr_prm{};
 
@@ -160,6 +139,31 @@ make_csv_reader(
     rdr_prm.reshuffle_each_epoch = reshuffle_each_epoch;
     rdr_prm.subsample_ratio = subsample_ratio;
 
+    return rdr_prm;
+}
+
+csv_params
+make_csv_reader_params(
+    std::vector<std::string> column_names,
+    std::string name_prefix,
+    std::unordered_set<std::string> use_columns,
+    std::unordered_set<std::size_t> use_columns_by_index,
+    std::optional<data_type> default_data_type,
+    std::unordered_map<std::string, data_type> column_types,
+    std::unordered_map<std::size_t, data_type> column_types_by_index,
+    std::optional<std::size_t> header_row_index,
+    bool has_single_header,
+    char delimiter,
+    char quote_char,
+    std::optional<char> comment_char,
+    bool allow_quoted_new_lines,
+    bool skip_blank_lines,
+    std::optional<std::string> encoding,
+    std::optional<std::size_t> max_field_length,
+    max_field_length_handling max_field_length_hnd,
+    std::optional<std::size_t> max_line_length,
+    std::optional<parser_params> parser_prm)
+{
     csv_params csv_prm{};
 
     csv_prm.column_names = std::move(column_names);
@@ -176,53 +180,44 @@ make_csv_reader(
     csv_prm.comment_char = comment_char;
     csv_prm.allow_quoted_new_lines = allow_quoted_new_lines;
     csv_prm.skip_blank_lines = skip_blank_lines;
-    if (!encoding.empty()) {
-        csv_prm.encoding = text_encoding{std::move(encoding)};
+    if (encoding) {
+        csv_prm.encoding = text_encoding{std::move(encoding.value())};
     }
     csv_prm.max_field_length = max_field_length;
     csv_prm.max_field_length_hnd = max_field_length_hnd;
     csv_prm.max_line_length = max_line_length;
-    csv_prm.parser_prm.nan_values = std::move(nan_values);
-    csv_prm.parser_prm.base = base;
+    if (parser_prm) {
+        csv_prm.parser_prm = std::move(parser_prm.value());
+    }
 
-    return make_intrusive<csv_reader>(std::move(rdr_prm), std::move(csv_prm));
+    return csv_prm;
+}
+
+parser_params
+make_parser_params(std::unordered_set<std::string> nan_values, int base)
+{
+    parser_params parser_prm{};
+
+    parser_prm.nan_values = std::move(nan_values);
+    parser_prm.base = base;
+
+    return parser_prm;
+}
+
+intrusive_ptr<csv_reader>
+make_csv_reader(data_reader_params rdr_prm, std::optional<csv_params> csv_prm)
+{
+    if (csv_prm) {
+        return make_intrusive<csv_reader>(std::move(rdr_prm),
+                                          std::move(csv_prm.value()));
+    }
+
+    return make_intrusive<csv_reader>(std::move(rdr_prm));
 }
 
 intrusive_ptr<recordio_protobuf_reader>
-make_recordio_protobuf_reader(std::vector<intrusive_ptr<data_store>> dataset,
-                              std::size_t batch_size,
-                              std::size_t num_prefetched_batches,
-                              std::size_t num_parallel_reads,
-                              last_batch_handling last_batch_hnd,
-                              bad_batch_handling bad_batch_hnd,
-                              std::size_t num_instances_to_skip,
-                              std::optional<std::size_t> num_instances_to_read,
-                              std::size_t shard_index,
-                              std::size_t num_shards,
-                              bool shuffle_instances,
-                              std::size_t shuffle_window,
-                              std::optional<std::size_t> shuffle_seed,
-                              bool reshuffle_each_epoch,
-                              std::optional<float> subsample_ratio)
+make_recordio_protobuf_reader(data_reader_params rdr_prm)
 {
-    data_reader_params rdr_prm{};
-
-    rdr_prm.dataset = std::move(dataset);
-    rdr_prm.batch_size = batch_size;
-    rdr_prm.num_prefetched_batches = num_prefetched_batches;
-    rdr_prm.num_parallel_reads = num_parallel_reads;
-    rdr_prm.last_batch_hnd = last_batch_hnd;
-    rdr_prm.bad_batch_hnd = bad_batch_hnd;
-    rdr_prm.num_instances_to_skip = num_instances_to_skip;
-    rdr_prm.num_instances_to_read = num_instances_to_read;
-    rdr_prm.shard_index = shard_index;
-    rdr_prm.num_shards = num_shards;
-    rdr_prm.shuffle_instances = shuffle_instances;
-    rdr_prm.shuffle_window = shuffle_window;
-    rdr_prm.shuffle_seed = shuffle_seed;
-    rdr_prm.reshuffle_each_epoch = reshuffle_each_epoch;
-    rdr_prm.subsample_ratio = subsample_ratio;
-
     return make_intrusive<recordio_protobuf_reader>(std::move(rdr_prm));
 }
 
@@ -280,6 +275,272 @@ register_data_readers(py::module &m)
              })
         .def("__next__", &py_data_iterator::next);
 
+    py::class_<data_reader_params>(
+        m,
+        "DataReaderParams",
+        "Represents the common parameters of a ``data_reader`` object.")
+        .def(py::init(&make_data_reader_params),
+             "dataset"_a,
+             "batch_size"_a,
+             "num_prefetched_batches"_a = 0,
+             "num_parallel_reads"_a = 0,
+             "last_batch_handling"_a = last_batch_handling::none,
+             "bad_batch_handling"_a = bad_batch_handling::error,
+             "num_instances_to_skip"_a = 0,
+             "num_instances_to_read"_a = std::nullopt,
+             "shard_index"_a = 0,
+             "num_shards"_a = 0,
+             "shuffle_instances"_a = false,
+             "shuffle_window"_a = 0,
+             "shuffle_seed"_a = std::nullopt,
+             "reshuffle_each_epoch"_a = false,
+             "subsample_ratio"_a = std::nullopt,
+             R"(
+            Parameters
+            ----------
+            dataset : list of DataStores
+                A list of ``data_store`` instances that together form the 
+                dataset to read from.
+            batch_size : int
+                A number indicating how many data instances should be packed
+                into a single ``example``.
+            num_prefetched_batches : int, optional
+                The number of batches to prefetch in background to accelerate
+                reading. If zero, default to the number of processor cores.
+            num_parallel_reads : int, optional
+                The number of parallel batch reads. If not specified, it equals
+                to `num_prefetched_batche`. In case a large number of batches
+                should be prefetched, this parameter can be used to avoid
+                thread oversubscription.
+            last_batch_handling : LastBatchHandling
+                See ``LastBatchHandling``.
+            bad_batch_handling : BadBatchHandling
+                See ``BadBatchHandling``.
+            num_instances_to_skip : int, optional
+                The number of data instances to skip from the beginning of the
+                dataset.
+            num_instances_to_read : int, optional
+                The number of data instances to read. The rest of the dataset
+                will be ignored.
+            shard_index : int, optional
+                The index of the shard to read.
+            num_shards : int, optional
+                The number of shards the dataset should be split into. The
+                reader will only read 1/num_shards of the dataset.
+            shuffle_instances : bool
+                A boolean value indicating whether to shuffle the data instances
+                while reading from the dataset.
+            shuffle_window : int
+                The number of data instances to buffer and sample from. The
+                selected data instances will be replaced with new data instances
+                read from the dataset.
+
+                A value of zero means perfect shuffling and requires loading the
+                whole dataset into memory first.
+            shuffle_seed : int, optional
+                The seed that will be used for initializing the sampling
+                distribution. If not specified, a random seed will be generated
+                internally.
+            reshuffle_each_epoch : bool, optional
+                A boolean value indicating whether the dataset should be
+                reshuffled after every `data_reader.reset()` call.
+            subsample_ratio : float, optional
+                A ratio between zero and one indicating how much of the dataset
+                should be read. The dataset will be subsampled based on this
+                number.
+
+                Note that, as the size of a dataset is not always known in
+                advance, the ratio will be used as an approximation for the
+                actual amount of data to read.
+            )")
+        .def_readwrite("dataset", &data_reader_params::dataset)
+        .def_readwrite("batch_size", &data_reader_params::batch_size)
+        .def_readwrite("num_prefetched_batches",
+                       &data_reader_params::num_prefetched_batches)
+        .def_readwrite("num_parallel_reads",
+                       &data_reader_params::num_parallel_reads)
+        .def_readwrite("last_batch_handling",
+                       &data_reader_params::last_batch_hnd)
+        .def_readwrite("bad_batch_handling", &data_reader_params::bad_batch_hnd)
+        .def_readwrite("num_instances_to_skip",
+                       &data_reader_params::num_instances_to_skip)
+        .def_readwrite("num_instances_to_read",
+                       &data_reader_params::num_instances_to_read)
+        .def_readwrite("shard_index", &data_reader_params::shard_index)
+        .def_readwrite("num_shards", &data_reader_params::num_shards)
+        .def_readwrite("shuffle_instances",
+                       &data_reader_params::shuffle_instances)
+        .def_readwrite("shuffle_window", &data_reader_params::shuffle_window)
+        .def_readwrite("shuffle_seed", &data_reader_params::shuffle_seed)
+        .def_readwrite("reshuffle_each_epoch",
+                       &data_reader_params::reshuffle_each_epoch)
+        .def_readwrite("subsample_ratio", &data_reader_params::subsample_ratio);
+
+    py::class_<csv_params>(
+        m,
+        "CsvReaderParams",
+        "Represents the optional parameters of a ``CsvReader`` object.")
+        .def(py::init(&make_csv_reader_params),
+             "column_names"_a = std::vector<std::string>{},
+             "name_prefix"_a = "",
+             "use_columns"_a = std::unordered_set<std::string>{},
+             "use_columns_by_index"_a = std::unordered_set<std::size_t>{},
+             "default_data_type"_a = std::nullopt,
+             "column_types"_a = std::unordered_map<std::string, data_type>{},
+             "column_types_by_index"_a =
+                 std::unordered_map<std::size_t, data_type>{},
+             "header_row_index"_a = 0,
+             "has_single_header"_a = false,
+             "delimiter"_a = ',',
+             "quote_char"_a = '"',
+             "comment_char"_a = std::nullopt,
+             "allow_quoted_new_lines"_a = false,
+             "skip_blank_lines"_a = true,
+             "encoding"_a = std::nullopt,
+             "max_field_length"_a = std::nullopt,
+             "max_field_length_handling"_a = max_field_length_handling::error,
+             "max_line_length"_a = std::nullopt,
+             "parser_params"_a = std::nullopt,
+             R"(
+            Parameters
+            ----------
+            column_names : list of strs
+                The column names.
+
+                If the dataset has a header and `header_row_index` is specified,
+                this list can be left empty to infer the column names from the
+                dataset.
+
+                Due to a shortcoming in pybind11, values cannot be added to
+                container types, and updates must instead be made via
+                assignment.
+            name_prefix : str
+                The prefix to prepend to column names.
+            use_columns : list of strs
+                The columns that should be read. The rest of the columns will
+                be skipped.
+
+                Due to a shortcoming in pybind11, values cannot be added to
+                container types, and updates must instead be made via
+                assignment.
+            use_columns_by_index : list of ints
+                The columns, specified by index, that should be read. The rest
+                of the columns will be skipped.
+
+                Due to a shortcoming in pybind11, values cannot be added to
+                container types, and updates must instead be made via
+                assignment.
+            default_data_type : DataType
+                The data type for columns for which no explicit data type is
+                specified via `column_types` or `column_types_by_index`. If not
+                specified, the column data types will be inferred from the
+                dataset.
+            column_types : map of str/data type
+                The mapping between columns and data types by name.
+
+                Due to a shortcoming in pybind11, values cannot be added to
+                container types, and updates must instead be made via
+                assignment.
+            column_types_by_index : map of str/int
+                The mapping between columns and data types by index.
+
+                Due to a shortcoming in pybind11, values cannot be added to
+                container types, and updates must instead be made via
+                assignment.
+            header_row_index : int, optional
+                The index of the row that should be treated as the header of the
+                dataset. If specified, the column names will be inferred from
+                that row; otherwise `column_names` will be used. If neither
+                `header_row_index` nor `column_names` is specified, the column
+                ordinal positions will be used as column names
+
+                The index of the row that should be treated as the header of the
+                dataset. If `column_names` is empty, the column names will be
+                inferred from that row.  If neither `header_row_index` nor
+                `column_names` is specified, the column ordinal positions
+                will be used as column names.
+
+                Each data store in the dataset should have its header at the
+                same index.
+            has_single_header : bool, optional
+                A boolean value indicating whether the dataset has a header row
+                only in the first data store.
+            delimiter : char
+                The delimiter character.
+            quote_char : char
+                The character used for quoting field values.
+            comment_char : char, optional
+                The comment character. Lines that start with the comment
+                character will be skipped.
+            allow_quoted_new_lines : bool
+                A boolean value indicating whether quoted fields can be multi-
+                line. Note that turning this flag on can slow down the reading
+                speed.
+            skip_blank_lines : bool
+                A boolean value indicating whether to skip empty lines.
+            encoding : str, optional
+                The text encoding to use for reading. If not specified, it will
+                be inferred from the preamble of the text; otherwise falls back
+                to UTF-8.
+            max_field_length : int, optional
+                The maximum number of characters that will be read in a field.
+                Any characters beyond this limit will be handled using the
+                strategy in `max_field_length_hnd`.
+            max_field_length_handling : MaxFieldLengthHandling, optional
+                See ``MaxFieldLengthHandling``.
+            max_line_length : int, optional
+                The maximum size of a row to read before failing gracefully.
+            parser_params : ParserParams, optional
+                See ``ParserParams``.
+            )")
+        .def_readwrite("column_names", &csv_params::column_names)
+        .def_readwrite("name_prefix", &csv_params::name_prefix)
+        .def_readwrite("use_columns", &csv_params::use_columns)
+        .def_readwrite("use_columns_by_index",
+                       &csv_params::use_columns_by_index)
+        .def_readwrite("default_data_type", &csv_params::default_data_type)
+        .def_readwrite("column_types", &csv_params::column_types)
+        .def_readwrite("column_types_by_index",
+                       &csv_params::column_types_by_index)
+        .def_readwrite("header_row_index", &csv_params::header_row_index)
+        .def_readwrite("has_single_header", &csv_params::has_single_header)
+        .def_readwrite("delimiter", &csv_params::delimiter)
+        .def_readwrite("quote_char", &csv_params::quote_char)
+        .def_readwrite("comment_char", &csv_params::comment_char)
+        .def_readwrite("allow_quoted_new_lines",
+                       &csv_params::allow_quoted_new_lines)
+        .def_readwrite("skip_blank_lines", &csv_params::skip_blank_lines)
+        .def_readwrite("encoding", &csv_params::encoding)
+        .def_readwrite("max_field_length", &csv_params::max_field_length)
+        .def_readwrite("max_field_length_handling",
+                       &csv_params::max_field_length_hnd)
+        .def_readwrite("max_line_length", &csv_params::max_line_length)
+        .def_readwrite("parser_params", &csv_params::parser_prm);
+
+    py::class_<parser_params>(
+        m,
+        "ParserParams",
+        "Represents the parameters of a ``parser`` object.")
+        .def(py::init(&make_parser_params),
+             "nan_values"_a = std::unordered_set<std::string>{},
+             "number_base"_a = 10,
+             R"(
+            Parameters
+            ----------
+            nan_values : list of strs
+                For a floating-point parse operation holds the list of strings
+                that should be treated as NaN.
+
+                Due to a shortcoming in pybind11, values cannot be added to
+                container types, and updates must instead be made via
+                assignment.
+            number_base : int
+                For a number parse operation specifies the base of the number
+                in its string representation.
+             )")
+        .def_readwrite("nan_values", &parser_params::nan_values)
+        .def_readwrite("number_base", &parser_params::base);
+
     py::class_<data_reader, py_data_reader, intrusive_ptr<data_reader>>(
         m,
         "DataReader",
@@ -320,168 +581,15 @@ register_data_readers(py::module &m)
         "CsvReader",
         "Represents a ``data_reader`` for reading CSV datasets.")
         .def(py::init<>(&make_csv_reader),
-             "dataset"_a,
-             "batch_size"_a,
-             "num_prefetched_batches"_a = 0,
-             "num_parallel_reads"_a = 0,
-             "last_batch_handling"_a = last_batch_handling::none,
-             "bad_batch_handling"_a = bad_batch_handling::error,
-             "num_instances_to_skip"_a = 0,
-             "num_instances_to_read"_a = std::nullopt,
-             "shard_index"_a = 0,
-             "num_shards"_a = 0,
-             "shuffle_instances"_a = false,
-             "shuffle_window"_a = 0,
-             "shuffle_seed"_a = std::nullopt,
-             "reshuffle_each_epoch"_a = false,
-             "subsample_ratio"_a = std::nullopt,
-             "column_names"_a = std::vector<std::string>{},
-             "name_prefix"_a = "",
-             "use_columns"_a = std::unordered_set<std::string>{},
-             "use_columns_by_index"_a = std::unordered_set<std::size_t>{},
-             "default_data_type"_a = std::nullopt,
-             "column_types"_a = std::unordered_map<std::string, data_type>{},
-             "column_types_by_index"_a =
-                 std::unordered_map<std::size_t, data_type>{},
-             "header_row_index"_a = 0,
-             "has_single_header"_a = false,
-             "delimiter"_a = ',',
-             "quote_char"_a = '"',
-             "comment_char"_a = std::nullopt,
-             "allow_quoted_new_lines"_a = false,
-             "skip_blank_lines"_a = true,
-             "encoding"_a = "",
-             "max_field_length"_a = std::nullopt,
-             "max_field_length_handling"_a = max_field_length_handling::error,
-             "max_line_length"_a = std::nullopt,
-             "nan_values"_a = std::unordered_set<std::string>{},
-             "number_base"_a = 10,
+             "data_reader_params"_a,
+             "csv_params"_a = std::nullopt,
              R"(
             Parameters
             ----------
-            dataset : list of DataStores
-                A list of ``data_store`` instances that together form the 
-                dataset to read from.
-            batch_size : int
-                A number indicating how many data instances should be packed
-                into a single ``example``.
-            num_prefetched_batches : int, optional
-                The number of batches to prefetch in background to accelerate
-                reading. If zero, default to the number of processor cores.
-            num_parallel_reads : int, optional
-                The number of parallel batch reads. If not specified, it equals
-                to `num_prefetched_batche`. In case a large number of batches
-                should be prefetched, this parameter can be used to avoid
-                thread oversubscription.
-            last_batch_handling : LastBatchHandling
-                See ``LastBatchHandling``.
-            bad_batch_handling : BadBatchHandling
-                See ``BadBatchHandling``.
-            num_instances_to_skip : int, optional
-                The number of data instances to skip from the beginning of the
-                dataset.
-            num_instances_to_read : int, optional
-                A boolean value indicating whether to shuffle the data instances
-                while reading from the dataset.
-            shard_index : int, optional
-                The index of the shard to read.
-            num_shards : int, optional
-                The number of shards the dataset should be split into. The
-                reader will only read 1/num_shards of the dataset.
-            shuffle_instances : bool
-                The number of data instances to buffer and sample from. The
-                selected data instances will be replaced with new data instances
-                read from the dataset.
-
-                A value of zero means perfect shuffling and requires loading the
-                whole dataset into memory first.
-            shuffle_window : int
-                The seed that will be used for initializing the sampling
-                distribution. If not specified, a random seed will be generated
-                internally.
-            reshuffle_each_epoch : bool, optional
-                A boolean value indicating whether the dataset should be
-                reshuffled after every `data_reader.reset()` call.
-            subsample_ratio : float, optional
-                A ratio between zero and one indicating how much of the dataset
-                should be read. The dataset will be subsampled based on this
-                number.
-
-                Note that, as the size of a dataset is not always known in
-                advance, the ratio will be used as an approximation for the
-                actual amount of data to read.
-            header_row_index : int, optional
-                The index of the row that should be treated as the header of the
-                dataset. If specified, the column names will be inferred from
-                that row; otherwise `column_names` will be used. If neither
-                `header_row_index` nor `column_names` is specified, the column
-                ordinal positions will be used as column names
-
-                The index of the row that should be treated as the header of the
-                dataset. If `column_names` is empty, the column names will be
-                inferred from that row.  If neither `header_row_index` nor
-                `column_names` is specified, the column ordinal positions
-                will be used as column names.
-
-                Each data store in the dataset should have its header at the
-                same index.
-            has_single_header : bool, optional
-                A boolean value indicating whether the dataset has a header row
-                only in the first data store.
-            column_names : list of strs
-                The column names.
-
-                If the dataset has a header and `header_row_index` is specified,
-                this list can be left empty to infer the column names from the
-                dataset.
-            name_prefix : str
-                The prefix to prepend to column names.
-            use_columns : list of strs
-                The columns that should be read. The rest of the columns will
-                be skipped.
-            use_columns_by_index : list of ints
-                The columns, specified by index, that should be read. The rest
-                of the columns will be skipped.
-            default_data_type : DataType
-                The data type for columns for which no explicit data type is
-                specified via `column_types` or `column_types_by_index`. If not
-                specified, the column data types will be inferred from the
-                dataset.
-            column_types : map of str/data type
-                The mapping between columns and data types by name.
-            column_types_by_index : map of str/int
-                The mapping between columns and data types by index.
-            delimiter : char
-                The delimiter character.
-            quote_char : char
-                The character used for quoting field values.
-            comment_char : char, optional
-                The comment character. Lines that start with the comment
-                character will be skipped.
-            allow_quoted_new_lines : bool
-                A boolean value indicating whether quoted fields can be multi-
-                line. Note that turning this flag on can slow down the reading
-                speed.
-            skip_blank_lines : bool
-                A boolean value indicating whether to skip empty lines.
-            encoding : str
-                The text encoding to use for reading. If not specified, it will
-                be inferred from the preamble of the text; otherwise falls back
-                to UTF-8.
-            max_field_length : int, optional
-                The maximum number of characters that will be read in a field.
-                Any characters beyond this limit will be handled using the
-                strategy in `max_field_length_hnd`.
-            max_field_length_handling : MaxFieldLengthHandling, optional
-                See ``MaxFieldLengthHandling``.
-            max_line_length : int, optional
-                The maximum size of a row to read before failing gracefully.
-            nan_values : list of strs
-                For a floating-point parse operation holds the list of strings
-                that should be treated as NaN.
-            number_base : int
-                For a number parse operation specified the base of the number
-                in its string representation.
+            data_reader_params : DataReaderParams
+                See ``DataReaderParams``.
+            csv_reader_params : CsvReaderParams, optional
+                See ``CsvReaderParams``.
             )");
 
     py::class_<recordio_protobuf_reader,
@@ -489,75 +597,12 @@ register_data_readers(py::module &m)
                intrusive_ptr<recordio_protobuf_reader>>(
         m, "RecordIOProtobufReader")
         .def(py::init<>(&make_recordio_protobuf_reader),
-             "dataset"_a,
-             "batch_size"_a,
-             "num_prefetched_batches"_a = 0,
-             "num_parallel_reads"_a = 0,
-             "last_batch_handling"_a = last_batch_handling::none,
-             "bad_batch_handling"_a = bad_batch_handling::error,
-             "num_instances_to_skip"_a = 0,
-             "num_instances_to_read"_a = std::nullopt,
-             "shard_index"_a = 0,
-             "num_shards"_a = 0,
-             "shuffle_instances"_a = false,
-             "shuffle_window"_a = 0,
-             "shuffle_seed"_a = std::nullopt,
-             "reshuffle_each_epoch"_a = false,
-             "subsample_ratio"_a = std::nullopt,
+             "data_reader_params"_a,
              R"(
             Parameters
             ----------
-            dataset : list of DataStores
-                A list of ``data_store`` instances that together form the 
-                dataset to read from.
-            batch_size : int
-                A number indicating how many data instances should be packed
-                into a single ``example``.
-            num_prefetched_batches : int, optional
-                The number of batches to prefetch in background to accelerate
-                reading. If zero, default to the number of processor cores.
-            num_parallel_reads : int, optional
-                The number of parallel batch reads. If not specified, it equals
-                to `num_prefetched_batche`. In case a large number of batches
-                should be prefetched, this parameter can be used to avoid
-                thread oversubscription.
-            last_batch_handling : LastBatchHandling
-                See ``LastBatchHandling``.
-            bad_batch_handling : BadBatchHandling
-                See ``BadBatchHandling``.
-            num_instances_to_skip : int, optional
-                The number of data instances to skip from the beginning of the
-                dataset.
-            num_instances_to_read : int, optional
-                A boolean value indicating whether to shuffle the data instances
-                while reading from the dataset.
-            shard_index : int, optional
-                The index of the shard to read.
-            num_shards : int, optional
-                The number of shards the dataset should be split into. The
-                reader will only read 1/num_shards of the dataset.
-            shuffle_instances : bool
-                The number of data instances to buffer and sample from. The
-                selected data instances will be replaced with new data instances
-                read from the dataset.
-
-                A value of zero means perfect shuffling and requires loading the
-                whole dataset into memory first.
-            shuffle_window : int
-                The seed that will be used for initializing the sampling
-                distribution. If not specified, a random seed will be generated
-                internally.
-            reshuffle_each_epoch : bool, optional
-                A boolean value indicating whether the dataset should be
-                reshuffled after every `data_reader.reset()` call.
-            subsample_ratio : float, optional
-                A ratio between zero and one indicating how much of the dataset
-                should be read. The dataset will be subsampled based on this
-                number.
-
-                Note that, as the size of a dataset is not always known in
-                advance, the ratio will be used as an approximation for the
-                actual amount of data to read.
+            data_reader_params : DataReaderParams
+                See ``DataReaderParams``.
             )");
 }
 
