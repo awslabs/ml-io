@@ -44,6 +44,8 @@ $ brew update && brew install automake libtool llvm cmake ninja doxygen git
 ## Building the Library
 Run the following commands to pull and build the ML-IO C++ library.
 
+### Linux build commands
+
 ```bash
 $ git clone https://github.com/awslabs/ml-io.git mlio
 $ cd mlio
@@ -52,6 +54,19 @@ $ mkdir build/release
 $ cd build/release
 $ cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_PREFIX_PATH="$(pwd)/../third-party" ../..
 $ cmake --build . -- -j $(nproc)
+```
+
+### Mac build commands
+Mac environments default to a proprietary version of LLVM and Clang which do not work with ML-IO build. It is recommended to use the LLVM that is installed via Homebrew; this version is usually found in ```/usr/local/opt/llvm/bin/clang``` after installation.
+
+```bash
+$ git clone https://github.com/awslabs/ml-io.git mlio
+$ cd mlio
+$ build-tools/build-dependency build/third-party all
+$ mkdir build/release
+$ cd build/release
+$ cmake -DCMAKE_C_COMPILER=/usr/local/opt/llvm/bin/clang -DCMAKE_CXX_COMPILER=/usr/local/opt/llvm/bin/clang++ -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_PREFIX_PATH="$(pwd)/../third-party" ../..
+$ cmake --build . -- -j $(sysctl -n hw.ncpu)
 ```
 
 ## Build Options
