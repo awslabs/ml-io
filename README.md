@@ -67,7 +67,8 @@ dataset = mlio.list_files(file_dir, pattern='*.csv')
 
 # CsvReader supports an extensive set of constructor parameters. Here we
 # just specify the two required arguments.
-reader = mlio.CsvReader(dataset=dataset, batch_size=200)
+reader_params = mlio.DataReaderParams(dataset=dataset, batch_size=200)
+reader = mlio.CsvReader(reader_params)
 
 num_epochs = 5 # Number of times to read the full dataset.
 for epoch in range(num_epochs):
@@ -97,7 +98,8 @@ from mlio.integ.pandas import to_pandas
 # this time we construct an ``mlio.SageMakerPipe`` instance. 
 pipe = mlio.SageMakerPipe('/opt/ml/train')
 
-reader = mlio.CsvReader(dataset=[pipe], batch_size=200)
+reader_params = mlio.DataReaderParams(dataset=[pipe], batch_size=200)
+reader = mlio.CsvReader(reader_params)
 
 num_epochs = 5 # Number of times to read the full dataset.
 for epoch in range(num_epochs):
@@ -123,7 +125,8 @@ dataset = mlio.list_files('/path/to/recordio_data')
 
 # RecordIOProtobufReader supports an extensive set of constructor
 # parameters. Here we just specify the two required arguments.
-reader = mlio.RecordIOProtobufReader(dataset=dataset, batch_size=200)
+reader_params = mlio.DataReaderParams(dataset=dataset, batch_size=200)
+reader = mlio.RecordIOProtobufReader(reader_params)
 
 num_epochs = 5  # Number of times to read the full dataset.
 for epoch in range(num_epochs):
@@ -177,7 +180,7 @@ Below we show the same `CsvReader` sample code; this time exporting columns as D
 
 int main(int argc, char *argv[])
 {
-    auto dataset = mlio::list_files(/"/path/to/csv_data", /*pattern=*/"*.csv");
+    auto dataset = mlio::list_files("/path/to/csv_data", /*pattern=*/"*.csv");
 
     // csv_reader supports an extensive set of constructor parameters.
     // Here we just specify the two required arguments.
