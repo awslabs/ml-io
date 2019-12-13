@@ -73,7 +73,7 @@ __all__ = [
     'CsvReaderParams',
     'DataReader',
     'DataReaderError',
-    'DataReaderParams'
+    'DataReaderParams',
     'DataStore',
     'DataType',
     'DenseTensor',
