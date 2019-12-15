@@ -289,26 +289,38 @@ csv_reader::init_parsers_and_schema()
     auto col_beg = tbb::make_zip_iterator(idx_beg, name_beg, type_beg);
     auto col_end = tbb::make_zip_iterator(idx_end, name_end, type_end);
 
+    std::unordered_map<std::string, std::size_t> name_count{};
+
     for (auto col_pos = col_beg; col_pos < col_end; ++col_pos) {
         std::size_t idx = std::get<0>(*col_pos);
-
-        std::string const &name = std::get<1>(*col_pos);
-
+        std::string name = std::get<1>(*col_pos);
         data_type dt = std::get<2>(*col_pos);
 
         if (should_skip(idx, name)) {
             skipped_columns_.emplace_back(1);
-
             column_parsers_.emplace_back(nullptr);
+            continue;
         }
-        else {
-            skipped_columns_.emplace_back(0);
 
-            column_parsers_.emplace_back(make_parser(dt, params_.parser_prm));
+        skipped_columns_.emplace_back(0);
+        column_parsers_.emplace_back(make_parser(dt, params_.parser_prm));
 
-            descs.emplace_back(
-                feature_desc_builder{name, dt, {batch_size, 1}}.build());
+        if (params_.dedupe_column_names) {
+            // Keep count of column names. If the key already exists, create a
+            // new name by appending underscore + count. Since this new name
+            // might also exist, iterate until we can insert the new name.
+            auto [pos, inserted] = name_count.try_emplace(name, 0);
+            while (!inserted) {
+                name.append("_").append(fmt::to_string(pos->second++));
+                std::tie(pos, inserted) = name_count.try_emplace(name, 0);
+            }
+            pos->second++;
         }
+
+        descs.emplace_back(feature_desc_builder{
+            std::move(name),
+            dt,
+            {batch_size, 1}}.build());
     }
 
     try {

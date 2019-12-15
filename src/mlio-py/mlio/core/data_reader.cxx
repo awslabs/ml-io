@@ -153,6 +153,7 @@ make_csv_reader_params(
     std::unordered_map<std::size_t, data_type> column_types_by_index,
     std::optional<std::size_t> header_row_index,
     bool has_single_header,
+    bool dedupe_column_names,
     char delimiter,
     char quote_char,
     std::optional<char> comment_char,
@@ -175,6 +176,7 @@ make_csv_reader_params(
     csv_prm.column_types_by_index = std::move(column_types_by_index);
     csv_prm.header_row_index = header_row_index;
     csv_prm.has_single_header = has_single_header;
+    csv_prm.dedupe_column_names = dedupe_column_names;
     csv_prm.delimiter = delimiter;
     csv_prm.quote_char = quote_char;
     csv_prm.comment_char = comment_char;
@@ -391,6 +393,7 @@ register_data_readers(py::module &m)
                  std::unordered_map<std::size_t, data_type>{},
              "header_row_index"_a = 0,
              "has_single_header"_a = false,
+             "dedupe_column_names"_a = true,
              "delimiter"_a = ',',
              "quote_char"_a = '"',
              "comment_char"_a = std::nullopt,
@@ -465,6 +468,10 @@ register_data_readers(py::module &m)
             has_single_header : bool, optional
                 A boolean value indicating whether the dataset has a header row
                 only in the first data store.
+            dedupe_column_names: bool, optional
+                A boolean value indiciating whether duplicate columns should be
+                renamed. If true, duplicate columns 'X', ..., 'X' will be
+                renamed to 'X', 'X_1', X_2', ...
             delimiter : char
                 The delimiter character.
             quote_char : char
@@ -504,6 +511,7 @@ register_data_readers(py::module &m)
                        &csv_params::column_types_by_index)
         .def_readwrite("header_row_index", &csv_params::header_row_index)
         .def_readwrite("has_single_header", &csv_params::has_single_header)
+        .def_readwrite("dedupe_column_names", &csv_params::dedupe_column_names)
         .def_readwrite("delimiter", &csv_params::delimiter)
         .def_readwrite("quote_char", &csv_params::quote_char)
         .def_readwrite("comment_char", &csv_params::comment_char)
