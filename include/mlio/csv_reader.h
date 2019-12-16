@@ -59,6 +59,10 @@ struct MLIO_API csv_params final {
     /// A boolean value indicating whether the dataset has a header row
     /// only in the first data store.
     bool has_single_header = false;
+    /// A boolean value indiciating whether duplicate columns should be
+    /// renamed. If true, duplicate columns 'X', ..., 'X' will be
+    /// renamed to 'X', 'X_1', X_2', ...
+    bool dedupe_column_names = true;
     /// The column names.
     ///
     /// @note
