@@ -14,15 +14,15 @@
 import numpy as np
 import tensorflow as tf
 
+from mlio import DenseTensor
 from mlio.integ.numpy import as_numpy
 from mlio.integ.scipy import to_coo_matrix
 
 
-def as_tensorflow(tensor):
-    return tf.convert_to_tensor(as_numpy(tensor))
+def to_tf(tensor):
+    if isinstance(tensor, DenseTensor):
+        return tf.convert_to_tensor(as_numpy(tensor))
 
-
-def as_tensorflow_sparse(tensor):
     mtx = to_coo_matrix(tensor).tocsr()
 
     non_zero_row_col = mtx.nonzero()
@@ -32,7 +32,7 @@ def as_tensorflow_sparse(tensor):
     return tf.SparseTensor(indices, mtx.data, mtx.shape)
 
 
-def make_tensorflow_dataset(data_reader, features, dtypes):
+def make_tf_dataset(data_reader, features, dtypes):
     def generator():
         for exm in data_reader:
             feature_tensor_dict = {}
