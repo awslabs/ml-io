@@ -23,7 +23,7 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 # Project
 # ------------------------------------------------------------
 
-project(ML-IO VERSION 0.3.0 LANGUAGES C CXX)
+project(ML-IO VERSION 0.3.1 LANGUAGES C CXX)
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     set_property(CACHE CMAKE_BUILD_TYPE PROPERTY VALUE RelWithDebInfo)
