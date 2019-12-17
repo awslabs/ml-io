@@ -54,7 +54,7 @@ Datasets read with ML-IO can be converted into NumPy arrays, SciPy COO matrices,
 
 ### Reading CSV Files as NumPy Arrays
 
-One or more CSV files can be read as a single dataset using the `CsvReader` class. The code snippet below shows how you can quickly iterate through a CSV dataset in mini-batches.
+One or more CSV files can be read as a single dataset using the [`CsvReader`](doc/python/data_reader.md#CsvReader) class. The code snippet below shows how you can quickly iterate through a CSV dataset in mini-batches.
 
 ```python
 import numpy as np
@@ -112,7 +112,7 @@ for epoch in range(num_epochs):
 ```
 
 ### Reading RecordIO-protobuf Files as PyTorch Tensors
-RecordIO-protobuf is the native data format of first-party Amazon SageMaker algorithms. It is a binary format that is specifically tuned for high-throughput. With ML-IO third-party algorithms can now leverage the same performance benefit as first-party Amazon SageMaker algorithms.
+[RecordIO-protobuf](https://docs.aws.amazon.com/sagemaker/latest/dg/cdf-training.html) is the native data format of first-party Amazon SageMaker algorithms. It is a binary format that is specifically tuned for high-throughput. With ML-IO third-party algorithms can now leverage the same performance benefit as first-party Amazon SageMaker algorithms.
 
 ```python
 import numpy as np
@@ -173,7 +173,7 @@ with pipe.open_read() as strm:
 ### Reading in C++
 The C++ API of ML-IO has full feature parity with its Python API. In fact ML-IO is mostly written in modern C++ and exposes its functionality to Python using a thin language binding layer. This makes it possible to perform quick experimentations and fast iterations in Python that can later be productionized in C++ with very little effort.
 
-Below we show the same `CsvReader` sample code; this time exporting columns as DLPack tensors instead of NumPy arrays.
+Below we show the same [`CsvReader`](doc/python/data_reader.md#CsvReader) sample code; this time exporting columns as DLPack tensors instead of NumPy arrays.
 
 ```cpp
 #include <mlio.h>
@@ -221,9 +221,9 @@ ML-IO uses a layered architecture as shown in the following figure. Check out th
 * [Data Stores](doc/python/data_store.md)
 * [Streams](doc/python/stream.md)
 * [Record Readers](doc/python/record_reader.md)
-* Data Readers
+* [Data Readers](doc/python/data_reader.md)
 * [Tensors](doc/python/tensor.md)
-* Framework/Library Integration
+* [Framework/Library Integration](doc/python/integration.md)
 * [Logging](doc/python/logging.md)
 
 ### C++
