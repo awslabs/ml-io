@@ -26,12 +26,12 @@ def test_recordio_protobuf_reader_params():
     assert reader2.peek_example()
 
 
-def test_csv_reader_params():
+def test_csv_params():
     filename = os.path.join(resources_dir, 'test.csv')
     dataset = [mlio.File(filename)]
     rdr_prm = mlio.DataReaderParams(dataset=dataset,
                                     batch_size=1)
-    csv_prm = mlio.CsvReaderParams(header_row_index=None)
+    csv_prm = mlio.CsvParams(header_row_index=None)
     reader = mlio.CsvReader(rdr_prm, csv_prm)
 
     example = reader.read_example()
@@ -68,8 +68,8 @@ def test_data_reader_params_members():
     assert rdr_prm.batch_size == 2
 
 
-def test_csv_reader_params_members():
-    csv_prm = mlio.CsvReaderParams()
+def test_csv_params_members():
+    csv_prm = mlio.CsvParams()
 
     assert csv_prm.column_names == []
     assert csv_prm.name_prefix == ''

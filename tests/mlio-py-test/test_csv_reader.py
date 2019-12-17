@@ -24,7 +24,7 @@ def _test_dedupe_column_names(
 
     dataset = [mlio.File(str(csv_file))]
     reader_params = mlio.DataReaderParams(dataset=dataset, batch_size=1)
-    csv_params = mlio.CsvReaderParams(
+    csv_params = mlio.CsvParams(
         dedupe_column_names=dedupe_column_names,
         **kwargs
     )

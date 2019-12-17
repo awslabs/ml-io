@@ -24,7 +24,7 @@ from mlio._core import\
     CorruptHeaderError,\
     CorruptRecordError,\
     CsvReader,\
-    CsvReaderParams,\
+    CsvParams,\
     DataReader,\
     DataReaderError,\
     DataReaderParams,\
@@ -70,7 +70,7 @@ __all__ = [
     'CorruptHeaderError',
     'CorruptRecordError',
     'CsvReader',
-    'CsvReaderParams',
+    'CsvParams',
     'DataReader',
     'DataReaderError',
     'DataReaderParams',

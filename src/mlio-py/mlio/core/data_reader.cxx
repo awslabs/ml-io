@@ -251,7 +251,7 @@ register_data_readers(py::module &m)
         "BadBatchHandling",
         "Specifies how a batch that contains erroneous data should be"
         "handled.")
-        .value("ERROR", bad_batch_handling::error, "Throw an exception.")
+        .value("ERROR", bad_batch_handling::error, "Raise an error.")
         .value("SKIP", bad_batch_handling::skip, "Skip the batch.")
         .value("WARN",
                bad_batch_handling::warn,
@@ -262,7 +262,7 @@ register_data_readers(py::module &m)
         "MaxFieldLengthHandling",
         "Specifies how field and columns should be handled when breached.")
         .value(
-            "ERROR", max_field_length_handling::error, "Throw an exception.")
+            "ERROR", max_field_length_handling::error, "Raise an error.")
         .value("TRUNCATE",
                max_field_length_handling::truncate,
                "Truncate the field.")
@@ -301,7 +301,7 @@ register_data_readers(py::module &m)
             Parameters
             ----------
             dataset : list of DataStores
-                A list of ``data_store`` instances that together form the 
+                A list of ``DataStore`` instances that together form the
                 dataset to read from.
             batch_size : int
                 A number indicating how many data instances should be packed
@@ -380,7 +380,7 @@ register_data_readers(py::module &m)
 
     py::class_<csv_params>(
         m,
-        "CsvReaderParams",
+        "CsvParams",
         "Represents the optional parameters of a ``CsvReader`` object.")
         .def(py::init(&make_csv_reader_params),
              "column_names"_a = std::vector<std::string>{},
@@ -452,12 +452,6 @@ register_data_readers(py::module &m)
                 assignment.
             header_row_index : int, optional
                 The index of the row that should be treated as the header of the
-                dataset. If specified, the column names will be inferred from
-                that row; otherwise `column_names` will be used. If neither
-                `header_row_index` nor `column_names` is specified, the column
-                ordinal positions will be used as column names
-
-                The index of the row that should be treated as the header of the
                 dataset. If `column_names` is empty, the column names will be
                 inferred from that row.  If neither `header_row_index` nor
                 `column_names` is specified, the column ordinal positions
@@ -492,7 +486,7 @@ register_data_readers(py::module &m)
             max_field_length : int, optional
                 The maximum number of characters that will be read in a field.
                 Any characters beyond this limit will be handled using the
-                strategy in `max_field_length_hnd`.
+                strategy in `max_field_length_handling`.
             max_field_length_handling : MaxFieldLengthHandling, optional
                 See ``MaxFieldLengthHandling``.
             max_line_length : int, optional
@@ -527,8 +521,7 @@ register_data_readers(py::module &m)
 
     py::class_<parser_params>(
         m,
-        "ParserParams",
-        "Represents the parameters of a ``parser`` object.")
+        "ParserParams")
         .def(py::init(&make_parser_params),
              "nan_values"_a = std::unordered_set<std::string>{},
              "number_base"_a = 10,
