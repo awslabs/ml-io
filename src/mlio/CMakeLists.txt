@@ -28,13 +28,12 @@ add_library(mlio
     record_readers/detail/in_memory_chunk_reader.cxx
     record_readers/detail/recordio_header.cxx
     record_readers/detail/text_line.cxx
-    record_readers/corrupt_record_error.cxx
     record_readers/csv_record_reader.cxx
     record_readers/parquet_record_reader.cxx
-    record_readers/recordio_record_reader.cxx
-    record_readers/record_reader_base.cxx
+    record_readers/record_error.cxx
     record_readers/record_reader.cxx
-    record_readers/record_too_large_error.cxx
+    record_readers/record_reader_base.cxx
+    record_readers/recordio_record_reader.cxx
     record_readers/stream_record_reader.cxx
     record_readers/text_line_record_reader.cxx
     record_readers/text_record_reader.cxx
@@ -65,6 +64,7 @@ add_library(mlio
     instance_reader.cxx
     instance_reader_base.cxx
     logger.cxx
+    mlio_error.cxx
     not_supported_error.cxx
     parallel_data_reader.cxx
     parser.cxx

@@ -31,8 +31,8 @@
 #include "mlio/instance_batch.h"
 #include "mlio/memory/memory_slice.h"
 #include "mlio/not_supported_error.h"
-#include "mlio/record_readers/corrupt_record_error.h"
 #include "mlio/record_readers/record.h"
+#include "mlio/record_readers/record_error.h"
 #include "mlio/streams/stream_error.h"
 
 namespace mlio {

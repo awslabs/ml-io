@@ -16,7 +16,7 @@
 #include "mlio/csv_record_tokenizer.h"
 
 #include "mlio/config.h"
-#include "mlio/record_readers/corrupt_record_error.h"
+#include "mlio/record_readers/record_error.h"
 
 namespace mlio {
 inline namespace v1 {

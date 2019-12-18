@@ -24,36 +24,45 @@ namespace pymlio {
 void
 register_exceptions(py::module &m)
 {
-    PyObject *base;
+    // clang-format off
 
-    base = py::register_exception<stream_error>(
-               m, "StreamError", ::PyExc_RuntimeError)
-               .ptr();
-    py::register_exception<inflate_error>(m, "InflateError", base);
+    PyObject *mlio_err = py::register_exception<mlio_error>(
+        m, "MLIOError", ::PyExc_RuntimeError).ptr();
 
-    base = py::register_exception<corrupt_record_error>(
-               m, "CorruptRecordError", ::PyExc_RuntimeError)
-               .ptr();
+    PyObject *base =
+    py::register_exception<stream_error>(
+        m, "StreamError", mlio_err).ptr();
+    py::register_exception<inflate_error>(
+        m, "InflateError", base);
+
+    base =
+    py::register_exception<record_error>(
+        m, "RecordError", mlio_err).ptr();
+    py::register_exception<record_too_large_error>(
+        m, "RecordTooLargeError", base);
+
+    base =
+    py::register_exception<corrupt_record_error>(
+        m, "CorruptRecordError", base).ptr();
     py::register_exception<corrupt_footer_error>(
         m, "CorruptFooterError", base);
     py::register_exception<corrupt_header_error>(
         m, "CorruptHeaderError", base);
 
-    py::register_exception<record_too_large_error>(
-        m, "RecordTooLargeError", ::PyExc_RuntimeError);
-
-    base = py::register_exception<data_reader_error>(
-               m, "DataReaderError", ::PyExc_RuntimeError)
-               .ptr();
-    py::register_exception<schema_error>(m, "SchemaError", base);
+    base =
+    py::register_exception<data_reader_error>(
+        m, "DataReaderError", mlio_err).ptr();
+    py::register_exception<schema_error>(
+        m, "SchemaError", base);
     py::register_exception<invalid_instance_error>(
         m, "InvalidInstanceError", base);
-
     py::register_exception<field_too_large_error>(
-        m, "FieldTooLargeError", ::PyExc_RuntimeError);
+        m, "FieldTooLargeError", base);
 
     py::register_exception<not_supported_error>(
-        m, "NotSupportedError", ::PyExc_RuntimeError);
+        m, "NotSupportedError", mlio_err);
+
+    // clang-format on
 }
 
 }  // namespace pymlio

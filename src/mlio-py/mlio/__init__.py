@@ -44,12 +44,14 @@ from mlio._core import\
     InvalidInstanceError,\
     LastBatchHandling,\
     LogLevel,\
+    MLIOError,\
     MaxFieldLengthHandling,\
     MemorySlice,\
     NotSupportedError,\
     ParquetRecordReader,\
     ParserParams,\
     Record,\
+    RecordError,\
     RecordIOProtobufReader,\
     RecordKind,\
     RecordReader,\
@@ -90,12 +92,14 @@ __all__ = [
     'InvalidInstanceError',
     'LastBatchHandling',
     'LogLevel',
+    'MLIOError',
     'MaxFieldLengthHandling',
     'MemorySlice',
     'NotSupportedError',
     'ParquetRecordReader',
     'ParserParams',
     'Record',
+    'RecordError',
     'RecordIOProtobufReader',
     'RecordKind',
     'RecordReader',

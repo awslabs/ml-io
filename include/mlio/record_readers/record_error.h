@@ -15,9 +15,8 @@
 
 #pragma once
 
-#include <stdexcept>
-
 #include "mlio/config.h"
+#include "mlio/mlio_error.h"
 
 namespace mlio {
 inline namespace v1 {
@@ -25,9 +24,28 @@ inline namespace v1 {
 /// @addtogroup records Records
 /// @{
 
-class MLIO_API corrupt_record_error : public std::runtime_error {
+class MLIO_API record_error : public mlio_error {
 public:
-    using std::runtime_error::runtime_error;
+    using mlio_error::mlio_error;
+
+public:
+    record_error(record_error const &) = default;
+
+    record_error(record_error &&) = default;
+
+    ~record_error() override;
+
+public:
+    record_error &
+    operator=(record_error const &) = default;
+
+    record_error &
+    operator=(record_error &&) = default;
+};
+
+class MLIO_API corrupt_record_error : public record_error {
+public:
+    using record_error::record_error;
 
 public:
     corrupt_record_error(corrupt_record_error const &) = default;
@@ -80,6 +98,25 @@ public:
 
     corrupt_footer_error &
     operator=(corrupt_footer_error &&) = default;
+};
+
+class MLIO_API record_too_large_error : public record_error {
+public:
+    using record_error::record_error;
+
+public:
+    record_too_large_error(record_too_large_error const &) = default;
+
+    record_too_large_error(record_too_large_error &&) = default;
+
+    ~record_too_large_error() override;
+
+public:
+    record_too_large_error &
+    operator=(record_too_large_error const &) = default;
+
+    record_too_large_error &
+    operator=(record_too_large_error &&) = default;
 };
 
 /// @}

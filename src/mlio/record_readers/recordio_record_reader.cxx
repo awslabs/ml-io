@@ -20,10 +20,10 @@
 #include <fmt/format.h>
 
 #include "mlio/memory/memory_slice.h"
-#include "mlio/record_readers/corrupt_record_error.h"
 #include "mlio/record_readers/detail/recordio_header.h"
 #include "mlio/record_readers/detail/util.h"
 #include "mlio/record_readers/record.h"
+#include "mlio/record_readers/record_error.h"
 
 namespace mlio {
 inline namespace v1 {

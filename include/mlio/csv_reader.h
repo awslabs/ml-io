@@ -23,6 +23,7 @@
 #include <vector>
 
 #include "mlio/config.h"
+#include "mlio/data_reader_error.h"
 #include "mlio/data_type.h"
 #include "mlio/fwd.h"
 #include "mlio/intrusive_ptr.h"
@@ -194,9 +195,9 @@ private:
     bool should_read_header = true;
 };
 
-class MLIO_API field_too_large_error : public std::runtime_error {
+class MLIO_API field_too_large_error : public data_reader_error {
 public:
-    using std::runtime_error::runtime_error;
+    using data_reader_error::data_reader_error;
 
 public:
     field_too_large_error(field_too_large_error const &) = default;

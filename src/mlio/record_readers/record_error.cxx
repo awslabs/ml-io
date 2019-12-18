@@ -13,10 +13,18 @@
  * language governing permissions and limitations under the License.
  */
 
-#include "mlio/record_readers/record_too_large_error.h"
+#include "mlio/record_readers/record_error.h"
 
 namespace mlio {
 inline namespace v1 {
+
+record_error::~record_error() = default;
+
+corrupt_record_error::~corrupt_record_error() = default;
+
+corrupt_header_error::~corrupt_header_error() = default;
+
+corrupt_footer_error::~corrupt_footer_error() = default;
 
 record_too_large_error::~record_too_large_error() = default;
 

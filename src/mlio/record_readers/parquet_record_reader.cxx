@@ -16,8 +16,8 @@
 #include "mlio/record_readers/parquet_record_reader.h"
 
 #include "mlio/memory/memory_slice.h"
-#include "mlio/record_readers/corrupt_record_error.h"
 #include "mlio/record_readers/record.h"
+#include "mlio/record_readers/record_error.h"
 #include "mlio/util/cast.h"
 
 namespace mlio {

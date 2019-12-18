@@ -22,9 +22,8 @@
 #include <fmt/format.h>
 
 #include "mlio/memory/memory_slice.h"
-#include "mlio/record_readers/corrupt_record_error.h"
 #include "mlio/record_readers/record.h"
-#include "mlio/record_readers/record_too_large_error.h"
+#include "mlio/record_readers/record_error.h"
 #include "mlio/span.h"
 #include "mlio/util/cast.h"
 

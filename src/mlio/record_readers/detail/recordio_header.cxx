@@ -16,7 +16,7 @@
 #include "mlio/record_readers/detail/recordio_header.h"
 
 #include "mlio/endian.h"
-#include "mlio/record_readers/corrupt_record_error.h"
+#include "mlio/record_readers/record_error.h"
 #include "mlio/span.h"
 
 namespace mlio {

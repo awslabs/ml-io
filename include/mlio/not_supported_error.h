@@ -15,16 +15,15 @@
 
 #pragma once
 
-#include <stdexcept>
-
 #include "mlio/config.h"
+#include "mlio/mlio_error.h"
 
 namespace mlio {
 inline namespace v1 {
 
-class MLIO_API not_supported_error : public std::runtime_error {
+class MLIO_API not_supported_error : public mlio_error {
 public:
-    using std::runtime_error::runtime_error;
+    using mlio_error::mlio_error;
 
 public:
     not_supported_error(not_supported_error const &) = default;

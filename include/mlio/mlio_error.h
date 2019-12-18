@@ -22,29 +22,24 @@
 namespace mlio {
 inline namespace v1 {
 
-/// @addtogroup records Records
-/// @{
-
-class MLIO_API record_too_large_error : public std::runtime_error {
+class MLIO_API mlio_error : public std::runtime_error {
 public:
     using std::runtime_error::runtime_error;
 
 public:
-    record_too_large_error(record_too_large_error const &) = default;
+    mlio_error(mlio_error const &) = default;
 
-    record_too_large_error(record_too_large_error &&) = default;
+    mlio_error(mlio_error &&) = default;
 
-    ~record_too_large_error() override;
+    ~mlio_error() override;
 
 public:
-    record_too_large_error &
-    operator=(record_too_large_error const &) = default;
+    mlio_error &
+    operator=(mlio_error const &) = default;
 
-    record_too_large_error &
-    operator=(record_too_large_error &&) = default;
+    mlio_error &
+    operator=(mlio_error &&) = default;
 };
-
-/// @}
 
 }  // namespace v1
 }  // namespace mlio

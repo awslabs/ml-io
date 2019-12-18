@@ -13,16 +13,12 @@
  * language governing permissions and limitations under the License.
  */
 
-#include "mlio/record_readers/corrupt_record_error.h"
+#include "mlio/mlio_error.h"
 
 namespace mlio {
 inline namespace v1 {
 
-corrupt_record_error::~corrupt_record_error() = default;
-
-corrupt_header_error::~corrupt_header_error() = default;
-
-corrupt_footer_error::~corrupt_footer_error() = default;
+mlio_error::~mlio_error() = default;
 
 }  // namespace v1
 }  // namespace mlio
