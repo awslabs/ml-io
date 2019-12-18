@@ -81,8 +81,6 @@ as_arrow_file(record const &rec)
 
 PYBIND11_MODULE(arrow, m)
 {
-    m.attr("__module__") = "mlio";
-
     m.def("as_arrow_file",
           py::overload_cast<data_store const &>(&as_arrow_file),
           "store"_a);

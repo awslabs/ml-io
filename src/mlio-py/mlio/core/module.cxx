@@ -21,7 +21,7 @@ namespace pymlio {
 
 PYBIND11_MODULE(_core, m)
 {
-    m.attr("__module__") = "mlio";
+    m.attr("__name__") = "mlio";
 
     initialize();
 
