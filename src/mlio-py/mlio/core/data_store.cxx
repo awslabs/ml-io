@@ -15,6 +15,7 @@
 
 #include "module.h"
 
+#include <chrono>
 #include <exception>
 
 #include "py_memory_block.h"
@@ -159,8 +160,12 @@ register_data_stores(py::module &m)
         m,
         "SageMakerPipe",
         "Represents an Amazon SageMaker pipe channel as a ``data_store``.")
-        .def(py::init<std::string, std::optional<std::size_t>, compression>(),
+        .def(py::init<std::string,
+                      std::chrono::seconds,
+                      std::optional<std::size_t>,
+                      compression>(),
              "pathname"_a,
+             "timeout"_a = sagemaker_pipe_default_timeout,
              "fifo_id"_a = std::nullopt,
              "compression"_a = compression::none,
              R"(
@@ -168,6 +173,9 @@ register_data_stores(py::module &m)
             ----------
             pathname : str
                 The path to the SageMaker pipe channel.
+            timeout : datetime.timedelta
+                The duration to wait for data to appear in the SageMaker pipe
+                channel.
             fifo_id : int, optional
                 The FIFO suffix of the SageMaker pipe channel.
             compression : Compression, optional

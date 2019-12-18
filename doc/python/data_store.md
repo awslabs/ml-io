@@ -53,12 +53,16 @@ InMemoryStore(buf : buffer, compression : Compression = Compression.INFER)
 Represents an Amazon SageMaker pipe channel as a data store. Inherits from [DataStore](#DataStore).
 
 ```python
-SageMakerPipe(pathname : str, fifo_id : int = None, compression : Compression = Compression.INFER)
+SageMakerPipe(pathname : str,
+              timeout : datetime.timedelta = datetime.timedelta(seconds=60),
+              fifo_id : int = None,
+              compression : Compression = Compression.INFER)
 ```
 
 - `pathname`: The path of an Amazon SageMaker pipe channel on the local file system; by convention this is usually a path residing under `/opt/ml` (e.g. `/opt/ml/train`)
-- `fifo_id`: (Advanced) The UNIX named pipe (a.k.a. FIFO) suffix of the channel. This parameter should only be used if you read from the pipe channel using another mechanism before instantiating a `SageMakerPipe` instance.
-- `compression`: The [compression](#Compression) format of the pipe channel.
+- `timeout`: The duration to wait for data to appear in the channel.
+- `fifo_id`: (Advanced) The UNIX named pipe (a.k.a. FIFO) suffix of the channel. This parameter should only be used if you read from the channel using another mechanism before instantiating a `SageMakerPipe` instance.
+- `compression`: The [compression](#Compression) format of the channel.
 
 ## Enumerations
 #### Compression

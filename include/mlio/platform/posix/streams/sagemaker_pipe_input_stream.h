@@ -17,6 +17,7 @@
 
 // IWYU pragma: private, include "mlio/streams/sagemaker_pipe_input_stream.h"
 
+#include <chrono>
 #include <cstddef>
 #include <optional>
 #include <string>
@@ -43,6 +44,7 @@ class MLIO_API sagemaker_pipe_input_stream final : public input_stream_base {
 
 private:
     explicit sagemaker_pipe_input_stream(std::string &&pathname,
+                                         std::chrono::seconds timeout,
                                          std::optional<std::size_t> fifo_id);
 
 public:
@@ -96,12 +98,17 @@ private:
     std::string pathname_;
     std::ptrdiff_t fifo_id_ = -1;
     detail::file_descriptor fifo_fd_{};
+    std::chrono::seconds timeout_;
 };
+
+inline constexpr std::chrono::seconds sagemaker_pipe_default_timeout{60};
 
 MLIO_API
 intrusive_ptr<sagemaker_pipe_input_stream>
-make_sagemaker_pipe_input_stream(std::string pathname,
-                                 std::optional<std::size_t> fifo_id = {});
+make_sagemaker_pipe_input_stream(
+    std::string pathname,
+    std::chrono::seconds timeout = sagemaker_pipe_default_timeout,
+    std::optional<std::size_t> fifo_id = {});
 
 /// @}
 

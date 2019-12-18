@@ -30,9 +30,13 @@ namespace mlio {
 inline namespace v1 {
 
 sagemaker_pipe::sagemaker_pipe(std::string pathname,
+                               std::chrono::seconds timeout,
                                std::optional<std::size_t> fifo_id,  // NOLINT
                                compression cmp)
-    : pathname_{std::move(pathname)}, fifo_id_{fifo_id}, compression_{cmp}
+    : pathname_{std::move(pathname)}
+    , timeout_{timeout}
+    , fifo_id_{fifo_id}
+    , compression_{cmp}
 {
     detail::validate_file_pathname(pathname_);
 
@@ -49,7 +53,7 @@ sagemaker_pipe::open_read() const
     logger::info("The SageMaker pipe '{0}' is being opened.", pathname_);
 
     auto strm = make_sagemaker_pipe_input_stream(
-        pathname_, std::exchange(fifo_id_, std::nullopt));
+        pathname_, timeout_, std::exchange(fifo_id_, std::nullopt));
 
     if (compression_ == compression::none) {
         return std::move(strm);

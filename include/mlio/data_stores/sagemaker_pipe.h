@@ -15,6 +15,7 @@
 
 #pragma once
 
+#include <chrono>
 #include <cstddef>
 #include <optional>
 #include <string>
@@ -24,6 +25,7 @@
 #include "mlio/data_stores/data_store.h"
 #include "mlio/fwd.h"
 #include "mlio/intrusive_ptr.h"
+#include "mlio/streams/sagemaker_pipe_input_stream.h"
 
 namespace mlio {
 inline namespace v1 {
@@ -34,9 +36,11 @@ inline namespace v1 {
 /// Represents an Amazon SageMaker pipe channel as a @ref data_store.
 class MLIO_API sagemaker_pipe final : public data_store {
 public:
-    explicit sagemaker_pipe(std::string pathname,
-                            std::optional<std::size_t> fifo_id = {},
-                            compression cmp = {});
+    explicit sagemaker_pipe(
+        std::string pathname,
+        std::chrono::seconds timeout = sagemaker_pipe_default_timeout,
+        std::optional<std::size_t> fifo_id = {},
+        compression cmp = {});
 
 public:
     intrusive_ptr<input_stream>
@@ -54,6 +58,7 @@ public:
 
 private:
     std::string pathname_;
+    std::chrono::seconds timeout_;
     mutable std::optional<std::size_t> fifo_id_;
     compression compression_;
 };

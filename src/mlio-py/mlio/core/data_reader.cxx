@@ -261,8 +261,7 @@ register_data_readers(py::module &m)
         m,
         "MaxFieldLengthHandling",
         "Specifies how field and columns should be handled when breached.")
-        .value(
-            "ERROR", max_field_length_handling::error, "Raise an error.")
+        .value("ERROR", max_field_length_handling::error, "Raise an error.")
         .value("TRUNCATE",
                max_field_length_handling::truncate,
                "Truncate the field.")
@@ -363,7 +362,8 @@ register_data_readers(py::module &m)
                        &data_reader_params::num_parallel_reads)
         .def_readwrite("last_batch_handling",
                        &data_reader_params::last_batch_hnd)
-        .def_readwrite("bad_batch_handling", &data_reader_params::bad_batch_hnd)
+        .def_readwrite("bad_batch_handling",
+                       &data_reader_params::bad_batch_hnd)
         .def_readwrite("num_instances_to_skip",
                        &data_reader_params::num_instances_to_skip)
         .def_readwrite("num_instances_to_read",
@@ -376,7 +376,8 @@ register_data_readers(py::module &m)
         .def_readwrite("shuffle_seed", &data_reader_params::shuffle_seed)
         .def_readwrite("reshuffle_each_epoch",
                        &data_reader_params::reshuffle_each_epoch)
-        .def_readwrite("subsample_ratio", &data_reader_params::subsample_ratio);
+        .def_readwrite("subsample_ratio",
+                       &data_reader_params::subsample_ratio);
 
     py::class_<csv_params>(
         m,
@@ -463,7 +464,7 @@ register_data_readers(py::module &m)
                 A boolean value indicating whether the dataset has a header row
                 only in the first data store.
             dedupe_column_names: bool, optional
-                A boolean value indiciating whether duplicate columns should be
+                A boolean value indicating whether duplicate columns should be
                 renamed. If true, duplicate columns 'X', ..., 'X' will be
                 renamed to 'X', 'X_1', X_2', ...
             delimiter : char
@@ -519,9 +520,7 @@ register_data_readers(py::module &m)
         .def_readwrite("max_line_length", &csv_params::max_line_length)
         .def_readwrite("parser_params", &csv_params::parser_prm);
 
-    py::class_<parser_params>(
-        m,
-        "ParserParams")
+    py::class_<parser_params>(m, "ParserParams")
         .def(py::init(&make_parser_params),
              "nan_values"_a = std::unordered_set<std::string>{},
              "number_base"_a = 10,

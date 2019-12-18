@@ -17,7 +17,6 @@
 
 #include <atomic>
 #include <cerrno>
-#include <chrono>
 #include <system_error>
 #include <thread>
 #include <unordered_map>
@@ -46,10 +45,12 @@ namespace detail {
 
 struct sagemaker_pipe_input_stream_access {
     static inline auto
-    make(std::string &&pathname, std::optional<std::size_t> fifo_id)
+    make(std::string &&pathname,
+         std::chrono::seconds timeout,
+         std::optional<std::size_t> fifo_id)
     {
-        auto *ptr =
-            new sagemaker_pipe_input_stream{std::move(pathname), fifo_id};
+        auto *ptr = new sagemaker_pipe_input_stream{
+            std::move(pathname), timeout, fifo_id};
 
         auto strm = wrap_intrusive(ptr);
 
@@ -74,15 +75,18 @@ std::unordered_map<std::string, std::atomic_ptrdiff_t> fifo_ids_{};
 
 intrusive_ptr<sagemaker_pipe_input_stream>
 make_sagemaker_pipe_input_stream(std::string pathname,
+                                 std::chrono::seconds timeout,
                                  std::optional<std::size_t> fifo_id)
 {
-    return sagemaker_pipe_input_stream_access::make(std::move(pathname),
-                                                    fifo_id);
+    return sagemaker_pipe_input_stream_access::make(
+        std::move(pathname), timeout, fifo_id);
 }
 
 sagemaker_pipe_input_stream::sagemaker_pipe_input_stream(
-    std::string &&pathname, std::optional<std::size_t> fifo_id)
-    : pathname_{std::move(pathname)}
+    std::string &&pathname,
+    std::chrono::seconds timeout,
+    std::optional<std::size_t> fifo_id)
+    : pathname_{std::move(pathname)}, timeout_{timeout}
 {
     detail::validate_file_pathname(pathname_);
 
@@ -240,10 +244,8 @@ sagemaker_pipe_input_stream::wait_for_data()
 #    pragma GCC diagnostic pop
 #endif
 
-    constexpr std::chrono::seconds timeout{60};
-
     ::timeval tv{};
-    tv.tv_sec = timeout.count();
+    tv.tv_sec = timeout_.count();
 
     // On Linux if select() is interrupted by a signal handler, the
     // timeout is modified to indicate the remaining time. This means we
