@@ -13,12 +13,15 @@ multithreading primitives as ML-IO to achieve better performance.
 import mlio
 from mlio.contrib.insights import analyze_dataset
 
-reader = mlio.CsvReader(dataset=mlio.list_files(csv_files),
-                        batch_size=batch_size,
-                        default_data_type=mlio.DataType.STRING,
-                        header_row_index=None,
-                        max_line_length=100_000,
-                        allow_quoted_new_lines=True)
+rdr_prm = mlio.DataReaderParams(dataset=mlio.list_files(csv_files),
+                                batch_size=batch_size)
+                                
+csv_prm = mlio.CsvParams(default_data_type=mlio.DataType.STRING,
+                         header_row_index=None,
+                         max_line_length=100_000,
+                         allow_quoted_new_lines=True)
+                         
+reader = mlio.CsvReader(rdr_prm, csv_prm)
 
 null_values = set(['null', 'none', 'nil', 'na', 'nan'])
 columns_to_capture = set([1, 5, 9])

@@ -2,7 +2,7 @@
 
 `contrib` is a package of utilities that work with ML-IO but are not directly within the scope of the core ML-IO library. Currently the `contrib` package includes:
 
-* `insights`: a utility for analzing large datasets in a streaming manner using ML-IO.
+* [`insights`](insights/README.md): a utility for analzing large datasets in a streaming manner using ML-IO.
 
 
 ## Build Design

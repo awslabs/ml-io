@@ -65,7 +65,8 @@ Specifies the kind of a record.
 ## Exceptions
 | Type                  | Description                                                                       |
 |-----------------------|-----------------------------------------------------------------------------------|
-| `CorruptRecordReader` | Thrown when the record is corrupt. Inherits from `RuntimeError`                   |
+| `RecordError`         | Thrown when the record cannot be read. Inherits from `MLIOError`.                 |
+| `CorruptRecordReader` | Thrown when the record is corrupt. Inherits from `RecordError`.                   |
 | `CorruptRecordHeader` | Thrown when the record has a corrupt header. Inherits from `CorruptRecordReader`. |
 | `CorruptRecordFooter` | Thrown when the record has a corrupt footer. Inherits from `CorruptRecordReader`. |
-| `RecordTooLargeError` | Thrown when the record is larger than a threshold. Inherits from `RuntimeError`   |
+| `RecordTooLargeError` | Thrown when the record is larger than a threshold. Inherits from `RecordError`.   |

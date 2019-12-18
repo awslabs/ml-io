@@ -56,5 +56,5 @@ Not implemented yet
 ## Exceptions
 | Type           | Description                                                                 |
 |----------------|-----------------------------------------------------------------------------|
-| `StreamError`  | Thrown when the stream cannot be read. Inherits from `RuntimeError`.        |
+| `StreamError`  | Thrown when the stream cannot be read. Inherits from `MLIOError`.           |
 | `InflateError` | Thrown when the stream cannot be decompressed. Inherits from `StreamError`. |

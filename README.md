@@ -225,6 +225,7 @@ ML-IO uses a layered architecture as shown in the following figure. Check out th
 * [Tensors](doc/python/tensor.md)
 * [Framework/Library Integration](doc/python/integration.md)
 * [Logging](doc/python/logging.md)
+* [Contrib Extensions](src/mlio-py/mlio/contrib)
 
 ### C++
 * TBD

@@ -13,7 +13,8 @@
     * [LastBatchHandling](#LastBatchHandling)
     * [BadBatchHandling](#BadBatchHandling)
     * [MaxFieldLengthHandling](#MaxFieldLengthHandling)
-    
+* [Exceptions](#Exceptions)
+
 A data reader is the main interface of ML-IO for reading datasets. A dataset is a collection of one or more [data stores](data_store.md) all of which contain data in the same format (e.g. CSV or RecordIO-protobuf). By instantiating a subclass of [`DataReader`](#DataReader) such as a [`CsvReader`](#CsvReader) or a [`RecordIOProtobufReader`](#RecordIOProtobufReader) a dataset can be read in batches.
 
 ## DataReader
@@ -284,3 +285,12 @@ Specifies how field and columns should be handled when breached.
 | `ERROR`    | Raise an error.                               |
 | `TRUNCATE` | Truncate the field.                           |
 | `WARN`     | Truncate the field and log a warning message. |
+
+
+## Exceptions
+| Type                   | Description                                                                                 |
+|------------------------|---------------------------------------------------------------------------------------------|
+| `DataReaderError`      | Thrown when the dataset cannot be read. Inherits from `MLIOError`.                          |
+| `SchemaError`          | Thrown when the dataset has a schema error. Inherits from `DataReaderError`.                |
+| `InvalidInstanceError` | Thrown when the dataset contains an invalid data instance. Inherits from `DataReaderError`. |
+| `FieldTooLargeError`   | Thrown when the dataset contains a field that exceeds the maximum allowed length. Inherits from `DataReaderError`. |
