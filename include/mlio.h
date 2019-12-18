@@ -72,6 +72,7 @@
 #include "mlio/tensor.h"                               // IWYU pragma: export
 #include "mlio/tensor_visitor.h"                       // IWYU pragma: export
 #include "mlio/text_encoding.h"                        // IWYU pragma: export
+#include "mlio/text_line_reader.h"                     // IWYU pragma: export
 #include "mlio/type_traits.h"                          // IWYU pragma: export
 #include "mlio/util/cast.h"                            // IWYU pragma: export
 #include "mlio/util/number.h"                          // IWYU pragma: export
