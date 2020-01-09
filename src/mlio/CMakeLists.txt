@@ -74,7 +74,7 @@ add_library(mlio
     tensor.cxx
     tensor_visitor.cxx
     text_encoding.cxx
-)
+    text_line_reader.cxx)
 
 if(WIN32)
     # TODO: Windows Support

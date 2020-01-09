@@ -223,6 +223,12 @@ make_recordio_protobuf_reader(data_reader_params rdr_prm)
     return make_intrusive<recordio_protobuf_reader>(std::move(rdr_prm));
 }
 
+intrusive_ptr<text_line_reader>
+make_text_line_reader(data_reader_params prm)
+{
+    return make_intrusive<text_line_reader>(std::move(prm));
+}
+
 }  // namespace
 
 void
@@ -597,6 +603,19 @@ register_data_readers(py::module &m)
                intrusive_ptr<recordio_protobuf_reader>>(
         m, "RecordIOProtobufReader")
         .def(py::init<>(&make_recordio_protobuf_reader),
+             "data_reader_params"_a,
+             R"(
+            Parameters
+            ----------
+            data_reader_params : DataReaderParams
+                See ``DataReaderParams``.
+            )");
+
+    py::class_<text_line_reader,
+        data_reader,
+        intrusive_ptr<text_line_reader>>(
+        m, "TextLineReader")
+        .def(py::init<>(&make_text_line_reader),
              "data_reader_params"_a,
              R"(
             Parameters

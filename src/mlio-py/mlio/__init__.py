@@ -61,6 +61,7 @@ from mlio._core import\
     SchemaError,\
     StreamError,\
     Tensor,\
+    TextLineReader,\
     list_files
 
 
@@ -109,6 +110,7 @@ __all__ = [
     'SchemaError',
     'StreamError',
     'Tensor',
+    'TextLineReader',
     'list_files']
 
 
