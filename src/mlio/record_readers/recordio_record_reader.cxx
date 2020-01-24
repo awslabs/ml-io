@@ -75,7 +75,7 @@ recordio_record_reader::decode_record(memory_slice &chunk,
     chunk = chunk.subslice(record_size);
 
     return record{
-        std::move(payload), record_size + hdr->size(), hdr->get_record_kind()};
+        std::move(payload), hdr->payload_size(), hdr->get_record_kind()};
 }
 
 }  // namespace detail

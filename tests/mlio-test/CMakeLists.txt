@@ -3,7 +3,8 @@
 # ------------------------------------------------------------
 
 add_executable(mlio-test
-    test_text_line_reader.cxx)
+    test_text_line_reader.cxx
+	test_recordio_protobuf_reader.cxx)
 
 target_include_directories(mlio-test
     PRIVATE
