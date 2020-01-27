@@ -38,8 +38,6 @@
 #include "mlio/streams/stream_error.h"
 
 
-#include "mlio/memory/heap_memory_block.h"
-
 namespace mlio {
 inline namespace v1 {
 namespace detail {
@@ -55,7 +53,7 @@ default_instance_reader::default_instance_reader(data_reader_params const &prm,
         throw std::invalid_argument{
             "The shard index must be less than the number of shards."};
     }
-	corrupt_split_record_ = false;
+    corrupt_split_record_ = false;
     store_iter_ = params_->dataset.begin();
 }
 
@@ -163,55 +161,56 @@ default_instance_reader::handle_nested_errors()
 std::optional<memory_slice>
 default_instance_reader::read_record_payload()
 {
-	if (this->corrupt_split_record_) {
-		throw corrupt_record_error("Split record is not formatted with the correct cflag.");
-	}
+    std::string split_record_err_str = "Split record is not formatted with the correct cflag.";
+    if (this->corrupt_split_record_) {
+        throw corrupt_record_error(split_record_err_str); 
+    }
     std::optional<record> rec = read_record();
     if (rec == std::nullopt) {
         return {};
     }
 
     if (rec->kind() == record_kind::complete) {
-    	num_bytes_read_ += rec->size();
-    	store_record_idx_++;
+        num_bytes_read_ += rec->size();
+        store_record_idx_++;
 
-    	return std::move(*rec).payload();
+        return std::move(*rec).payload();
     } else {
-		if (rec->kind() == record_kind::begin) {
-			std::vector<std::optional<record>> split_records;
-			split_records.push_back(rec);
-			std::size_t total_record_size = 0;
-			total_record_size += rec->size();
+        if (rec->kind() == record_kind::begin) {
+            std::vector<std::optional<record>> split_records;
+            split_records.push_back(rec);
+            std::size_t total_record_size = 0;
+            total_record_size += rec->size();
 
-			std::optional<record> next_rec = read_record();
-			while(next_rec->kind() == record_kind::middle) {
-				split_records.push_back(next_rec);
-				total_record_size += next_rec->size();
-				next_rec = read_record();
-			}
-			
-			if (next_rec->kind() == record_kind::end) {
-				split_records.push_back(next_rec);
-				total_record_size += next_rec->size();
-			} else {
-				this->corrupt_split_record_ = true;
-				throw corrupt_record_error("Split record is not formatted with the correct cflag.");
-			}
+            std::optional<record> next_rec = read_record();
+            while(next_rec->kind() == record_kind::middle) {
+                split_records.push_back(next_rec);
+                total_record_size += next_rec->size();
+                next_rec = read_record();
+            }
+            
+            if (next_rec->kind() == record_kind::end) {
+                split_records.push_back(next_rec);
+                total_record_size += next_rec->size();
+            } else {
+                this->corrupt_split_record_ = true;
+                throw corrupt_record_error(split_record_err_str);
+            }
 
-			auto combined_blk = get_memory_allocator().allocate(total_record_size);
-			auto copied_so_far_blk = combined_blk->begin();
+            auto combined_blk = get_memory_allocator().allocate(total_record_size);
+            auto copied_so_far_blk = combined_blk->begin();
 
-			for (auto it = split_records.begin(); it < split_records.end(); it++) {
-				auto current_payload = std::move(*it)->payload();
-				copied_so_far_blk = std::copy(current_payload.begin(), current_payload.end(), copied_so_far_blk);
-			}
+            for (auto it = split_records.begin(); it < split_records.end(); it++) {
+                auto current_payload = std::move(*it)->payload();
+                copied_so_far_blk = std::copy(current_payload.begin(), current_payload.end(), copied_so_far_blk);
+            }
 
-			store_record_idx_++;
-			return std::move(combined_blk);	
-		} else {
-			this->corrupt_split_record_ = true;
-			throw corrupt_record_error("Split record is not formatted with the correct cflag.");
-		}
+            store_record_idx_++;
+            return std::move(combined_blk); 
+        } else {
+            this->corrupt_split_record_ = true;
+            throw corrupt_record_error(split_record_err_str);
+        }
     }
 }
 
@@ -292,7 +291,7 @@ default_instance_reader::reset() noexcept
 
     num_instances_read_ = 0;
 
-	corrupt_split_record_ = false; 
+    corrupt_split_record_ = false; 
 }
 
 }  // namespace detail
