@@ -1,9 +1,6 @@
 #include <gtest/gtest.h>
 #include <mlio.h>
 
-#include "mlio/memory/memory_allocator.h"
-#include "mlio/memory/memory_block.h"
-
 namespace mlio {
 
 class test_recordio_protobuf_reader : public ::testing::Test {
