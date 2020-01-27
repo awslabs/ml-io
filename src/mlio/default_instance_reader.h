@@ -39,7 +39,7 @@ public:
                                      record_reader_factory &&fct);
 
 private:
-	bool corrupt_split_record_;
+    bool corrupt_split_record_;
 
     std::optional<instance>
     read_instance_core() final;

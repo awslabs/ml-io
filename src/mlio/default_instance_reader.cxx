@@ -205,6 +205,7 @@ default_instance_reader::read_record_payload()
                 copied_so_far_blk = std::copy(current_payload.begin(), current_payload.end(), copied_so_far_blk);
             }
 
+            num_bytes_read_ += total_record_size;
             store_record_idx_++;
             return std::move(combined_blk); 
         } else {
