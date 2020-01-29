@@ -39,8 +39,6 @@ public:
                                      record_reader_factory &&fct);
 
 private:
-    bool corrupt_split_record_;
-
     std::optional<instance>
     read_instance_core() final;
 
@@ -90,6 +88,7 @@ private:
     std::size_t next_instance_idx_to_read_;
     std::size_t num_instances_skipped_{};
     std::size_t num_instances_read_{};
+    bool has_corrupt_split_record_ = false;
 };
 
 }  // namespace detail
