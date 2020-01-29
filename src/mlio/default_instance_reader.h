@@ -89,7 +89,7 @@ private:
     std::size_t num_instances_skipped_{};
     std::size_t num_instances_read_{};
     bool has_corrupt_split_record_ = false;
-	const char * corrupt_split_error_msg_ = "Split record is not formatted with the correct cflag.";
+    const char * corrupt_split_error_msg_ = "Split record is not formatted with the correct cflag.";
 };
 
 }  // namespace detail
