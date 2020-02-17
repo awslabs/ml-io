@@ -89,8 +89,8 @@ DataReaderParams(dataset : Sequence[DataStore],
                  shuffle_instances : bool = False,
                  shuffle_window : int = 0,
                  shuffle_seed : Optional[int] = None,
-                 reshuffle_each_epoch: False,
-                 subsample_ratio: Optionla[float] : None)
+                 reshuffle_each_epoch : bool = True,
+                 subsample_ratio: Optional[float] : None)
 ```
 
 - `dataset`: A sequence of [`DataStore`](data_store.md#DataStore) instances that together form the dataset to read from.

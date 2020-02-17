@@ -300,7 +300,7 @@ register_data_readers(py::module &m)
              "shuffle_instances"_a = false,
              "shuffle_window"_a = 0,
              "shuffle_seed"_a = std::nullopt,
-             "reshuffle_each_epoch"_a = false,
+             "reshuffle_each_epoch"_a = true,
              "subsample_ratio"_a = std::nullopt,
              R"(
             Parameters

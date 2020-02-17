@@ -106,7 +106,7 @@ struct MLIO_API data_reader_params {
     std::optional<std::uint_fast64_t> shuffle_seed{};
     /// A boolean value indicating whether the dataset should be
     /// reshuffled after every @ref data_reader::reset() call.
-    bool reshuffle_each_epoch = false;
+    bool reshuffle_each_epoch = true;
     /// A ratio between zero and one indicating how much of the dataset
     /// should be read. The dataset will be subsampled based on this
     /// number.
