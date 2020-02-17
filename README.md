@@ -86,7 +86,7 @@ for epoch in range(num_epochs):
  ```
 
 ### Reading CSV Files over Amazon SageMaker Pipe Mode as pandas DataFrames
-ML-IO can read datasets from various sources including local file system, in-memory buffers, Amazon S3 (in development), and Amazon SageMaker Pipe mode. Below we show how you can read a CSV dataset over Amazon SageMaker Pipe mode.
+ML-IO can read datasets from various sources including local file system, in-memory buffers, and Amazon SageMaker Pipe mode. Below we show how you can read a CSV dataset over Amazon SageMaker Pipe mode.
 
 ```python
 import numpy as np
