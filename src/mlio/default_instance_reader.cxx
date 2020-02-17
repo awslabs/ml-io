@@ -42,9 +42,10 @@ inline namespace v1 {
 namespace detail {
 namespace {
 
-constexpr const char *corrupt_split_error_msg_ = "Split record is not formatted with the correct cflag.";
+constexpr char const *corrupt_split_error_msg =
+    "Corrupt split record encountered.";
 
-} // namespace
+}  // namespace
 
 default_instance_reader::default_instance_reader(data_reader_params const &prm,
                                                  record_reader_factory &&fct)
@@ -57,6 +58,7 @@ default_instance_reader::default_instance_reader(data_reader_params const &prm,
         throw std::invalid_argument{
             "The shard index must be less than the number of shards."};
     }
+
     store_iter_ = params_->dataset.begin();
 }
 
@@ -165,8 +167,9 @@ std::optional<memory_slice>
 default_instance_reader::read_record_payload()
 {
     if (has_corrupt_split_record_) {
-        throw corrupt_record_error(corrupt_split_error_msg_);
+        throw corrupt_record_error(corrupt_split_error_msg);
     }
+
     std::optional<record> rec = read_record();
     if (rec == std::nullopt) {
         return {};
@@ -174,46 +177,55 @@ default_instance_reader::read_record_payload()
 
     if (rec->kind() == record_kind::complete) {
         num_bytes_read_ += rec->size();
+
         store_record_idx_++;
 
         return std::move(*rec).payload();
     }
+
     if (rec->kind() != record_kind::begin) {
         has_corrupt_split_record_ = true;
-        throw corrupt_record_error(corrupt_split_error_msg_);
+
+        throw corrupt_record_error(corrupt_split_error_msg);
     }
-    std::size_t total_record_size = 0;
-    total_record_size += rec->size();
+
+    std::size_t total_record_size = rec->size();
 
     std::vector<record> split_records{std::move(*rec)};
+
     rec = read_record();
-    while (rec  && rec->kind() == record_kind::middle) {
+    while (rec && rec->kind() == record_kind::middle) {
         total_record_size += rec->size();
+
         split_records.emplace_back(std::move(*rec));
+
         rec = read_record();
     }
 
     if (rec && rec->kind() == record_kind::end) {
         total_record_size += rec->size();
+
         split_records.emplace_back(std::move(*rec));
     }
     else {
         has_corrupt_split_record_ = true;
-        throw corrupt_record_error(corrupt_split_error_msg_);
+
+        throw corrupt_record_error(corrupt_split_error_msg);
     }
 
     auto combined_blk = get_memory_allocator().allocate(total_record_size);
-    auto copied_so_far_iter = combined_blk->begin();
 
+    auto copied_pos = combined_blk->begin();
     for (auto &split_rec : split_records) {
-        auto &current_payload = split_rec.payload();
-        copied_so_far_iter = std::copy(current_payload.begin(),
-                                       current_payload.end(),
-                                       copied_so_far_iter);
+        copied_pos = std::copy(split_rec.payload().begin(),
+                               split_rec.payload().end(),
+                               copied_pos);
     }
 
     num_bytes_read_ += total_record_size;
+
     store_record_idx_++;
+
     return std::move(combined_blk);
 }
 
