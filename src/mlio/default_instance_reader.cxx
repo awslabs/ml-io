@@ -40,6 +40,11 @@
 namespace mlio {
 inline namespace v1 {
 namespace detail {
+namespace {
+
+constexpr const char *corrupt_split_error_msg_ = "Split record is not formatted with the correct cflag.";
+
+} // namespace
 
 default_instance_reader::default_instance_reader(data_reader_params const &prm,
                                                  record_reader_factory &&fct)
@@ -180,17 +185,15 @@ default_instance_reader::read_record_payload()
     std::size_t total_record_size = 0;
     total_record_size += rec->size();
 
-    std::vector<record> split_records{};
-    split_records.emplace_back(std::move(*rec));
-
+    std::vector<record> split_records{std::move(*rec)};
     rec = read_record();
-    while (rec != std::nullopt && rec->kind() == record_kind::middle) {
+    while (rec  && rec->kind() == record_kind::middle) {
         total_record_size += rec->size();
         split_records.emplace_back(std::move(*rec));
         rec = read_record();
     }
 
-    if (rec != std::nullopt && rec->kind() == record_kind::end) {
+    if (rec && rec->kind() == record_kind::end) {
         total_record_size += rec->size();
         split_records.emplace_back(std::move(*rec));
     }
