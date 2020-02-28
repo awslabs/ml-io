@@ -3,6 +3,7 @@
 # ------------------------------------------------------------
 
 add_executable(mlio-test
+    record_readers/test_blob_record_reader.cxx
     test_text_line_reader.cxx
     test_recordio_protobuf_reader.cxx)
 

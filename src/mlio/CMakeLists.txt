@@ -33,6 +33,7 @@ add_library(mlio
     record_readers/detail/in_memory_chunk_reader.cxx
     record_readers/detail/recordio_header.cxx
     record_readers/detail/text_line.cxx
+    record_readers/blob_record_reader.cxx
     record_readers/csv_record_reader.cxx
     record_readers/parquet_record_reader.cxx
     record_readers/record_error.cxx
