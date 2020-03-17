@@ -25,6 +25,17 @@ target_link_libraries(mlio-test
         GTest::GTest GTest::Main mlio
 )
 
+if(MLIO_BUILD_IMAGE_READER)
+    target_sources(mlio-test
+        PRIVATE
+            test_image_reader.cxx
+    )
+    target_link_libraries(mlio-test
+        PRIVATE
+            opencv_core opencv_imgcodecs opencv_imgproc
+    )
+endif()
+
 # ------------------------------------------------------------
 # Tests
 # ------------------------------------------------------------

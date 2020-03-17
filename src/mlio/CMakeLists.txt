@@ -68,6 +68,7 @@ add_library(mlio
     device_array.cxx
     device.cxx
     example.cxx
+    image_reader.cxx
     init.cxx
     init_aws.cxx
     instance_batch_reader.cxx
@@ -128,6 +129,17 @@ if(MLIO_BUILD_S3_SUPPORT)
         PRIVATE
             aws-cpp-sdk-core aws-cpp-sdk-s3
     )
+endif()
+
+if(MLIO_BUILD_IMAGE_READER)
+    target_compile_definitions(mlio
+        PUBLIC
+            MLIO_BUILD_IMAGE_READER
+     )
+
+    target_link_libraries(mlio
+        PRIVATE
+            opencv_core opencv_imgcodecs opencv_imgproc)
 endif()
 
 set_target_properties(mlio PROPERTIES

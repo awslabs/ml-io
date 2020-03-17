@@ -32,6 +32,7 @@
 #include "mlio/device_array.h"                         // IWYU pragma: export
 #include "mlio/endian.h"                               // IWYU pragma: export
 #include "mlio/example.h"                              // IWYU pragma: export
+#include "mlio/image_reader.h"                         // IWYU pragma: export
 #include "mlio/init.h"                                 // IWYU pragma: export
 #include "mlio/instance.h"                             // IWYU pragma: export
 #include "mlio/instance_batch.h"                       // IWYU pragma: export
