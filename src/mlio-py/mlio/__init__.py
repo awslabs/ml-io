@@ -38,6 +38,9 @@ from mlio._core import\
     Example,\
     FieldTooLargeError,\
     File,\
+    ImageFrame,\
+    ImageReader,\
+    ImageReaderParams,\
     InMemoryStore,\
     InflateError,\
     InputStream,\
@@ -92,6 +95,9 @@ __all__ = [
     'Example',
     'FieldTooLargeError',
     'File',
+    'ImageFrame',
+    'ImageReader',
+    'ImageReaderParams',
     'InMemoryStore',
     'InflateError',
     'InputStream',

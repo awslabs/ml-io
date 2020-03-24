@@ -206,6 +206,20 @@ make_csv_reader_params(
     return csv_prm;
 }
 
+image_reader_params
+make_image_reader_params(image_frame img_frame,
+                         std::optional<size_t> resize,
+                         std::vector<std::size_t> image_dimensions,
+                         bool to_rgb)
+{
+    image_reader_params img_prm{};
+    img_prm.img_frame = img_frame;
+    img_prm.resize = resize;
+    img_prm.image_dimensions = std::move(image_dimensions);
+    img_prm.to_rgb = to_rgb;
+    return img_prm;
+}
+
 parser_params
 make_parser_params(std::unordered_set<std::string> nan_values, int base)
 {
@@ -226,6 +240,13 @@ make_csv_reader(data_reader_params rdr_prm, std::optional<csv_params> csv_prm)
     }
 
     return make_intrusive<csv_reader>(std::move(rdr_prm));
+}
+
+intrusive_ptr<image_reader>
+make_image_reader(data_reader_params rdr_prm, image_reader_params img_prm)
+{
+    return make_intrusive<image_reader>(std::move(rdr_prm),
+                                        std::move(img_prm));
 }
 
 intrusive_ptr<recordio_protobuf_reader>
@@ -285,6 +306,11 @@ register_data_readers(py::module &m)
         .value("WARN",
                max_field_length_handling::warn,
                "Truncate the field and log a warning message.");
+
+    py::enum_<image_frame>(
+        m, "ImageFrame", "Specifies the image_frame parameter value")
+        .value("NONE", image_frame::none, "none.")
+        .value("RECORDIO", image_frame::recordio, "For recordio files.");
 
     py::class_<py_data_iterator>(m, "DataIterator")
         .def("__iter__",
@@ -537,6 +563,36 @@ register_data_readers(py::module &m)
         .def_readwrite("max_line_length", &csv_params::max_line_length)
         .def_readwrite("parser_params", &csv_params::parser_prm);
 
+    py::class_<image_reader_params>(
+        m,
+        "ImageReaderParams",
+        "Represents the optional parameters of an ``ImageReader`` object.")
+        .def(py::init(&make_image_reader_params),
+             "img_frame"_a = image_frame::none,
+             "resize"_a = std::nullopt,
+             "image_dimensions"_a = std::nullopt,
+             "to_rgb"_a = false,
+             R"(
+            Parameters
+            ----------
+            img_frame : enum {NONE, RECORDIO}
+                Selects the image frame to NONE(for raw image files) or
+                RECORDIO(for recordio files).
+            resize : int, optional
+                Scales the shorter edge to a new size before applying other
+                augmentations.
+            image_dimensions : list of ints
+                The dimensions of output image in (channels, height, width)
+                format.
+            to_rgb : boolean
+                Converts from BGR (OpenCV default) to RGB, if set to true.
+            )")
+        .def_readwrite("img_frame", &image_reader_params::img_frame)
+        .def_readwrite("resize", &image_reader_params::resize)
+        .def_readwrite("image_dimensions",
+                       &image_reader_params::image_dimensions)
+        .def_readwrite("to_rgb", &image_reader_params::to_rgb);
+
     py::class_<parser_params>(m, "ParserParams")
         .def(py::init(&make_parser_params),
              "nan_values"_a = std::unordered_set<std::string>{},
@@ -611,6 +667,22 @@ register_data_readers(py::module &m)
                 See ``DataReaderParams``.
             csv_reader_params : CsvReaderParams, optional
                 See ``CsvReaderParams``.
+            )");
+
+    py::class_<image_reader, data_reader, intrusive_ptr<image_reader>>(
+        m,
+        "ImageReader",
+        "Represents a ``data_reader`` for reading Image datasets.")
+        .def(py::init<>(&make_image_reader),
+             "data_reader_params"_a,
+             "image_reader_params"_a = std::nullopt,
+             R"(
+            Parameters
+            ----------
+            data_reader_params : DataReaderParams
+                See ``DataReaderParams``.
+            image_reader_params : ImageReaderParams
+                See ``ImageReaderParams``.
             )");
 
     py::class_<recordio_protobuf_reader,
