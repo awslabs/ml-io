@@ -59,7 +59,7 @@ public:
 public:
     /// Returns a unique identifier for the data store.
     virtual std::string const &
-    id() const noexcept = 0;
+    id() const = 0;
 };
 
 MLIO_API

@@ -111,7 +111,7 @@ for epoch in range(num_epochs):
     reader.reset() # Return to the beginning of dataset.
 ```
 
-### Reading RecordIO-protobuf Files as PyTorch Tensors
+### Reading RecordIO-protobuf Files over Amazon S3 as PyTorch Tensors
 [RecordIO-protobuf](https://docs.aws.amazon.com/sagemaker/latest/dg/cdf-training.html) is the native data format of first-party Amazon SageMaker algorithms. It is a binary format that is specifically tuned for high-throughput. With ML-IO third-party algorithms can now leverage the same performance benefit as first-party Amazon SageMaker algorithms.
 
 ```python
@@ -120,8 +120,13 @@ import mlio
 
 from mlio.integ.torch import as_torch
 
-# This can be a directory or a single file.
-dataset = mlio.list_files('/path/to/recordio_data')
+# Make sure that AWS C++ SDK is initialized.
+mlio.initialize_aws_sdk()
+
+# Use default AWS credentials.
+client = mlio.S3Client()
+
+dataset = mlio.list_s3_objects(client, 's3://path/to/recordio_data')
 
 # RecordIOProtobufReader supports an extensive set of constructor
 # parameters. Here we just specify the two required arguments.
@@ -143,6 +148,9 @@ for epoch in range(num_epochs):
 
         ...
     reader.reset()
+    
+ # Optionally dispose internal data structures used by AWS C++ SDK (recommended).
+ mlio.dispose_aws_sdk()
  ```
 
 ### Reading Parquet Files over Amazon SageMaker Pipe Mode with Apache Arrow
@@ -225,6 +233,7 @@ ML-IO uses a layered architecture as shown in the following figure. Check out th
 * [Tensors](doc/python/tensor.md)
 * [Framework/Library Integration](doc/python/integration.md)
 * [Logging](doc/python/logging.md)
+* [Miscellaneous](doc/python/misc.md)
 * [Contrib Extensions](src/mlio-py/mlio/contrib)
 
 ### C++

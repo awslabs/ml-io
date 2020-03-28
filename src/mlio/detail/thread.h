@@ -4,10 +4,10 @@
 #include <utility>
 
 #ifdef MLIO_PLATFORM_UNIX
-#    include <csignal>
-#    include <system_error>
+#include <csignal>
+#include <system_error>
 
-#    include <pthread.h>
+#include <pthread.h>
 #endif
 
 #include "mlio/config.h"

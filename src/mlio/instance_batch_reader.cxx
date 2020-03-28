@@ -84,7 +84,7 @@ instance_batch_reader::read_instance_batch()
         }
     }
 
-    std::size_t size;
+    std::size_t size{};
     if (params_->last_batch_hnd == last_batch_handling::pad) {
         size = params_->batch_size;
     }

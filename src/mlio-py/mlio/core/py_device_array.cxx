@@ -63,8 +63,8 @@ to_py_buffer(py_device_array &arr)
 {
     auto size = static_cast<py::ssize_t>(arr.size());
 
-    std::size_t item_size;
-    std::string fmt;
+    std::size_t item_size{};
+    std::string fmt{};
 
     switch (arr.dtype()) {
     case data_type::size:
@@ -74,7 +74,7 @@ to_py_buffer(py_device_array &arr)
 #elif SIZE_MAX == UINT64_MAX
         fmt = "q";
 #else
-#    error "Only 32-bit and 64-bit systems are supported."
+#error "Only 32-bit and 64-bit systems are supported."
 #endif
         break;
     case data_type::float16:

@@ -32,10 +32,14 @@ outputs:
         - doxygen
         - ninja
       host:
+        - aws-sdk-cpp
         - libiconv
         - libprotobuf
         - tbb-devel
         - zlib
+      run:
+        # aws-sdk-cpp does not have a run_exports directive.
+        - aws-sdk-cpp
     test:
       commands:
         - test -f "$PREFIX/lib/libmlio.so"     # [linux]

@@ -185,7 +185,7 @@ csr_tensor::csr_tensor(size_vector shape,
             "array."};
     }
 
-    std::size_t num_rows;
+    std::size_t num_rows{};
     if (shp.empty()) {
         num_rows = 0;
     }

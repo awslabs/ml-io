@@ -57,8 +57,7 @@ public:
     using const_iterator = T const *;
 
 public:
-    constexpr span() noexcept : data_{}, size_{}
-    {}
+    constexpr span() noexcept = default;
 
     constexpr span(span const &other) noexcept = default;
 
@@ -143,7 +142,8 @@ public:
     }
 
 public:
-    constexpr reference operator[](index_type index) const
+    constexpr reference
+    operator[](index_type index) const
     {
         return data_[index];
     }
@@ -199,8 +199,8 @@ public:
     }
 
 private:
-    pointer data_;
-    index_type size_;
+    pointer data_{};
+    index_type size_{};
 };
 
 template<class T>

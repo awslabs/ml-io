@@ -196,12 +196,14 @@ public:
         return ptr_;
     }
 
-    constexpr T *operator->() const noexcept
+    constexpr T *
+    operator->() const noexcept
     {
         return ptr_;
     }
 
-    constexpr T &operator*() const noexcept
+    constexpr T &
+    operator*() const noexcept
     {
         return *ptr_;
     }

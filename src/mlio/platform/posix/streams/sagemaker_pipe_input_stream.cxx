@@ -44,7 +44,7 @@ inline namespace v1 {
 namespace detail {
 
 struct sagemaker_pipe_input_stream_access {
-    static inline auto
+    static inline intrusive_ptr<sagemaker_pipe_input_stream>
     make(std::string &&pathname,
          std::chrono::seconds timeout,
          std::optional<std::size_t> fifo_id)
@@ -233,15 +233,15 @@ sagemaker_pipe_input_stream::wait_for_data()
 
     // See https://sourceware.org/bugzilla/show_bug.cgi?id=12373.
 #ifdef __GNUC__
-#    pragma GCC diagnostic push
-#    pragma GCC diagnostic ignored "-Wsign-conversion"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-conversion"
 #endif
 
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-constant-array-index)
     FD_SET(fifo_fd_.get(), &readfds);
 
 #ifdef __GNUC__
-#    pragma GCC diagnostic pop
+#pragma GCC diagnostic pop
 #endif
 
     ::timeval tv{};

@@ -26,7 +26,7 @@ template<typename Func, typename... Args>
 inline int
 temp_failure_retry(Func syscall, Args &&... args) noexcept
 {
-    int r;
+    int r{};
 
     do {
         r = syscall(std::forward<Args>(args)...);

@@ -22,8 +22,8 @@
 #include "mlio/config.h"
 #include "mlio/data_stores/compression.h"
 #include "mlio/data_stores/data_store.h"
-#include "mlio/fwd.h"
 #include "mlio/intrusive_ptr.h"
+#include "mlio/s3_client.h"
 #include "mlio/span.h"
 
 namespace mlio {
@@ -32,19 +32,16 @@ inline namespace v1 {
 /// @addtogroup data_stores Data Stores
 /// @{
 
-/// Represents a file as a @ref data_store.
-class MLIO_API file final : public data_store {
+/// Represents an S3 object as a @ref data_store.
+class MLIO_API s3_object final : public data_store {
 public:
-    /// @param mmap
-    ///     A boolean value indicating whether the file should be
-    ///     memory-mapped.
-    ///
     /// @param cmp
-    ///     The compression type of the file. If set to @c infer, the
-    ///     compression will be inferred from the filename.
-    explicit file(std::string pathname,
-                  bool mmap = true,
-                  compression cmp = compression::infer);
+    ///     The compression type of the S3 object. If set to @c infer,
+    ///     the compression will be inferred from the URI.
+    explicit s3_object(intrusive_ptr<s3_client const> client,
+                       std::string uri,
+                       std::string version_id = {},
+                       compression cmp = compression::infer);
 
 public:
     intrusive_ptr<input_stream>
@@ -55,42 +52,42 @@ public:
 
 public:
     std::string const &
-    id() const noexcept final
-    {
-        return pathname_;
-    }
+    id() const final;
 
 private:
-    std::string pathname_;
-    bool mmap_;
+    intrusive_ptr<s3_client const> client_;
+    std::string uri_;
+    std::string version_id_;
     compression compression_;
+    mutable std::string id_{};
 };
 
-struct MLIO_API list_files_params {
+struct MLIO_API list_s3_objects_params {
     using predicate_callback = std::function<bool(std::string const &)>;
 
-    /// The list of pathnames to traverse.
-    stdx::span<std::string const> pathnames{};
-    /// The pattern to match the filenames against.
+    /// The S3 client to use.
+    s3_client const *client{};
+    /// The list of URIs to traverse.
+    stdx::span<std::string const> uris{};
+    /// The pattern to match the S3 objects against.
     std::string const *pattern{};
     /// The callback function for user-specific filtering.
     predicate_callback const *predicate{};
-    /// A boolean value indicating whether the files should be
-    /// memory-mapped.
-    bool mmap = true;
-    /// The compression type of the files. If set to @c infer, the
-    /// compression will be inferred from the filenames.
+    /// The compression type of the S3 objects. If set to @c infer, the
+    /// compression will be inferred from the URIs.
     compression cmp = compression::infer;
 };
 
-/// Recursively lists all files residing under the specified pathnames.
+/// Lists all S3 objects residing under the specified URIs.
 MLIO_API
 std::vector<intrusive_ptr<data_store>>
-list_files(list_files_params const &prm);
+list_s3_objects(list_s3_objects_params const &prm);
 
 MLIO_API
 std::vector<intrusive_ptr<data_store>>
-list_files(std::string const &pathname, std::string const &pattern = {});
+list_s3_objects(s3_client const &client,
+                std::string const &uri,
+                std::string const &pattern = {});
 
 /// @}
 

@@ -13,7 +13,7 @@
  * language governing permissions and limitations under the License.
  */
 
-#include "mlio/data_stores/file_hierarchy.h"  // IWYU pragma: associated
+#include "mlio/data_stores/file.h"  // IWYU pragma: associated
 
 #include <algorithm>
 #include <cerrno>
@@ -70,9 +70,9 @@ get_pathname_c_strs(stdx::span<std::string const> pathnames)
 }
 
 #ifdef MLIO_PLATFORM_LINUX
-#    define mlio_pathname_comparer ::strverscmp
+#define mlio_pathname_comparer ::strverscmp
 #else
-#    define mlio_pathname_comparer ::strcmp
+#define mlio_pathname_comparer ::strcmp
 #endif
 
 inline int
@@ -110,7 +110,7 @@ list_files(list_files_params const &prm)
 
     std::vector<intrusive_ptr<data_store>> lst;
 
-    ::FTSENT *e;
+    ::FTSENT *e{};
     while ((e = ::fts_read(fts.get())) != nullptr) {
         if (e->fts_info == FTS_ERR || e->fts_info == FTS_DNR ||
             e->fts_info == FTS_NS) {
@@ -131,10 +131,10 @@ list_files(list_files_params const &prm)
             continue;
         }
 
+        // Pattern match.
         std::string const *pattern = prm.pattern;
         if (pattern != nullptr && !pattern->empty()) {
             int r = ::fnmatch(pattern->c_str(), e->fts_accpath, 0);
-
             if (r == FNM_NOMATCH) {
                 continue;
             }
@@ -144,6 +144,7 @@ list_files(list_files_params const &prm)
             }
         }
 
+        // Predicate match.
         auto const *predicate = prm.predicate;
         if (predicate != nullptr && *predicate != nullptr) {
             if (!(*predicate)(e->fts_accpath)) {

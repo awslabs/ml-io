@@ -18,7 +18,7 @@
 #include "mlio/config.h"  // IWYU pragma: keep
 
 #ifdef MLIO_PLATFORM_WIN32
-#    include "mlio/platform/win32/memory/file_backed_memory_block.h"  // IWYU pragma: export
+#include "mlio/platform/win32/memory/file_backed_memory_block.h"  // IWYU pragma: export
 #else
-#    include "mlio/platform/posix/memory/file_backed_memory_block.h"  // IWYU pragma: export
+#include "mlio/platform/posix/memory/file_backed_memory_block.h"  // IWYU pragma: export
 #endif

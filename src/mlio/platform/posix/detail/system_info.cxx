@@ -21,7 +21,7 @@
 
 // IWYU pragma: no_include <linux/sysinfo.h>
 
-#    include <sys/sysinfo.h>
+#include <sys/sysinfo.h>
 
 namespace mlio {
 inline namespace v1 {
@@ -43,10 +43,10 @@ get_total_ram() noexcept
 
 #elif defined(MLIO_PLATFORM_MACOS)
 
-#    include <array>
+#include <array>
 
-#    include <sys/sysctl.h>
-#    include <sys/types.h>
+#include <sys/sysctl.h>
+#include <sys/types.h>
 
 namespace mlio {
 inline namespace v1 {

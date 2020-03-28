@@ -98,31 +98,31 @@ typedef enum { XXH_OK = 0, XXH_ERROR } XXH_errorcode;
  * object.
  */
 #if defined(XXH_INLINE_ALL) || defined(XXH_PRIVATE_API)
-#    ifndef XXH_STATIC_LINKING_ONLY
-#        define XXH_STATIC_LINKING_ONLY
-#    endif
-#    if defined(__GNUC__)
-#        define XXH_PUBLIC_API static __inline __attribute__((unused))
-#    elif defined(__cplusplus) || (defined(__STDC_VERSION__) && \
-                                   (__STDC_VERSION__ >= 199901L) /* C99 */)
-#        define XXH_PUBLIC_API static inline
-#    elif defined(_MSC_VER)
-#        define XXH_PUBLIC_API static __inline
-#    else
-/* this version may generate warnings for unused static functions */
-#        define XXH_PUBLIC_API static
-#    endif
+#ifndef XXH_STATIC_LINKING_ONLY
+#define XXH_STATIC_LINKING_ONLY
+#endif
+#if defined(__GNUC__)
+#define XXH_PUBLIC_API static __inline __attribute__((unused))
+#elif defined(__cplusplus) || \
+    (defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L) /* C99 */)
+#define XXH_PUBLIC_API static inline
+#elif defined(_MSC_VER)
+#define XXH_PUBLIC_API static __inline
 #else
-#    if defined(WIN32) && defined(_MSC_VER) && \
-        (defined(XXH_IMPORT) || defined(XXH_EXPORT))
-#        ifdef XXH_EXPORT
-#            define XXH_PUBLIC_API __declspec(dllexport)
-#        elif XXH_IMPORT
-#            define XXH_PUBLIC_API __declspec(dllimport)
-#        endif
-#    else
-#        define XXH_PUBLIC_API /* do nothing */
-#    endif
+/* this version may generate warnings for unused static functions */
+#define XXH_PUBLIC_API static
+#endif
+#else
+#if defined(WIN32) && defined(_MSC_VER) && \
+    (defined(XXH_IMPORT) || defined(XXH_EXPORT))
+#ifdef XXH_EXPORT
+#define XXH_PUBLIC_API __declspec(dllexport)
+#elif XXH_IMPORT
+#define XXH_PUBLIC_API __declspec(dllimport)
+#endif
+#else
+#define XXH_PUBLIC_API /* do nothing */
+#endif
 #endif /* XXH_INLINE_ALL || XXH_PRIVATE_API */
 
 /*! XXH_NAMESPACE, aka Namespace Emulation :
@@ -140,31 +140,31 @@ typedef enum { XXH_OK = 0, XXH_ERROR } XXH_errorcode;
  * by this header.
  */
 #ifdef XXH_NAMESPACE
-#    define XXH_CAT(A, B) A##B
-#    define XXH_NAME2(A, B) XXH_CAT(A, B)
-#    define XXH_versionNumber XXH_NAME2(XXH_NAMESPACE, XXH_versionNumber)
-#    define XXH32 XXH_NAME2(XXH_NAMESPACE, XXH32)
-#    define XXH32_createState XXH_NAME2(XXH_NAMESPACE, XXH32_createState)
-#    define XXH32_freeState XXH_NAME2(XXH_NAMESPACE, XXH32_freeState)
-#    define XXH32_reset XXH_NAME2(XXH_NAMESPACE, XXH32_reset)
-#    define XXH32_update XXH_NAME2(XXH_NAMESPACE, XXH32_update)
-#    define XXH32_digest XXH_NAME2(XXH_NAMESPACE, XXH32_digest)
-#    define XXH32_copyState XXH_NAME2(XXH_NAMESPACE, XXH32_copyState)
-#    define XXH32_canonicalFromHash \
-        XXH_NAME2(XXH_NAMESPACE, XXH32_canonicalFromHash)
-#    define XXH32_hashFromCanonical \
-        XXH_NAME2(XXH_NAMESPACE, XXH32_hashFromCanonical)
-#    define XXH64 XXH_NAME2(XXH_NAMESPACE, XXH64)
-#    define XXH64_createState XXH_NAME2(XXH_NAMESPACE, XXH64_createState)
-#    define XXH64_freeState XXH_NAME2(XXH_NAMESPACE, XXH64_freeState)
-#    define XXH64_reset XXH_NAME2(XXH_NAMESPACE, XXH64_reset)
-#    define XXH64_update XXH_NAME2(XXH_NAMESPACE, XXH64_update)
-#    define XXH64_digest XXH_NAME2(XXH_NAMESPACE, XXH64_digest)
-#    define XXH64_copyState XXH_NAME2(XXH_NAMESPACE, XXH64_copyState)
-#    define XXH64_canonicalFromHash \
-        XXH_NAME2(XXH_NAMESPACE, XXH64_canonicalFromHash)
-#    define XXH64_hashFromCanonical \
-        XXH_NAME2(XXH_NAMESPACE, XXH64_hashFromCanonical)
+#define XXH_CAT(A, B) A##B
+#define XXH_NAME2(A, B) XXH_CAT(A, B)
+#define XXH_versionNumber XXH_NAME2(XXH_NAMESPACE, XXH_versionNumber)
+#define XXH32 XXH_NAME2(XXH_NAMESPACE, XXH32)
+#define XXH32_createState XXH_NAME2(XXH_NAMESPACE, XXH32_createState)
+#define XXH32_freeState XXH_NAME2(XXH_NAMESPACE, XXH32_freeState)
+#define XXH32_reset XXH_NAME2(XXH_NAMESPACE, XXH32_reset)
+#define XXH32_update XXH_NAME2(XXH_NAMESPACE, XXH32_update)
+#define XXH32_digest XXH_NAME2(XXH_NAMESPACE, XXH32_digest)
+#define XXH32_copyState XXH_NAME2(XXH_NAMESPACE, XXH32_copyState)
+#define XXH32_canonicalFromHash \
+    XXH_NAME2(XXH_NAMESPACE, XXH32_canonicalFromHash)
+#define XXH32_hashFromCanonical \
+    XXH_NAME2(XXH_NAMESPACE, XXH32_hashFromCanonical)
+#define XXH64 XXH_NAME2(XXH_NAMESPACE, XXH64)
+#define XXH64_createState XXH_NAME2(XXH_NAMESPACE, XXH64_createState)
+#define XXH64_freeState XXH_NAME2(XXH_NAMESPACE, XXH64_freeState)
+#define XXH64_reset XXH_NAME2(XXH_NAMESPACE, XXH64_reset)
+#define XXH64_update XXH_NAME2(XXH_NAMESPACE, XXH64_update)
+#define XXH64_digest XXH_NAME2(XXH_NAMESPACE, XXH64_digest)
+#define XXH64_copyState XXH_NAME2(XXH_NAMESPACE, XXH64_copyState)
+#define XXH64_canonicalFromHash \
+    XXH_NAME2(XXH_NAMESPACE, XXH64_canonicalFromHash)
+#define XXH64_hashFromCanonical \
+    XXH_NAME2(XXH_NAMESPACE, XXH64_hashFromCanonical)
 #endif
 
 /* *************************************
@@ -185,19 +185,19 @@ XXH_versionNumber(void);
 #if !defined(__VMS) && \
     (defined(__cplusplus) || \
      (defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L) /* C99 */))
-#    include <stdint.h>
+#include <stdint.h>
 typedef uint32_t XXH32_hash_t;
 #else
-#    include <limits.h>
-#    if UINT_MAX == 0xFFFFFFFFUL
+#include <limits.h>
+#if UINT_MAX == 0xFFFFFFFFUL
 typedef unsigned int XXH32_hash_t;
-#    else
-#        if ULONG_MAX == 0xFFFFFFFFUL
+#else
+#if ULONG_MAX == 0xFFFFFFFFUL
 typedef unsigned long XXH32_hash_t;
-#        else
-#            error "unsupported platform : need a 32-bit type"
-#        endif
-#    endif
+#else
+#error "unsupported platform : need a 32-bit type"
+#endif
+#endif
 #endif
 
 /*! XXH32() :
@@ -282,15 +282,15 @@ XXH32_hashFromCanonical(const XXH32_canonical_t *src);
 /*-**********************************************************************
  *  64-bit hash
  ************************************************************************/
-#    if !defined(__VMS) && \
-        (defined(__cplusplus) || (defined(__STDC_VERSION__) && \
-                                  (__STDC_VERSION__ >= 199901L) /* C99 */))
-#        include <stdint.h>
+#if !defined(__VMS) && \
+    (defined(__cplusplus) || \
+     (defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L) /* C99 */))
+#include <stdint.h>
 typedef uint64_t XXH64_hash_t;
-#    else
+#else
 /* the following type must have a width of 64-bit */
 typedef unsigned long long XXH64_hash_t;
-#    endif
+#endif
 
 /*! XXH64() :
  *  Returns the 64-bit hash of sequence of length @length stored at memory
@@ -461,25 +461,23 @@ struct XXH64_state_s {
  * that consistent enough ?
  */
 
-#    ifdef XXH_NAMESPACE
-#        define XXH3_64bits XXH_NAME2(XXH_NAMESPACE, XXH3_64bits)
-#        define XXH3_64bits_withSecret \
-            XXH_NAME2(XXH_NAMESPACE, XXH3_64bits_withSecret)
-#        define XXH3_64bits_withSeed \
-            XXH_NAME2(XXH_NAMESPACE, XXH3_64bits_withSeed)
+#ifdef XXH_NAMESPACE
+#define XXH3_64bits XXH_NAME2(XXH_NAMESPACE, XXH3_64bits)
+#define XXH3_64bits_withSecret XXH_NAME2(XXH_NAMESPACE, XXH3_64bits_withSecret)
+#define XXH3_64bits_withSeed XXH_NAME2(XXH_NAMESPACE, XXH3_64bits_withSeed)
 
-#        define XXH3_createState XXH_NAME2(XXH_NAMESPACE, XXH3_createState)
-#        define XXH3_freeState XXH_NAME2(XXH_NAMESPACE, XXH3_freeState)
-#        define XXH3_copyState XXH_NAME2(XXH_NAMESPACE, XXH3_copyState)
+#define XXH3_createState XXH_NAME2(XXH_NAMESPACE, XXH3_createState)
+#define XXH3_freeState XXH_NAME2(XXH_NAMESPACE, XXH3_freeState)
+#define XXH3_copyState XXH_NAME2(XXH_NAMESPACE, XXH3_copyState)
 
-#        define XXH3_64bits_reset XXH_NAME2(XXH_NAMESPACE, XXH3_64bits_reset)
-#        define XXH3_64bits_reset_withSeed \
-            XXH_NAME2(XXH_NAMESPACE, XXH3_64bits_reset_withSeed)
-#        define XXH3_64bits_reset_withSecret \
-            XXH_NAME2(XXH_NAMESPACE, XXH3_64bits_reset_withSecret)
-#        define XXH3_64bits_update XXH_NAME2(XXH_NAMESPACE, XXH3_64bits_update)
-#        define XXH3_64bits_digest XXH_NAME2(XXH_NAMESPACE, XXH3_64bits_digest)
-#    endif
+#define XXH3_64bits_reset XXH_NAME2(XXH_NAMESPACE, XXH3_64bits_reset)
+#define XXH3_64bits_reset_withSeed \
+    XXH_NAME2(XXH_NAMESPACE, XXH3_64bits_reset_withSeed)
+#define XXH3_64bits_reset_withSecret \
+    XXH_NAME2(XXH_NAMESPACE, XXH3_64bits_reset_withSecret)
+#define XXH3_64bits_update XXH_NAME2(XXH_NAMESPACE, XXH3_64bits_update)
+#define XXH3_64bits_digest XXH_NAME2(XXH_NAMESPACE, XXH3_64bits_digest)
+#endif
 
 /* XXH3_64bits() :
  * default 64-bit variant, using default secret and default seed of 0.
@@ -495,7 +493,7 @@ XXH3_64bits(const void *data, size_t len);
  * same character, or sequences of bytes, and especially avoid swathes of \0.
  * Failure to respect these conditions will result in a poor quality hash.
  */
-#    define XXH3_SECRET_SIZE_MIN 136
+#define XXH3_SECRET_SIZE_MIN 136
 XXH_PUBLIC_API XXH64_hash_t
 XXH3_64bits_withSecret(const void *data,
                        size_t len,
@@ -512,21 +510,21 @@ XXH3_64bits_withSeed(const void *data, size_t len, XXH64_hash_t seed);
 
 /* streaming 64-bit */
 
-#    if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L) /* C11+ */
-#        include <stdalign.h>
-#        define XXH_ALIGN(n) alignas(n)
-#    elif defined(__GNUC__)
-#        define XXH_ALIGN(n) __attribute__((aligned(n)))
-#    elif defined(_MSC_VER)
-#        define XXH_ALIGN(n) __declspec(align(n))
-#    else
-#        define XXH_ALIGN(n) /* disabled */
-#    endif
+#if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L) /* C11+ */
+#include <stdalign.h>
+#define XXH_ALIGN(n) alignas(n)
+#elif defined(__GNUC__)
+#define XXH_ALIGN(n) __attribute__((aligned(n)))
+#elif defined(_MSC_VER)
+#define XXH_ALIGN(n) __declspec(align(n))
+#else
+#define XXH_ALIGN(n) /* disabled */
+#endif
 
 typedef struct XXH3_state_s XXH3_state_t;
 
-#    define XXH3_SECRET_DEFAULT_SIZE 192 /* minimum XXH3_SECRET_SIZE_MIN */
-#    define XXH3_INTERNALBUFFER_SIZE 256
+#define XXH3_SECRET_DEFAULT_SIZE 192 /* minimum XXH3_SECRET_SIZE_MIN */
+#define XXH3_INTERNALBUFFER_SIZE 256
 struct XXH3_state_s {
     XXH_ALIGN(64) XXH64_hash_t acc[8];
     XXH_ALIGN(64)
@@ -588,31 +586,28 @@ XXH3_64bits_digest(const XXH3_state_t *statePtr);
 
 /* 128-bit */
 
-#    ifdef XXH_NAMESPACE
-#        define XXH128 XXH_NAME2(XXH_NAMESPACE, XXH128)
-#        define XXH3_128bits XXH_NAME2(XXH_NAMESPACE, XXH3_128bits)
-#        define XXH3_128bits_withSeed \
-            XXH_NAME2(XXH_NAMESPACE, XXH3_128bits_withSeed)
-#        define XXH3_128bits_withSecret \
-            XXH_NAME2(XXH_NAMESPACE, XXH3_128bits_withSecret)
+#ifdef XXH_NAMESPACE
+#define XXH128 XXH_NAME2(XXH_NAMESPACE, XXH128)
+#define XXH3_128bits XXH_NAME2(XXH_NAMESPACE, XXH3_128bits)
+#define XXH3_128bits_withSeed XXH_NAME2(XXH_NAMESPACE, XXH3_128bits_withSeed)
+#define XXH3_128bits_withSecret \
+    XXH_NAME2(XXH_NAMESPACE, XXH3_128bits_withSecret)
 
-#        define XXH3_128bits_reset XXH_NAME2(XXH_NAMESPACE, XXH3_128bits_reset)
-#        define XXH3_128bits_reset_withSeed \
-            XXH_NAME2(XXH_NAMESPACE, XXH3_128bits_reset_withSeed)
-#        define XXH3_128bits_reset_withSecret \
-            XXH_NAME2(XXH_NAMESPACE, XXH3_128bits_reset_withSecret)
-#        define XXH3_128bits_update \
-            XXH_NAME2(XXH_NAMESPACE, XXH3_128bits_update)
-#        define XXH3_128bits_digest \
-            XXH_NAME2(XXH_NAMESPACE, XXH3_128bits_digest)
+#define XXH3_128bits_reset XXH_NAME2(XXH_NAMESPACE, XXH3_128bits_reset)
+#define XXH3_128bits_reset_withSeed \
+    XXH_NAME2(XXH_NAMESPACE, XXH3_128bits_reset_withSeed)
+#define XXH3_128bits_reset_withSecret \
+    XXH_NAME2(XXH_NAMESPACE, XXH3_128bits_reset_withSecret)
+#define XXH3_128bits_update XXH_NAME2(XXH_NAMESPACE, XXH3_128bits_update)
+#define XXH3_128bits_digest XXH_NAME2(XXH_NAMESPACE, XXH3_128bits_digest)
 
-#        define XXH128_isEqual XXH_NAME2(XXH_NAMESPACE, XXH128_isEqual)
-#        define XXH128_cmp XXH_NAME2(XXH_NAMESPACE, XXH128_cmp)
-#        define XXH128_canonicalFromHash \
-            XXH_NAME2(XXH_NAMESPACE, XXH128_canonicalFromHash)
-#        define XXH128_hashFromCanonical \
-            XXH_NAME2(XXH_NAMESPACE, XXH128_hashFromCanonical)
-#    endif
+#define XXH128_isEqual XXH_NAME2(XXH_NAMESPACE, XXH128_isEqual)
+#define XXH128_cmp XXH_NAME2(XXH_NAMESPACE, XXH128_cmp)
+#define XXH128_canonicalFromHash \
+    XXH_NAME2(XXH_NAMESPACE, XXH128_canonicalFromHash)
+#define XXH128_hashFromCanonical \
+    XXH_NAME2(XXH_NAMESPACE, XXH128_hashFromCanonical)
+#endif
 
 typedef struct {
     XXH64_hash_t low64;
@@ -676,7 +671,7 @@ XXH128_hashFromCanonical(const XXH128_canonical_t *src);
  *  XXH_INLINE_ALL
  ************************************************************************/
 #if defined(XXH_INLINE_ALL) || defined(XXH_PRIVATE_API)
-#    include "xxhash.c" /* include xxhash function bodies as `static`, for inlining */
+#include "xxhash.c" /* include xxhash function bodies as `static`, for inlining */
 #endif
 
 #if defined(__cplusplus)

@@ -89,6 +89,16 @@ py_list_files(std::vector<std::string> const &pathnames,
     return list_files({pathnames, &pattern, &predicate, mmap, cmp});
 }
 
+std::vector<intrusive_ptr<data_store>>
+py_list_s3_objects(s3_client const &client,
+                   std::vector<std::string> const &uris,
+                   std::string const &pattern,
+                   list_files_params::predicate_callback &predicate,
+                   compression cmp)
+{
+    return list_s3_objects({&client, uris, &pattern, &predicate, cmp});
+}
+
 }  // namespace
 
 void
@@ -124,9 +134,9 @@ register_data_stores(py::module &m)
             "Returns a unique identifier for the data store.");
 
     py::class_<file, data_store, intrusive_ptr<file>>(
-        m, "File", "Represents a file as a ``data_store``.")
+        m, "File", "Represents a file as a ``DataStore``.")
         .def(py::init<std::string, bool, compression>(),
-             "patname"_a,
+             "pathname"_a,
              "mmap"_a = true,
              "compression"_a = compression::infer,
              R"(
@@ -156,10 +166,34 @@ register_data_stores(py::module &m)
                 The compression type of the data.
             )");
 
+    py::class_<s3_object, data_store, intrusive_ptr<s3_object>>(
+        m, "S3Object", "Represents an S3 object as a ``DataStore``.")
+        .def(py::init<intrusive_ptr<s3_client>,
+                      std::string,
+                      std::string,
+                      compression>(),
+             "client"_a,
+             "uri"_a,
+             "version_id"_a = "",
+             "compression"_a = compression::infer,
+             R"(
+            Parameters
+            ----------
+            client : S3Client
+                The `S3Client` to use.
+            uri : str
+                The URI of the S3 object.
+            version_id : str
+                The version of the S3 object to read.
+            compression : Compression
+                The compression type of the S3 object. If set to `INFER`, the
+                compression will be inferred from the URI.
+            )");
+
     py::class_<sagemaker_pipe, data_store, intrusive_ptr<sagemaker_pipe>>(
         m,
         "SageMakerPipe",
-        "Represents an Amazon SageMaker pipe channel as a ``data_store``.")
+        "Represents an Amazon SageMaker pipe channel as a ``DataStore``.")
         .def(py::init<std::string,
                       std::chrono::seconds,
                       std::optional<std::size_t>,
@@ -208,15 +242,13 @@ register_data_stores(py::module &m)
             compression will be inferred from the filenames.
         )");
 
-    m.def(
-        "list_files",
-        [](std::string const &pathname, std::string const &pattern) {
-            return list_files(pathname, pattern);
-        },
-        "pathname"_a,
-        "pattern"_a = "",
-        R"(
-        Recursively list all files residing under the specified pathnames.
+    m.def("list_files",
+          py::overload_cast<std::string const &, std::string const &>(
+              &list_files),
+          "pathname"_a,
+          "pattern"_a = "",
+          R"(
+        Recursively list all files residing under the specified pathname.
 
         Parameters
         ----------
@@ -224,6 +256,51 @@ register_data_stores(py::module &m)
             The pathname to traverse.
         pattern : str, optional
             The pattern to match the filenames against.
+        )");
+
+    m.def("list_s3_objects",
+          &py_list_s3_objects,
+          "client"_a,
+          "uris"_a,
+          "pattern"_a = "",
+          "predicate"_a = nullptr,
+          "compression"_a = compression::infer,
+          R"(
+        List all S3 objects residing under the specified URIs.
+
+        Parameters
+        ----------
+        client : S3Client
+            The S3 client to use.
+        uris : list of strs
+            The list of URIs to traverse.
+        pattern : str, optional
+            The pattern to match the S3 objects against.
+        predicate : callable
+            The callback function for user-specific filtering.
+        compression : Compression
+            The compression type of the S3 objects. If set to `INFER`, the
+            compression will be inferred from the URIs.
+        )");
+
+    m.def("list_s3_objects",
+          py::overload_cast<s3_client const &,
+                            std::string const &,
+                            std::string const &>(&list_s3_objects),
+          "client"_a,
+          "uri"_a,
+          "pattern"_a = "",
+          R"(
+        List all S3 objects residing under the specified URI.
+
+        Parameters
+        ----------
+        client : S3Client
+            The S3 client to use.
+        uri : str
+            The URI to traverse.
+        pattern : str, optional
+            The pattern to match the S3 objects against.
         )");
 }
 

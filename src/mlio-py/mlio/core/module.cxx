@@ -27,6 +27,7 @@ PYBIND11_MODULE(_core, m)
 
     register_exceptions(m);
     register_logging(m);
+    register_s3_client(m);
     register_memory_slice(m);
     register_device_array(m);
     register_tensors(m);

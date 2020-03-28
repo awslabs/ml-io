@@ -18,7 +18,7 @@
 #include "mlio/config.h"  // IWYU pragma: keep
 
 #ifdef MLIO_PLATFORM_WIN32
-#    include "mlio/platform/win32/streams/sagemaker_pipe_input_stream.h"  // IWYU pragma: export
+#include "mlio/platform/win32/streams/sagemaker_pipe_input_stream.h"  // IWYU pragma: export
 #else
-#    include "mlio/platform/posix/streams/sagemaker_pipe_input_stream.h"  // IWYU pragma: export
+#include "mlio/platform/posix/streams/sagemaker_pipe_input_stream.h"  // IWYU pragma: export
 #endif

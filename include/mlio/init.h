@@ -27,5 +27,15 @@ MLIO_API
 void
 initialize();
 
+/// Initializes AWS C++ SDK.
+MLIO_API
+void
+initialize_aws_sdk();
+
+/// Disposes the internal data structures used by AWS C++ SDK.
+MLIO_API
+void
+dispose_aws_sdk();
+
 }  // namespace v1
 }  // namespace mlio

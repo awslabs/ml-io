@@ -13,6 +13,10 @@ if(@MLIO_STATIC_LIB@)
     find_dependency(TBB COMPONENTS tbb)
     find_dependency(Threads)
     find_dependency(ZLIB)
+
+    if(@MLIO_BUILD_S3_SUPPORT@)
+        find_dependency(AWSSDK 1.7 COMPONENTS s3)
+    endif()
 endif()
 
 include(${CMAKE_CURRENT_LIST_DIR}/mlio-targets.cmake)

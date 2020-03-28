@@ -43,7 +43,7 @@
 
 #if defined(__has_builtin) && (defined(__GNUC__) || defined(__clang__))
 
-#    define _GET_CLZ(x, b) (uint8_t) std::min(b, ::__builtin_clz(x)) + 1
+#define _GET_CLZ(x, b) (uint8_t) std::min(b, ::__builtin_clz(x)) + 1
 
 #else
 
@@ -51,21 +51,21 @@ inline uint8_t
 _get_leading_zero_count(uint32_t x, uint8_t b)
 {
 
-#    if defined(_MSC_VER)
+#if defined(_MSC_VER)
     uint32_t leading_zero_len = 32;
     ::_BitScanReverse(&leading_zero_len, x);
     --leading_zero_len;
     return std::min(b, (uint8_t) leading_zero_len);
-#    else
+#else
     uint8_t v = 1;
     while (v <= b && !(x & 0x80000000)) {
         v++;
         x <<= 1;
     }
     return v;
-#    endif
+#endif
 }
-#    define _GET_CLZ(x, b) _get_leading_zero_count(x, b)
+#define _GET_CLZ(x, b) _get_leading_zero_count(x, b)
 #endif /* defined(__GNUC__) */
 #pragma GCC diagnostic pop
 

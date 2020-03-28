@@ -82,7 +82,7 @@ file_input_stream::seek(std::size_t position)
     if (o == -1) {
         std::error_code err = current_error_code();
 
-        char const *msg;
+        char const *msg{};
         if (err == std::errc::invalid_seek) {
             msg = "The file is not seekable.";
         }
@@ -137,7 +137,7 @@ file_input_stream::position() const
     if (o == -1) {
         std::error_code err = current_error_code();
 
-        char const *msg;
+        char const *msg{};
         if (err == std::errc::invalid_seek) {
             msg = "The file is not seekable.";
         }

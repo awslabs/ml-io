@@ -343,8 +343,8 @@ csv_reader::init_parsers_and_schema()
 }
 
 bool
-csv_reader::should_skip(std::size_t index, std::string const &name) const
-    noexcept
+csv_reader::should_skip(std::size_t index,
+                        std::string const &name) const noexcept
 {
     auto use_cols_idx = params_.use_columns_by_index;
     if (!use_cols_idx.empty()) {

@@ -10,10 +10,11 @@ add_library(mlio
     data_stores/compression.cxx
     data_stores/data_store.cxx
     data_stores/file.cxx
-    data_stores/file_hierarchy.cxx
     data_stores/in_memory_store.cxx
+    data_stores/s3_object.cxx
     data_stores/sagemaker_pipe.cxx
     detail/pathname.cxx
+    detail/s3_utils.cxx
     integ/dlpack.cxx
     memory/external_memory_block.cxx
     memory/file_backed_memory_allocator.cxx
@@ -43,6 +44,7 @@ add_library(mlio
     streams/input_stream_base.cxx
     streams/input_stream.cxx
     streams/memory_input_stream.cxx
+    streams/s3_input_stream.cxx
     streams/stream_error.cxx
     streams/utf8_input_stream.cxx
     util/number.cxx
@@ -60,6 +62,7 @@ add_library(mlio
     device.cxx
     example.cxx
     init.cxx
+    init_aws.cxx
     instance_batch_reader.cxx
     instance_reader.cxx
     instance_reader_base.cxx
@@ -69,6 +72,7 @@ add_library(mlio
     parallel_data_reader.cxx
     parser.cxx
     recordio_protobuf_reader.cxx
+    s3_client.cxx
     schema.cxx
     shuffled_instance_reader.cxx
     tensor.cxx
@@ -81,7 +85,7 @@ if(WIN32)
 else()
     target_sources(mlio
         PRIVATE
-            platform/posix/data_stores/file_hierarchy.cxx
+            platform/posix/data_stores/file.cxx
             platform/posix/detail/system_info.cxx
             platform/posix/memory/file_backed_memory_block.cxx
             platform/posix/memory/file_mapped_memory_block.cxx
@@ -120,6 +124,18 @@ target_link_libraries(mlio
     PRIVATE
         Iconv::Iconv Threads::Threads ZLIB::ZLIB
 )
+
+if(MLIO_BUILD_S3_SUPPORT)
+    target_compile_definitions(mlio
+        PUBLIC
+            MLIO_BUILD_S3_SUPPORT
+    )
+
+    target_link_libraries(mlio
+        PRIVATE
+            aws-cpp-sdk-core aws-cpp-sdk-s3
+    )
+endif()
 
 set_target_properties(mlio PROPERTIES
     VERSION

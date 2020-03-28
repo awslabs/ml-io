@@ -37,6 +37,9 @@ void
 register_logging(pybind11::module &m);
 
 void
+register_s3_client(pybind11::module &m);
+
+void
 register_memory_slice(pybind11::module &m);
 
 void

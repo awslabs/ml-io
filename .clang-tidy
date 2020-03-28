@@ -13,6 +13,7 @@ Checks: "*,\
     -cppcoreguidelines-pro-type-vararg,\
     -fuchsia-*,\
     -google-build-using-namespace,\
+    -google-readability-avoid-underscore-in-googletest-name,\
     -google-runtime-references,\
     -hicpp-*,\
     -llvm-*,\
@@ -21,7 +22,9 @@ Checks: "*,\
     -modernize-use-nodiscard,\
     -modernize-use-trailing-return-type,\
     -readability-magic-numbers,\
-    -readability-named-parameter"
+    -readability-named-parameter,\
+    -readability-qualified-auto,\
+    -readability-redundant-access-specifiers"
 
 HeaderFilterRegex: "mlio"
 

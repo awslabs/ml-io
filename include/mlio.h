@@ -24,8 +24,8 @@
 #include "mlio/data_stores/compression.h"              // IWYU pragma: export
 #include "mlio/data_stores/data_store.h"               // IWYU pragma: export
 #include "mlio/data_stores/file.h"                     // IWYU pragma: export
-#include "mlio/data_stores/file_hierarchy.h"           // IWYU pragma: export
 #include "mlio/data_stores/in_memory_store.h"          // IWYU pragma: export
+#include "mlio/data_stores/s3_object.h"                // IWYU pragma: export
 #include "mlio/data_stores/sagemaker_pipe.h"           // IWYU pragma: export
 #include "mlio/data_type.h"                            // IWYU pragma: export
 #include "mlio/device.h"                               // IWYU pragma: export
@@ -59,6 +59,7 @@
 #include "mlio/record_readers/stream_record_reader.h"  // IWYU pragma: export
 #include "mlio/record_readers/text_record_reader.h"    // IWYU pragma: export
 #include "mlio/recordio_protobuf_reader.h"             // IWYU pragma: export
+#include "mlio/s3_client.h"                            // IWYU pragma: export
 #include "mlio/schema.h"                               // IWYU pragma: export
 #include "mlio/span.h"                                 // IWYU pragma: export
 #include "mlio/streams/file_input_stream.h"            // IWYU pragma: export
@@ -66,6 +67,7 @@
 #include "mlio/streams/input_stream.h"                 // IWYU pragma: export
 #include "mlio/streams/input_stream_base.h"            // IWYU pragma: export
 #include "mlio/streams/memory_input_stream.h"          // IWYU pragma: export
+#include "mlio/streams/s3_input_stream.h"              // IWYU pragma: export
 #include "mlio/streams/sagemaker_pipe_input_stream.h"  // IWYU pragma: export
 #include "mlio/streams/stream_error.h"                 // IWYU pragma: export
 #include "mlio/streams/utf8_input_stream.h"            // IWYU pragma: export

@@ -106,8 +106,8 @@ operator==(schema const &lhs, schema const &rhs) noexcept
 namespace std {  // NOLINT(cert-dcl58-cpp)
 
 size_t
-hash<mlio::feature_desc>::operator()(mlio::feature_desc const &desc) const
-    noexcept
+hash<mlio::feature_desc>::operator()(
+    mlio::feature_desc const &desc) const noexcept
 {
     size_t seed = 0;
 

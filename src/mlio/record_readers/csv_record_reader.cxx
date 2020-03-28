@@ -91,7 +91,7 @@ csv_record_reader::read_line(memory_slice &chunk, bool ignore_leftover)
 
     auto pos = chrs.begin();
 
-    char chr;
+    char chr{};
 
     parser_state state;
 

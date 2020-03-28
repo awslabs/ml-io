@@ -18,6 +18,7 @@
 * On Linux libc 2.12 or higher
 * Intel TBB 2019.0 or higher
 * Python 3.6 or higher
+* AWS C++ SDK 1.7 or higher (optional)
 * Apache Arrow 0.15.1 (optional)
 
 ## Build Requirements
@@ -33,7 +34,7 @@ Official Ubuntu APT repositories do not contain an up-to-date version of CMake r
 
 On Ubuntu 18.04 you can install the build dependencies with:
 ```bash
-$ sudo -- sh -c 'apt update && apt install -qy build-essential cmake ninja-build doxygen git'
+$ sudo -- sh -c 'apt update && apt install -qy build-essential autoconf libtool cmake ninja-build doxygen git python3-dev python3-distutils python3-pip zlib1g-dev libssl-dev libcurl4-openssl-dev'
 ```
 
 On macOS you can use Homebrew:
@@ -80,8 +81,9 @@ $ cmake --build .
 | MLIO_INCLUDE_ARROW_INTEGRATION | Generates build target 'mlio-arrow' for the Apache Arrow integration | OFF     |
 | MLIO_INCLUDE_TESTS             | Generates build target 'mlio-test' for the tests                     | ON      |
 | MLIO_INCLUDE_DOC               | Generates build target 'mlio-doc' for the documentation              | OFF     |
-| MLIO_TREAT_WARNINGS_AS_ERRORS  | Treats compilation warnings as errors                                | OFF     |
+| MLIO_BUILD_S3_SUPPORT          | Builds with Amazon S3 support                                        | OFF     |
 | MLIO_BUILD_FOR_NATIVE_ARCH     | Builds for the processor type of the compiling machine               | OFF     |
+| MLIO_TREAT_WARNINGS_AS_ERRORS  | Treats compilation warnings as errors                                | OFF     |
 | MLIO_ENABLE_LTO                | Enables link time optimization                                       | ON      |
 | MLIO_ENABLE_ASAN               | Enables address sanitizer                                            | OFF     |
 | MLIO_ENABLE_USAN               | Enables undefined behavior sanitizer                                 | OFF     |

@@ -35,15 +35,14 @@ in_memory_store::in_memory_store(memory_slice chunk, compression cmp)
         throw not_supported_error{
             "The in-memory store does not support inferring compression."};
     }
-
-    auto *ptr = static_cast<void const *>(chunk_.data());
-    id_ = fmt::format("{0:p}+{1:#04x}", ptr, chunk_.size());
 }
 
 intrusive_ptr<input_stream>
 in_memory_store::open_read() const
 {
-    logger::info("The in-memory store '{0}' is being opened.", id_);
+    if (logger::is_enabled_for(log_level::info)) {
+        logger::info("The in-memory store '{0}' is being opened.", id());
+    }
 
     auto strm = make_intrusive<memory_input_stream>(chunk_);
 
@@ -51,6 +50,17 @@ in_memory_store::open_read() const
         return std::move(strm);
     }
     return make_inflate_stream(std::move(strm), compression_);
+}
+
+std::string const &
+in_memory_store::id() const
+{
+    if (id_.empty()) {
+        auto *ptr = static_cast<void const *>(chunk_.data());
+        id_ = fmt::format("{0:p}+{1:#04x}", ptr, chunk_.size());
+    }
+
+    return id_;
 }
 
 std::string

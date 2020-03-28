@@ -4,6 +4,7 @@ set -o errexit
 
 declare -r _valid_dependencies=(
     absl
+    awssdk
     dlpack
     fmt
     gtest

@@ -35,7 +35,7 @@ csv_record_tokenizer::next()
         return false;
     }
 
-    char chr;
+    char chr{};
 
     // Start of a new field.
     parser_state state = parser_state::new_field;

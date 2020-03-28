@@ -20,6 +20,7 @@
 #include "mlio/logger.h"
 #include "mlio/memory/file_backed_memory_allocator.h"
 #include "mlio/memory/memory_allocator.h"
+#include "mlio/not_supported_error.h"
 
 namespace mlio {
 inline namespace v1 {

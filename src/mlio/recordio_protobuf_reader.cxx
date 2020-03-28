@@ -273,7 +273,7 @@ recordio_protobuf_reader::copy_shape(instance const &ins,
                                      ProtobufTensor const &tsr)
 {
     for (std::uint64_t dim : tsr.shape()) {
-        std::size_t d;
+        std::size_t d{};
         if (!try_narrow(dim, d)) {
             std::size_t s =
                 std::numeric_limits<std::byte>::digits * sizeof(std::size_t);
@@ -613,7 +613,7 @@ recordio_protobuf_reader::decoder::decode_feature(ProtobufTensor const &tsr)
 
     if (is_sparse(tsr) != ftr_dsc_->sparse()) {
         if (state_->bbh != bad_batch_handling::skip) {
-            char const *ft;
+            char const *ft{};
             if (ftr_dsc_->sparse()) {
                 ft =
                     "The feature '{2}' of the record {1:n} in the data store "
@@ -715,7 +715,7 @@ recordio_protobuf_reader::decoder::shape_equals(
     auto pos = shape.begin() + 1;
 
     for (std::uint64_t dim : tsr.shape()) {
-        std::size_t d;
+        std::size_t d{};
         if (!try_narrow(dim, d) || *pos != d) {
             return false;
         }

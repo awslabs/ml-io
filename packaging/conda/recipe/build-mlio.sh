@@ -26,7 +26,8 @@ cmake -GNinja\
       -DCMAKE_INSTALL_PREFIX="$PREFIX"\
       -DCMAKE_TOOLCHAIN_FILE="$_toolchain_file"\
       -DCMAKE_FIND_ROOT_PATH="$_dependencies_dir"\
-      -DIconv_IS_BUILT_IN=FALSE\
+      -DIconv_IS_BUILT_IN=OFF\
+      -DMLIO_BUILD_S3_SUPPORT=ON\
       "$SRC_DIR"
 
 cmake --build .

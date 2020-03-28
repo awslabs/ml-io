@@ -49,25 +49,25 @@
 /* ===   Compiler specifics   === */
 
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L /* >= C99 */
-#    define XXH_RESTRICT restrict
+#define XXH_RESTRICT restrict
 #else
 /* note : it might be useful to define __restrict or __restrict__ for some C++
  * compilers */
-#    define XXH_RESTRICT /* disable */
+#define XXH_RESTRICT /* disable */
 #endif
 
 #if defined(__GNUC__)
-#    if defined(__AVX2__)
-#        include <immintrin.h>
-#    elif defined(__SSE2__)
-#        include <emmintrin.h>
-#    elif defined(__ARM_NEON__) || defined(__ARM_NEON)
-#        define inline __inline__ /* clang bug */
-#        include <arm_neon.h>
-#        undef inline
-#    endif
+#if defined(__AVX2__)
+#include <immintrin.h>
+#elif defined(__SSE2__)
+#include <emmintrin.h>
+#elif defined(__ARM_NEON__) || defined(__ARM_NEON)
+#define inline __inline__ /* clang bug */
+#include <arm_neon.h>
+#undef inline
+#endif
 #elif defined(_MSC_VER)
-#    include <intrin.h>
+#include <intrin.h>
 #endif
 
 /*
@@ -102,7 +102,7 @@
  * architecture.
  */
 #if defined(__thumb__) && !defined(__thumb2__) && defined(__ARM_ARCH_ISA_ARM)
-#    warning "XXH3 is highly inefficient without ARM or Thumb-2."
+#warning "XXH3 is highly inefficient without ARM or Thumb-2."
 #endif
 
 /* ==========================================
@@ -115,80 +115,78 @@
 #define XXH_VSX 4
 
 #ifndef XXH_VECTOR /* can be defined on command line */
-#    if defined(__AVX2__)
-#        define XXH_VECTOR XXH_AVX2
-#    elif defined(__SSE2__) || defined(_M_AMD64) || defined(_M_X64) || \
-        (defined(_M_IX86_FP) && (_M_IX86_FP == 2))
-#        define XXH_VECTOR XXH_SSE2
-#    elif defined(__GNUC__) /* msvc support maybe later */ \
-        && (defined(__ARM_NEON__) || defined(__ARM_NEON)) && \
-        (defined(__LITTLE_ENDIAN__) /* We only support little endian NEON */ \
-         || (defined(__BYTE_ORDER__) && \
-             __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__))
-#        define XXH_VECTOR XXH_NEON
-#    elif defined(__PPC64__) && defined(__POWER8_VECTOR__) && defined(__GNUC__)
-#        define XXH_VECTOR XXH_VSX
-#    else
-#        define XXH_VECTOR XXH_SCALAR
-#    endif
+#if defined(__AVX2__)
+#define XXH_VECTOR XXH_AVX2
+#elif defined(__SSE2__) || defined(_M_AMD64) || defined(_M_X64) || \
+    (defined(_M_IX86_FP) && (_M_IX86_FP == 2))
+#define XXH_VECTOR XXH_SSE2
+#elif defined(__GNUC__) /* msvc support maybe later */ \
+    && (defined(__ARM_NEON__) || defined(__ARM_NEON)) && \
+    (defined(__LITTLE_ENDIAN__) /* We only support little endian NEON */ \
+     || \
+     (defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__))
+#define XXH_VECTOR XXH_NEON
+#elif defined(__PPC64__) && defined(__POWER8_VECTOR__) && defined(__GNUC__)
+#define XXH_VECTOR XXH_VSX
+#else
+#define XXH_VECTOR XXH_SCALAR
+#endif
 #endif
 
 /* control alignment of accumulator,
  * for compatibility with fast vector loads */
 #ifndef XXH_ACC_ALIGN
-#    if XXH_VECTOR == 0 /* scalar */
-#        define XXH_ACC_ALIGN 8
-#    elif XXH_VECTOR == 1 /* sse2 */
-#        define XXH_ACC_ALIGN 16
-#    elif XXH_VECTOR == 2 /* avx2 */
-#        define XXH_ACC_ALIGN 32
-#    elif XXH_VECTOR == 3 /* neon */
-#        define XXH_ACC_ALIGN 16
-#    elif XXH_VECTOR == 4 /* vsx */
-#        define XXH_ACC_ALIGN 16
-#    endif
+#if XXH_VECTOR == 0 /* scalar */
+#define XXH_ACC_ALIGN 8
+#elif XXH_VECTOR == 1 /* sse2 */
+#define XXH_ACC_ALIGN 16
+#elif XXH_VECTOR == 2 /* avx2 */
+#define XXH_ACC_ALIGN 32
+#elif XXH_VECTOR == 3 /* neon */
+#define XXH_ACC_ALIGN 16
+#elif XXH_VECTOR == 4 /* vsx */
+#define XXH_ACC_ALIGN 16
+#endif
 #endif
 
 /* xxh_u64 XXH_mult32to64(xxh_u32 a, xxh_u64 b) { return (xxh_u64)a *
  * (xxh_u64)b; } */
 #if defined(_MSC_VER) && defined(_M_IX86)
-#    include <intrin.h>
-#    define XXH_mult32to64(x, y) __emulu(x, y)
+#include <intrin.h>
+#define XXH_mult32to64(x, y) __emulu(x, y)
 #else
-#    define XXH_mult32to64(x, y) \
-        ((xxh_u64)((x) &0xFFFFFFFF) * (xxh_u64)((y) &0xFFFFFFFF))
+#define XXH_mult32to64(x, y) \
+    ((xxh_u64)((x) &0xFFFFFFFF) * (xxh_u64)((y) &0xFFFFFFFF))
 #endif
 
 /* VSX stuff. It's a lot because VSX support is mediocre across compilers and
  * there is a lot of mischief with endianness. */
 #if XXH_VECTOR == XXH_VSX
-#    include <altivec.h>
-#    undef vector
+#include <altivec.h>
+#undef vector
 typedef __vector unsigned long long U64x2;
 typedef __vector unsigned char U8x16;
 typedef __vector unsigned U32x4;
 
-#    ifndef XXH_VSX_BE
-#        if defined(__BIG_ENDIAN__) || \
-            (defined(__BYTE_ORDER__) && \
-             __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
-#            define XXH_VSX_BE 1
-#        elif defined(__VEC_ELEMENT_REG_ORDER__) && \
-            __VEC_ELEMENT_REG_ORDER__ == __ORDER_BIG_ENDIAN__
-#            warning \
-                "-maltivec=be is not recommended. Please use native endianness."
-#            define XXH_VSX_BE 1
-#        else
-#            define XXH_VSX_BE 0
-#        endif
-#    endif
+#ifndef XXH_VSX_BE
+#if defined(__BIG_ENDIAN__) || \
+    (defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
+#define XXH_VSX_BE 1
+#elif defined(__VEC_ELEMENT_REG_ORDER__) && \
+    __VEC_ELEMENT_REG_ORDER__ == __ORDER_BIG_ENDIAN__
+#warning "-maltivec=be is not recommended. Please use native endianness."
+#define XXH_VSX_BE 1
+#else
+#define XXH_VSX_BE 0
+#endif
+#endif
 
 /* We need some helpers for big endian mode. */
-#    if XXH_VSX_BE
+#if XXH_VSX_BE
 /* A wrapper for POWER9's vec_revb. */
-#        ifdef __POWER9_VECTOR__
-#            define XXH_vec_revb vec_revb
-#        else
+#ifdef __POWER9_VECTOR__
+#define XXH_vec_revb vec_revb
+#else
 XXH_FORCE_INLINE U64x2
 XXH_vec_revb(U64x2 val)
 {
@@ -210,7 +208,7 @@ XXH_vec_revb(U64x2 val)
                              0x08};
     return vec_perm(val, val, vByteSwap);
 }
-#        endif
+#endif
 
 /* Power8 Crypto gives us vpermxor which is very handy for
  * PPC64EB.
@@ -227,12 +225,12 @@ XXH_vec_revb(U64x2 val)
  * Because both of the main loops load the key, swap, and xor it with input,
  * we can combine the key swap into this instruction.
  */
-#        ifdef vec_permxor
-#            define XXH_vec_permxor vec_permxor
-#        else
-#            define XXH_vec_permxor __builtin_crypto_vpermxor
-#        endif
-#    endif /* XXH_VSX_BE */
+#ifdef vec_permxor
+#define XXH_vec_permxor vec_permxor
+#else
+#define XXH_vec_permxor __builtin_crypto_vpermxor
+#endif
+#endif /* XXH_VSX_BE */
 /*
  * Because we reinterpret the multiply, there are endian memes: vec_mulo
  * actually becomes vec_mule.
@@ -240,10 +238,10 @@ XXH_vec_revb(U64x2 val)
  * Additionally, the intrinsic wasn't added until GCC 8, despite existing for a
  * while. Clang has an easy way to control this, we can just use the builtin
  * which doesn't swap. GCC needs inline assembly. */
-#    if __has_builtin(__builtin_altivec_vmuleuw)
-#        define XXH_vec_mulo __builtin_altivec_vmulouw
-#        define XXH_vec_mule __builtin_altivec_vmuleuw
-#    else
+#if __has_builtin(__builtin_altivec_vmuleuw)
+#define XXH_vec_mulo __builtin_altivec_vmulouw
+#define XXH_vec_mule __builtin_altivec_vmuleuw
+#else
 /* Adapted from
  * https://github.com/google/highwayhash/blob/master/highwayhash/hh_vsx.h. */
 XXH_FORCE_INLINE U64x2
@@ -260,28 +258,26 @@ XXH_vec_mule(U32x4 a, U32x4 b)
     __asm__("vmuleuw %0, %1, %2" : "=v"(result) : "v"(a), "v"(b));
     return result;
 }
-#    endif /* __has_builtin(__builtin_altivec_vmuleuw) */
-#endif     /* XXH_VECTOR == XXH_VSX */
+#endif /* __has_builtin(__builtin_altivec_vmuleuw) */
+#endif /* XXH_VECTOR == XXH_VSX */
 
 /* prefetch
  * can be disabled, by declaring XXH_NO_PREFETCH build macro */
 #if defined(XXH_NO_PREFETCH)
-#    define XXH_PREFETCH(ptr) (void) (ptr) /* disabled */
+#define XXH_PREFETCH(ptr) (void) (ptr) /* disabled */
 #else
-#    if defined(_MSC_VER) && \
-        (defined(_M_X64) || \
-         defined( \
-             _M_I86)) /* _mm_prefetch() is not defined outside of x86/x64 */
-#        include <mmintrin.h> /* https://msdn.microsoft.com/fr-fr/library/84szxsww(v=vs.90).aspx */
-#        define XXH_PREFETCH(ptr) \
-            _mm_prefetch((const char *) (ptr), _MM_HINT_T0)
-#    elif defined(__GNUC__) && \
-        ((__GNUC__ >= 4) || ((__GNUC__ == 3) && (__GNUC_MINOR__ >= 1)))
-#        define XXH_PREFETCH(ptr) \
-            __builtin_prefetch((ptr), 0 /* rw==read */, 3 /* locality */)
-#    else
-#        define XXH_PREFETCH(ptr) (void) (ptr) /* disabled */
-#    endif
+#if defined(_MSC_VER) && \
+    (defined(_M_X64) || \
+     defined(_M_I86)) /* _mm_prefetch() is not defined outside of x86/x64 */
+#include <mmintrin.h> /* https://msdn.microsoft.com/fr-fr/library/84szxsww(v=vs.90).aspx */
+#define XXH_PREFETCH(ptr) _mm_prefetch((const char *) (ptr), _MM_HINT_T0)
+#elif defined(__GNUC__) && \
+    ((__GNUC__ >= 4) || ((__GNUC__ == 3) && (__GNUC_MINOR__ >= 1)))
+#define XXH_PREFETCH(ptr) \
+    __builtin_prefetch((ptr), 0 /* rw==read */, 3 /* locality */)
+#else
+#define XXH_PREFETCH(ptr) (void) (ptr) /* disabled */
+#endif
 #endif /* XXH_NO_PREFETCH */
 
 /* ==========================================
@@ -291,7 +287,7 @@ XXH_vec_mule(U32x4 a, U32x4 b)
 #define XXH_SECRET_DEFAULT_SIZE 192 /* minimum XXH3_SECRET_SIZE_MIN */
 
 #if (XXH_SECRET_DEFAULT_SIZE < XXH3_SECRET_SIZE_MIN)
-#    error "default keyset is not large enough"
+#error "default keyset is not large enough"
 #endif
 
 XXH_ALIGN(64)
@@ -362,9 +358,9 @@ XXH_mult64to128(xxh_u64 lhs, xxh_u64 rhs)
      */
 #elif defined(_M_X64) || defined(_M_IA64)
 
-#    ifndef _MSC_VER
-#        pragma intrinsic(_umul128)
-#    endif
+#ifndef _MSC_VER
+#pragma intrinsic(_umul128)
+#endif
     xxh_u64 product_high;
     xxh_u64 const product_low = _umul128(lhs, rhs, &product_high);
     XXH128_hash_t const r128 = {product_low, product_high};
@@ -642,8 +638,8 @@ XXH3_accumulate_512(void *XXH_RESTRICT acc,
 
         size_t i;
         for (i = 0; i < STRIPE_LEN / sizeof(uint64x2_t); i++) {
-#    if !defined(__aarch64__) && !defined(__arm64__) && \
-        defined(__GNUC__) /* ARM32-specific hack */
+#if !defined(__aarch64__) && !defined(__arm64__) && \
+    defined(__GNUC__) /* ARM32-specific hack */
             /* vzip on ARMv7 Clang generates a lot of vmovs (technically vorrs)
              * without this. vzip on 32-bit ARM NEON will overwrite the
              * original register, and I think that Clang assumes I don't want
@@ -689,7 +685,7 @@ XXH3_accumulate_512(void *XXH_RESTRICT acc,
             xacc[i] = vmlal_u32(
                 xacc[i], vget_low_u32(data_key), vget_high_u32(data_key));
 
-#    else
+#else
             /* On aarch64, vshrn/vmovn seems to be equivalent to, if not faster
              * than, the vzip method. */
 
@@ -718,7 +714,7 @@ XXH3_accumulate_512(void *XXH_RESTRICT acc,
              */
             xacc[i] = vmlal_u32(xacc[i], data_key_lo, data_key_hi);
 
-#    endif
+#endif
         }
     }
 
@@ -729,7 +725,7 @@ XXH3_accumulate_512(void *XXH_RESTRICT acc,
     U64x2 const *const xsecret =
         (U64x2 const *) secret; /* no alignment restriction */
     U64x2 const v32 = {32, 32};
-#    if XXH_VSX_BE
+#if XXH_VSX_BE
     U8x16 const vXorSwap = {0x07,
                             0x16,
                             0x25,
@@ -746,23 +742,23 @@ XXH3_accumulate_512(void *XXH_RESTRICT acc,
                             0xDA,
                             0xE9,
                             0xF8};
-#    endif
+#endif
     size_t i;
     for (i = 0; i < STRIPE_LEN / sizeof(U64x2); i++) {
         /* data_vec = xinput[i]; */
         /* key_vec = xsecret[i]; */
-#    if XXH_VSX_BE
+#if XXH_VSX_BE
         /* byteswap */
         U64x2 const data_vec = XXH_vec_revb(vec_vsx_ld(0, xinput + i));
         U64x2 const key_raw = vec_vsx_ld(0, xsecret + i);
         /* See comment above. data_key = data_vec ^ swap(xsecret[i]); */
         U64x2 const data_key = (U64x2) XXH_vec_permxor(
             (U8x16) data_vec, (U8x16) key_raw, vXorSwap);
-#    else
+#else
         U64x2 const data_vec = vec_vsx_ld(0, xinput + i);
         U64x2 const key_vec = vec_vsx_ld(0, xsecret + i);
         U64x2 const data_key = data_vec ^ key_vec;
-#    endif
+#endif
         /* shuffled = (data_key << 32) | (data_key >> 32); */
         U32x4 const shuffled = (U32x4) vec_rl(data_key, v32);
         /* product = ((U64x2)data_key & 0xFFFFFFFF) * ((U64x2)shuffled &
@@ -913,7 +909,7 @@ XXH3_scrambleAcc(void *XXH_RESTRICT acc, const void *XXH_RESTRICT secret)
     U64x2 const v47 = {47, 47};
     U32x4 const prime = {PRIME32_1, PRIME32_1, PRIME32_1, PRIME32_1};
     size_t i;
-#    if XXH_VSX_BE
+#if XXH_VSX_BE
     /* endian swap */
     U8x16 const vXorSwap = {0x07,
                             0x16,
@@ -931,20 +927,20 @@ XXH3_scrambleAcc(void *XXH_RESTRICT acc, const void *XXH_RESTRICT secret)
                             0xDA,
                             0xE9,
                             0xF8};
-#    endif
+#endif
     for (i = 0; i < STRIPE_LEN / sizeof(U64x2); i++) {
         U64x2 const acc_vec = xacc[i];
         U64x2 const data_vec = acc_vec ^ (acc_vec >> v47);
         /* key_vec = xsecret[i]; */
-#    if XXH_VSX_BE
+#if XXH_VSX_BE
         /* swap bytes words */
         U64x2 const key_raw = vec_vsx_ld(0, xsecret + i);
         U64x2 const data_key = (U64x2) XXH_vec_permxor(
             (U8x16) data_vec, (U8x16) key_raw, vXorSwap);
-#    else
+#else
         U64x2 const key_vec = vec_vsx_ld(0, xsecret + i);
         U64x2 const data_key = data_vec ^ key_vec;
-#    endif
+#endif
 
         /* data_key *= PRIME32_1 */
 

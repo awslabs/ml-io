@@ -71,5 +71,13 @@ file::repr() const
         compression_);
 }
 
+std::vector<intrusive_ptr<data_store>>
+list_files(std::string const &pathname, std::string const &pattern)
+{
+    stdx::span<std::string const> pathnames{&pathname, 1};
+
+    return list_files({pathnames, &pattern});
+}
+
 }  // namespace v1
 }  // namespace mlio

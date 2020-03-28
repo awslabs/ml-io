@@ -42,7 +42,7 @@ coo_tensor_builder::append_core(stdx::span<std::uint64_t const> keys)
     auto zip_end = tbb::make_zip_iterator(dim_end, stride_end, indices_end);
 
     for (auto uint_key : keys) {
-        std::size_t key;
+        std::size_t key{};
         // On a 32-bit system we might not be able to convert the key
         // from 64-bit to 32-bit without truncating.
         if (!try_narrow(uint_key, key)) {

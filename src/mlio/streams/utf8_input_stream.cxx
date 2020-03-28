@@ -38,7 +38,7 @@ namespace detail {
 
 struct utf8_input_stream_access {
     template<typename... Args>
-    static inline auto
+    static inline intrusive_ptr<utf8_input_stream>
     make(Args &&... args)
     {
         auto *ptr = new utf8_input_stream{std::forward<Args>(args)...};

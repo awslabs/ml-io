@@ -44,15 +44,12 @@ public:
 
 public:
     std::string const &
-    id() const noexcept final
-    {
-        return id_;
-    }
+    id() const final;
 
 private:
-    std::string id_;
     memory_slice chunk_;
     compression compression_;
+    mutable std::string id_{};
 };
 
 /// @}

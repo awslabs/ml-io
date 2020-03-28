@@ -611,9 +611,7 @@ register_data_readers(py::module &m)
                 See ``DataReaderParams``.
             )");
 
-    py::class_<text_line_reader,
-        data_reader,
-        intrusive_ptr<text_line_reader>>(
+    py::class_<text_line_reader, data_reader, intrusive_ptr<text_line_reader>>(
         m, "TextLineReader")
         .def(py::init<>(&make_text_line_reader),
              "data_reader_params"_a,

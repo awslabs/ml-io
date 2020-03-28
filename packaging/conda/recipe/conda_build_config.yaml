@@ -26,6 +26,8 @@ SDKROOT:
 # Pinned versions
 arrow_cpp:
   - 0.15.1
+aws_sdk_cpp:
+  - 1.7
 cmake:
   - 3.15
 doxygen:

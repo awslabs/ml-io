@@ -62,12 +62,14 @@ as_dl_data_type(::DLDataTypeCode code)
     return ::DLDataType{uint_code, bit_size, 1};
 }
 
+// clang-format off
+
 DLDataType
 as_dl_data_type(data_type dt)
 {
     switch (dt) {
     case data_type::size:
-        return as_dl_data_type<data_type::size>(::kDLUInt);
+        return as_dl_data_type<data_type::size>   (::kDLUInt);
     case data_type::float16:
         return as_dl_data_type<data_type::float16>(::kDLFloat);
     case data_type::float32:
@@ -75,21 +77,21 @@ as_dl_data_type(data_type dt)
     case data_type::float64:
         return as_dl_data_type<data_type::float64>(::kDLFloat);
     case data_type::sint8:
-        return as_dl_data_type<data_type::sint8>(::kDLInt);
+        return as_dl_data_type<data_type::sint8>  (::kDLInt);
     case data_type::sint16:
-        return as_dl_data_type<data_type::sint16>(::kDLInt);
+        return as_dl_data_type<data_type::sint16> (::kDLInt);
     case data_type::sint32:
-        return as_dl_data_type<data_type::sint32>(::kDLInt);
+        return as_dl_data_type<data_type::sint32> (::kDLInt);
     case data_type::sint64:
-        return as_dl_data_type<data_type::sint64>(::kDLInt);
+        return as_dl_data_type<data_type::sint64> (::kDLInt);
     case data_type::uint8:
-        return as_dl_data_type<data_type::uint8>(::kDLUInt);
+        return as_dl_data_type<data_type::uint8>  (::kDLUInt);
     case data_type::uint16:
-        return as_dl_data_type<data_type::uint16>(::kDLUInt);
+        return as_dl_data_type<data_type::uint16> (::kDLUInt);
     case data_type::uint32:
-        return as_dl_data_type<data_type::uint32>(::kDLUInt);
+        return as_dl_data_type<data_type::uint32> (::kDLUInt);
     case data_type::uint64:
-        return as_dl_data_type<data_type::uint64>(::kDLUInt);
+        return as_dl_data_type<data_type::uint64> (::kDLUInt);
     case data_type::string:
         throw not_supported_error{
             "The string data type is not supported by DLPack."};
@@ -97,6 +99,8 @@ as_dl_data_type(data_type dt)
 
     throw not_supported_error{"The tensor has an unknown data type."};
 }
+
+// clang-format on
 
 std::int64_t *
 cast_shape(size_vector const &shape) noexcept
@@ -118,8 +122,8 @@ cast_strides(ssize_vector const &strides) noexcept
     }
 
 #if defined(__GNUC__) && !defined(__clang__)
-#    pragma GCC diagnostic push
-#    pragma GCC diagnostic ignored "-Wuseless-cast"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuseless-cast"
 #endif
 
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
@@ -127,7 +131,7 @@ cast_strides(ssize_vector const &strides) noexcept
         reinterpret_cast<std::int64_t const *>(strides.data()));
 
 #if defined(__GNUC__) && !defined(__clang__)
-#    pragma GCC diagnostic pop
+#pragma GCC diagnostic pop
 #endif
 }
 

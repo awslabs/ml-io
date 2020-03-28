@@ -78,7 +78,7 @@ zlib_inflater::inflate(memory_span &inp, mutable_memory_span &out)
 }
 
 void
-zlib_inflater::validate_state()
+zlib_inflater::validate_state() const
 {
     switch (state_) {
     case Z_OK:

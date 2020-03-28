@@ -15,49 +15,18 @@
 
 #pragma once
 
-#include <zlib.h>
-
-#include "mlio/span.h"
+#include <string_view>
+#include <utility>
 
 namespace mlio {
 inline namespace v1 {
 namespace detail {
 
-class zlib_inflater {
-public:
-    explicit zlib_inflater();
+std::pair<std::string_view, std::string_view>
+split_s3_uri_to_bucket_and_key(std::string_view uri);
 
-    zlib_inflater(zlib_inflater const &) = delete;
-
-    zlib_inflater(zlib_inflater &&) = delete;
-
-    ~zlib_inflater();
-
-public:
-    zlib_inflater &
-    operator=(zlib_inflater const &) = delete;
-
-    zlib_inflater &
-    operator=(zlib_inflater &&) = delete;
-
-public:
-    void
-    inflate(memory_span &inp, mutable_memory_span &out);
-
-    bool
-    eof() const noexcept
-    {
-        return state_ == Z_STREAM_END;
-    }
-
-private:
-    void
-    validate_state() const;
-
-private:
-    ::z_stream stream_{};
-    int state_ = Z_STREAM_END;
-};
+void
+validate_s3_uri(std::string_view uri);
 
 }  // namespace detail
 }  // namespace v1

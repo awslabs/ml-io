@@ -28,21 +28,21 @@ infer_data_type(std::string_view s) noexcept
         return data_type::string;
     }
 
-    std::int64_t sint64_val;
+    std::int64_t sint64_val{};
     parse_result r = try_parse_int<std::int64_t>(s, sint64_val);
     if (r == parse_result::ok) {
         return data_type::sint64;
     }
 
     if (r == parse_result::overflowed) {
-        std::uint64_t uint64_val;
+        std::uint64_t uint64_val{};
         r = try_parse_int<std::uint64_t>(s, uint64_val);
         if (r == parse_result::ok) {
             return data_type::uint64;
         }
     }
 
-    double double_val;
+    double double_val{};
     r = try_parse_float<double>(s, double_val);
     if (r == parse_result::ok) {
         return data_type::float64;

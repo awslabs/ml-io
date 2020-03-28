@@ -15,6 +15,7 @@ add_python_extension(mlio-py _core
     py_device_array.cxx
     py_memory_block.cxx
     record_reader.cxx
+    s3_client.cxx
     schema.cxx
     stream.cxx
     tensor.cxx

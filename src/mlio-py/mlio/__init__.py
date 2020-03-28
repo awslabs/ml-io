@@ -23,8 +23,8 @@ from mlio._core import\
     CorruptFooterError,\
     CorruptHeaderError,\
     CorruptRecordError,\
-    CsvReader,\
     CsvParams,\
+    CsvReader,\
     DataReader,\
     DataReaderError,\
     DataReaderParams,\
@@ -56,13 +56,18 @@ from mlio._core import\
     RecordKind,\
     RecordReader,\
     RecordTooLargeError,\
+    S3Client,\
+    S3Object,\
     SageMakerPipe,\
     Schema,\
     SchemaError,\
     StreamError,\
     Tensor,\
     TextLineReader,\
-    list_files
+    dispose_aws_sdk,\
+    initialize_aws_sdk,\
+    list_files,\
+    list_s3_objects
 
 
 __all__ = [
@@ -105,13 +110,18 @@ __all__ = [
     'RecordKind',
     'RecordReader',
     'RecordTooLargeError',
+    'S3Client',
+    'S3Object',
     'SageMakerPipe',
     'Schema',
     'SchemaError',
     'StreamError',
     'Tensor',
     'TextLineReader',
-    'list_files']
+    'dispose_aws_sdk',
+    'initialize_aws_sdk',
+    'list_files',
+    'list_s3_objects']
 
 
 _logger = logging.getLogger("mlio")
