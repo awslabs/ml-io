@@ -18,10 +18,6 @@ macos_machine:
   - x86_64-apple-darwin18.7.0  # [osx]
 MACOSX_DEPLOYMENT_TARGET:
   - 10.14                      # [osx]
-CONDA_BUILD_SYSROOT:
-  - /opt/MacOSX10.14.sdk       # [osx]
-SDKROOT:
-  - /opt/MacOSX10.14.sdk       # [osx]
 
 # Pinned versions
 arrow_cpp:
