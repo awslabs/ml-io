@@ -7,7 +7,7 @@ if(@MLIO_STATIC_LIB@)
 
     find_dependency(absl)
     find_dependency(dlpack 0.1.0)
-    find_dependency(fmt 5.3)
+    find_dependency(fmt 6.0)
     find_dependency(IConv)
     find_dependency(Protobuf 3.8)
     find_dependency(TBB COMPONENTS tbb)

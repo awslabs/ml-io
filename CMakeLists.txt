@@ -290,7 +290,7 @@ endif()
 # ------------------------------------------------------------
 
 find_package(dlpack 0.1.0 REQUIRED CONFIG)
-find_package(fmt 5.3 REQUIRED CONFIG)
+find_package(fmt 6.0 REQUIRED CONFIG)
 
 if(MLIO_INCLUDE_LIB)
     find_package(absl REQUIRED CONFIG)
