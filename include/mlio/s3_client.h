@@ -26,13 +26,11 @@
 #include "mlio/intrusive_ref_counter.h"
 #include "mlio/span.h"
 
-namespace Aws {
-namespace S3 {
+namespace Aws::S3 {
 
 class S3Client;
 
-}  // namespace S3
-}  // namespace Aws
+}  // namespace Aws::S3
 
 namespace mlio {
 inline namespace v1 {
