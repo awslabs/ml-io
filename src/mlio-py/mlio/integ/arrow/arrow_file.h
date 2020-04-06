@@ -19,6 +19,7 @@
 #include <memory>
 
 #include <arrow/io/interfaces.h>
+#include <arrow/type_fwd.h>
 #include <mlio.h>
 
 namespace pymlio {
@@ -41,14 +42,11 @@ public:
     operator=(arrow_file &&) = delete;
 
 public:
-    arrow::Status
-    Read(std::int64_t nbytes,
-         std::int64_t *bytes_read,
-         void *out) noexcept final;
+    arrow::Result<std::int64_t>
+    Read(std::int64_t nbytes, void *out) noexcept final;
 
-    arrow::Status
-    Read(std::int64_t nbytes,
-         std::shared_ptr<arrow::Buffer> *out) noexcept final;
+    arrow::Result<std::shared_ptr<arrow::Buffer>>
+    Read(std::int64_t nbytes) noexcept final;
 
     arrow::Status
     Seek(std::int64_t position) noexcept final;
@@ -56,11 +54,11 @@ public:
     arrow::Status
     Close() noexcept final;
 
-    arrow::Status
-    Tell(std::int64_t *position) const noexcept final;
+    arrow::Result<std::int64_t>
+    Tell() const noexcept final;
 
-    arrow::Status
-    GetSize(std::int64_t *size) noexcept final;
+    arrow::Result<std::int64_t>
+    GetSize() noexcept final;
 
 private:
     arrow::Status

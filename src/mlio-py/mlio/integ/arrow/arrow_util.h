@@ -20,18 +20,19 @@
 #include <stdexcept>
 #include <utility>
 
+#include <arrow/result.h>
 #include <arrow/status.h>
 
 #include <mlio.h>
 
 namespace pymlio {
+namespace detail {
 
-template<typename Function, typename... Args>
-arrow::Status
-arrow_boundary(Function &&f, Args &&... args) noexcept
+inline arrow::Status
+convert_exception()
 {
     try {
-        std::forward<Function>(f)(std::forward<Args>(args)...);
+        throw;
     }
     catch (std::bad_alloc const &e) {
         return arrow::Status::OutOfMemory(e.what());
@@ -51,8 +52,34 @@ arrow_boundary(Function &&f, Args &&... args) noexcept
     catch (...) {
         return arrow::Status::UnknownError("An unknown error has occured.");
     }
+}
+
+}  // namespace detail
+
+template<typename Function, typename... Args>
+arrow::Status
+arrow_boundary(Function &&f, Args &&... args) noexcept
+{
+    try {
+        std::forward<Function>(f)(std::forward<Args>(args)...);
+    }
+    catch (...) {
+        return detail::convert_exception();
+    }
 
     return arrow::Status::OK();
+}
+
+template<typename T, typename Function, typename... Args>
+arrow::Result<T>
+arrow_boundary(Function &&f, Args &&... args) noexcept
+{
+    try {
+        return std::forward<Function>(f)(std::forward<Args>(args)...);
+    }
+    catch (...) {
+        return detail::convert_exception();
+    }
 }
 
 }  // namespace pymlio

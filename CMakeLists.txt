@@ -317,7 +317,7 @@ if(MLIO_INCLUDE_PYTHON_EXTENSION)
     find_package(pybind11 2.4.2 REQUIRED CONFIG)
 
     if(MLIO_INCLUDE_ARROW_INTEGRATION)
-        find_package(arrow 0.15.1 REQUIRED CONFIG)
+        find_package(Arrow 0.16.0 REQUIRED CONFIG)
     endif()
 
     include(PythonExtension)

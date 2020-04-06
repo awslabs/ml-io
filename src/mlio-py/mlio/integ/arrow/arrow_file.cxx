@@ -18,6 +18,7 @@
 #include <stdexcept>
 #include <utility>
 
+#include <arrow/result.h>
 #include <arrow/status.h>
 
 #include "arrow_buffer.h"
@@ -37,36 +38,31 @@ arrow_file::arrow_file(intrusive_ptr<input_stream> strm)
 
 arrow_file::~arrow_file() = default;
 
-arrow::Status
-arrow_file::Read(std::int64_t nbytes,
-                 std::int64_t *bytes_read,
-                 void *out) noexcept
+arrow::Result<std::int64_t>
+arrow_file::Read(std::int64_t nbytes, void *out) noexcept
 {
     RETURN_NOT_OK(check_if_closed());
 
-    return arrow_boundary([=]() {
+    return arrow_boundary<std::int64_t>([=]() {
         auto size = static_cast<std::size_t>(nbytes);
 
         auto bits = static_cast<std::byte *>(out);
 
         mutable_memory_span dest{bits, size};
 
-        std::size_t num_bytes_read = stream_->read(dest);
-
-        *bytes_read = static_cast<std::int64_t>(num_bytes_read);
+        return static_cast<std::int64_t>(stream_->read(dest));
     });
 }
 
-arrow::Status
-arrow_file::Read(std::int64_t nbytes,
-                 std::shared_ptr<arrow::Buffer> *out) noexcept
+arrow::Result<std::shared_ptr<arrow::Buffer>>
+arrow_file::Read(std::int64_t nbytes) noexcept
 {
     RETURN_NOT_OK(check_if_closed());
 
-    return arrow_boundary([=]() {
+    return arrow_boundary<std::shared_ptr<arrow::Buffer>>([=]() {
         auto size = static_cast<std::size_t>(nbytes);
 
-        *out = std::make_shared<arrow_buffer>(stream_->read(size));
+        return std::make_shared<arrow_buffer>(stream_->read(size));
     });
 }
 
@@ -88,23 +84,23 @@ arrow_file::Close() noexcept
     return arrow::Status::OK();
 }
 
-arrow::Status
-arrow_file::Tell(std::int64_t *position) const noexcept
+arrow::Result<std::int64_t>
+arrow_file::Tell() const noexcept
 {
     RETURN_NOT_OK(check_if_closed());
 
-    return arrow_boundary([=]() {
-        *position = static_cast<std::int64_t>(stream_->position());
+    return arrow_boundary<std::int64_t>([=]() {
+        return static_cast<std::int64_t>(stream_->position());
     });
 }
 
-arrow::Status
-arrow_file::GetSize(std::int64_t *size) noexcept
+arrow::Result<std::int64_t>
+arrow_file::GetSize() noexcept
 {
     RETURN_NOT_OK(check_if_closed());
 
-    return arrow_boundary([=]() {
-        *size = static_cast<std::int64_t>(stream_->size());
+    return arrow_boundary<std::int64_t>([=]() {
+        return static_cast<std::int64_t>(stream_->size());
     });
 }
 
