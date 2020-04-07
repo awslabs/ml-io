@@ -1,0 +1,7 @@
+# /tbb/task.h:1046:28: runtime error: member call on address 0x7f67b4183e00 which does not point to an object of type 'scheduler'
+# 0x7f67b4183e00: note: object is of type 'tbb::internal::custom_scheduler<tbb::internal::IntelSchedulerTraits>'
+#  00 00 00 00  50 1d cb bd 67 7f 00 00  00 00 00 00 00 00 00 00  60 f6 19 b4 67 7f 00 00  10 1c 19 b4
+#               ^~~~~~~~~~~~~~~~~~~~~~~
+#               vptr for 'tbb::internal::custom_scheduler<tbb::internal::IntelSchedulerTraits>'
+
+vptr:include/tbb/task.h

@@ -36,3 +36,8 @@ add_test(
     WORKING_DIRECTORY
         ${PROJECT_SOURCE_DIR}/tests/mlio-test
 )
+
+set_property(TEST mlio-test APPEND
+    PROPERTY
+        ENVIRONMENT "UBSAN_OPTIONS=suppressions=${PROJECT_SOURCE_DIR}/UBSan.supp"
+)

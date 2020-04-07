@@ -58,9 +58,9 @@ option(MLIO_BUILD_FOR_NATIVE_ARCH "If set, builds for the processor type of the 
 option(MLIO_ENABLE_LTO "If set, enables link time optimization." ON)
 
 # Sanitizers
-option(MLIO_ENABLE_ASAN "If set, enables ASan.")
-option(MLIO_ENABLE_USAN "If set, enables USan.")
-option(MLIO_ENABLE_TSAN "If set, enables TSan.")
+option(MLIO_ENABLE_ASAN  "If set, enables ASan.")
+option(MLIO_ENABLE_UBSAN "If set, enables UBSan.")
+option(MLIO_ENABLE_TSAN  "If set, enables TSan.")
 
 # Static Analyzers
 option(MLIO_USE_CLANG_TIDY "If set, uses clang-tidy as static analyzer.")
@@ -232,7 +232,7 @@ endif()
 # Sanitizers
 # ------------------------------------------------------------
 
-if(MLIO_ENABLE_ASAN OR MLIO_ENABLE_USAN OR MLIO_ENABLE_TSAN)
+if(MLIO_ENABLE_ASAN OR MLIO_ENABLE_UBSAN OR MLIO_ENABLE_TSAN)
     add_compile_options(-fno-omit-frame-pointer)
 endif()
 
@@ -245,7 +245,7 @@ if(MLIO_ENABLE_ASAN)
     add_link_options   (-fsanitize=address)
 endif()
 
-if(MLIO_ENABLE_USAN)
+if(MLIO_ENABLE_UBSAN)
     add_compile_options(-fsanitize=undefined)
     add_link_options   (-fsanitize=undefined)
 endif()
@@ -282,7 +282,7 @@ if(MLIO_USE_IWYU)
         message(FATAL_ERROR "include-what-you-use is not found!")
     endif()
 
-    set(CMAKE_CXX_INCLUDE_WHAT_YOU_USE ${MLIO_IWYU};-Xiwyu;--mapping_file=${CMAKE_CURRENT_SOURCE_DIR}/iwyu.imp)
+    set(CMAKE_CXX_INCLUDE_WHAT_YOU_USE ${MLIO_IWYU};-Xiwyu;--mapping_file=${PROJECT_SOURCE_DIR}/iwyu.imp)
 endif()
 
 # ------------------------------------------------------------
