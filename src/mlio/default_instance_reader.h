@@ -45,12 +45,6 @@ private:
     bool
     should_stop_reading() const noexcept;
 
-    bool
-    skip_instances();
-
-    std::optional<instance>
-    read_instance_internal();
-
     [[noreturn]] void
     handle_nested_errors();
 
@@ -85,9 +79,7 @@ private:
     std::size_t store_record_idx_{};
     std::size_t store_instance_idx_{};
     std::size_t instance_idx_{};
-    std::size_t next_instance_idx_to_read_;
-    std::size_t num_instances_skipped_{};
-    std::size_t num_instances_read_{};
+    std::size_t instance_to_read_;
     bool has_corrupt_split_record_{};
 };
 

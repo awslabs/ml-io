@@ -52,7 +52,7 @@ default_instance_reader::default_instance_reader(data_reader_params const &prm,
     : params_{&prm}
     , record_reader_factory_{std::move(fct)}
     , num_shards_{std::max(params_->num_shards, 1UL)}
-    , next_instance_idx_to_read_{params_->shard_index}
+    , instance_to_read_{params_->num_instances_to_skip + params_->shard_index}
 {
     if (params_->shard_index >= num_shards_) {
         throw std::invalid_argument{
@@ -65,68 +65,60 @@ default_instance_reader::default_instance_reader(data_reader_params const &prm,
 std::optional<instance>
 default_instance_reader::read_instance_core()
 {
-    if (should_stop_reading() || !skip_instances()) {
-        return {};
+    std::optional<memory_slice> payload;
+
+    try {
+        // We skip to the next element in our shard.
+        while (instance_idx_ < instance_to_read_) {
+            if (should_stop_reading()) {
+                return {};
+            }
+
+            if ((payload = read_record_payload()) == std::nullopt) {
+                return {};
+            }
+
+            instance_idx_++;
+
+            store_instance_idx_++;
+        }
+
+        if (should_stop_reading()) {
+            return {};
+        }
+
+        if ((payload = read_record_payload()) == std::nullopt) {
+            return {};
+        }
+
+        instance_idx_++;
+
+        store_instance_idx_++;
+
+        instance_to_read_ += num_shards_;
+
+        return instance{*store_, store_instance_idx_, std::move(*payload)};
     }
-
-    num_instances_read_++;
-
-    return read_instance_internal();
+    catch (std::exception const &) {
+        handle_nested_errors();
+    }
 }
 
 bool
 default_instance_reader::should_stop_reading() const noexcept
 {
-    if (params_->num_instances_to_read != std::nullopt) {
-        if (num_instances_read_ == *params_->num_instances_to_read) {
-            return true;
-        }
-    }
-    return false;
-}
-
-bool
-default_instance_reader::skip_instances()
-{
-    while (num_instances_skipped_ < params_->num_instances_to_skip) {
-        if (read_instance_internal() == std::nullopt) {
-            return false;
-        }
-
-        num_instances_skipped_++;
+    if (params_->num_instances_to_read == std::nullopt) {
+        return false;
     }
 
-    return true;
-}
-
-std::optional<instance>
-default_instance_reader::read_instance_internal()
-{
-    std::optional<memory_slice> payload;
-
-    try {
-        // In case sharding is enabled, we skip to the next element in
-        // our shard.
-        for (; instance_idx_ < next_instance_idx_to_read_; instance_idx_++) {
-            if ((payload = read_record_payload()) == std::nullopt) {
-                return {};
-            }
-        }
-
-        if ((payload = read_record_payload())) {
-            instance_idx_++;
-
-            next_instance_idx_to_read_ += num_shards_;
-
-            return instance{
-                *store_, store_instance_idx_++, std::move(*payload)};
-        }
+    std::size_t num_instances_read{};
+    if (instance_idx_ <= params_->num_instances_to_skip) {
+        num_instances_read = 0;
     }
-    catch (std::exception const &) {
-        handle_nested_errors();
+    else {
+        num_instances_read = instance_idx_ - params_->num_instances_to_skip;
     }
-
-    return {};
+    return num_instances_read == *params_->num_instances_to_read;
 }
 
 void
@@ -167,7 +159,7 @@ std::optional<memory_slice>
 default_instance_reader::read_record_payload()
 {
     if (has_corrupt_split_record_) {
-        throw corrupt_record_error(corrupt_split_error_msg);
+        throw corrupt_record_error{corrupt_split_error_msg};
     }
 
     std::optional<record> rec = read_record();
@@ -178,28 +170,23 @@ default_instance_reader::read_record_payload()
     if (rec->kind() == record_kind::complete) {
         num_bytes_read_ += rec->size();
 
-        store_record_idx_++;
-
         return std::move(*rec).payload();
     }
 
     if (rec->kind() != record_kind::begin) {
         has_corrupt_split_record_ = true;
 
-        throw corrupt_record_error(corrupt_split_error_msg);
+        throw corrupt_record_error{corrupt_split_error_msg};
     }
 
     std::size_t total_record_size = rec->size();
 
     std::vector<record> split_records{std::move(*rec)};
 
-    rec = read_record();
-    while (rec && rec->kind() == record_kind::middle) {
+    while ((rec = read_record()) && rec->kind() == record_kind::middle) {
         total_record_size += rec->size();
 
         split_records.emplace_back(std::move(*rec));
-
-        rec = read_record();
     }
 
     if (rec && rec->kind() == record_kind::end) {
@@ -216,15 +203,13 @@ default_instance_reader::read_record_payload()
     auto combined_blk = get_memory_allocator().allocate(total_record_size);
 
     auto copied_pos = combined_blk->begin();
-    for (auto &split_rec : split_records) {
+    for (record &split_rec : split_records) {
         copied_pos = std::copy(split_rec.payload().begin(),
                                split_rec.payload().end(),
                                copied_pos);
     }
 
     num_bytes_read_ += total_record_size;
-
-    store_record_idx_++;
 
     return std::move(combined_blk);
 }
@@ -240,6 +225,8 @@ default_instance_reader::read_record()
             return {};
         }
     }
+
+    store_record_idx_++;
 
     return rec;
 }
@@ -300,11 +287,7 @@ default_instance_reader::reset() noexcept
 
     instance_idx_ = 0;
 
-    next_instance_idx_to_read_ = params_->shard_index;
-
-    num_instances_skipped_ = 0;
-
-    num_instances_read_ = 0;
+    instance_to_read_= params_->shard_index;
 
     has_corrupt_split_record_ = false;
 }
