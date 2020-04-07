@@ -16,7 +16,6 @@
 #pragma once
 
 #include <cstddef>
-#include <optional>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -29,7 +28,6 @@
 #include "mlio/intrusive_ptr.h"
 #include "mlio/parallel_data_reader.h"
 #include "mlio/parser.h"
-#include "mlio/schema.h"
 #include "mlio/text_encoding.h"
 
 namespace mlio {
@@ -150,8 +148,8 @@ private:
     skip_to_header_row(record_reader &rdr);
 
     MLIO_HIDDEN
-    void
-    infer_schema(instance const &ins) final;
+    intrusive_ptr<schema const>
+    infer_schema(std::optional<instance> const &ins) final;
 
     MLIO_HIDDEN
     void
@@ -166,7 +164,7 @@ private:
     apply_column_type_overrides();
 
     MLIO_HIDDEN
-    void
+    intrusive_ptr<schema const>
     init_parsers_and_schema();
 
     MLIO_HIDDEN
@@ -191,7 +189,6 @@ private:
     std::vector<data_type> column_types_{};
     std::vector<int> skipped_columns_{};
     std::vector<parser> column_parsers_{};
-    intrusive_ptr<schema> schema_{};
     bool should_read_header = true;
 };
 

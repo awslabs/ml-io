@@ -20,6 +20,7 @@
 #include <exception>
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <thread>
 
 #include "mlio/config.h"
@@ -91,8 +92,8 @@ private:
     ///     This function will be called once throughout the lifetime
     ///     of the data reader before any calls to the @ref decode()
     ///     function.
-    virtual void
-    infer_schema(instance const &ins) = 0;
+    virtual intrusive_ptr<schema const>
+    infer_schema(std::optional<instance> const &ins) = 0;
 
     /// When implemented in a derived class, converts the specified
     /// @ref instance_batch into an @ref example.
@@ -100,6 +101,9 @@ private:
     decode(instance_batch const &batch) const = 0;
 
 public:
+    intrusive_ptr<schema const>
+    read_schema() final;
+
     void
     reset() noexcept override;
 
@@ -109,6 +113,12 @@ protected:
     /// resources are properly disposed.
     void
     stop();
+
+    intrusive_ptr<schema const>
+    get_schema() const noexcept
+    {
+        return schema_;
+    }
 
 public:
     std::size_t
@@ -127,7 +137,7 @@ private:
     std::condition_variable fill_cond_{};
     std::condition_variable read_cond_{};
     std::exception_ptr exception_ptr_{};
-    bool schema_inferred_{};
+    intrusive_ptr<schema const> schema_{};
 };
 
 /// @}

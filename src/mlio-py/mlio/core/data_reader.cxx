@@ -58,6 +58,9 @@ public:
     intrusive_ptr<example>
     peek_example() override;
 
+    intrusive_ptr<schema const>
+    read_schema() override;
+
     void
     reset() noexcept override;
 
@@ -78,6 +81,13 @@ py_data_reader::peek_example()
 {
     // NOLINTNEXTLINE
     PYBIND11_OVERLOAD_PURE(intrusive_ptr<example>, data_reader, peek_example, )
+}
+
+intrusive_ptr<schema const>
+py_data_reader::read_schema()
+{
+    // NOLINTNEXTLINE
+    PYBIND11_OVERLOAD_PURE(intrusive_ptr<schema const>, data_reader, read_schema, )
 }
 
 void
@@ -563,6 +573,10 @@ register_data_readers(py::module &m)
              py::call_guard<py::gil_scoped_release>(),
              "Returns the next ``example`` read from the dataset without "
              "consuming it.")
+        .def("read_schema",
+             &data_reader::read_schema,
+             py::call_guard<py::gil_scoped_release>(),
+             "Returns the ``schema`` of the dataset.")
         .def("reset",
              &data_reader::reset,
              "Resets the state of the reader. Calling ``read_example()`` the "

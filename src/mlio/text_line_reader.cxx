@@ -26,7 +26,6 @@
 #include "mlio/intrusive_ptr.h"
 #include "mlio/parallel_data_reader.h"
 #include "mlio/record_readers/text_line_record_reader.h"
-#include "mlio/schema.h"
 #include "mlio/streams/utf8_input_stream.h"
 #include "mlio/text_encoding.h"
 
@@ -51,14 +50,14 @@ text_line_reader::make_record_reader(data_store const &ds)
     return std::move(rdr);
 }
 
-void
-text_line_reader::infer_schema(instance const &)
+intrusive_ptr<schema const>
+text_line_reader::infer_schema(std::optional<instance> const &)
 {
     std::vector<feature_desc> descs{};
     descs.emplace_back(feature_desc_builder{
         "value", data_type::string, {params().batch_size, 1}}
                            .build());
-    schema_ = make_intrusive<schema>(std::move(descs));
+    return make_intrusive<schema>(std::move(descs));
 }
 
 intrusive_ptr<example>
@@ -68,7 +67,7 @@ text_line_reader::decode(instance_batch const &batch) const
     auto tsr = make_tensor(instances, batch.size());
     std::vector<intrusive_ptr<tensor>> tensors{};
     tensors.emplace_back(std::move(tsr));
-    return make_intrusive<example>(schema_, std::move(tensors));
+    return make_intrusive<example>(get_schema(), std::move(tensors));
 }
 
 intrusive_ptr<dense_tensor>

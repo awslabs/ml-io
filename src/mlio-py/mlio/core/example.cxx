@@ -56,7 +56,7 @@ register_example(py::module &m)
         m,
         "Example",
         "Represents an example that holds a ``Schema`` and a set of features.")
-        .def(py::init<intrusive_ptr<schema>,
+        .def(py::init<intrusive_ptr<schema const>,
                       std::vector<intrusive_ptr<tensor>>>(),
              "schema"_a,
              "features"_a,

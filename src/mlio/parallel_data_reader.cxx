@@ -16,7 +16,6 @@
 #include "mlio/parallel_data_reader.h"
 
 #include <cstddef>
-#include <optional>
 #include <tuple>
 #include <utility>
 #include <vector>
@@ -278,18 +277,19 @@ parallel_data_reader::init_graph()
 void
 parallel_data_reader::ensure_schema_inferred()
 {
-    if (schema_inferred_) {
+    if (schema_) {
         return;
     }
 
-    std::optional<instance> ins = reader_->peek_instance();
-    if (ins == std::nullopt) {
-        return;
-    }
+    schema_ = infer_schema(reader_->peek_instance());
+}
 
-    infer_schema(*ins);
+intrusive_ptr<schema const>
+parallel_data_reader::read_schema()
+{
+    ensure_schema_inferred();
 
-    schema_inferred_ = true;
+    return schema_;
 }
 
 void

@@ -20,7 +20,6 @@
 #include "mlio/fwd.h"
 #include "mlio/intrusive_ptr.h"
 #include "mlio/parallel_data_reader.h"
-#include "mlio/schema.h"
 
 namespace aialgs {
 namespace data {
@@ -65,8 +64,8 @@ private:
     make_record_reader(data_store const &ds) final;
 
     MLIO_HIDDEN
-    void
-    infer_schema(instance const &ins) final;
+    intrusive_ptr<schema const>
+    infer_schema(std::optional<instance> const &ins) final;
 
     MLIO_HIDDEN
     feature_desc
@@ -98,7 +97,6 @@ private:
     parse_proto(instance const &ins);
 
 private:
-    intrusive_ptr<schema> schema_{};
     bool has_sparse_feature_{};
     std::size_t num_values_per_instance_{};
 };

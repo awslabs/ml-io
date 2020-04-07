@@ -18,7 +18,6 @@
 #include <algorithm>
 #include <cstddef>
 #include <limits>
-#include <optional>
 #include <utility>
 #include <vector>
 
@@ -143,16 +142,20 @@ recordio_protobuf_reader::make_record_reader(data_store const &ds)
     return make_intrusive<detail::recordio_record_reader>(ds.open_read());
 }
 
-void
-recordio_protobuf_reader::infer_schema(instance const &ins)
+intrusive_ptr<schema const>
+recordio_protobuf_reader::infer_schema(std::optional<instance> const &ins)
 {
-    Record const *proto_msg = parse_proto(ins);
+    if (ins == std::nullopt) {
+        return {};
+    }
+
+    Record const *proto_msg = parse_proto(*ins);
     if (proto_msg == nullptr) {
         throw schema_error{fmt::format(
             "The record {1:n} in the data store {0} contains a corrupt "
             "RecordIO-protobuf message.",
-            ins.get_data_store(),
-            ins.index() + 1)};
+            ins->get_data_store(),
+            ins->index() + 1)};
     }
 
     std::vector<feature_desc> descs{};
@@ -161,22 +164,24 @@ recordio_protobuf_reader::infer_schema(instance const &ins)
         // The label and feature maps of a RecordIO-protobuf message can
         // contain same-named features. In order to avoid name clashes
         // we use the "label_" prefix for the labels.
-        descs.emplace_back(make_feature_desc(ins, "label_" + label, value));
+        descs.emplace_back(make_feature_desc(*ins, "label_" + label, value));
     }
     for (auto &[label, value] : proto_msg->features()) {
-        descs.emplace_back(make_feature_desc(ins, label, value));
+        descs.emplace_back(make_feature_desc(*ins, label, value));
     }
 
-    schema_ = make_intrusive<schema>(std::move(descs));
+    auto shm = make_intrusive<schema>(std::move(descs));
 
     // We use this value in the decode() function to decide whether the
     // amount of data we need to process is worth to parallelize.
-    for (feature_desc const &desc : schema_->descriptors()) {
+    for (feature_desc const &desc : shm->descriptors()) {
         if (!desc.sparse()) {
             // The stride of the batch dimension.
             num_values_per_instance_ += as_size(desc.strides()[0]);
         }
     }
+
+    return shm;
 }
 
 feature_desc
@@ -370,7 +375,7 @@ recordio_protobuf_reader::decode(instance_batch const &batch) const
         }
     }
 
-    auto exm = make_intrusive<example>(schema_, std::move(dec_state.tensors));
+    auto exm = make_intrusive<example>(get_schema(), std::move(dec_state.tensors));
 
     exm->padding = batch.size() - num_instances;
 
@@ -389,7 +394,7 @@ recordio_protobuf_reader::parse_proto(instance const &ins)
 recordio_protobuf_reader::decoder_state::decoder_state(
     recordio_protobuf_reader const &reader, std::size_t batch_size)
 {
-    init_state(*reader.schema_, batch_size);
+    init_state(*reader.get_schema(), batch_size);
 
     bbh = reader.effective_bad_batch_handling();
 }
@@ -477,7 +482,7 @@ recordio_protobuf_reader::decoder::decode(std::size_t row_idx,
 
     // Make sure that we read all the features for which we
     // have a descriptor in the schema.
-    if (num_features_read == reader_->schema_->descriptors().size()) {
+    if (num_features_read == reader_->get_schema()->descriptors().size()) {
         return true;
     }
 
@@ -488,7 +493,7 @@ recordio_protobuf_reader::decoder::decode(std::size_t row_idx,
             instance_->get_data_store(),
             instance_->index() + 1,
             num_features_read,
-            reader_->schema_->descriptors().size());
+            reader_->get_schema()->descriptors().size());
 
         if (state_->bbh == bad_batch_handling::error) {
             throw invalid_instance_error{msg};
@@ -529,7 +534,7 @@ bool
 recordio_protobuf_reader::decoder::decode_feature(std::string const &name,
                                                   Value const &value)
 {
-    std::optional<std::size_t> idx = reader_->schema_->get_index(name);
+    std::optional<std::size_t> idx = reader_->get_schema()->get_index(name);
     if (idx == std::nullopt) {
         if (state_->bbh != bad_batch_handling::skip) {
             auto msg = fmt::format(
@@ -551,7 +556,7 @@ recordio_protobuf_reader::decoder::decode_feature(std::string const &name,
 
     ftr_idx_ = *idx;
 
-    ftr_dsc_ = &reader_->schema_->descriptors()[ftr_idx_];
+    ftr_dsc_ = &reader_->get_schema()->descriptors()[ftr_idx_];
 
     switch (value.value_case()) {
     case Value::ValueCase::kFloat32Tensor:

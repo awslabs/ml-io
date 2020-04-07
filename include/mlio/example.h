@@ -46,7 +46,7 @@ public:
     ///     example.
     /// @param features
     ///     The features of the example.
-    explicit example(intrusive_ptr<schema> shm,
+    explicit example(intrusive_ptr<schema const> shm,
                      std::vector<intrusive_ptr<tensor>> &&features);
 
 public:
@@ -83,7 +83,7 @@ public:
     std::size_t padding{};
 
 private:
-    intrusive_ptr<schema> schema_;
+    intrusive_ptr<schema const> schema_;
     std::vector<intrusive_ptr<tensor>> features_;
 };
 

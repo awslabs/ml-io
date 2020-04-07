@@ -31,7 +31,7 @@
 namespace mlio {
 inline namespace v1 {
 
-example::example(intrusive_ptr<schema> shm,
+example::example(intrusive_ptr<schema const> shm,
                  std::vector<intrusive_ptr<tensor>> &&features)
     : schema_{std::move(shm)}, features_{std::move(features)}
 {

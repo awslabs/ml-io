@@ -25,6 +25,7 @@
 #include "mlio/fwd.h"
 #include "mlio/intrusive_ptr.h"
 #include "mlio/intrusive_ref_counter.h"
+#include "mlio/schema.h"
 
 namespace mlio {
 inline namespace v1 {
@@ -138,6 +139,10 @@ public:
     operator=(data_reader &&) = delete;
 
 public:
+    /// Returns the @ref schema of the dataset.
+    virtual intrusive_ptr<schema const>
+    read_schema() = 0;
+
     /// Returns the next @ref example read from the dataset.
     ///
     /// @remark

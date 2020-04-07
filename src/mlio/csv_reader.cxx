@@ -136,22 +136,22 @@ csv_reader::skip_to_header_row(record_reader &rdr)
     }
 }
 
-void
-csv_reader::infer_schema(instance const &ins)
+intrusive_ptr<schema const>
+csv_reader::infer_schema(std::optional<instance> const &ins)
 {
-    infer_column_types(ins);
+    infer_column_types(*ins);
 
-    set_or_validate_names(ins);
+    set_or_validate_names(*ins);
 
     apply_column_type_overrides();
 
-    init_parsers_and_schema();
+    return init_parsers_and_schema();
 }
 
 void
 csv_reader::infer_column_types(instance const &ins)
 {
-    try {
+    try   {
         csv_record_tokenizer tk{params_, ins.bits()};
         while (tk.next()) {
             data_type dt;
@@ -268,7 +268,7 @@ csv_reader::apply_column_type_overrides()
     }
 }
 
-void
+intrusive_ptr<schema const>
 csv_reader::init_parsers_and_schema()
 {
     std::size_t batch_size = params().batch_size;
@@ -324,7 +324,7 @@ csv_reader::init_parsers_and_schema()
     }
 
     try {
-        schema_ = make_intrusive<schema>(descs);
+        return make_intrusive<schema>(descs);
     }
     catch (std::invalid_argument const &) {
         std::unordered_set<std::string_view> tmp{};
@@ -547,7 +547,7 @@ csv_reader::decode(instance_batch const &batch) const
         return nullptr;
     }
 
-    auto exm = make_intrusive<example>(schema_, std::move(tensors));
+    auto exm = make_intrusive<example>(get_schema(), std::move(tensors));
 
     exm->padding = batch.size() - num_instances;
 
