@@ -139,9 +139,15 @@ csv_reader::skip_to_header_row(record_reader &rdr)
 intrusive_ptr<schema const>
 csv_reader::infer_schema(std::optional<instance> const &ins)
 {
-    infer_column_types(*ins);
+    // If we don't have any data rows and if the store has no header or
+    // no explicit column names, we have no way of inferring a schema.
+    if (ins == std::nullopt && column_names_.empty()) {
+       return {};
+    }
 
-    set_or_validate_names(*ins);
+    infer_column_types(ins);
+
+    set_or_validate_names(ins);
 
     apply_column_type_overrides();
 
@@ -149,10 +155,27 @@ csv_reader::infer_schema(std::optional<instance> const &ins)
 }
 
 void
-csv_reader::infer_column_types(instance const &ins)
+csv_reader::infer_column_types(std::optional<instance> const &ins)
 {
+    // If we don't have any data rows, assume that all fields are of
+    // the default data type or of type string.
+    if (ins == std::nullopt) {
+        for (std::size_t i = 0; i < column_names_.size(); i++) {
+            data_type dt;
+            if (params_.default_data_type == std::nullopt) {
+                dt = data_type::string;
+            }
+            else {
+                dt = *params_.default_data_type;
+            }
+            column_types_.emplace_back(dt);
+        }
+
+        return;
+    }
+
     try   {
-        csv_record_tokenizer tk{params_, ins.bits()};
+        csv_record_tokenizer tk{params_, ins->bits()};
         while (tk.next()) {
             data_type dt;
             if (params_.default_data_type == std::nullopt) {
@@ -168,12 +191,12 @@ csv_reader::infer_column_types(instance const &ins)
         std::throw_with_nested(schema_error{
             fmt::format("The schema of the data store {0} cannot be inferred. "
                         "See nested exception for details.",
-                        ins.get_data_store())});
+                        ins->get_data_store())});
     }
 }
 
 void
-csv_reader::set_or_validate_names(instance const &ins)
+csv_reader::set_or_validate_names(std::optional<instance> const &ins)
 {
     if (column_names_.empty()) {
         for (std::size_t idx = 1; idx <= column_types_.size(); idx++) {
@@ -192,8 +215,8 @@ csv_reader::set_or_validate_names(instance const &ins)
             throw schema_error{fmt::format(
                 "The number of columns ({3:n}) read from the row {1:n} in the "
                 "data store {0} does not match the number of headers ({2:n}).",
-                ins.get_data_store(),
-                ins.index() + 1,
+                ins->get_data_store(),
+                ins->index() + 1,
                 column_names_.size(),
                 column_types_.size())};
         }

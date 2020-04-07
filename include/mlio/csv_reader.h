@@ -153,11 +153,11 @@ private:
 
     MLIO_HIDDEN
     void
-    infer_column_types(instance const &ins);
+    infer_column_types(std::optional<instance> const &ins);
 
     MLIO_HIDDEN
     void
-    set_or_validate_names(instance const &ins);
+    set_or_validate_names(std::optional<instance> const &ins);
 
     MLIO_HIDDEN
     void
