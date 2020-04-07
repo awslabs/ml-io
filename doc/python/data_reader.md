@@ -21,6 +21,13 @@ A data reader is the main interface of ML-IO for reading datasets. A dataset is 
 Represents an abstract base class for all data reader types.
 
 ### Methods
+#### read_schema
+Reads the [Schema](#Schema) of the underlying dataset.
+
+```python
+read_schema()
+```
+
 #### read_example
 Reads the next [Example](#Example) from the underlying dataset. If the end of the dataset is reached, returns None.
 
