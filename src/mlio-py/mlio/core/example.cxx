@@ -66,7 +66,7 @@ register_example(py::module &m)
             schema : Schema
                 The schema that describes the `features` container in the
                 example.
-            features : list of FeatureDescs
+            features : list of tensors.
                 The features of the example.
             )")
         .def("__len__",

@@ -20,7 +20,7 @@ def to_pandas(example):
     """
     Converts the specified ``Example`` to a pandas DataFrame.
     """
-    data = {dsc.name: as_numpy(ftr).flatten()
-            for dsc, ftr in zip(example.schema.descriptors, example)}
+    data = {attr.name: as_numpy(ftr).flatten()
+            for attr, ftr in zip(example.schema.attributes, example)}
 
     return pd.DataFrame(data)

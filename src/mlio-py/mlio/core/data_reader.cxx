@@ -87,7 +87,8 @@ intrusive_ptr<schema const>
 py_data_reader::read_schema()
 {
     // NOLINTNEXTLINE
-    PYBIND11_OVERLOAD_PURE(intrusive_ptr<schema const>, data_reader, read_schema, )
+    PYBIND11_OVERLOAD_PURE(
+        intrusive_ptr<schema const>, data_reader, read_schema, )
 }
 
 void

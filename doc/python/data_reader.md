@@ -8,7 +8,7 @@
     * [ParserParams](#ParserParams)
     * [Example](#Example)
     * [Schema](#Schema)
-    * [FeatureDesc](#FeatureDesc)
+    * [Attribute](#Attribute)
 * [Enumerations](#Enumerations)
     * [LastBatchHandling](#LastBatchHandling)
     * [BadBatchHandling](#BadBatchHandling)
@@ -213,57 +213,57 @@ Gets the [`Schema`](#Schema) instance describing the dataset.
 Gets the padding of the batch. If it is greater than zero, it means that the last `padding` number of elements in the batch dimension are zero-initialized. This is typically the case for the last batch read from a dataset if the size of the dataset is not evenly divisible by the batch size.
 
 ## Schema
-Describes the features of a dataset.
+Describes the attributes of a dataset.
 
 ```python
-Schema(descs : Sequence[FeatureDesc])
+Schema(descs : Sequence[Attribute])
 ```
 
-- `descs`: A sequence of [`FeatureDesc`](#FeatureDesc) instances describing the features of the dataset.
+- `descs`: A sequence of [`Attribute`](#Attribute) instances describing the attributes of the dataset.
 
 ### Functions
 #### get_index
-Returns the index of the [feature descriptor](#FeatureDesc) with the specified name.
+Returns the index of the [attributes](#Attribute) with the specified name.
 
 ```python
 get_index(name : str)
 ```
 
-- `name`: The name of the feature.
+- `name`: The name of the attribute.
 
 ### Properties
 #### descriptors
-Gets the list of [feature descriptors](#FeatureDesc).
+Gets the list of [attributes](#Attribute).
 
-## FeatureDesc
-Describes a feature which defines a measurable property of a dataset.
+## Attribute
+Describes an attribute which defines a measurable property of a dataset.
 
 ```python
-FeatureDesc(name : str,
-            dtype : DataType,
-            shape : Sequence[int],
-            strides : Sequence[int] = None,
-            sparse : bool = False)
+Attribute(name : str,
+          dtype : DataType,
+          shape : Sequence[int],
+          strides : Sequence[int] = None,
+          sparse : bool = False)
 ```
 
-- `name`: The name of the feature.
-- `dtype`: The [data type](tensor.md#DataType) of the feature.
-- `shape`: The shape of the feature.
-- `strides`: The strides, if any, of the feature.
-- `sparse`: A boolean value indicating whether the feature is sparse or dense.
+- `name`: The name of the attribute.
+- `dtype`: The [data type](tensor.md#DataType) of the attribute.
+- `shape`: The shape of the attribute.
+- `strides`: The strides, if any, of the attribute.
+- `sparse`: A boolean value indicating whether the attribute is sparse or dense.
 
 ### Properties
 #### name
-Gets the name of the feature.
+Gets the name of the attribute.
 
 #### dtype
-Gets the [data type](tensor.md#DataType) of the feature.
+Gets the [data type](tensor.md#DataType) of the attribute.
 
 #### shape
-Gets the strides of the feature.
+Gets the strides of the attribute.
 
 #### spase
-Gets a boolean value indicating whether the feature is sparse or dense.
+Gets a boolean value indicating whether the attribute is sparse or dense.
 
 ## Enumerations
 ### LastBatchHandling

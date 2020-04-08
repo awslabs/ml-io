@@ -25,14 +25,14 @@ using namespace pybind11::literals;
 namespace pymlio {
 namespace {
 
-feature_desc
-make_feature_desc(std::string name,
-                  data_type dt,
-                  size_vector shape,
-                  std::optional<ssize_vector> strides,
-                  bool sparse)
+attribute
+make_attribute(std::string name,
+               data_type dt,
+               size_vector shape,
+               std::optional<ssize_vector> strides,
+               bool sparse)
 {
-    feature_desc_builder bld{std::move(name), dt, std::move(shape)};
+    attribute_builder bld{std::move(name), dt, std::move(shape)};
 
     if (strides) {
         bld.with_strides(std::move(*strides));
@@ -46,52 +46,50 @@ make_feature_desc(std::string name,
 void
 register_schema(py::module &m)
 {
-    py::class_<feature_desc>(m,
-                             "FeatureDesc",
-                             "Describes a feature which defines a "
-                             "measurable property of a dataset.")
-        .def(py::init(&make_feature_desc),
+    py::class_<attribute>(m,
+                          "Attribute",
+                          "Describes an attribute which defines a measurable "
+                          "property of a dataset.")
+        .def(py::init(&make_attribute),
              "name"_a,
              "dtype"_a,
              "shape"_a,
              "strides"_a = std::nullopt,
              "sparse"_a = false)
         .def("__eq__",
-             [](feature_desc const &self, feature_desc const &other) {
+             [](attribute const &self, attribute const &other) {
                  return self == other;
              })
         .def("__hash__",
-             [](feature_desc const &self) {
-                 return std::hash<feature_desc>{}(self);
+             [](attribute const &self) {
+                 return std::hash<attribute>{}(self);
              })
-        .def("__repr__", &feature_desc::repr)
-        .def_property_readonly("name", &feature_desc::name)
-        .def_property_readonly("dtype", &feature_desc::dtype)
+        .def("__repr__", &attribute::repr)
+        .def_property_readonly("name", &attribute::name)
+        .def_property_readonly("dtype", &attribute::dtype)
         .def_property_readonly("shape",
-                               [](feature_desc &self) -> py::tuple {
+                               [](attribute &self) -> py::tuple {
                                    return py::cast(self.shape());
                                })
         .def_property_readonly("strides",
-                               [](feature_desc &self) -> py::tuple {
+                               [](attribute &self) -> py::tuple {
                                    return py::cast(self.strides());
                                })
-        .def_property_readonly("sparse", &feature_desc::sparse);
+        .def_property_readonly("sparse", &attribute::sparse);
 
-    py::bind_vector<std::vector<feature_desc>>(m, "FeatureDescList");
+    py::bind_vector<std::vector<attribute>>(m, "AttributeList");
 
-    py::implicitly_convertible<py::list, std::vector<feature_desc>>();
+    py::implicitly_convertible<py::list, std::vector<attribute>>();
 
     py::class_<schema, intrusive_ptr<schema>>(
         m,
         "Schema",
-        "Represents a schema that contains the descriptions of all the "
-        "features containes in a particular dataset.")
-        .def(py::init<std::vector<feature_desc>>(), "descs"_a)
+        "Represents a schema that contains the attributes of a dataset.")
+        .def(py::init<std::vector<attribute>>(), "attrs"_a)
         .def("get_index",
              &schema::get_index,
              "name"_a,
-             "Returns the index of the feature descriptor with the specified "
-             "name in the descriptor list")
+             "Returns the index of the attribute with the specified name.")
         .def("__eq__",
              [](schema const &self, schema const &other) {
                  return self == other;
@@ -101,7 +99,7 @@ register_schema(py::module &m)
                  return std::hash<schema>{}(self);
              })
         .def("__repr__", &schema::repr)
-        .def_property_readonly("descriptors", &schema::descriptors);
+        .def_property_readonly("attributes", &schema::attributes);
 }
 
 }  // namespace pymlio

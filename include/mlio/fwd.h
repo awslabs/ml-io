@@ -28,6 +28,7 @@ class zlib_inflater;
 
 }  // namespace detail
 
+class attribute;
 class coo_tensor;
 class csr_tensor;
 class data_store;
@@ -35,7 +36,6 @@ class data_store;
 class dense_tensor;
 class example;
 class example;
-class feature_desc;
 class input_stream;
 class input_stream;
 class instance;

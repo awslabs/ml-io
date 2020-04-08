@@ -26,7 +26,7 @@
 
 PYBIND11_DECLARE_HOLDER_TYPE(T, mlio::intrusive_ptr<T>, true);
 
-PYBIND11_MAKE_OPAQUE(std::vector<mlio::feature_desc>);
+PYBIND11_MAKE_OPAQUE(std::vector<mlio::attribute>);
 
 namespace pymlio {
 

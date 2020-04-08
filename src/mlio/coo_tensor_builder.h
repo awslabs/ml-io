@@ -33,9 +33,8 @@ namespace detail {
 
 class coo_tensor_builder {
 public:
-    explicit coo_tensor_builder(feature_desc const &desc,
-                                std::size_t batch_size)
-        : desc_{&desc}, batch_size_{batch_size}, coords_(desc.shape().size())
+    explicit coo_tensor_builder(attribute const &attr, std::size_t batch_size)
+        : attr_{&attr}, batch_size_{batch_size}, coords_(attr.shape().size())
     {}
 
     coo_tensor_builder(coo_tensor_builder const &) = delete;
@@ -63,7 +62,7 @@ protected:
     build_core(std::unique_ptr<device_array> &&data);
 
 private:
-    feature_desc const *desc_;
+    attribute const *attr_;
     std::size_t batch_size_;
     std::size_t row_idx_{};
     std::vector<std::vector<std::size_t>> coords_{};
@@ -111,17 +110,17 @@ coo_tensor_builder_impl<dt>::build()
 template<data_type dt>
 struct make_coo_tensor_builder_op {
     std::unique_ptr<coo_tensor_builder>
-    operator()(feature_desc const &desc, std::size_t batch_size)
+    operator()(attribute const &attr, std::size_t batch_size)
     {
-        return std::make_unique<coo_tensor_builder_impl<dt>>(desc, batch_size);
+        return std::make_unique<coo_tensor_builder_impl<dt>>(attr, batch_size);
     }
 };
 
 inline std::unique_ptr<coo_tensor_builder>
-make_coo_tensor_builder(feature_desc const &desc, std::size_t batch_size)
+make_coo_tensor_builder(attribute const &attr, std::size_t batch_size)
 {
     return dispatch<make_coo_tensor_builder_op>(
-        desc.dtype(), desc, batch_size);
+        attr.dtype(), attr, batch_size);
 }
 
 }  // namespace detail

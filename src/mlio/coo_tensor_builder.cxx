@@ -29,11 +29,11 @@ coo_tensor_builder::append_core(stdx::span<std::uint64_t const> keys)
     // The first element of the shape and the strides corresponds to the
     // batch dimension. We do not need it for computing the indices.
 
-    auto dim_beg = desc_->shape().begin() + 1;
-    auto dim_end = desc_->shape().end();
+    auto dim_beg = attr_->shape().begin() + 1;
+    auto dim_end = attr_->shape().end();
 
-    auto stride_beg = desc_->strides().begin() + 1;
-    auto stride_end = desc_->strides().end();
+    auto stride_beg = attr_->strides().begin() + 1;
+    auto stride_end = attr_->strides().end();
 
     auto indices_beg = coords_.begin() + 1;
     auto indices_end = coords_.end();
@@ -88,7 +88,7 @@ coo_tensor_builder::build_core(std::unique_ptr<device_array> &&data)
         layout.emplace_back(std::move(arr));
     }
 
-    size_vector shape = desc_->shape();
+    size_vector shape = attr_->shape();
 
     // The passed batch size can be less than the actual batch size if
     // there is padding.

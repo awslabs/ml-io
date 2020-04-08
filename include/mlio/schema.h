@@ -36,15 +36,15 @@ inline namespace v1 {
 /// @addtogroup data_readers Data Readers
 /// @{
 
-/// Describes a feature which defines a measurable property of a
+/// Describes an attribute which defines a measurable property of a
 /// dataset.
-class MLIO_API feature_desc {
-    friend class feature_desc_builder;
+class MLIO_API attribute {
+    friend class attribute_builder;
 
 private:
-    explicit feature_desc(std::string &&name,
-                          data_type dt,
-                          size_vector &&shape) noexcept
+    explicit attribute(std::string &&name,
+                       data_type dt,
+                       size_vector &&shape) noexcept
         : name_{std::move(name)}, data_type_{dt}, shape_{std::move(shape)}
     {}
 
@@ -96,69 +96,68 @@ private:
 
 MLIO_API
 bool
-operator==(feature_desc const &lhs, feature_desc const &rhs) noexcept;
+operator==(attribute const &lhs, attribute const &rhs) noexcept;
 
 MLIO_API
 inline bool
-operator!=(feature_desc const &lhs, feature_desc const &rhs) noexcept
+operator!=(attribute const &lhs, attribute const &rhs) noexcept
 {
     return !(lhs == rhs);
 }
 
 MLIO_API
 inline std::ostream &
-operator<<(std::ostream &strm, feature_desc const &desc)
+operator<<(std::ostream &strm, attribute const &attr)
 {
-    return strm << desc.repr();
+    return strm << attr.repr();
 }
 
-/// Builds a @ref feature_desc instance.
-class MLIO_API feature_desc_builder {
+/// Builds a @ref attribute instance.
+class MLIO_API attribute_builder {
 public:
-    explicit feature_desc_builder(std::string name,
-                                  data_type dt,
-                                  size_vector shape) noexcept
-        : desc_{std::move(name), dt, std::move(shape)}
+    explicit attribute_builder(std::string name,
+                               data_type dt,
+                               size_vector shape) noexcept
+        : attr_{std::move(name), dt, std::move(shape)}
     {}
 
 public:
-    feature_desc_builder &
+    attribute_builder &
     with_sparsity(bool value) noexcept
     {
-        desc_.sparse_ = value;
+        attr_.sparse_ = value;
 
         return *this;
     }
 
-    feature_desc_builder &
+    attribute_builder &
     with_strides(ssize_vector strides) noexcept
     {
-        desc_.strides_ = std::move(strides);
+        attr_.strides_ = std::move(strides);
 
         return *this;
     }
 
-    feature_desc &&
+    attribute &&
     build()
     {
-        desc_.init();
+        attr_.init();
 
-        return std::move(desc_);
+        return std::move(attr_);
     }
 
 private:
-    feature_desc desc_;
+    attribute attr_;
 };
 
 /// Represents a schema that contains the descriptions of all the
 /// features contained in a particular dataset.
 class MLIO_API schema : public intrusive_ref_counter<schema> {
 public:
-    explicit schema(std::vector<feature_desc> descs);
+    explicit schema(std::vector<attribute> attrs);
 
 public:
-    /// Returns the index of the feature descriptor with the specified
-    /// name in the descriptor list.
+    /// Returns the index of the attribute with the specified name.
     std::optional<std::size_t>
     get_index(std::string const &name) const noexcept;
 
@@ -166,14 +165,14 @@ public:
     repr() const;
 
 public:
-    std::vector<feature_desc> const &
-    descriptors() const noexcept
+    std::vector<attribute> const &
+    attributes() const noexcept
     {
-        return descriptors_;
+        return attributes_;
     }
 
 private:
-    std::vector<feature_desc> descriptors_;
+    std::vector<attribute> attributes_;
     std::unordered_map<std::string, std::size_t> name_index_map_;
 };
 
@@ -203,9 +202,9 @@ operator<<(std::ostream &strm, schema const &shm)
 namespace std {
 
 template<>
-struct MLIO_API hash<mlio::feature_desc> {
+struct MLIO_API hash<mlio::attribute> {
     size_t
-    operator()(mlio::feature_desc const &desc) const noexcept;
+    operator()(mlio::attribute const &attr) const noexcept;
 };
 
 template<>
@@ -213,7 +212,7 @@ struct MLIO_API hash<mlio::schema> {
     inline size_t
     operator()(mlio::schema const &shm) const noexcept
     {
-        return mlio::detail::hash_range(shm.descriptors());
+        return mlio::detail::hash_range(shm.attributes());
     }
 };
 

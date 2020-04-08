@@ -287,7 +287,7 @@ default_instance_reader::reset() noexcept
 
     instance_idx_ = 0;
 
-    instance_to_read_= params_->shard_index;
+    instance_to_read_ = params_->shard_index;
 
     has_corrupt_split_record_ = false;
 }

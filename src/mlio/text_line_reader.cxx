@@ -53,11 +53,11 @@ text_line_reader::make_record_reader(data_store const &ds)
 intrusive_ptr<schema const>
 text_line_reader::infer_schema(std::optional<instance> const &)
 {
-    std::vector<feature_desc> descs{};
-    descs.emplace_back(feature_desc_builder{
-        "value", data_type::string, {params().batch_size, 1}}
-                           .build());
-    return make_intrusive<schema>(std::move(descs));
+    std::vector<attribute> attrs{};
+    attrs.emplace_back(
+        attribute_builder{"value", data_type::string, {params().batch_size, 1}}
+            .build());
+    return make_intrusive<schema>(std::move(attrs));
 }
 
 intrusive_ptr<example>

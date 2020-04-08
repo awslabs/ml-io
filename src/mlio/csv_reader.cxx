@@ -142,7 +142,7 @@ csv_reader::infer_schema(std::optional<instance> const &ins)
     // If we don't have any data rows and if the store has no header or
     // no explicit column names, we have no way of inferring a schema.
     if (ins == std::nullopt && column_names_.empty()) {
-       return {};
+        return {};
     }
 
     infer_column_types(ins);
@@ -174,7 +174,7 @@ csv_reader::infer_column_types(std::optional<instance> const &ins)
         return;
     }
 
-    try   {
+    try {
         csv_record_tokenizer tk{params_, ins->bits()};
         while (tk.next()) {
             data_type dt;
@@ -296,7 +296,7 @@ csv_reader::init_parsers_and_schema()
 {
     std::size_t batch_size = params().batch_size;
 
-    std::vector<feature_desc> descs{};
+    std::vector<attribute> attrs{};
 
     std::size_t num_columns = column_names_.size();
 
@@ -340,19 +340,17 @@ csv_reader::init_parsers_and_schema()
             pos->second++;
         }
 
-        descs.emplace_back(feature_desc_builder{
-            std::move(name),
-            dt,
-            {batch_size, 1}}.build());
+        attrs.emplace_back(
+            attribute_builder{std::move(name), dt, {batch_size, 1}}.build());
     }
 
     try {
-        return make_intrusive<schema>(descs);
+        return make_intrusive<schema>(attrs);
     }
     catch (std::invalid_argument const &) {
         std::unordered_set<std::string_view> tmp{};
-        for (auto &desc : descs) {
-            auto pr = tmp.emplace(desc.name());
+        for (auto &attr : attrs) {
+            auto pr = tmp.emplace(attr.name());
             if (!pr.second) {
                 throw schema_error{
                     fmt::format("The dataset contains more than "

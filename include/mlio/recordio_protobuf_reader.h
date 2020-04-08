@@ -68,17 +68,17 @@ private:
     infer_schema(std::optional<instance> const &ins) final;
 
     MLIO_HIDDEN
-    feature_desc
-    make_feature_desc(instance const &ins,
-                      std::string const &name,
-                      aialgs::data::Value const &value);
+    attribute
+    make_attribute(instance const &ins,
+                   std::string const &name,
+                   aialgs::data::Value const &value);
 
     template<data_type dt, typename ProtobufTensor>
     MLIO_HIDDEN
-    feature_desc
-    make_feature_desc(instance const &ins,
-                      std::string const &name,
-                      ProtobufTensor const &tsr);
+    attribute
+    make_attribute(instance const &ins,
+                   std::string const &name,
+                   ProtobufTensor const &tsr);
 
     template<typename ProtobufTensor>
     MLIO_HIDDEN

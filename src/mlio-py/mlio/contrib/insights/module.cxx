@@ -55,13 +55,13 @@ analyze_dataset(mlio::data_reader &reader,
     std::vector<column_analysis> column_stats;
     column_stats.reserve(exm->features().size());
 
-    for (mlio::feature_desc const &desc : exm->get_schema().descriptors()) {
-        if (desc.sparse() || desc.dtype() != mlio::data_type::string) {
+    for (mlio::feature_desc const &attr : exm->get_schema().attributes()) {
+        if (attr.sparse() || attr.dtype() != mlio::data_type::string) {
             throw std::runtime_error(
                 "Data insights only works with dense string tensors.");
         }
 
-        column_stats.emplace_back(desc.name());
+        column_stats.emplace_back(attr.name());
     }
 
     std::vector<std::string> null_like_list{null_like_values.begin(),

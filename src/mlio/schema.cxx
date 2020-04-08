@@ -23,14 +23,14 @@
 #include "mlio/util/cast.h"
 
 template<typename Char>
-struct fmt::formatter<mlio::feature_desc, Char>
-    : fmt::v6::internal::fallback_formatter<mlio::feature_desc, Char> {};
+struct fmt::formatter<mlio::attribute, Char>
+    : fmt::v6::internal::fallback_formatter<mlio::attribute, Char> {};
 
 namespace mlio {
 inline namespace v1 {
 
 void
-feature_desc::init()
+attribute::init()
 {
     if (strides_.empty()) {
         strides_ = tensor::default_strides(shape_);
@@ -42,9 +42,9 @@ feature_desc::init()
 }
 
 std::string
-feature_desc::repr() const
+attribute::repr() const
 {
-    return fmt::format("<feature_desc name='{0}' data_type='{1}' "
+    return fmt::format("<attribute name='{0}' data_type='{1}' "
                        "shape=({2}) strides=({3}) sparse='{4}'>",
                        name_,
                        data_type_,
@@ -54,25 +54,24 @@ feature_desc::repr() const
 }
 
 bool
-operator==(feature_desc const &lhs, feature_desc const &rhs) noexcept
+operator==(attribute const &lhs, attribute const &rhs) noexcept
 {
     return lhs.name() == rhs.name() && lhs.dtype() == rhs.dtype() &&
            lhs.sparse() == rhs.sparse() && lhs.shape() == rhs.shape() &&
            lhs.strides() == rhs.strides();
 }
 
-schema::schema(std::vector<feature_desc> descs)
-    : descriptors_{std::move(descs)}
+schema::schema(std::vector<attribute> attrs) : attributes_{std::move(attrs)}
 {
     std::size_t idx = 0;
 
-    for (auto &desc : descriptors_) {
-        auto pr = name_index_map_.emplace(desc.name(), idx++);
+    for (auto &attr : attributes_) {
+        auto pr = name_index_map_.emplace(attr.name(), idx++);
         if (!pr.second) {
             throw std::invalid_argument{fmt::format(
-                "The feature descriptor list contains more than one element "
-                "with the name '{0}'.",
-                desc.name())};
+                "The attribute list contains more than one element with the "
+                "name '{0}'.",
+                attr.name())};
         }
     }
 }
@@ -90,14 +89,14 @@ schema::get_index(std::string const &name) const noexcept
 std::string
 schema::repr() const
 {
-    return fmt::format("<schema descriptors={{{0}}}>",
-                       fmt::join(descriptors_, ", "));
+    return fmt::format("<schema attributes={{{0}}}>",
+                       fmt::join(attributes_, ", "));
 }
 
 bool
 operator==(schema const &lhs, schema const &rhs) noexcept
 {
-    return lhs.descriptors() == rhs.descriptors();
+    return lhs.attributes() == rhs.attributes();
 }
 
 }  // namespace v1
@@ -106,17 +105,16 @@ operator==(schema const &lhs, schema const &rhs) noexcept
 namespace std {  // NOLINT(cert-dcl58-cpp)
 
 size_t
-hash<mlio::feature_desc>::operator()(
-    mlio::feature_desc const &desc) const noexcept
+hash<mlio::attribute>::operator()(mlio::attribute const &attr) const noexcept
 {
     size_t seed = 0;
 
-    mlio::detail::hash_combine(seed, desc.name());
-    mlio::detail::hash_combine(seed, desc.dtype());
-    mlio::detail::hash_combine(seed, desc.sparse());
+    mlio::detail::hash_combine(seed, attr.name());
+    mlio::detail::hash_combine(seed, attr.dtype());
+    mlio::detail::hash_combine(seed, attr.sparse());
 
-    mlio::detail::hash_range(seed, desc.shape());
-    mlio::detail::hash_range(seed, desc.strides());
+    mlio::detail::hash_range(seed, attr.shape());
+    mlio::detail::hash_range(seed, attr.strides());
 
     return seed;
 }

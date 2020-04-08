@@ -47,7 +47,7 @@ using ssize_vector = std::vector<std::ptrdiff_t>;
 /// of a tensor. Derived types specify how the tensor data is laid out
 /// in memory.
 class MLIO_API tensor : public intrusive_ref_counter<tensor> {
-    friend feature_desc;
+    friend attribute;
 
 protected:
     explicit tensor(data_type dt, size_vector &&shape, ssize_vector &&strides);

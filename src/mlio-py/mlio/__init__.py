@@ -17,6 +17,7 @@ import logging
 import mlio._core
 
 from mlio._core import\
+    Attribute,\
     BadBatchHandling,\
     Compression,\
     CooTensor,\
@@ -35,7 +36,6 @@ from mlio._core import\
     DeviceArray,\
     DeviceKind,\
     Example,\
-    FeatureDesc,\
     FieldTooLargeError,\
     File,\
     InMemoryStore,\
@@ -71,6 +71,7 @@ from mlio._core import\
 
 
 __all__ = [
+    'Attribute',
     'BadBatchHandling',
     'Compression',
     'CooTensor',
@@ -89,7 +90,6 @@ __all__ = [
     'DeviceArray',
     'DeviceKind',
     'Example',
-    'FeatureDesc',
     'FieldTooLargeError',
     'File',
     'InMemoryStore',

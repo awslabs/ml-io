@@ -35,9 +35,9 @@ example::example(intrusive_ptr<schema const> shm,
                  std::vector<intrusive_ptr<tensor>> &&features)
     : schema_{std::move(shm)}, features_{std::move(features)}
 {
-    if (schema_->descriptors().size() != features_.size()) {
+    if (schema_->attributes().size() != features_.size()) {
         throw std::invalid_argument{
-            "The number of the descriptors does not match the number of "
+            "The number of attributes does not match the number of "
             "specified features."};
     }
 }
@@ -55,8 +55,8 @@ example::find_feature(std::string const &name) const noexcept
 std::string
 example::repr() const
 {
-    auto dsc_beg = schema_->descriptors().begin();
-    auto dsc_end = schema_->descriptors().end();
+    auto dsc_beg = schema_->attributes().begin();
+    auto dsc_end = schema_->attributes().end();
 
     auto ftr_beg = features_.begin();
     auto ftr_end = features_.end();
