@@ -26,6 +26,7 @@
 #include "mlio/memory/memory_block.h"
 #include "mlio/span.h"
 #include "mlio/streams/input_stream_base.h"
+#include "mlio/text_encoding.h"
 
 namespace mlio {
 inline namespace v1 {
@@ -114,7 +115,7 @@ private:
 MLIO_API
 intrusive_ptr<input_stream>
 make_utf8_stream(intrusive_ptr<input_stream> strm,
-                 std::optional<text_encoding> enc);
+                 std::optional<text_encoding> enc = {});
 
 /// @}
 

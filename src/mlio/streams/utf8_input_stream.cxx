@@ -25,7 +25,6 @@
 #include "mlio/streams/detail/iconv.h"
 #include "mlio/streams/input_stream.h"
 #include "mlio/streams/stream_error.h"
-#include "mlio/text_encoding.h"
 #include "mlio/util/cast.h"
 
 using mlio::detail::iconv_desc;

@@ -41,12 +41,11 @@ inline namespace v1 {
 class MLIO_API attribute {
     friend class attribute_builder;
 
+public:
+    explicit attribute(std::string &&name, data_type dt, size_vector &&shape);
+
 private:
-    explicit attribute(std::string &&name,
-                       data_type dt,
-                       size_vector &&shape) noexcept
-        : name_{std::move(name)}, data_type_{dt}, shape_{std::move(shape)}
-    {}
+    explicit attribute() noexcept = default;
 
     void
     init();
@@ -87,9 +86,9 @@ public:
     }
 
 private:
-    std::string name_;
-    data_type data_type_;
-    size_vector shape_;
+    std::string name_{};
+    data_type data_type_{};
+    size_vector shape_{};
     ssize_vector strides_{};
     bool sparse_{};
 };
@@ -118,8 +117,11 @@ public:
     explicit attribute_builder(std::string name,
                                data_type dt,
                                size_vector shape) noexcept
-        : attr_{std::move(name), dt, std::move(shape)}
-    {}
+    {
+        attr_.name_ = std::move(name);
+        attr_.data_type_ = dt;
+        attr_.shape_ = std::move(shape);
+    }
 
 public:
     attribute_builder &
@@ -146,8 +148,14 @@ public:
         return std::move(attr_);
     }
 
+    // NOLINTNEXTLINE(google-explicit-constructor)
+    operator attribute &&()
+    {
+        return build();
+    }
+
 private:
-    attribute attr_;
+    attribute attr_{};
 };
 
 /// Represents a schema that contains the descriptions of all the

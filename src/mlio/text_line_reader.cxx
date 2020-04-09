@@ -29,6 +29,8 @@
 #include "mlio/streams/utf8_input_stream.h"
 #include "mlio/text_encoding.h"
 
+using mlio::detail::text_line_record_reader;
+
 namespace mlio {
 inline namespace v1 {
 
@@ -44,29 +46,25 @@ text_line_reader::~text_line_reader()
 intrusive_ptr<record_reader>
 text_line_reader::make_record_reader(data_store const &ds)
 {
-    auto strm = make_utf8_stream(ds.open_read(), text_encoding::utf8);
-    auto rdr = make_intrusive<detail::text_line_record_reader>(std::move(strm),
-                                                               false);
-    return std::move(rdr);
+    auto strm = make_utf8_stream(ds.open_read());
+    return make_intrusive<text_line_record_reader>(std::move(strm), false);
 }
 
 intrusive_ptr<schema const>
 text_line_reader::infer_schema(std::optional<instance> const &)
 {
-    std::vector<attribute> attrs{};
-    attrs.emplace_back(
-        attribute_builder{"value", data_type::string, {params().batch_size, 1}}
-            .build());
+    std::vector<attribute> attrs{
+        attribute{"value", data_type::string, {params().batch_size, 1}}};
+
     return make_intrusive<schema>(std::move(attrs));
 }
 
 intrusive_ptr<example>
 text_line_reader::decode(instance_batch const &batch) const
 {
-    std::vector<instance> const &instances = batch.instances();
-    auto tsr = make_tensor(instances, batch.size());
-    std::vector<intrusive_ptr<tensor>> tensors{};
-    tensors.emplace_back(std::move(tsr));
+    auto tsr = make_tensor(batch.instances(), batch.size());
+
+    std::vector<intrusive_ptr<tensor>> tensors{std::move(tsr)};
     return make_intrusive<example>(get_schema(), std::move(tensors));
 }
 
@@ -74,16 +72,18 @@ intrusive_ptr<dense_tensor>
 text_line_reader::make_tensor(std::vector<instance> const &instances,
                               std::size_t batch_size)
 {
-    std::vector<std::string> strings{};
-    for (const instance &ins : instances) {
-        auto temp = as_span<char const>(ins.bits());
-        std::string text_line(temp.data(), 0, temp.size());
-        strings.emplace_back(std::move(text_line));
+    std::vector<std::string> strs{};
+
+    for (instance const &ins : instances) {
+        auto tmp = as_span<char const>(ins.bits());
+        strs.emplace_back(tmp.data(), 0, tmp.size());
     }
-    auto arr = wrap_cpu_array<data_type::string>(std::move(strings));
-    auto tsr = make_intrusive<dense_tensor>(size_vector{batch_size, 1},
-                                            std::move(arr));
-    return tsr;
+
+    size_vector shp{batch_size, 1};
+
+    auto arr = wrap_cpu_array<data_type::string>(std::move(strs));
+
+    return make_intrusive<dense_tensor>(std::move(shp), std::move(arr));
 }
 
 }  // namespace v1

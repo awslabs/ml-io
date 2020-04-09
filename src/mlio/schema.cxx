@@ -29,6 +29,12 @@ struct fmt::formatter<mlio::attribute, Char>
 namespace mlio {
 inline namespace v1 {
 
+attribute::attribute(std::string &&name, data_type dt, size_vector &&shape)
+    : name_{std::move(name)}, data_type_{dt}, shape_{std::move(shape)}
+{
+    init();
+}
+
 void
 attribute::init()
 {

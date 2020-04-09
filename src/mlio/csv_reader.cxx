@@ -340,8 +340,7 @@ csv_reader::init_parsers_and_schema()
             pos->second++;
         }
 
-        attrs.emplace_back(
-            attribute_builder{std::move(name), dt, {batch_size, 1}}.build());
+        attrs.emplace_back(std::move(name), dt, size_vector{batch_size, 1});
     }
 
     try {
