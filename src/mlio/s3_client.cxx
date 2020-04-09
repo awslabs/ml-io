@@ -17,6 +17,7 @@
 
 #ifdef MLIO_BUILD_S3_SUPPORT
 
+#include <mutex>
 #include <system_error>
 
 #include <aws/core/Aws.h>
@@ -36,12 +37,23 @@ inline namespace v1 {
 namespace detail {
 namespace {
 
+std::once_flag chain_initialized;
+
 Aws::Auth::AWSCredentials
 get_default_aws_credentials()
 {
-    static Aws::Auth::DefaultAWSCredentialsProviderChain chain{};
+    using ProvChain = Aws::Auth::DefaultAWSCredentialsProviderChain;
 
-    return chain.GetAWSCredentials();
+    std::unique_ptr<ProvChain> chain{};
+
+    // Compilers are allowed to initialize local static variables before
+    // entering the main function. As the credentials provider chain has
+    // to be constructed after Aws::InitAPI() we initialize lazily.
+    std::call_once(chain_initialized, [&chain]() {
+        chain = std::make_unique<ProvChain>();
+    });
+
+    return chain->GetAWSCredentials();
 }
 
 #pragma GCC diagnostic push

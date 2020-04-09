@@ -266,7 +266,8 @@ recordio_protobuf_reader::make_attribute(instance const &ins,
     }
 
     return attribute_builder{name, dt, std::move(shape)}
-        .with_sparsity(is_sparse);
+        .with_sparsity(is_sparse)
+        .build();
 }
 
 template<typename ProtobufTensor>
