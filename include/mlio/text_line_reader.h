@@ -15,7 +15,11 @@
 
 #pragma once
 
+#include <cstddef>
+#include <vector>
+
 #include "mlio/config.h"
+#include "mlio/intrusive_ptr.h"
 #include "mlio/parallel_data_reader.h"
 
 namespace mlio {
@@ -53,8 +57,7 @@ private:
     decode(instance_batch const &batch) const final;
 
     static intrusive_ptr<dense_tensor>
-    make_tensor(std::vector<instance> const &instances,
-                std::size_t batch_size);
+    make_tensor(std::vector<instance> const &lst, std::size_t batch_size);
 };
 
 /// @}

@@ -15,19 +15,11 @@
 
 #include "mlio/text_line_reader.h"
 
-#include <cstddef>
-#include <stdexcept>
-#include <vector>
-
 #include "mlio/cpu_array.h"
-#include "mlio/data_type.h"
 #include "mlio/instance.h"
 #include "mlio/instance_batch.h"
-#include "mlio/intrusive_ptr.h"
-#include "mlio/parallel_data_reader.h"
 #include "mlio/record_readers/text_line_record_reader.h"
 #include "mlio/streams/utf8_input_stream.h"
-#include "mlio/text_encoding.h"
 
 using mlio::detail::text_line_record_reader;
 
@@ -69,12 +61,12 @@ text_line_reader::decode(instance_batch const &batch) const
 }
 
 intrusive_ptr<dense_tensor>
-text_line_reader::make_tensor(std::vector<instance> const &instances,
+text_line_reader::make_tensor(std::vector<instance> const &lst,
                               std::size_t batch_size)
 {
     std::vector<std::string> strs{};
 
-    for (instance const &ins : instances) {
+    for (instance const &ins : lst) {
         auto tmp = as_span<char const>(ins.bits());
         strs.emplace_back(tmp.data(), 0, tmp.size());
     }
