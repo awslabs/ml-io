@@ -17,7 +17,7 @@ ML-IO is already being leveraged by various components of the [Amazon SageMaker]
 * [How to Contribute](#How-to-Contribute)
 
 ## Installation
-> As of today ML-IO is only available for Linux and macOS operating systems. Windows support is planned for a future release.
+> ML-IO is only available for Linux and macOS operating systems.
 
 ### Binaries
 #### Conda

@@ -26,8 +26,8 @@
 #include <unistd.h>
 
 #include "mlio/detail/error.h"
+#include "mlio/detail/file_descriptor.h"
 #include "mlio/detail/pathname.h"
-#include "mlio/platform/posix/detail/file_descriptor.h"
 
 using mlio::detail::current_error_code;
 using mlio::detail::file_descriptor;

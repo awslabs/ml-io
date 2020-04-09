@@ -15,10 +15,86 @@
 
 #pragma once
 
-#include "mlio/config.h"  // IWYU pragma: keep
+#include <cstddef>
 
-#ifdef MLIO_PLATFORM_WIN32
-#include "mlio/platform/win32/memory/file_backed_memory_block.h"  // IWYU pragma: export
-#else
-#include "mlio/platform/posix/memory/file_backed_memory_block.h"  // IWYU pragma: export
-#endif
+#include "mlio/config.h"
+#include "mlio/detail/file_descriptor.h"
+#include "mlio/memory/memory_block.h"
+
+namespace mlio {
+inline namespace v1 {
+
+/// @addtogroup memory Memory
+/// @{
+
+/// Represents a memory block backed by a temporary file instead of the
+/// process heap.
+class MLIO_API file_backed_memory_block final : public mutable_memory_block {
+public:
+    explicit file_backed_memory_block(size_type size);
+
+    file_backed_memory_block(file_backed_memory_block const &) = delete;
+
+    file_backed_memory_block(file_backed_memory_block &&) = delete;
+
+    ~file_backed_memory_block() final;
+
+public:
+    file_backed_memory_block &
+    operator=(file_backed_memory_block const &) = delete;
+
+    file_backed_memory_block &
+    operator=(file_backed_memory_block &&) = delete;
+
+public:
+    void
+    resize(size_type size) final;
+
+private:
+    MLIO_HIDDEN
+    void
+    make_temporary_file();
+
+    MLIO_HIDDEN
+    std::byte *
+    init_memory_map(std::size_t size);
+
+    MLIO_HIDDEN
+    static void
+    validate_mapped_address(void *addr);
+
+public:
+    pointer
+    data() noexcept final
+    {
+        return data_;
+    }
+
+    const_pointer
+    data() const noexcept final
+    {
+        return data_;
+    }
+
+    size_type
+    size() const noexcept final
+    {
+        return size_;
+    }
+
+    bool
+    resizable() const noexcept final
+    {
+        return true;
+    }
+
+private:
+    detail::file_descriptor fd_{};
+    std::byte *data_{};
+    std::size_t size_{};
+};
+
+/// @}
+
+}  // namespace v1
+}  // namespace mlio

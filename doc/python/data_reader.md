@@ -216,10 +216,10 @@ Gets the padding of the batch. If it is greater than zero, it means that the las
 Describes the attributes of a dataset.
 
 ```python
-Schema(descs : Sequence[Attribute])
+Schema(attrs : Sequence[Attribute])
 ```
 
-- `descs`: A sequence of [`Attribute`](#Attribute) instances describing the attributes of the dataset.
+- `attrs`: A sequence of [`Attribute`](#Attribute) instances describing the attributes of the dataset.
 
 ### Functions
 #### get_index

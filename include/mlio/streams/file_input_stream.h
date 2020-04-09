@@ -15,10 +15,67 @@
 
 #pragma once
 
-#include "mlio/config.h"  // IWYU pragma: keep
+#include <cstddef>
+#include <string>
 
-#ifdef MLIO_PLATFORM_WIN32
-#include "mlio/platform/win32/streams/file_input_stream.h"  // IWYU pragma: export
-#else
-#include "mlio/platform/posix/streams/file_input_stream.h"  // IWYU pragma: export
-#endif
+#include "mlio/config.h"
+#include "mlio/detail/file_descriptor.h"
+#include "mlio/span.h"
+#include "mlio/streams/input_stream_base.h"
+
+namespace mlio {
+inline namespace v1 {
+
+/// @addtogroup streams Streams
+/// @{
+
+class MLIO_API file_input_stream final : public input_stream_base {
+public:
+    explicit file_input_stream(std::string pathname);
+
+public:
+    using input_stream_base::read;
+
+    std::size_t
+    read(mutable_memory_span dest) final;
+
+    void
+    seek(std::size_t position) final;
+
+    void
+    close() noexcept final;
+
+private:
+    MLIO_HIDDEN
+    void
+    check_if_closed() const;
+
+public:
+    std::size_t
+    size() const final;
+
+    std::size_t
+    position() const final;
+
+    bool
+    closed() const noexcept final
+    {
+        return !fd_.is_open();
+    }
+
+    bool
+    seekable() const noexcept final
+    {
+        return true;
+    }
+
+private:
+    std::string pathname_;
+    detail::file_descriptor fd_{};
+    mutable std::size_t size_{};
+};
+
+/// @}
+
+}  // namespace v1
+}  // namespace mlio

@@ -32,7 +32,7 @@
 #include "mlio/detail/error.h"
 #include "mlio/detail/pathname.h"
 #include "mlio/logger.h"
-#include "mlio/platform/posix/detail/system_call.h"
+#include "mlio/detail/system_call.h"
 #include "mlio/streams/stream_error.h"
 #include "mlio/util/cast.h"
 

@@ -19,29 +19,14 @@
 #define MLIO_PLATFORM_LINUX
 #elif defined(__APPLE__) && defined(__MACH__)
 #define MLIO_PLATFORM_MACOS
-#elif defined(_WIN32)
-#define MLIO_PLATFORM_WIN32
 #else
 #error "Unsupported platform!"
-#endif
-
-#if defined(MLIO_PLATFORM_LINUX) || defined(MLIO_PLATFORM_MACOS)
-#define MLIO_PLATFORM_POSIX
 #endif
 
 #ifdef MLIO_STATIC_LIB
 #define MLIO_API
 #define MLIO_HIDDEN
 #else
-#ifdef _WIN32
-#ifdef MLIO_COMPILE_LIB
-#define MLIO_API __declspec(dllexport)
-#else
-#define MLIO_API __declspec(dllimport)
-#endif
-#define MLIO_HIDDEN
-#else
 #define MLIO_API __attribute__((visibility("default")))
 #define MLIO_HIDDEN __attribute__((visibility("hidden")))
-#endif
 #endif

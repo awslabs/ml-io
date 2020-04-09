@@ -1,14 +1,26 @@
+/*
+ * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"). You
+ * may not use this file except in compliance with the License. A copy of
+ * the License is located at
+ *
+ *      http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is
+ * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
+ * ANY KIND, either express or implied. See the License for the specific
+ * language governing permissions and limitations under the License.
+ */
+
 #pragma once
 
+#include <csignal>
+#include <system_error>
 #include <thread>
 #include <utility>
 
-#ifdef MLIO_PLATFORM_UNIX
-#include <csignal>
-#include <system_error>
-
 #include <pthread.h>
-#endif
 
 #include "mlio/config.h"
 
@@ -20,30 +32,23 @@ template<typename Func, typename... Args>
 std::thread
 start_thread(Func &&f, Args &&... args)
 {
-#ifdef MLIO_PLATFORM_UNIX
     // Block all asynchronous signals on the new thread.
-
-    ::sigset_t mask{}, original_mask{};
+    ::sigset_t mask{};
+    ::sigset_t original_mask{};
     ::sigfillset(&mask);
 
-    int s;
-
-    s = ::pthread_sigmask(SIG_SETMASK, &mask, &original_mask);
+    int s = ::pthread_sigmask(SIG_SETMASK, &mask, &original_mask);
     if (s != 0) {
         throw std::system_error{s, std::generic_category()};
     }
-#endif
 
     std::thread t{std::forward<Func>(f), std::forward<Args>(args)...};
 
-#ifdef MLIO_PLATFORM_UNIX
     // Restore the signal mask.
-
     s = ::pthread_sigmask(SIG_SETMASK, &original_mask, nullptr);
     if (s != 0) {
         throw std::system_error{s, std::generic_category()};
     }
-#endif
 
     return t;
 }

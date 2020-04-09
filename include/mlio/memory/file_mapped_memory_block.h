@@ -15,10 +15,61 @@
 
 #pragma once
 
-#include "mlio/config.h"  // IWYU pragma: keep
+#include <cstddef>
+#include <string>
 
-#ifdef MLIO_PLATFORM_WIN32
-#include "mlio/platform/win32/memory/file_mapped_memory_block.h"  // IWYU pragma: export
-#else
-#include "mlio/platform/posix/memory/file_mapped_memory_block.h"  // IWYU pragma: export
-#endif
+#include "mlio/config.h"
+#include "mlio/memory/memory_block.h"
+
+namespace mlio {
+inline namespace v1 {
+
+/// @addtogroup memory Memory
+/// @{
+
+/// Represents a file-mapped read-only memory block.
+class MLIO_API file_mapped_memory_block final : public memory_block {
+public:
+    explicit file_mapped_memory_block(std::string pathname);
+
+    file_mapped_memory_block(file_mapped_memory_block const &) = delete;
+
+    file_mapped_memory_block(file_mapped_memory_block &&) = delete;
+
+    ~file_mapped_memory_block() final;
+
+public:
+    file_mapped_memory_block &
+    operator=(file_mapped_memory_block const &) = delete;
+
+    file_mapped_memory_block &
+    operator=(file_mapped_memory_block &&) = delete;
+
+private:
+    MLIO_HIDDEN
+    void
+    init_memory_map();
+
+public:
+    const_pointer
+    data() const noexcept final
+    {
+        return data_;
+    }
+
+    size_type
+    size() const noexcept final
+    {
+        return size_;
+    }
+
+private:
+    std::string pathname_;
+    std::byte *data_{};
+    std::size_t size_{};
+};
+
+/// @}
+
+}  // namespace v1
+}  // namespace mlio

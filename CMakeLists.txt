@@ -184,12 +184,6 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
         $<$<NOT:$<CONFIG:Debug>>:-U_FORTIFY_SOURCE>
         $<$<NOT:$<CONFIG:Debug>>:-D_FORTIFY_SOURCE=2>
     )
-elseif(MSVC AND MSVC_VERSION VERSION_GREATER_EQUAL 1910)
-    add_compile_options(/Zc:__cplusplus /W3 /wd4251 /wd4275 /permissive-)
-
-    if(MLIO_TREAT_WARNINGS_AS_ERRORS)
-        add_compile_options(/WX)
-    endif()
 else()
     message(FATAL_ERROR "Unsupported compiler!")
 endif()
@@ -218,12 +212,6 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     if(MLIO_TREAT_WARNINGS_AS_ERRORS)
         add_link_options(
             LINKER:--fatal-warnings
-        )
-    endif()
-elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    if(MLIO_TREAT_WARNINGS_AS_ERRORS)
-        add_link_options(
-            LINKER:/WX
         )
     endif()
 endif()

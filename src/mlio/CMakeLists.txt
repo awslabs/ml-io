@@ -10,14 +10,18 @@ add_library(mlio
     data_stores/compression.cxx
     data_stores/data_store.cxx
     data_stores/file.cxx
+    data_stores/file_list.cxx
     data_stores/in_memory_store.cxx
     data_stores/s3_object.cxx
     data_stores/sagemaker_pipe.cxx
     detail/pathname.cxx
     detail/s3_utils.cxx
+    detail/system_info.cxx
     integ/dlpack.cxx
     memory/external_memory_block.cxx
+    memory/file_backed_memory_block.cxx
     memory/file_backed_memory_allocator.cxx
+    memory/file_mapped_memory_block.cxx
     memory/heap_memory_allocator.cxx
     memory/heap_memory_block.cxx
     memory/memory_allocator.cxx
@@ -40,11 +44,13 @@ add_library(mlio
     record_readers/text_record_reader.cxx
     streams/detail/iconv.cxx
     streams/detail/zlib.cxx
+    streams/file_input_stream.cxx
     streams/gzip_inflate_stream.cxx
     streams/input_stream_base.cxx
     streams/input_stream.cxx
     streams/memory_input_stream.cxx
     streams/s3_input_stream.cxx
+    streams/sagemaker_pipe_input_stream.cxx
     streams/stream_error.cxx
     streams/utf8_input_stream.cxx
     util/number.cxx
@@ -79,20 +85,6 @@ add_library(mlio
     tensor_visitor.cxx
     text_encoding.cxx
     text_line_reader.cxx)
-
-if(WIN32)
-    # TODO: Windows Support
-else()
-    target_sources(mlio
-        PRIVATE
-            platform/posix/data_stores/file.cxx
-            platform/posix/detail/system_info.cxx
-            platform/posix/memory/file_backed_memory_block.cxx
-            platform/posix/memory/file_mapped_memory_block.cxx
-            platform/posix/streams/file_input_stream.cxx
-            platform/posix/streams/sagemaker_pipe_input_stream.cxx
-    )
-endif()
 
 target_include_directories(mlio
     PUBLIC
@@ -189,15 +181,3 @@ install(
     COMPONENT
         devel
 )
-
-if(WIN32 AND MSVC AND NOT MLIO_STATIC_LIB)
-  install(
-      FILES
-          $<TARGET_PDB_FILE:mlio>
-      DESTINATION
-          ${CMAKE_INSTALL_BINDIR}
-      COMPONENT
-          debug
-      OPTIONAL
-  )
-endif()
