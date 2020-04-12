@@ -51,6 +51,33 @@ using mlio::detail::csv_record_tokenizer;
 namespace mlio {
 inline namespace v1 {
 
+struct csv_reader::decoder_state {
+    csv_reader const *reader;
+    std::vector<intrusive_ptr<tensor>> *tensors;
+    bad_batch_handling bbh;
+};
+
+template<typename ColIt>
+class csv_reader::decoder {
+public:
+    explicit decoder(decoder_state &state,
+                     csv_record_tokenizer &tk,
+                     ColIt col_beg,
+                     ColIt col_end)
+        : state_{&state}, tokenizer_{&tk}, col_beg_{col_beg}, col_end_{col_end}
+    {}
+
+public:
+    bool
+    decode(std::size_t row_idx, instance const &ins);
+
+private:
+    decoder_state *state_;
+    csv_record_tokenizer *tokenizer_;
+    ColIt col_beg_;
+    ColIt col_end_;
+};
+
 csv_reader::csv_reader(data_reader_params rdr_prm, csv_params csv_prm)
     : parallel_data_reader{std::move(rdr_prm)}, params_{std::move(csv_prm)}
 {
@@ -78,6 +105,7 @@ csv_reader::make_record_reader(data_store const &ds)
         else if (should_read_header || !params_.has_single_header) {
             skip_to_header_row(*rdr);
 
+            // Discard the header row.
             rdr->read_record();
         }
 
@@ -98,14 +126,14 @@ csv_reader::read_names_from_header(data_store const &ds, record_reader &rdr)
             return;
         }
 
-        csv_record_tokenizer tk{params_, hdr->payload()};
-        while (tk.next()) {
+        csv_record_tokenizer tokenizer{params_, hdr->payload()};
+        while (tokenizer.next()) {
             std::string name;
             if (params_.name_prefix.empty()) {
-                name = tk.value();
+                name = tokenizer.value();
             }
             else {
-                name = params_.name_prefix + tk.value();
+                name = params_.name_prefix + tokenizer.value();
             }
             column_names_.emplace_back(std::move(name));
         }
@@ -117,8 +145,8 @@ csv_reader::read_names_from_header(data_store const &ds, record_reader &rdr)
                         ds)});
     }
 
-    // If the header row was blank, we treat it as a single
-    // column with an empty name.
+    // If the header row was blank, we treat it as a single column with
+    // an empty name.
     if (column_names_.empty()) {
         column_names_.emplace_back(params_.name_prefix);
     }
@@ -147,11 +175,11 @@ csv_reader::infer_schema(std::optional<instance> const &ins)
 
     infer_column_types(ins);
 
-    set_or_validate_names(ins);
+    set_or_validate_column_names(ins);
 
     apply_column_type_overrides();
 
-    return init_parsers_and_schema();
+    return init_parsers_and_make_schema();
 }
 
 void
@@ -160,8 +188,10 @@ csv_reader::infer_column_types(std::optional<instance> const &ins)
     // If we don't have any data rows, assume that all fields are of
     // the default data type or of type string.
     if (ins == std::nullopt) {
+        column_types_.reserve(column_names_.size());
+
         for (std::size_t i = 0; i < column_names_.size(); i++) {
-            data_type dt;
+            data_type dt{};
             if (params_.default_data_type == std::nullopt) {
                 dt = data_type::string;
             }
@@ -170,37 +200,38 @@ csv_reader::infer_column_types(std::optional<instance> const &ins)
             }
             column_types_.emplace_back(dt);
         }
-
-        return;
     }
-
-    try {
-        csv_record_tokenizer tk{params_, ins->bits()};
-        while (tk.next()) {
-            data_type dt;
-            if (params_.default_data_type == std::nullopt) {
-                dt = infer_data_type(tk.value());
+    else {
+        try {
+            csv_record_tokenizer tokenizer{params_, ins->bits()};
+            while (tokenizer.next()) {
+                data_type dt{};
+                if (params_.default_data_type == std::nullopt) {
+                    dt = infer_data_type(tokenizer.value());
+                }
+                else {
+                    dt = *params_.default_data_type;
+                }
+                column_types_.emplace_back(dt);
             }
-            else {
-                dt = *params_.default_data_type;
-            }
-            column_types_.emplace_back(dt);
         }
-    }
-    catch (corrupt_record_error const &) {
-        std::throw_with_nested(schema_error{
-            fmt::format("The schema of the data store {0} cannot be inferred. "
-                        "See nested exception for details.",
-                        ins->get_data_store())});
+        catch (corrupt_record_error const &) {
+            std::throw_with_nested(schema_error{fmt::format(
+                "The schema of the data store {0} cannot be inferred. "
+                "See nested exception for details.",
+                ins->get_data_store())});
+        }
     }
 }
 
 void
-csv_reader::set_or_validate_names(std::optional<instance> const &ins)
+csv_reader::set_or_validate_column_names(std::optional<instance> const &ins)
 {
     if (column_names_.empty()) {
+        column_names_.reserve(column_types_.size());
+
         for (std::size_t idx = 1; idx <= column_types_.size(); idx++) {
-            std::string name;
+            std::string name{};
             if (params_.name_prefix.empty()) {
                 name = fmt::to_string(idx);
             }
@@ -240,6 +271,7 @@ csv_reader::apply_column_type_overrides()
     auto col_beg = tbb::make_zip_iterator(idx_beg, name_beg, type_beg);
     auto col_end = tbb::make_zip_iterator(idx_end, name_end, type_end);
 
+    // Override column types by index.
     auto idx_overrides = params_.column_types_by_index;
 
     for (auto col_pos = col_beg; col_pos < col_end; ++col_pos) {
@@ -251,20 +283,22 @@ csv_reader::apply_column_type_overrides()
         }
     }
 
+    // Throw an error if there are leftover indices.
     if (!idx_overrides.empty()) {
-        std::vector<std::size_t> extra_inds;
-        extra_inds.reserve(idx_overrides.size());
+        std::vector<std::size_t> leftover_inds{};
+        leftover_inds.reserve(idx_overrides.size());
 
         for (auto &pr : idx_overrides) {
-            extra_inds.emplace_back(pr.first);
+            leftover_inds.emplace_back(pr.first);
         }
 
         throw std::invalid_argument{fmt::format(
             "The column types cannot bet set. The following column indices "
             "are out of range: {0}",
-            fmt::join(extra_inds, ", "))};
+            fmt::join(leftover_inds, ", "))};
     }
 
+    // Override column types by name.
     auto name_overrides = params_.column_types;
 
     for (auto col_pos = col_beg; col_pos < col_end; ++col_pos) {
@@ -276,29 +310,33 @@ csv_reader::apply_column_type_overrides()
         }
     }
 
+    // Throw an error if there are leftover names.
     if (!name_overrides.empty()) {
-        std::vector<std::string> extra_names;
-        extra_names.reserve(name_overrides.size());
+        std::vector<std::string> leftover_names{};
+        leftover_names.reserve(name_overrides.size());
 
         for (auto &pr : name_overrides) {
-            extra_names.emplace_back(pr.first);
+            leftover_names.emplace_back(pr.first);
         }
 
         throw std::invalid_argument{fmt::format(
             "The column types cannot be set. The following columns are not "
             "found in the dataset: {0}",
-            fmt::join(extra_names, ", "))};
+            fmt::join(leftover_names, ", "))};
     }
 }
 
 intrusive_ptr<schema const>
-csv_reader::init_parsers_and_schema()
+csv_reader::init_parsers_and_make_schema()
 {
     std::size_t batch_size = params().batch_size;
 
     std::vector<attribute> attrs{};
 
     std::size_t num_columns = column_names_.size();
+
+    column_ignores_.reserve(num_columns);
+    column_parsers_.reserve(num_columns);
 
     auto idx_beg = tbb::counting_iterator<std::size_t>(0);
     auto idx_end = tbb::counting_iterator<std::size_t>(num_columns);
@@ -312,30 +350,31 @@ csv_reader::init_parsers_and_schema()
     auto col_beg = tbb::make_zip_iterator(idx_beg, name_beg, type_beg);
     auto col_end = tbb::make_zip_iterator(idx_end, name_end, type_end);
 
-    std::unordered_map<std::string, std::size_t> name_count{};
+    std::unordered_map<std::string, std::size_t> name_counts{};
 
     for (auto col_pos = col_beg; col_pos < col_end; ++col_pos) {
-        std::size_t idx = std::get<0>(*col_pos);
         std::string name = std::get<1>(*col_pos);
-        data_type dt = std::get<2>(*col_pos);
 
-        if (should_skip(idx, name)) {
-            skipped_columns_.emplace_back(1);
+        if (should_skip(std::get<0>(*col_pos), name)) {
+            column_ignores_.emplace_back(1);
             column_parsers_.emplace_back(nullptr);
+
             continue;
         }
 
-        skipped_columns_.emplace_back(0);
+        data_type dt = std::get<2>(*col_pos);
+
+        column_ignores_.emplace_back(0);
         column_parsers_.emplace_back(make_parser(dt, params_.parser_prm));
 
         if (params_.dedupe_column_names) {
             // Keep count of column names. If the key already exists, create a
             // new name by appending underscore + count. Since this new name
             // might also exist, iterate until we can insert the new name.
-            auto [pos, inserted] = name_count.try_emplace(name, 0);
+            auto [pos, inserted] = name_counts.try_emplace(name, 0);
             while (!inserted) {
                 name.append("_").append(fmt::to_string(pos->second++));
-                std::tie(pos, inserted) = name_count.try_emplace(name, 0);
+                std::tie(pos, inserted) = name_counts.try_emplace(name, 0);
             }
             pos->second++;
         }
@@ -349,11 +388,10 @@ csv_reader::init_parsers_and_schema()
     catch (std::invalid_argument const &) {
         std::unordered_set<std::string_view> tmp{};
         for (auto &attr : attrs) {
-            auto pr = tmp.emplace(attr.name());
-            if (!pr.second) {
+            if (auto pr = tmp.emplace(attr.name()); !pr.second) {
                 throw schema_error{
-                    fmt::format("The dataset contains more than "
-                                "one column with the name '{0}'.",
+                    fmt::format("The dataset contains more than one column "
+                                "with the name '{0}'.",
                                 *pr.first)};
             }
         }
@@ -366,16 +404,16 @@ bool
 csv_reader::should_skip(std::size_t index,
                         std::string const &name) const noexcept
 {
-    auto use_cols_idx = params_.use_columns_by_index;
-    if (!use_cols_idx.empty()) {
-        if (use_cols_idx.find(index) == use_cols_idx.end()) {
+    auto uci = params_.use_columns_by_index;
+    if (!uci.empty()) {
+        if (uci.find(index) == uci.end()) {
             return true;
         }
     }
 
-    auto use_cols_name = params_.use_columns;
-    if (!use_cols_name.empty()) {
-        if (use_cols_name.find(name) == use_cols_name.end()) {
+    auto ucn = params_.use_columns;
+    if (!ucn.empty()) {
+        if (ucn.find(name) == ucn.end()) {
             return true;
         }
     }
@@ -388,7 +426,7 @@ csv_reader::decode(instance_batch const &batch) const
 {
     auto tensors = make_tensors(batch.size());
 
-    auto bbh = effective_bad_batch_handling();
+    decoder_state dec_state{this, &tensors, effective_bad_batch_handling()};
 
     std::atomic_bool skip_batch{};
 
@@ -405,8 +443,8 @@ csv_reader::decode(instance_batch const &batch) const
 
     tbb::blocked_range<decltype(rng_beg)> range{rng_beg, rng_end};
 
-    auto worker = [this, &tensors, bbh, &skip_batch](auto &sub_range) {
-        csv_record_tokenizer tk{params_};
+    auto worker = [this, &dec_state, &skip_batch](auto &sub_range) {
+        csv_record_tokenizer tokenizer{params_};
 
         std::size_t num_columns = column_names_.size();
 
@@ -419,8 +457,8 @@ csv_reader::decode(instance_batch const &batch) const
         auto type_beg = column_types_.begin();
         auto type_end = column_types_.end();
 
-        auto skip_beg = skipped_columns_.begin();
-        auto skip_end = skipped_columns_.end();
+        auto skip_beg = column_ignores_.begin();
+        auto skip_end = column_ignores_.end();
 
         auto prs_beg = column_parsers_.begin();
         auto prs_end = column_parsers_.end();
@@ -431,127 +469,14 @@ csv_reader::decode(instance_batch const &batch) const
             col_idx_end, name_end, type_end, skip_end, prs_end);
 
         for (auto row_zip : sub_range) {
-            std::size_t row_idx = std::get<0>(row_zip);
+            decoder<decltype(col_beg)> dc{
+                dec_state, tokenizer, col_beg, col_end};
 
-            instance const &ins = std::get<1>(row_zip);
-
-            auto col_pos = col_beg;
-
-            auto tsr_pos = tensors.begin();
-
-            tk.reset(ins.bits());
-
-            while (tk.next()) {
-                if (col_pos == col_end) {
-                    break;
-                }
-
-                // Check if we truncated the field.
-                if (tk.is_truncated()) {
-                    if (params_.max_field_length_hnd !=
-                        max_field_length_handling::truncate) {
-                        std::string const &name = std::get<1>(*col_pos);
-
-                        auto msg = fmt::format(
-                            "The column '{2}' of the row {1:n} in the data "
-                            "store {0} was truncated. Its truncated string "
-                            "value is '{3:.64}'.",
-                            ins.get_data_store(),
-                            ins.index() + 1,
-                            name,
-                            tk.value());
-
-                        if (params_.max_field_length_hnd ==
-                            max_field_length_handling::error) {
-                            throw field_too_large_error{msg};
-                        }
-
-                        logger::warn(msg);
-                    }
-                }
-
-                // Check if we should skip this column (because it's set
-                // to skip).
-                if (std::get<3>(*col_pos) != 0) {
-                    ++col_pos;
-
-                    continue;
-                }
-
-                parser const &prsr = std::get<4>(*col_pos);
-
-                intrusive_ptr<tensor> const &tsr = *tsr_pos;
-
-                auto &dense_tsr = static_cast<dense_tensor &>(*tsr);
-
-                parse_result r = prsr(tk.value(), dense_tsr.data(), row_idx);
-                if (r == parse_result::ok) {
-                    ++col_pos;
-                    ++tsr_pos;
-
-                    continue;
-                }
-
-                if (bbh != bad_batch_handling::skip) {
-                    std::string const &name = std::get<1>(*col_pos);
-
-                    data_type dt = std::get<2>(*col_pos);
-
-                    auto msg = fmt::format(
-                        "The column '{2}' of the row {1:n} in the data store "
-                        "{0} cannot be parsed as {3}. Its string value is "
-                        "'{4:.64}'.",
-                        ins.get_data_store(),
-                        ins.index() + 1,
-                        name,
-                        dt,
-                        tk.value());
-
-                    if (bbh == bad_batch_handling::error) {
-                        throw invalid_instance_error{msg};
-                    }
-
-                    logger::warn(msg);
-                }
-
+            if (!dc.decode(std::get<0>(row_zip), std::get<1>(row_zip))) {
                 skip_batch = true;
 
                 return;
             }
-
-            // Make sure we read all columns and there are no remaining
-            // fields.
-            if (col_pos == col_end && tk.eof()) {
-                continue;
-            }
-
-            if (bbh != bad_batch_handling::skip) {
-                std::size_t num_actual_cols = std::get<0>(*col_pos);
-                while (tk.next()) {
-                    num_actual_cols++;
-                }
-                if (col_pos == col_end) {
-                    num_actual_cols++;
-                }
-
-                auto msg = fmt::format(
-                    "The row {1:n} in the data store {0} has {2:n} column(s), "
-                    "while the expected number of column(s) is {3:n}.",
-                    ins.get_data_store(),
-                    ins.index() + 1,
-                    num_actual_cols,
-                    num_columns);
-
-                if (bbh == bad_batch_handling::error) {
-                    throw invalid_instance_error{msg};
-                }
-
-                logger::warn(msg);
-            }
-
-            skip_batch = true;
-
-            return;
         }
     };
 
@@ -577,19 +502,20 @@ csv_reader::decode(instance_batch const &batch) const
 std::vector<intrusive_ptr<tensor>>
 csv_reader::make_tensors(std::size_t batch_size) const
 {
-    std::vector<intrusive_ptr<tensor>> tensors;
-    tensors.reserve(column_types_.size() - skipped_columns_.size());
+    std::vector<intrusive_ptr<tensor>> tensors{};
+    tensors.reserve(column_types_.size() - column_ignores_.size());
 
     auto type_beg = column_types_.begin();
     auto type_end = column_types_.end();
 
-    auto skip_beg = skipped_columns_.begin();
-    auto skip_end = skipped_columns_.end();
+    auto skip_beg = column_ignores_.begin();
+    auto skip_end = column_ignores_.end();
 
     auto col_beg = tbb::make_zip_iterator(type_beg, skip_beg);
     auto col_end = tbb::make_zip_iterator(type_end, skip_end);
 
     for (auto col_pos = col_beg; col_pos < col_end; ++col_pos) {
+        // Check if we should skip this column.
         if (std::get<1>(*col_pos) != 0) {
             continue;
         }
@@ -605,6 +531,121 @@ csv_reader::make_tensors(std::size_t batch_size) const
     }
 
     return tensors;
+}
+
+template<typename ColIt>
+bool
+csv_reader::decoder<ColIt>::decode(std::size_t row_idx, instance const &ins)
+{
+    auto col_pos = col_beg_;
+
+    auto tsr_pos = state_->tensors->begin();
+
+    tokenizer_->reset(ins.bits());
+
+    while (tokenizer_->next()) {
+        if (col_pos == col_end_) {
+            break;
+        }
+
+        // Check if we should skip this column.
+        if (std::get<3>(*col_pos) != 0) {
+            ++col_pos;
+
+            continue;
+        }
+
+        // Check if we truncated the field.
+        if (tokenizer_->is_truncated()) {
+            auto mflh = state_->reader->params_.max_field_length_hnd;
+
+            if (mflh != max_field_length_handling::truncate) {
+                std::string const &name = std::get<1>(*col_pos);
+
+                auto msg = fmt::format(
+                    "The column '{2}' of the row {1:n} in the data store {0} "
+                    "was truncated. Its truncated string value is '{3:.64}'.",
+                    ins.get_data_store(),
+                    ins.index() + 1,
+                    name,
+                    tokenizer_->value());
+
+                if (mflh == max_field_length_handling::error) {
+                    throw field_too_large_error{msg};
+                }
+
+                logger::warn(msg);
+            }
+        }
+
+        parser const &prsr = std::get<4>(*col_pos);
+
+        auto &dense_tsr = static_cast<dense_tensor &>(**tsr_pos);
+
+        parse_result r = prsr(tokenizer_->value(), dense_tsr.data(), row_idx);
+        if (r == parse_result::ok) {
+            ++col_pos;
+            ++tsr_pos;
+
+            continue;
+        }
+
+        if (state_->bbh != bad_batch_handling::skip) {
+            std::string const &name = std::get<1>(*col_pos);
+
+            data_type dt = std::get<2>(*col_pos);
+
+            auto msg = fmt::format(
+                "The column '{2}' of the row {1:n} in the data store {0} "
+                "cannot be parsed as {3}. Its string value is '{4:.64}'.",
+                ins.get_data_store(),
+                ins.index() + 1,
+                name,
+                dt,
+                tokenizer_->value());
+
+            if (state_->bbh == bad_batch_handling::error) {
+                throw invalid_instance_error{msg};
+            }
+
+            logger::warn(msg);
+        }
+
+        return false;
+    }
+
+    // Make sure we read all columns and there are no remaining fields.
+    if (col_pos == col_end_ && tokenizer_->eof()) {
+        return true;
+    }
+
+    if (state_->bbh != bad_batch_handling::skip) {
+        std::size_t num_columns = state_->reader->column_names_.size();
+
+        std::size_t num_actual_cols = std::get<0>(*col_pos);
+        while (tokenizer_->next()) {
+            num_actual_cols++;
+        }
+        if (col_pos == col_end_) {
+            num_actual_cols++;
+        }
+
+        auto msg = fmt::format(
+            "The row {1:n} in the data store {0} has {2:n} column(s), while "
+            "the expected number of column(s) is {3:n}.",
+            ins.get_data_store(),
+            ins.index() + 1,
+            num_actual_cols,
+            num_columns);
+
+        if (state_->bbh == bad_batch_handling::error) {
+            throw invalid_instance_error{msg};
+        }
+
+        logger::warn(msg);
+    }
+
+    return false;
 }
 
 void

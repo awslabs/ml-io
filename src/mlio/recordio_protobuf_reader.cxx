@@ -58,7 +58,7 @@ thread_local Record proto_msg_{};  // NOLINT(cert-err58-cpp)
 
 class recordio_protobuf_reader::decoder_state {
 public:
-    explicit decoder_state(recordio_protobuf_reader const &reader,
+    explicit decoder_state(recordio_protobuf_reader const &rdr,
                            std::size_t batch_size);
 
 private:
@@ -72,16 +72,15 @@ private:
     init_coo_tensor_builder(attribute const &attr, std::size_t batch_size);
 
 public:
-    std::vector<intrusive_ptr<tensor>> tensors;
-    std::vector<std::unique_ptr<coo_tensor_builder>> coo_tensor_builders;
+    recordio_protobuf_reader const *reader;
     bad_batch_handling bbh;
+    std::vector<intrusive_ptr<tensor>> tensors{};
+    std::vector<std::unique_ptr<coo_tensor_builder>> coo_tensor_builders{};
 };
 
 class recordio_protobuf_reader::decoder {
 public:
-    explicit decoder(recordio_protobuf_reader const &reader,
-                     decoder_state &state)
-        : reader_{&reader}, state_{&state}
+    explicit decoder(decoder_state &state) : state_{&state}
     {}
 
 public:
@@ -116,7 +115,6 @@ private:
     append_to_builder(ProtobufTensor const &tsr) const;
 
 private:
-    recordio_protobuf_reader const *reader_;
     decoder_state *state_;
     instance const *instance_{};
     std::size_t row_idx_{};
@@ -316,9 +314,9 @@ recordio_protobuf_reader::decode(instance_batch const &batch) const
 
     tbb::blocked_range<decltype(rng_beg)> range{rng_beg, rng_end};
 
-    auto worker = [this, &dec_state, &skip_batch](auto &sub_range) {
+    auto worker = [&dec_state, &skip_batch](auto &sub_range) {
         for (auto row_zip : sub_range) {
-            decoder dc{*this, dec_state};
+            decoder dc{dec_state};
             // If we failed to decode the instance, we can terminate the
             // task early and skip this batch.
             if (!dc.decode(std::get<0>(row_zip), std::get<1>(row_zip))) {
@@ -393,11 +391,10 @@ recordio_protobuf_reader::parse_proto(instance const &ins)
 }
 
 recordio_protobuf_reader::decoder_state::decoder_state(
-    recordio_protobuf_reader const &reader, std::size_t batch_size)
+    recordio_protobuf_reader const &rdr, std::size_t batch_size)
+    : reader{&rdr}, bbh{rdr.effective_bad_batch_handling()}
 {
-    init_state(*reader.get_schema(), batch_size);
-
-    bbh = reader.effective_bad_batch_handling();
+    init_state(*rdr.get_schema(), batch_size);
 }
 
 void
@@ -481,9 +478,11 @@ recordio_protobuf_reader::decoder::decode(std::size_t row_idx,
         num_features_read++;
     }
 
+    auto const &shm = state_->reader->get_schema();
+
     // Make sure that we read all the features for which we
     // have an attribute in the schema.
-    if (num_features_read == reader_->get_schema()->attributes().size()) {
+    if (num_features_read == shm->attributes().size()) {
         return true;
     }
 
@@ -494,7 +493,7 @@ recordio_protobuf_reader::decoder::decode(std::size_t row_idx,
             instance_->get_data_store(),
             instance_->index() + 1,
             num_features_read,
-            reader_->get_schema()->attributes().size());
+            shm->attributes().size());
 
         if (state_->bbh == bad_batch_handling::error) {
             throw invalid_instance_error{msg};
@@ -535,7 +534,9 @@ bool
 recordio_protobuf_reader::decoder::decode_feature(std::string const &name,
                                                   Value const &value)
 {
-    std::optional<std::size_t> idx = reader_->get_schema()->get_index(name);
+    auto const &shm = state_->reader->get_schema();
+
+    std::optional<std::size_t> idx = shm->get_index(name);
     if (idx == std::nullopt) {
         if (state_->bbh != bad_batch_handling::skip) {
             auto msg = fmt::format(
@@ -557,7 +558,7 @@ recordio_protobuf_reader::decoder::decode_feature(std::string const &name,
 
     ftr_idx_ = *idx;
 
-    attr_ = &reader_->get_schema()->attributes()[ftr_idx_];
+    attr_ = &shm->attributes()[ftr_idx_];
 
     switch (value.value_case()) {
     case Value::ValueCase::kFloat32Tensor:

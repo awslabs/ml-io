@@ -55,9 +55,6 @@ private:
 
     intrusive_ptr<example>
     decode(instance_batch const &batch) const final;
-
-    static intrusive_ptr<dense_tensor>
-    make_tensor(std::vector<instance> const &lst, std::size_t batch_size);
 };
 
 /// @}

@@ -118,6 +118,11 @@ struct MLIO_API csv_params final {
 
 /// Represents a @ref data_reader for reading CSV datasets.
 class MLIO_API csv_reader final : public parallel_data_reader {
+    struct decoder_state;
+
+    template<typename ColIt>
+    class decoder;
+
 public:
     explicit csv_reader(data_reader_params rdr_prm, csv_params csv_prm = {});
 
@@ -157,7 +162,7 @@ private:
 
     MLIO_HIDDEN
     void
-    set_or_validate_names(std::optional<instance> const &ins);
+    set_or_validate_column_names(std::optional<instance> const &ins);
 
     MLIO_HIDDEN
     void
@@ -165,7 +170,7 @@ private:
 
     MLIO_HIDDEN
     intrusive_ptr<schema const>
-    init_parsers_and_schema();
+    init_parsers_and_make_schema();
 
     MLIO_HIDDEN
     bool
@@ -187,7 +192,7 @@ private:
     csv_params params_;
     std::vector<std::string> column_names_;
     std::vector<data_type> column_types_{};
-    std::vector<int> skipped_columns_{};
+    std::vector<int> column_ignores_{};
     std::vector<parser> column_parsers_{};
     bool should_read_header = true;
 };

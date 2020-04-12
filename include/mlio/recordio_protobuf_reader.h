@@ -39,8 +39,8 @@ inline namespace v1 {
 /// Represents a @ref data_reader for reading Amazon SageMaker
 /// RecordIO-protobuf datasets.
 class MLIO_API recordio_protobuf_reader final : public parallel_data_reader {
-    class decoder;
     class decoder_state;
+    class decoder;
 
 public:
     explicit recordio_protobuf_reader(data_reader_params prm);

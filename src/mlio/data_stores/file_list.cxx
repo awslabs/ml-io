@@ -55,7 +55,7 @@ struct FTS_deleter {
 std::vector<char const *>
 get_pathname_c_strs(stdx::span<std::string const> pathnames)
 {
-    std::vector<char const *> c_strs;
+    std::vector<char const *> c_strs{};
 
     std::transform(pathnames.begin(),
                    pathnames.end(),
@@ -108,7 +108,7 @@ list_files(list_files_params const &prm)
 {
     auto fts = detail::make_fts(prm.pathnames);
 
-    std::vector<intrusive_ptr<data_store>> lst;
+    std::vector<intrusive_ptr<data_store>> lst{};
 
     ::FTSENT *e{};
     while ((e = ::fts_read(fts.get())) != nullptr) {
