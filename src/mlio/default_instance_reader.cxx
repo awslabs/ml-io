@@ -93,11 +93,9 @@ default_instance_reader::read_instance_core()
 
         instance_idx_++;
 
-        store_instance_idx_++;
-
         instance_to_read_ += num_shards_;
 
-        return instance{*store_, store_instance_idx_, std::move(*payload)};
+        return instance{*store_, store_instance_idx_++, std::move(*payload)};
     }
     catch (std::exception const &) {
         handle_nested_errors();
