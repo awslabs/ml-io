@@ -61,7 +61,7 @@ def test_data_reader_params_members():
     assert rdr_prm.shuffle_instances is False
     assert rdr_prm.shuffle_window == 0
     assert rdr_prm.shuffle_seed is None
-    assert rdr_prm.reshuffle_each_epoch is False
+    assert rdr_prm.reshuffle_each_epoch is True
     assert rdr_prm.subsample_ratio is None
 
     rdr_prm.batch_size = 2

@@ -31,7 +31,7 @@ def _test_dedupe_column_names(
     reader = mlio.CsvReader(reader_params, csv_params)
 
     example = reader.read_example()
-    names = [desc.name for desc in example.schema.descriptors]
+    names = [desc.name for desc in example.schema.attributes]
     assert names == expected_column_names
 
     record = [as_numpy(feature) for feature in example]
