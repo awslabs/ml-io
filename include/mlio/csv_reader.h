@@ -110,7 +110,8 @@ struct MLIO_API csv_params final {
     /// See @ref max_field_length_handling.
     max_field_length_handling max_field_length_hnd =
         max_field_length_handling::error;
-    /// The maximum size of a row to read before failing gracefully.
+    /// The maximum size of a text line. If a row is longer than the
+    /// specified size, an error will be raised.
     std::optional<std::size_t> max_line_length{};
     /// Additional parameters relevant for field parsing.
     parser_params parser_prm{};

@@ -125,6 +125,13 @@ default_instance_reader::handle_nested_errors()
     try {
         throw;
     }
+    catch (record_too_large_error const &) {
+        std::throw_with_nested(data_reader_error{
+            fmt::format("The record {1:n} in the data store {0} is too large. "
+                        "See nested exception for details.",
+                        *store_,
+                        store_record_idx_)});
+    }
     catch (corrupt_record_error const &) {
         std::throw_with_nested(data_reader_error{
             fmt::format("The record {1:n} in the data store {0} is corrupt. "
@@ -146,8 +153,8 @@ default_instance_reader::handle_nested_errors()
     }
     catch (std::system_error const &) {
         std::throw_with_nested(data_reader_error{fmt::format(
-            "A system error occurred while trying to read from the data "
-            "store {0}. "
+            "A system error occurred while trying to read from the data store "
+            "{0}. "
             "See nested exception for details.",
             *store_)});
     }

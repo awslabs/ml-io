@@ -86,7 +86,8 @@ csv_record_reader::read_line(memory_slice &chunk, bool ignore_leftover)
             return {};
         }
 
-        throw corrupt_record_error{"The line ends with a corrupt character."};
+        throw corrupt_record_error{
+            "The text line ends with a corrupt character."};
     }
 
     auto pos = chrs.begin();
@@ -268,11 +269,9 @@ csv_record_reader::check_line_length(stdx::span<char const> const &chrs,
 {
     std::size_t num_chrs_read = as_size(pos - chrs.begin());
     if (num_chrs_read >= max_line_length) {
-        throw record_too_large_error{fmt::format(
-            "The line exceeds the maximum length of {1:n}. It begins with "
-            "'{0:.64}'.",
-            std::string_view{chrs.data(), max_line_length},
-            max_line_length)};
+        throw record_too_large_error{
+            fmt::format("The text line exceeds the maximum length of {0:n}.",
+                        max_line_length)};
     }
 }
 

@@ -534,7 +534,8 @@ register_data_readers(py::module &m)
             max_field_length_handling : MaxFieldLengthHandling, optional
                 See ``MaxFieldLengthHandling``.
             max_line_length : int, optional
-                The maximum size of a row to read before failing gracefully.
+                The maximum size of a text line. If a row is longer than the
+                specified size, an error will be raised.
             parser_params : ParserParams, optional
                 See ``ParserParams``.
             )")
