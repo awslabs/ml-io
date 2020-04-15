@@ -32,6 +32,7 @@
 #include "mlio/device_array.h"                         // IWYU pragma: export
 #include "mlio/endian.h"                               // IWYU pragma: export
 #include "mlio/example.h"                              // IWYU pragma: export
+#include "mlio/image_reader.h"                         // IWYU pragma: export
 #include "mlio/init.h"                                 // IWYU pragma: export
 #include "mlio/instance.h"                             // IWYU pragma: export
 #include "mlio/instance_batch.h"                       // IWYU pragma: export
@@ -52,6 +53,7 @@
 #include "mlio/not_supported_error.h"                  // IWYU pragma: export
 #include "mlio/parallel_data_reader.h"                 // IWYU pragma: export
 #include "mlio/parser.h"                               // IWYU pragma: export
+#include "mlio/record_readers/blob_record_reader.h"    // IWYU pragma: export
 #include "mlio/record_readers/record.h"                // IWYU pragma: export
 #include "mlio/record_readers/record_error.h"          // IWYU pragma: export
 #include "mlio/record_readers/record_reader.h"         // IWYU pragma: export

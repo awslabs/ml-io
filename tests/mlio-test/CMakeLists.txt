@@ -3,6 +3,7 @@
 # ------------------------------------------------------------
 
 add_executable(mlio-test
+    record_readers/test_blob_record_reader.cxx
     test_text_line_reader.cxx
     test_recordio_protobuf_reader.cxx)
 
@@ -23,6 +24,17 @@ target_link_libraries(mlio-test
     PRIVATE
         GTest::GTest GTest::Main mlio
 )
+
+if(MLIO_BUILD_IMAGE_READER)
+    target_sources(mlio-test
+        PRIVATE
+            test_image_reader.cxx
+    )
+    target_link_libraries(mlio-test
+        PRIVATE
+            opencv_core opencv_imgcodecs opencv_imgproc
+    )
+endif()
 
 # ------------------------------------------------------------
 # Tests

@@ -3,8 +3,10 @@
     * [DataReader](#DataReader)
     * [CsvReader](#CsvReader)
     * [RecordIOProtobufReader](#RecordIOProtobufReader)
+    * [ImageReader](#ImageReader)
     * [DataReaderParams](#DataReaderParams)
     * [CsvParams](#CsvParams)
+    * [ImageReaderParams](#ImageReaderParams)
     * [ParserParams](#ParserParams)
     * [Example](#Example)
     * [Schema](#Schema)
@@ -12,6 +14,7 @@
 * [Enumerations](#Enumerations)
     * [LastBatchHandling](#LastBatchHandling)
     * [BadBatchHandling](#BadBatchHandling)
+    * [ImageFrame](#ImageFrame)
     * [MaxFieldLengthHandling](#MaxFieldLengthHandling)
 * [Exceptions](#Exceptions)
 
@@ -76,6 +79,16 @@ RecordIOProtobufReader(data_reader_params : DataReaderParams)
 ```
 
 - `data_reader_params`: See[`DataReaderParams`](#DataReaderParams).
+
+## ImageReader
+Represents a data reader for reading image datasets in JPEG and PNG formats.
+
+```python
+ImageReader(data_reader_params : DataReaderParams, image_reader_params : ImageReaderParams)
+```
+
+- `data_reader_params`: See [`DataReaderParams`](#DataReaderParams).
+- `image_reader_params`: See [`ImageReaderParams`](#ImageReaderParams).
 
 ## DataReaderParams
 Contains the common parameters used by all data readers.
@@ -164,6 +177,23 @@ CsvReaderParams(column_names : Sequence[str] = None,
 - `max_field_length_handling`: See [`MaxFieldLengthHandling`](#MaxFieldLengthHandling).
 - `max_line_length`: The maximum length of a row. A row longer than this threshold will cause the data reader to fail.
 - `parser_params`: See [`ParserParams`](#ParserParams).
+
+## ImageReaderParams
+Contains the parameters used by [`ImageReader`](#ImageReader).
+
+All constructor parameters described below have a same-named read/write accessor property. Not though that, due to a shortcoming in pybind11-based language bindings, values cannot be added to container types via properties and updates must instead be made via assignment.
+
+```python
+ImageReaderParams(img_frame : ImageFrame = ImageFrame.NONE,
+                  resize : Optional[int] = None,
+                  image_dimensions : Sequence[int] = None,
+                  to_rgb : bool = False)
+```
+
+- `img_frame`: See [`ImageFrame`](#ImageFrame)
+- `resize`: Scales the shorter edge of the image to this value before applying other augmentations.
+- `image_dimensions`: The dimensions of output image in `channels, height, width` format.
+- `to_rgb`: A boolean value for converting from BGR (OpenCV default) to RGB color scheme.
 
 ## ParserParams
 Contains the parameters used for parsing dataset features.
@@ -283,6 +313,14 @@ Specifies how a batch that contains erroneous data should be handled.
 | `ERROR` | Raise an error.                           |
 | `SKIP`  | Skip the batch.                           |
 | `WARN`  | Skip the batch and log a warning message. |
+
+### ImageFrame
+Specifies what image frame to use for reading an image dataset.
+
+| Value       | Description                                        |
+|-------------|----------------------------------------------------|
+| `NONE`      | For reading raw image files in jpeg or png format. |
+| `RECORDIO`  | For reading MXNet RecordIO based image files.      |
 
 ### MaxFieldLengthHandling
 Specifies how field and columns should be handled when breached.
