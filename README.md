@@ -122,13 +122,16 @@ import mlio
 from mlio.integ.numpy import as_numpy
 
 file_dir = '/path/to/image_dir' # This can be a directory or a single file.
-dataset = mlio.list_files(file_dir, pattern='*.jpg') # This can be jpg, png, or rec, depending on the image format.
 
-# Setting general DataReader parameters.
+# JPEG or PNG images formats are supported.
+dataset = mlio.list_files(file_dir, pattern='*.jpg')
+
 data_reader_params = mlio.DataReaderParams(dataset=dataset, batch_size=200)
 
-# Setting ImageReader parameters. Set img_frame to mlio.ImageFrame.RECORDIO for MXNet RecordIO datasets.
-image_reader_prm = mlio.ImageReaderParams(img_frame=mlio.ImageFrame.NONE, resize=500, image_dimensions=[3,166,190], 
+# Setting ImageReader parameters.
+image_reader_prm = mlio.ImageReaderParams(img_frame=mlio.ImageFrame.NONE,
+                                          resize=500,
+                                          image_dimensions=[3,166,190],
                                           to_rgb=1)
 
 reader = mlio.ImageReader(data_reader_params, image_reader_prm)
@@ -137,10 +140,11 @@ num_epochs = 5 # Number of times to read the full dataset.
 for epoch in range(num_epochs):
     # ImageReader is simply an iterator over mini-batches of data.
     for example in reader:
-        # Get the ML-IO ``Tensor``.
-        # This will contain the batch of images in NHWC (batch * height * width * channel) format.
+        # The 'value' tensor will contain the batch of images in NHWC
+        # (batch * height * width * channel) format.
         lbl = example['value']
-        lbl = as_numpy(lbl) # Zero-copy convert the tensor into a NumPy array, with the array shape being [NHWC].
+        # Zero-copy convert the tensor into a NumPy array.
+        lbl = as_numpy(lbl)
         ...
     reader.reset() # Return to the beginning of dataset.
  ```

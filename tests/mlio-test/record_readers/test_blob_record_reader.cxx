@@ -49,4 +49,5 @@ TEST_F(test_blob_record_reader, test_peek_record)
     auto unread_stream= strm->read(strm->size());
     ASSERT_EQ(unread_stream.begin(), unread_stream.end());
 }
-}
+
+}  // namespace mlio

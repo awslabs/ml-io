@@ -6,7 +6,7 @@ import mlio
 from mlio.integ.numpy import as_numpy
 
 resources_dir = os.path.join(
-    os.path.dirname(os.path.realpath(__file__)), 'resources')
+    os.path.dirname(os.path.realpath(__file__)), '../resources')
 
 
 def test_recordio_protobuf_reader_params():

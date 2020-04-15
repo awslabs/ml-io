@@ -98,9 +98,9 @@ private:
     crop(cv::Mat &src, cv::Mat &dst, instance const &ins) const;
 
 private:
-    bad_batch_handling bbh_{};
-    image_reader_params params_{};
+    image_reader_params params_;
     std::array<int, image_dimensions_size_> img_dims_{};
+    bad_batch_handling bbh_{};
 };
 
 /// @}

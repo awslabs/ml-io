@@ -35,7 +35,7 @@ start_thread(Func &&f, Args &&... args)
     // Block all asynchronous signals on the new thread.
     ::sigset_t mask{};
     ::sigset_t original_mask{};
-    ::sigfillset(&mask);
+    sigfillset(&mask);
 
     int s = ::pthread_sigmask(SIG_SETMASK, &mask, &original_mask);
     if (s != 0) {

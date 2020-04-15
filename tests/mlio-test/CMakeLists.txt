@@ -30,6 +30,7 @@ if(MLIO_BUILD_IMAGE_READER)
         PRIVATE
             test_image_reader.cxx
     )
+
     target_link_libraries(mlio-test
         PRIVATE
             opencv_core opencv_imgcodecs opencv_imgproc

@@ -40,7 +40,6 @@ option(BUILD_SHARED_LIBS "If set, builds as a shared library." ON)
 option(MLIO_INCLUDE_LIB "If set, generates build target for the library." ON)
 option(MLIO_INCLUDE_CONTRIB "If set, generates build target for the contrib library.")
 option(MLIO_INCLUDE_PYTHON_EXTENSION "If set, generates build target for the Python C extension.")
-option(MLIO_BUILD_IMAGE_READER "If set, builds the image reader." OFF)
 
 cmake_dependent_option(
     MLIO_INCLUDE_ARROW_INTEGRATION "If set, generates build target for the Apache Arrow integration." OFF
@@ -50,6 +49,7 @@ cmake_dependent_option(
 option(MLIO_INCLUDE_TESTS "If set, generates build target for the tests." ON)
 option(MLIO_INCLUDE_DOC "If set, generates build target for the documentation.")
 
+option(MLIO_BUILD_IMAGE_READER "If set, builds the image reader.")
 option(MLIO_BUILD_S3_SUPPORT "If set, builds with Amazon S3 support.")
 
 option(MLIO_TREAT_WARNINGS_AS_ERRORS "If set, treats compilation warnings as errors.")

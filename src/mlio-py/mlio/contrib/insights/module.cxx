@@ -55,7 +55,7 @@ analyze_dataset(mlio::data_reader &reader,
     std::vector<column_analysis> column_stats;
     column_stats.reserve(exm->features().size());
 
-    for (mlio::feature_desc const &attr : exm->get_schema().attributes()) {
+    for (mlio::attribute const &attr : exm->get_schema().attributes()) {
         if (attr.sparse() || attr.dtype() != mlio::data_type::string) {
             throw std::runtime_error(
                 "Data insights only works with dense string tensors.");

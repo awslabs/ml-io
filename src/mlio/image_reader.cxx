@@ -43,12 +43,14 @@ image_reader::image_reader(data_reader_params rdr_prm,
         throw std::invalid_argument{
             "image_dimensions is a required parameter. "
             "Dimensions of the output image must be entered in "
-            "(channels, height, width) format"};
+            "(channels, height, width) format."};
     }
-    bbh_ = effective_bad_batch_handling();
+
     std::copy(params_.image_dimensions.begin(),
               params_.image_dimensions.end(),
               img_dims_.begin());
+
+    bbh_ = effective_bad_batch_handling();
 }
 
 image_reader::~image_reader()
@@ -74,13 +76,12 @@ image_reader::infer_schema(std::optional<instance> const &)
 {
     std::vector<attribute> attrs{};
     // schema follows the NHWC convention
-    attrs.emplace_back(attribute_builder{"value",
-                                            data_type::uint8,
-                                            {params().batch_size,
-                                             params_.image_dimensions[1],
-                                             params_.image_dimensions[2],
-                                             params_.image_dimensions[0]}}
-                           .build());
+    attrs.emplace_back("value",
+                       data_type::uint8,
+                       size_vector{params().batch_size,
+                                   params_.image_dimensions[1],
+                                   params_.image_dimensions[2],
+                                   params_.image_dimensions[0]});
     return make_intrusive<schema>(std::move(attrs));
 }
 
@@ -112,9 +113,9 @@ image_reader::make_tensor(std::vector<instance> const &instances,
         memory_slice img_buf;
         if (params_.img_frame == image_frame::recordio) {
             // This is to skip the 24 byte header as mentioned in
-            // image_recordio.h in the mxnet github repository. This header
-            // does not contain data related to image pixel values, but rather
-            // contains image metadata.
+            // image_recordio.h in the mxnet github repository. This
+            // header does not contain data related to image pixel
+            // values, but rather contains image metadata.
             img_buf = ins.bits().subslice(recordio_image_header_offset_);
         }
         else {
@@ -161,9 +162,9 @@ image_reader::make_tensor(std::vector<instance> const &instances,
             catch (cv::Exception const &e) {
                 if (bbh_ != bad_batch_handling::skip) {
                     auto msg =
-                        fmt::format("BGR2RGB operation for image: {0:n} "
-                                    "in data_store: {1:s} failed with the "
-                                    "following exception: {2:s}.",
+                        fmt::format("BGR2RGB operation for image {0:n} in "
+                                    "data_store {1:s} failed with the "
+                                    "following exception: {2:s}",
                                     ins.index(),
                                     ins.get_data_store().id(),
                                     e.what());
@@ -205,8 +206,8 @@ image_reader::decode_image(cv::Mat const &buf,
     catch (cv::Exception const &e) {
         if (bbh_ != bad_batch_handling::skip) {
             auto msg = fmt::format(
-                "Image decoding failed for the image: {0:n} in data_store: "
-                "{1:s}, with the following exception: {2:s}",
+                "Image decoding failed for the image {0:n} in data_store "
+                "{1:s} with the following exception: {2:s}",
                 ins.index(),
                 ins.get_data_store().id(),
                 e.what());
@@ -220,8 +221,8 @@ image_reader::decode_image(cv::Mat const &buf,
     if (decoded_img.empty()) {
         if (bbh_ != bad_batch_handling::skip) {
             auto msg =
-                fmt::format("Image decoding failed for the image: {0:n} in "
-                            "data_store: {1:s}.",
+                fmt::format("Image decoding failed for the image {0:n} in "
+                            "data_store {1:s}.",
                             ins.index(),
                             ins.get_data_store().id());
             if (bbh_ == bad_batch_handling::error) {
@@ -234,8 +235,8 @@ image_reader::decode_image(cv::Mat const &buf,
     if (mode == cv::ImreadModes::IMREAD_UNCHANGED &&
         decoded_img.channels() != 4) {
         throw std::invalid_argument{fmt::format(
-            "Image: {0:n} in data_store: {1:s} is expected to have "
-            "4 channels. However, it contains {2:n} channels.",
+            "Image {0:n} in data_store {1:s} is expected to have 4 channels. "
+            "However it contains {2:n} channels.",
             ins.index(),
             ins.get_data_store().id(),
             decoded_img.channels())};
@@ -264,8 +265,8 @@ image_reader::resize(cv::Mat &src, cv::Mat &dst, instance const &ins) const
     catch (cv::Exception const &e) {
         if (bbh_ != bad_batch_handling::skip) {
             auto msg = fmt::format(
-                "Image resize operation failed for the image: {0:n} in "
-                "data_store: {1:s}, with the following exception: {2:s}",
+                "Image resize operation failed for the image {0:n} in "
+                "data_store {1:s} with the following exception: {2:s}",
                 ins.index(),
                 ins.get_data_store().id(),
                 e.what());
@@ -287,7 +288,7 @@ image_reader::crop(cv::Mat &src, cv::Mat &dst, instance const &ins) const
             auto msg = fmt::format(
                 "Input image dimensions [rows: {0:n}, cols: {1:n}] are "
                 "smaller than the output image image_dimensions [rows: {2:n}, "
-                "cols: {3:n}], for the image: {4:n} in data_store: {5:s}",
+                "cols: {3:n}] for the image {4:n} in data_store {5:s}.",
                 src.rows,
                 src.cols,
                 img_dims_[1],
@@ -313,8 +314,8 @@ image_reader::crop(cv::Mat &src, cv::Mat &dst, instance const &ins) const
     catch (cv::Exception const &e) {
         if (bbh_ != bad_batch_handling::skip) {
             auto msg = fmt::format(
-                "Image crop operation failed for the image: {0:n} in "
-                "data_store: {1:s}, with the following exception: {2:s}",
+                "Image crop operation failed for the image {0:n} in "
+                "data_store {1:s} with the following exception: {2:s}",
                 ins.index(),
                 ins.get_data_store().id(),
                 e.what());
@@ -351,10 +352,12 @@ image_reader::image_reader(data_reader_params rdr_prm,
                            image_reader_params image_prm)
     : parallel_data_reader{std::move(rdr_prm)}, params_{std::move(image_prm)}
 {
-    bbh_ = {};
     img_dims_ = {};
-    throw not_supported_error{"ML-IO has not been built with image reader "
-                              "support."};
+
+    bbh_ = {};
+
+    throw not_supported_error{
+        "ML-IO has not been built with image reader support."};
 }
 
 image_reader::~image_reader() = default;
@@ -378,24 +381,28 @@ image_reader::decode(instance_batch const &) const
 }
 
 intrusive_ptr<dense_tensor>
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 image_reader::make_tensor(std::vector<instance> const &, std::size_t) const
 {
     return nullptr;
 }
 
 cv::Mat
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 image_reader::decode_image(cv::Mat const &, int, instance const &) const
 {
     return {};
 }
 
 bool
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 image_reader::resize(cv::Mat &, cv::Mat &, instance const &) const
 {
     return false;
 }
 
 bool
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 image_reader::crop(cv::Mat &, cv::Mat &, instance const &) const
 {
     return false;

@@ -55,11 +55,11 @@ protected:
     std::string missing_image_dimensions_prm_exception_{
         "image_dimensions is a required parameter. Dimensions of "
         "the output image must be entered in (channels, height, width) "
-        "format"};
+        "format."};
     std::string invalid_image_dimensions_exception_{
         "Input image dimensions [rows: 166, cols: 190] are smaller than the "
-        "output image image_dimensions [rows: 500, cols: 500], for the image: "
-        "0 in data_store:"};
+        "output image image_dimensions [rows: 500, cols: 500] for the image "
+        "0 in data_store"};
 
 public:
     cv::Mat

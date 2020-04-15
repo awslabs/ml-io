@@ -319,7 +319,7 @@ Specifies what image frame to use for reading an image dataset.
 
 | Value       | Description                                        |
 |-------------|----------------------------------------------------|
-| `NONE`      | For reading raw image files in jpeg or png format. |
+| `NONE`      | For reading raw image files in JPEG or PNG format. |
 | `RECORDIO`  | For reading MXNet RecordIO based image files.      |
 
 ### MaxFieldLengthHandling
