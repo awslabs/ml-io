@@ -30,6 +30,8 @@ doxygen:
   - 1.8
 libiconv:
   - 1.15
+libopencv:
+  - 4.2.0
 libprotobuf:
   - 3.11.0
 python:

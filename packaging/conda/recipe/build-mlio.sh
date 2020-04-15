@@ -27,6 +27,7 @@ cmake -GNinja\
       -DCMAKE_TOOLCHAIN_FILE="$_toolchain_file"\
       -DCMAKE_FIND_ROOT_PATH="$_dependencies_dir"\
       -DIconv_IS_BUILT_IN=OFF\
+      -DMLIO_BUILD_IMAGE_READER=ON\
       -DMLIO_BUILD_S3_SUPPORT=ON\
       "$SRC_DIR"
 
