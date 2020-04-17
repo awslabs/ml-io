@@ -89,7 +89,7 @@ column_analyzer::analyze(mlio::example const &exm) const
             }
 
             // Numeric analyzers
-            double as_float;
+            double as_float{};
             if (mlio::try_parse_float(cell, as_float) !=
                 mlio::parse_result::ok) {
                 stats.numeric_nan_count++;

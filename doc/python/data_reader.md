@@ -102,6 +102,7 @@ DataReaderParams(dataset : Sequence[DataStore],
                  num_parallel_reads : int = 0,
                  last_batch_handling : LastBatchHandling = LastBatchHandling.NONE,
                  bad_batch_handling : BadBatchHandling = BatchBatchHandling.ERROR,
+                 warn_bad_instances : True,
                  num_instances_to_skip : int = 0,
                  num_instances_to_read : Optional[int] = None,
                  shard_index : int = 0,
@@ -119,6 +120,7 @@ DataReaderParams(dataset : Sequence[DataStore],
 - `num_parallel_reads`: The number of parallel batch reads. If not specified, it equals to `num_prefetched_batches`. In case a large number of batches should be prefetched, this parameter can be used to avoid thread oversubscription.
 - `last_batch_handling`: See [`LastBatchHandling`](#LastBatchHandling).
 - `bad_batch_handling`: See [`BadBatchHandling`](#BadBatchHandling).
+- `warn_bad_instances`: A boolean value indicating whether a warning will be output for each bad instance.
 - `num_instances_to_skip`: The number of data instances to skip from the beginning of the dataset.
 - `num_instances_to_read`: The number of data instances to read. The rest of the dataset will be ignored.
 - `shard_index`: The index of the shard to read.
@@ -308,11 +310,11 @@ Specifies how the last batch read from a dataset should be handled if the datase
 ### BadBatchHandling
 Specifies how a batch that contains erroneous data should be handled.
 
-| Value   | Description                               |
-|---------|-------------------------------------------|
-| `ERROR` | Raise an error.                           |
-| `SKIP`  | Skip the batch.                           |
-| `WARN`  | Skip the batch and log a warning message. |
+| Value   | Description                                                       |
+|---------|-------------------------------------------------------------------|
+| `ERROR` | Raise an error.                                                   |
+| `SKIP`  | Skip the batch.                                                   |
+| `PAD`   | Skip bad instances and pad the batch to the specified batch size. |
 
 ### ImageFrame
 Specifies what image frame to use for reading an image dataset.
@@ -325,11 +327,10 @@ Specifies what image frame to use for reading an image dataset.
 ### MaxFieldLengthHandling
 Specifies how field and columns should be handled when breached.
 
-| Value      | Description                                   |
-|------------|-----------------------------------------------|
-| `ERROR`    | Raise an error.                               |
-| `TRUNCATE` | Truncate the field.                           |
-| `WARN`     | Truncate the field and log a warning message. |
+| Value          | Description                                   |
+|----------------|-----------------------------------------------|
+| `TREAT_AS_BAD` | Treat the corresponding row as bad.           |
+| `TRUNCATE`     | Truncate the field.                           |
 
 
 ## Exceptions
@@ -338,4 +339,3 @@ Specifies how field and columns should be handled when breached.
 | `DataReaderError`      | Thrown when the dataset cannot be read. Inherits from `MLIOError`.                          |
 | `SchemaError`          | Thrown when the dataset has a schema error. Inherits from `DataReaderError`.                |
 | `InvalidInstanceError` | Thrown when the dataset contains an invalid data instance. Inherits from `DataReaderError`. |
-| `FieldTooLargeError`   | Thrown when the dataset contains a field that exceeds the maximum allowed length. Inherits from `DataReaderError`. |

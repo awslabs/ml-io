@@ -25,15 +25,9 @@ inline namespace v1 {
 data_reader_base::data_reader_base(data_reader_params &&prm) noexcept
     : params_{std::move(prm)}
 {
-    if (params_.bad_batch_hnd == bad_batch_handling::warn) {
-        if (!logger::is_enabled_for(log_level::warning)) {
-            bad_batch_handling_ = bad_batch_handling::skip;
-
-            return;
-        }
+    if (params_.warn_bad_instances) {
+        warn_bad_instances_ = logger::is_enabled_for(log_level::warning);
     }
-
-    bad_batch_handling_ = params_.bad_batch_hnd;
 }
 
 intrusive_ptr<example>

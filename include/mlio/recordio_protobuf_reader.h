@@ -15,6 +15,8 @@
 
 #pragma once
 
+#include <optional>
+
 #include "mlio/config.h"
 #include "mlio/data_type.h"
 #include "mlio/fwd.h"
@@ -91,6 +93,14 @@ private:
     MLIO_HIDDEN
     intrusive_ptr<example>
     decode(instance_batch const &batch) const final;
+
+    MLIO_HIDDEN
+    std::optional<std::size_t>
+    decode_ser(decoder_state &state, instance_batch const &batch) const;
+
+    MLIO_HIDDEN
+    std::optional<std::size_t>
+    decode_prl(decoder_state &state, instance_batch const &batch) const;
 
     MLIO_HIDDEN
     static aialgs::data::Record const *

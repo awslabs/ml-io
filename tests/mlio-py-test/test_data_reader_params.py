@@ -88,7 +88,7 @@ def test_csv_params_members():
     assert csv_prm.encoding is None
     assert csv_prm.max_field_length is None
     assert csv_prm.max_field_length_handling == \
-        mlio.MaxFieldLengthHandling.ERROR
+        mlio.MaxFieldLengthHandling.TREAT_AS_BAD
     assert csv_prm.max_line_length is None
     assert csv_prm.parser_params.nan_values == set()
     assert csv_prm.parser_params.number_base == 10

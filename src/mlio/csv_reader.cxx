@@ -20,6 +20,7 @@
 #include <exception>
 #include <stdexcept>
 #include <tuple>
+#include <type_traits>
 #include <utility>
 
 #include <fmt/format.h>
@@ -52,9 +53,13 @@ namespace mlio {
 inline namespace v1 {
 
 struct csv_reader::decoder_state {
+    explicit decoder_state(csv_reader const &rdr,
+                           std::vector<intrusive_ptr<tensor>> &tsrs) noexcept;
+
     csv_reader const *reader;
     std::vector<intrusive_ptr<tensor>> *tensors;
-    bad_batch_handling bbh;
+    bool warn_bad_instance;
+    bool error_bad_batch;
 };
 
 template<typename ColIt>
@@ -78,8 +83,8 @@ private:
     ColIt col_end_;
 };
 
-csv_reader::csv_reader(data_reader_params rdr_prm, csv_params csv_prm)
-    : parallel_data_reader{std::move(rdr_prm)}, params_{std::move(csv_prm)}
+csv_reader::csv_reader(data_reader_params prm, csv_params csv_prm)
+    : parallel_data_reader{std::move(prm)}, params_{std::move(csv_prm)}
 {
     column_names_ = params_.column_names;
 }
@@ -426,75 +431,38 @@ csv_reader::decode(instance_batch const &batch) const
 {
     auto tensors = make_tensors(batch.size());
 
-    decoder_state dec_state{this, &tensors, effective_bad_batch_handling()};
-
-    std::atomic_bool skip_batch{};
-
-    std::size_t num_instances = batch.instances().size();
-
-    auto row_idx_beg = tbb::counting_iterator<std::size_t>(0);
-    auto row_idx_end = tbb::counting_iterator<std::size_t>(num_instances);
-
-    auto rec_beg = batch.instances().begin();
-    auto rec_end = batch.instances().end();
-
-    auto rng_beg = tbb::make_zip_iterator(row_idx_beg, rec_beg);
-    auto rng_end = tbb::make_zip_iterator(row_idx_end, rec_end);
-
-    tbb::blocked_range<decltype(rng_beg)> range{rng_beg, rng_end};
-
-    auto worker = [this, &dec_state, &skip_batch](auto &sub_range) {
-        csv_record_tokenizer tokenizer{params_};
-
-        std::size_t num_columns = column_names_.size();
-
-        auto col_idx_beg = tbb::counting_iterator<std::size_t>(0);
-        auto col_idx_end = tbb::counting_iterator<std::size_t>(num_columns);
-
-        auto name_beg = column_names_.begin();
-        auto name_end = column_names_.end();
-
-        auto type_beg = column_types_.begin();
-        auto type_end = column_types_.end();
-
-        auto skip_beg = column_ignores_.begin();
-        auto skip_end = column_ignores_.end();
-
-        auto prs_beg = column_parsers_.begin();
-        auto prs_end = column_parsers_.end();
-
-        auto col_beg = tbb::make_zip_iterator(
-            col_idx_beg, name_beg, type_beg, skip_beg, prs_beg);
-        auto col_end = tbb::make_zip_iterator(
-            col_idx_end, name_end, type_end, skip_end, prs_end);
-
-        for (auto row_zip : sub_range) {
-            decoder<decltype(col_beg)> dc{
-                dec_state, tokenizer, col_beg, col_end};
-
-            if (!dc.decode(std::get<0>(row_zip), std::get<1>(row_zip))) {
-                skip_batch = true;
-
-                return;
-            }
-        }
-    };
+    decoder_state state{*this, tensors};
 
     constexpr std::size_t cut_off = 10'000'000;
-    if (column_names_.size() * num_instances < cut_off) {
-        worker(range);
+
+    bool serial =
+        // If bad batch handling mode is pad, we cannot parallelize
+        // decoding as good records must be stacked together without
+        // any gap in between.
+        params().bad_batch_hnd == bad_batch_handling::pad ||
+        // If the number of values (e.g. integers, floating-points) we
+        // need to decode is below the cut-off, avoid parallel
+        // execution; otherwise the threading overhead will slow down
+        // the performance.
+        column_names_.size() * batch.instances().size() < cut_off;
+
+    std::optional<std::size_t> num_instances_read{};
+    if (serial) {
+        num_instances_read = decode_ser(state, batch);
     }
     else {
-        tbb::parallel_for(range, worker, tbb::auto_partitioner{});
+        num_instances_read = decode_prl(state, batch);
     }
 
-    if (skip_batch) {
+    // Check if we failed to decode the batch and return a null pointer
+    // if that is the case.
+    if (num_instances_read == std::nullopt) {
         return nullptr;
     }
 
     auto exm = make_intrusive<example>(get_schema(), std::move(tensors));
 
-    exm->padding = batch.size() - num_instances;
+    exm->padding = batch.size() - *num_instances_read;
 
     return exm;
 }
@@ -533,6 +501,129 @@ csv_reader::make_tensors(std::size_t batch_size) const
     return tensors;
 }
 
+auto
+csv_reader::make_column_iterators() const noexcept
+{
+    std::size_t num_columns = column_names_.size();
+
+    auto col_idx_beg = tbb::counting_iterator<std::size_t>(0);
+    auto col_idx_end = tbb::counting_iterator<std::size_t>(num_columns);
+
+    auto name_beg = column_names_.begin();
+    auto name_end = column_names_.end();
+
+    auto type_beg = column_types_.begin();
+    auto type_end = column_types_.end();
+
+    auto skip_beg = column_ignores_.begin();
+    auto skip_end = column_ignores_.end();
+
+    auto prs_beg = column_parsers_.begin();
+    auto prs_end = column_parsers_.end();
+
+    auto col_beg = tbb::make_zip_iterator(
+        col_idx_beg, name_beg, type_beg, skip_beg, prs_beg);
+    auto col_end = tbb::make_zip_iterator(
+        col_idx_end, name_end, type_end, skip_end, prs_end);
+
+    return std::make_pair(col_beg, col_end);
+}
+
+std::optional<std::size_t>
+csv_reader::decode_ser(decoder_state &state, instance_batch const &batch) const
+{
+    std::size_t row_idx = 0;
+
+    csv_record_tokenizer tokenizer{params_};
+
+    auto [col_beg, col_end] = make_column_iterators();
+
+    for (instance const &ins : batch.instances()) {
+        decoder<decltype(col_beg)> dc{state, tokenizer, col_beg, col_end};
+        if (dc.decode(row_idx, ins)) {
+            row_idx++;
+        }
+        else {
+            // If the user requested to skip the batch in case of an
+            // error, shortcut the loop and return immediately.
+            if (params().bad_batch_hnd == bad_batch_handling::skip) {
+                return {};
+            }
+            // We do not increment the row index if the requested bad
+            // batch handling mode is pad. This way we make sure that
+            // corrupt records are skipped and good records are stacked
+            // together.
+            if (params().bad_batch_hnd != bad_batch_handling::pad) {
+                throw std::invalid_argument{
+                    "The specified bad batch handling is invalid."};
+            }
+        }
+    }
+
+    return row_idx;
+}
+
+std::optional<std::size_t>
+csv_reader::decode_prl(decoder_state &state, instance_batch const &batch) const
+{
+    std::atomic_bool skip_batch{};
+
+    std::size_t num_instances = batch.instances().size();
+
+    auto row_idx_beg = tbb::counting_iterator<std::size_t>(0);
+    auto row_idx_end = tbb::counting_iterator<std::size_t>(num_instances);
+
+    auto ins_beg = batch.instances().begin();
+    auto ins_end = batch.instances().end();
+
+    auto rng_beg = tbb::make_zip_iterator(row_idx_beg, ins_beg);
+    auto rng_end = tbb::make_zip_iterator(row_idx_end, ins_end);
+
+    tbb::blocked_range<decltype(rng_beg)> range{rng_beg, rng_end};
+
+    auto worker = [this, &state, &skip_batch](auto &sub_range) {
+        csv_record_tokenizer tokenizer{params_};
+
+        auto [col_beg, col_end] = make_column_iterators();
+
+        for (auto ins_zip : sub_range) {
+            using ColIt = std::remove_reference_t<decltype(col_beg)>;
+
+            // Both GCC and clang have a bug that prevents using class
+            // template argument deduction (CTAD) with nested types.
+            decoder<ColIt> dc{state, tokenizer, col_beg, col_end};
+            if (!dc.decode(std::get<0>(ins_zip), std::get<1>(ins_zip))) {
+                // If we failed to decode the instance, we can
+                // terminate the task and skip this batch.
+                if (params().bad_batch_hnd == bad_batch_handling::skip) {
+                    skip_batch = true;
+
+                    return;
+                }
+
+                throw std::invalid_argument{
+                    "The specified bad batch handling is invalid."};
+            }
+        }
+    };
+
+    tbb::parallel_for(range, worker, tbb::auto_partitioner{});
+
+    if (skip_batch) {
+        return {};
+    }
+
+    return num_instances;
+}
+
+csv_reader::decoder_state::decoder_state(
+    csv_reader const &rdr, std::vector<intrusive_ptr<tensor>> &tsrs) noexcept
+    : reader{&rdr}
+    , tensors{&tsrs}
+    , warn_bad_instance{rdr.warn_bad_instances()}
+    , error_bad_batch{rdr.params().bad_batch_hnd == bad_batch_handling::error}
+{}
+
 template<typename ColIt>
 bool
 csv_reader::decoder<ColIt>::decode(std::size_t row_idx, instance const &ins)
@@ -558,23 +649,33 @@ csv_reader::decoder<ColIt>::decode(std::size_t row_idx, instance const &ins)
         // Check if we truncated the field.
         if (tokenizer_->is_truncated()) {
             auto mflh = state_->reader->params_.max_field_length_hnd;
+            if (mflh == max_field_length_handling::treat_as_bad) {
+                if (state_->warn_bad_instance || state_->error_bad_batch) {
+                    std::string const &name = std::get<1>(*col_pos);
 
-            if (mflh != max_field_length_handling::truncate) {
-                std::string const &name = std::get<1>(*col_pos);
+                    auto msg = fmt::format(
+                        "The column '{2}' of the row {1:n} in the data store "
+                        "{0} is too long. Its truncated value is '{3:.64}'.",
+                        ins.get_data_store(),
+                        ins.index() + 1,
+                        name,
+                        tokenizer_->value());
 
-                auto msg = fmt::format(
-                    "The column '{2}' of the row {1:n} in the data store {0} "
-                    "was truncated. Its truncated string value is '{3:.64}'.",
-                    ins.get_data_store(),
-                    ins.index() + 1,
-                    name,
-                    tokenizer_->value());
+                    if (state_->warn_bad_instance) {
+                        logger::warn(msg);
+                    }
 
-                if (mflh == max_field_length_handling::error) {
-                    throw field_too_large_error{msg};
+                    if (state_->error_bad_batch) {
+                        throw invalid_instance_error{msg};
+                    }
                 }
 
-                logger::warn(msg);
+                return false;
+            }
+
+            if (mflh != max_field_length_handling::truncate) {
+                throw std::invalid_argument{
+                    "The specified maximum field length handling is invalid."};
             }
         }
 
@@ -590,7 +691,7 @@ csv_reader::decoder<ColIt>::decode(std::size_t row_idx, instance const &ins)
             continue;
         }
 
-        if (state_->bbh != bad_batch_handling::skip) {
+        if (state_->warn_bad_instance || state_->error_bad_batch) {
             std::string const &name = std::get<1>(*col_pos);
 
             data_type dt = std::get<2>(*col_pos);
@@ -604,11 +705,13 @@ csv_reader::decoder<ColIt>::decode(std::size_t row_idx, instance const &ins)
                 dt,
                 tokenizer_->value());
 
-            if (state_->bbh == bad_batch_handling::error) {
-                throw invalid_instance_error{msg};
+            if (state_->warn_bad_instance) {
+                logger::warn(msg);
             }
 
-            logger::warn(msg);
+            if (state_->error_bad_batch) {
+                throw invalid_instance_error{msg};
+            }
         }
 
         return false;
@@ -619,7 +722,7 @@ csv_reader::decoder<ColIt>::decode(std::size_t row_idx, instance const &ins)
         return true;
     }
 
-    if (state_->bbh != bad_batch_handling::skip) {
+    if (state_->warn_bad_instance || state_->error_bad_batch) {
         std::size_t num_columns = state_->reader->column_names_.size();
 
         std::size_t num_actual_cols = std::get<0>(*col_pos);
@@ -638,11 +741,13 @@ csv_reader::decoder<ColIt>::decode(std::size_t row_idx, instance const &ins)
             num_actual_cols,
             num_columns);
 
-        if (state_->bbh == bad_batch_handling::error) {
-            throw invalid_instance_error{msg};
+        if (state_->warn_bad_instance) {
+            logger::warn(msg);
         }
 
-        logger::warn(msg);
+        if (state_->error_bad_batch) {
+            throw invalid_instance_error{msg};
+        }
     }
 
     return false;
@@ -655,8 +760,6 @@ csv_reader::reset() noexcept
 
     should_read_header = true;
 }
-
-field_too_large_error::~field_too_large_error() = default;
 
 }  // namespace v1
 }  // namespace mlio

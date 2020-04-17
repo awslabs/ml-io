@@ -16,6 +16,7 @@
 #pragma once
 
 #include <cstddef>
+#include <optional>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -35,9 +36,8 @@ inline namespace v1 {
 
 /// Specifies how field limits should be enforced.
 enum class max_field_length_handling {
-    error,     ///< Throw an exception.
-    truncate,  ///< Truncate the field.
-    warn       ///< Truncate the field and log a warning message.
+    treat_as_bad,  ///< Treat the corresponding row as bad.
+    truncate       ///< Truncate the field.
 };
 
 /// @addtogroup data_readers Data Readers
@@ -109,7 +109,7 @@ struct MLIO_API csv_params final {
     std::optional<std::size_t> max_field_length{};
     /// See @ref max_field_length_handling.
     max_field_length_handling max_field_length_hnd =
-        max_field_length_handling::error;
+        max_field_length_handling::treat_as_bad;
     /// The maximum size of a text line. If a row is longer than the
     /// specified size, an error will be raised.
     std::optional<std::size_t> max_line_length{};
@@ -125,7 +125,7 @@ class MLIO_API csv_reader final : public parallel_data_reader {
     class decoder;
 
 public:
-    explicit csv_reader(data_reader_params rdr_prm, csv_params csv_prm = {});
+    explicit csv_reader(data_reader_params prm, csv_params csv_prm = {});
 
     csv_reader(csv_reader const &) = delete;
 
@@ -185,6 +185,18 @@ private:
     std::vector<intrusive_ptr<tensor>>
     make_tensors(std::size_t batch_size) const;
 
+    MLIO_HIDDEN
+    std::optional<std::size_t>
+    decode_ser(decoder_state &state, instance_batch const &batch) const;
+
+    MLIO_HIDDEN
+    std::optional<std::size_t>
+    decode_prl(decoder_state &state, instance_batch const &batch) const;
+
+    MLIO_HIDDEN
+    auto
+    make_column_iterators() const noexcept;
+
 public:
     void
     reset() noexcept final;
@@ -196,25 +208,6 @@ private:
     std::vector<int> column_ignores_{};
     std::vector<parser> column_parsers_{};
     bool should_read_header = true;
-};
-
-class MLIO_API field_too_large_error : public data_reader_error {
-public:
-    using data_reader_error::data_reader_error;
-
-public:
-    field_too_large_error(field_too_large_error const &) = default;
-
-    field_too_large_error(field_too_large_error &&) = default;
-
-    ~field_too_large_error() override;
-
-public:
-    field_too_large_error &
-    operator=(field_too_large_error const &) = default;
-
-    field_too_large_error &
-    operator=(field_too_large_error &&) = default;
 };
 
 /// @}

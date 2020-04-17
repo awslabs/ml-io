@@ -36,7 +36,6 @@ from mlio._core import\
     DeviceArray,\
     DeviceKind,\
     Example,\
-    FieldTooLargeError,\
     File,\
     ImageFrame,\
     ImageReader,\
@@ -93,7 +92,6 @@ __all__ = [
     'DeviceArray',
     'DeviceKind',
     'Example',
-    'FieldTooLargeError',
     'File',
     'ImageFrame',
     'ImageReader',

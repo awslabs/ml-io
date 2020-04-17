@@ -104,10 +104,10 @@ parallel_data_reader::read_example_core()
             std::unique_lock<std::mutex> queue_lock{queue_mutex_};
 
             read_cond_.wait(queue_lock, [this] {
-                return state_ != state::running || !fill_queue_.empty();
+                return state_ != run_state::running || !fill_queue_.empty();
             });
 
-            if (state_ == state::faulted) {
+            if (state_ == run_state::faulted) {
                 std::rethrow_exception(exception_ptr_);
             }
 
@@ -133,11 +133,11 @@ parallel_data_reader::read_example_core()
 void
 parallel_data_reader::ensure_pipeline_running()
 {
-    if (state_ != state::not_started) {
+    if (state_ != run_state::not_started) {
         return;
     }
 
-    state_ = state::running;
+    state_ = run_state::running;
 
     thrd_ = detail::start_thread(&parallel_data_reader::run_pipeline, this);
 }
@@ -162,10 +162,10 @@ parallel_data_reader::run_pipeline()
         std::unique_lock<std::mutex> queue_lock{queue_mutex_};
 
         if (exception_ptr_) {
-            state_ = state::faulted;
+            state_ = run_state::faulted;
         }
         else {
-            state_ = state::stopped;
+            state_ = run_state::stopped;
         }
     }
 
@@ -297,7 +297,7 @@ parallel_data_reader::reset() noexcept
 {
     stop();
 
-    state_ = state::not_started;
+    state_ = run_state::not_started;
 
     batch_reader_->reset();
 
@@ -313,7 +313,7 @@ parallel_data_reader::reset() noexcept
 void
 parallel_data_reader::stop()
 {
-    if (state_ == state::not_started) {
+    if (state_ == run_state::not_started) {
         return;
     }
 

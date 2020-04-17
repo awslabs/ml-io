@@ -56,17 +56,17 @@ public:
     }
 
 protected:
-    /// Gets the effective @ref bad_batch_handling value based on the
-    /// current log level.
-    bad_batch_handling
-    effective_bad_batch_handling() const noexcept
+    /// Gets the effective boolean value indicating whether a warning
+    /// will be output for each bad instance.
+    bool
+    warn_bad_instances() const noexcept
     {
-        return bad_batch_handling_;
+        return warn_bad_instances_;
     }
 
 private:
     data_reader_params params_;
-    bad_batch_handling bad_batch_handling_;
+    bool warn_bad_instances_{};
     intrusive_ptr<example> peeked_example_{};
 };
 

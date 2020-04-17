@@ -73,9 +73,6 @@ throw_nested_error(std::exception const &exc, py::object const &py_exc)
     catch (not_supported_error const &e) {
         set_nested_error(py_exc, e, "NotSupportedError");
     }
-    catch (field_too_large_error const &e) {
-        set_nested_error(py_exc, e, "FieldTooLargeError");
-    }
     catch (invalid_instance_error const &e) {
         set_nested_error(py_exc, e, "InvalidInstanceError");
     }
@@ -161,7 +158,7 @@ register_exceptions(py::module &m)
         m, "CorruptHeaderError", py_corrupt_record_error);
     register_exception<corrupt_footer_error>(
         m, "CorruptFooterError", py_corrupt_record_error);
-    register_exception<field_too_large_error>(
+    register_exception<record_too_large_error>(
         m, "RecordTooLargeError", py_record_error);
 
     PyObject *py_data_reader_error = register_exception<data_reader_error>(
@@ -170,8 +167,6 @@ register_exceptions(py::module &m)
         m, "SchemaError", py_data_reader_error);
     register_exception<invalid_instance_error>(
         m, "InvalidInstanceError", py_data_reader_error);
-    register_exception<field_too_large_error>(
-        m, "FieldTooLargeError", py_data_reader_error);
 
     register_exception<not_supported_error>(
         m, "NotSupportedError", py_mlio_error);
@@ -189,9 +184,6 @@ register_exceptions(py::module &m)
         }
         catch (not_supported_error const &e) {
             set_error(e, "NotSupportedError");
-        }
-        catch (field_too_large_error const &e) {
-            set_error(e, "FieldTooLargeError");
         }
         catch (invalid_instance_error const &e) {
             set_error(e, "InvalidInstanceError");

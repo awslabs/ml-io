@@ -16,12 +16,16 @@
 #pragma once
 
 #include <array>
+#include <cstdint>
 
 #include "mlio/config.h"
 #include "mlio/parallel_data_reader.h"
+#include "mlio/span.h"
 
 namespace cv {
+
 class Mat;
+
 }  // namespace cv
 
 namespace mlio {
@@ -30,16 +34,22 @@ inline namespace v1 {
 /// @addtogroup data_readers Data Readers
 /// @{
 
-enum class image_frame { none, recordio };
+/// Specifies the frame of an image.
+enum class image_frame {
+    none,     ///< The image is contained in a regular file.
+    recordio  ///< The image is contained in an MXNet RecordIO record.
+};
 
 struct MLIO_API image_reader_params final {
-    /// Enum to identify image_frame. Defaults to none.
+    /// See @ref image_frame.
     image_frame img_frame{image_frame::none};
-    /// Parameter to down scale the shorter edge to a new size
+    /// Scales the shorter edge of the image to the specified size
+    /// before applying other augmentations.
     std::optional<std::size_t> resize{};
-    /// The dimensions of output image in (channels, height, width) format.
+    /// The dimensions of output image in (channels, height, width)
+    /// format.
     std::vector<std::size_t> image_dimensions{};
-    /// Converts from BGR (OpenCV default) to RGB, if set to true.
+    /// A boolean value indicating whether to convert from BGR to RGB.
     bool to_rgb = false;
 };
 
@@ -50,8 +60,7 @@ private:
     static std::size_t constexpr recordio_image_header_offset_ = 24;
 
 public:
-    explicit image_reader(data_reader_params rdr_prm,
-                          image_reader_params image_prm);
+    explicit image_reader(data_reader_params prm, image_reader_params img_prm);
 
     image_reader(image_reader const &) = delete;
 
@@ -79,11 +88,13 @@ private:
     intrusive_ptr<example>
     decode(instance_batch const &batch) const final;
 
-private:
     MLIO_HIDDEN
     intrusive_ptr<dense_tensor>
-    make_tensor(std::vector<instance> const &instances,
-                std::size_t batch_size) const;
+    make_tensor(std::size_t batch_size, std::size_t batch_stride) const;
+
+    MLIO_HIDDEN
+    bool
+    decode_core(stdx::span<std::uint8_t> out, instance const &ins) const;
 
     MLIO_HIDDEN
     cv::Mat
@@ -100,7 +111,7 @@ private:
 private:
     image_reader_params params_;
     std::array<int, image_dimensions_size_> img_dims_{};
-    bad_batch_handling bbh_{};
+    bool error_bad_batch_;
 };
 
 /// @}

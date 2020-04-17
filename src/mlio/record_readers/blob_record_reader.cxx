@@ -15,6 +15,8 @@
 
 #include "mlio/record_readers/blob_record_reader.h"
 
+#include <utility>
+
 #include "mlio/memory/memory_slice.h"
 #include "mlio/record_readers/record.h"
 #include "mlio/streams/input_stream.h"
@@ -32,10 +34,10 @@ blob_record_reader::decode_record(memory_slice &chunk, bool)
     if (chunk.empty()) {
         return {};
     }
-    auto payload = std::move(chunk);
-    auto size = payload.size();
-    chunk = {};
-    return record{std::move(payload), size};
+
+    auto size = chunk.size();
+
+    return record{std::exchange(chunk, {}), size};
 }
 
 }  // namespace v1

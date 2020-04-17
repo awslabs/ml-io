@@ -56,7 +56,8 @@ enum class last_batch_handling {
 enum class bad_batch_handling {
     error,  ///< Throw an exception.
     skip,   ///< Skip the batch.
-    warn    ///< Skip the batch and log a warning message.
+    /// Skip bad instances and pad the batch to the specified batch size.
+    pad
 };
 
 /// Contains the parameters that are common to all @ref data_reader
@@ -80,6 +81,9 @@ struct MLIO_API data_reader_params {
     last_batch_handling last_batch_hnd = last_batch_handling::none;
     /// See @ref bad_batch_handling.
     bad_batch_handling bad_batch_hnd = bad_batch_handling::error;
+    /// A boolean value indicating whether a warning will be output for
+    /// each bad instance.
+    bool warn_bad_instances = true;
     /// The number of @ref instance "data instances" to skip from the
     /// beginning of the dataset.
     std::size_t num_instances_to_skip{};

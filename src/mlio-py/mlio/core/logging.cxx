@@ -51,6 +51,8 @@ public:
     void
     operator()(log_level lvl, std::string_view msg) const
     {
+        py::gil_scoped_acquire acq_gil;
+
         hdl_(lvl, msg);
     }
 

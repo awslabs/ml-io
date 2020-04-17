@@ -38,7 +38,7 @@ inline namespace v1 {
 /// Represents an abstract helper base class for data readers
 /// that support multi-threading.
 class MLIO_API parallel_data_reader : public data_reader_base {
-    enum class state { not_started, running, stopped, faulted };
+    enum class run_state { not_started, running, stopped, faulted };
 
     struct graph_data;
 
@@ -128,7 +128,7 @@ private:
     data_reader_params params_;
     std::unique_ptr<detail::instance_reader> reader_;
     std::unique_ptr<detail::instance_batch_reader> batch_reader_;
-    state state_{};
+    run_state state_{};
     std::unique_ptr<graph_data> graph_;
     std::thread thrd_{};
     std::deque<intrusive_ptr<example>> fill_queue_{};

@@ -122,6 +122,7 @@ make_data_reader_params(std::vector<intrusive_ptr<data_store>> dataset,
                         std::size_t num_parallel_reads,
                         last_batch_handling last_batch_hnd,
                         bad_batch_handling bad_batch_hnd,
+                        bool warn_bad_instances,
                         std::size_t num_instances_to_skip,
                         std::optional<std::size_t> num_instances_to_read,
                         std::size_t shard_index,
@@ -132,25 +133,26 @@ make_data_reader_params(std::vector<intrusive_ptr<data_store>> dataset,
                         bool reshuffle_each_epoch,
                         std::optional<float> subsample_ratio)
 {
-    data_reader_params rdr_prm{};
+    data_reader_params prm{};
 
-    rdr_prm.dataset = std::move(dataset);
-    rdr_prm.batch_size = batch_size;
-    rdr_prm.num_prefetched_batches = num_prefetched_batches;
-    rdr_prm.num_parallel_reads = num_parallel_reads;
-    rdr_prm.last_batch_hnd = last_batch_hnd;
-    rdr_prm.bad_batch_hnd = bad_batch_hnd;
-    rdr_prm.num_instances_to_skip = num_instances_to_skip;
-    rdr_prm.num_instances_to_read = num_instances_to_read;
-    rdr_prm.shard_index = shard_index;
-    rdr_prm.num_shards = num_shards;
-    rdr_prm.shuffle_instances = shuffle_instances;
-    rdr_prm.shuffle_window = shuffle_window;
-    rdr_prm.shuffle_seed = shuffle_seed;
-    rdr_prm.reshuffle_each_epoch = reshuffle_each_epoch;
-    rdr_prm.subsample_ratio = subsample_ratio;
+    prm.dataset = std::move(dataset);
+    prm.batch_size = batch_size;
+    prm.num_prefetched_batches = num_prefetched_batches;
+    prm.num_parallel_reads = num_parallel_reads;
+    prm.last_batch_hnd = last_batch_hnd;
+    prm.bad_batch_hnd = bad_batch_hnd;
+    prm.warn_bad_instances = warn_bad_instances;
+    prm.num_instances_to_skip = num_instances_to_skip;
+    prm.num_instances_to_read = num_instances_to_read;
+    prm.shard_index = shard_index;
+    prm.num_shards = num_shards;
+    prm.shuffle_instances = shuffle_instances;
+    prm.shuffle_window = shuffle_window;
+    prm.shuffle_seed = shuffle_seed;
+    prm.reshuffle_each_epoch = reshuffle_each_epoch;
+    prm.subsample_ratio = subsample_ratio;
 
-    return rdr_prm;
+    return prm;
 }
 
 csv_params
@@ -232,27 +234,26 @@ make_parser_params(std::unordered_set<std::string> nan_values, int base)
 }
 
 intrusive_ptr<csv_reader>
-make_csv_reader(data_reader_params rdr_prm, std::optional<csv_params> csv_prm)
+make_csv_reader(data_reader_params prm, std::optional<csv_params> csv_prm)
 {
     if (csv_prm) {
-        return make_intrusive<csv_reader>(std::move(rdr_prm),
+        return make_intrusive<csv_reader>(std::move(prm),
                                           std::move(csv_prm.value()));
     }
 
-    return make_intrusive<csv_reader>(std::move(rdr_prm));
+    return make_intrusive<csv_reader>(std::move(prm));
 }
 
 intrusive_ptr<image_reader>
-make_image_reader(data_reader_params rdr_prm, image_reader_params img_prm)
+make_image_reader(data_reader_params prm, image_reader_params img_prm)
 {
-    return make_intrusive<image_reader>(std::move(rdr_prm),
-                                        std::move(img_prm));
+    return make_intrusive<image_reader>(std::move(prm), std::move(img_prm));
 }
 
 intrusive_ptr<recordio_protobuf_reader>
-make_recordio_protobuf_reader(data_reader_params rdr_prm)
+make_recordio_protobuf_reader(data_reader_params prm)
 {
-    return make_intrusive<recordio_protobuf_reader>(std::move(rdr_prm));
+    return make_intrusive<recordio_protobuf_reader>(std::move(prm));
 }
 
 intrusive_ptr<text_line_reader>
@@ -291,21 +292,21 @@ register_data_readers(py::module &m)
         "handled.")
         .value("ERROR", bad_batch_handling::error, "Raise an error.")
         .value("SKIP", bad_batch_handling::skip, "Skip the batch.")
-        .value("WARN",
-               bad_batch_handling::warn,
-               "Skip the batch and log a warning message.");
+        .value("PAD",
+               bad_batch_handling::pad,
+               "Skip bad instances and pad the batch to the specified batch "
+               "size.");
 
     py::enum_<max_field_length_handling>(
         m,
         "MaxFieldLengthHandling",
         "Specifies how field and columns should be handled when breached.")
-        .value("ERROR", max_field_length_handling::error, "Raise an error.")
+        .value("TREAT_AS_BAD",
+               max_field_length_handling::treat_as_bad,
+               "Treat the corresponding row as bad.")
         .value("TRUNCATE",
                max_field_length_handling::truncate,
-               "Truncate the field.")
-        .value("WARN",
-               max_field_length_handling::warn,
-               "Truncate the field and log a warning message.");
+               "Truncate the field.");
 
     py::enum_<image_frame>(
         m, "ImageFrame", "Specifies the image_frame parameter value")
@@ -330,6 +331,7 @@ register_data_readers(py::module &m)
              "num_parallel_reads"_a = 0,
              "last_batch_handling"_a = last_batch_handling::none,
              "bad_batch_handling"_a = bad_batch_handling::error,
+             "warn_bad_instances"_a = true,
              "num_instances_to_skip"_a = 0,
              "num_instances_to_read"_a = std::nullopt,
              "shard_index"_a = 0,
@@ -360,6 +362,9 @@ register_data_readers(py::module &m)
                 See ``LastBatchHandling``.
             bad_batch_handling : BadBatchHandling
                 See ``BadBatchHandling``.
+            warn_bad_instances : bool, optional
+                A boolean value indicating whether a warning will be output for
+                each bad instance.
             num_instances_to_skip : int, optional
                 The number of data instances to skip from the beginning of the
                 dataset.
@@ -445,7 +450,8 @@ register_data_readers(py::module &m)
              "skip_blank_lines"_a = true,
              "encoding"_a = std::nullopt,
              "max_field_length"_a = std::nullopt,
-             "max_field_length_handling"_a = max_field_length_handling::error,
+             "max_field_length_handling"_a =
+                 max_field_length_handling::treat_as_bad,
              "max_line_length"_a = std::nullopt,
              "parser_params"_a = std::nullopt,
              R"(
