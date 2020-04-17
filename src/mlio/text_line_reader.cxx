@@ -18,18 +18,22 @@
 #include <string>
 
 #include "mlio/cpu_array.h"
+#include "mlio/data_type.h"
+#include "mlio/example.h"
 #include "mlio/instance.h"
 #include "mlio/instance_batch.h"
 #include "mlio/record_readers/text_line_record_reader.h"
 #include "mlio/streams/utf8_input_stream.h"
+#include "mlio/tensor.h"
+#include "mlio/util/string.h"
 
 using mlio::detail::text_line_record_reader;
 
 namespace mlio {
 inline namespace v1 {
 
-text_line_reader::text_line_reader(data_reader_params rdr_prm)
-    : parallel_data_reader{std::move(rdr_prm)}
+text_line_reader::text_line_reader(data_reader_params prm)
+    : parallel_data_reader{std::move(prm)}
 {}
 
 text_line_reader::~text_line_reader()
@@ -47,8 +51,9 @@ text_line_reader::make_record_reader(data_store const &ds)
 intrusive_ptr<schema const>
 text_line_reader::infer_schema(std::optional<instance> const &)
 {
-    std::vector<attribute> attrs{
-        attribute{"value", data_type::string, {params().batch_size, 1}}};
+    std::vector<attribute> attrs{};
+    attrs.emplace_back(
+        "value", data_type::string, size_vector{params().batch_size, 1});
 
     return make_intrusive<schema>(std::move(attrs));
 }
@@ -56,22 +61,32 @@ text_line_reader::infer_schema(std::optional<instance> const &)
 intrusive_ptr<example>
 text_line_reader::decode(instance_batch const &batch) const
 {
-    std::vector<std::string> strs{};
-    strs.reserve(batch.instances().size());
+    intrusive_ptr<dense_tensor> tsr = make_tensor(batch.size());
+
+    auto row_pos = tsr->data().as<std::string>().begin();
 
     for (instance const &ins : batch.instances()) {
-        auto tmp = as_span<char const>(ins.bits());
-        strs.emplace_back(tmp.data(), 0, tmp.size());
+        *row_pos++ = as_string_view(ins.bits());
     }
 
-    size_vector shp{batch.size(), 1};
+    std::vector<intrusive_ptr<tensor>> tensors{};
+    tensors.emplace_back(std::move(tsr));
 
-    auto arr = wrap_cpu_array<data_type::string>(std::move(strs));
+    auto exm = make_intrusive<example>(get_schema(), std::move(tensors));
 
-    std::vector<intrusive_ptr<tensor>> tensors{
-        make_intrusive<dense_tensor>(std::move(shp), std::move(arr))};
+    exm->padding = batch.size() - batch.instances().size();
 
-    return make_intrusive<example>(get_schema(), std::move(tensors));
+    return exm;
+}
+
+intrusive_ptr<dense_tensor>
+text_line_reader::make_tensor(std::size_t batch_size)
+{
+    size_vector shp{batch_size, 1};
+
+    auto arr = make_cpu_array(data_type::string, batch_size);
+
+    return make_intrusive<dense_tensor>(std::move(shp), std::move(arr));
 }
 
 }  // namespace v1

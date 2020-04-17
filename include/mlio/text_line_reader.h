@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "mlio/config.h"
+#include "mlio/fwd.h"
 #include "mlio/intrusive_ptr.h"
 #include "mlio/parallel_data_reader.h"
 
@@ -31,7 +32,7 @@ inline namespace v1 {
 /// Represents a @ref data_reader for reading simple text-based datasets.
 class MLIO_API text_line_reader final : public parallel_data_reader {
 public:
-    explicit text_line_reader(data_reader_params rdr_prm);
+    explicit text_line_reader(data_reader_params prm);
 
     text_line_reader(text_line_reader const &) = delete;
 
@@ -55,6 +56,9 @@ private:
 
     intrusive_ptr<example>
     decode(instance_batch const &batch) const final;
+
+    static intrusive_ptr<dense_tensor>
+    make_tensor(std::size_t batch_size);
 };
 
 /// @}
