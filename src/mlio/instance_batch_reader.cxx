@@ -35,20 +35,25 @@ instance_batch_reader::instance_batch_reader(data_reader_params const &prm,
             "The batch size must be greater than zero."};
     }
 
-    if (params_->subsample_ratio == std::nullopt) {
-        return;
+    if (params_->subsample_ratio) {
+        init_num_instances_to_skip();
     }
+}
 
-    float sbr = *params_->subsample_ratio;
-    if (sbr <= 0.0F || sbr >= 1.0F) {
+void
+instance_batch_reader::init_num_instances_to_skip()
+{
+    float sr = *params_->subsample_ratio;
+    if (sr <= 0.0F || sr >= 1.0F) {
         throw std::invalid_argument{"The subsampling ratio must be greater "
                                     "than zero and less than one."};
     }
 
-    auto tmp = static_cast<float>(params_->batch_size);
+    std::size_t batch_size = params_->batch_size;
 
-    num_instances_to_skip_ =
-        static_cast<std::size_t>(tmp / sbr) - params_->batch_size;
+    auto size = static_cast<float>(batch_size) / sr;
+
+    num_instances_to_skip_ = static_cast<std::size_t>(size) - batch_size;
 }
 
 std::optional<instance_batch>

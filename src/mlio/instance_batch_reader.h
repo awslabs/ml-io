@@ -39,6 +39,10 @@ public:
     reset() noexcept;
 
 private:
+    void
+    init_num_instances_to_skip();
+
+private:
     data_reader_params const *params_;
     instance_reader *reader_;
     std::size_t num_instances_to_skip_{};
