@@ -115,10 +115,27 @@ image_reader::decode(instance_batch const &batch) const
             if (params().bad_batch_hnd == bad_batch_handling::skip) {
                 return {};
             }
-            if (params().bad_batch_hnd != bad_batch_handling::pad) {
+            if (params().bad_batch_hnd == bad_batch_handling::skip_warn) {
+                logger::warn("The example #{0:n} has been skipped as it had "
+                             "at least one bad instance.",
+                             batch.index());
+
+                return {};
+            }
+            if (params().bad_batch_hnd != bad_batch_handling::pad &&
+                params().bad_batch_hnd != bad_batch_handling::pad_warn) {
                 throw std::invalid_argument{
                     "The specified bad batch handling is invalid."};
             }
+        }
+    }
+
+    if (batch.instances().size() != num_instances_read) {
+        if (params().bad_batch_hnd == bad_batch_handling::pad_warn) {
+            logger::warn("The example #{0:n} has been padded as it had {1:n} "
+                         "bad instance(s).",
+                         batch.index(),
+                         batch.instances().size() - num_instances_read);
         }
     }
 

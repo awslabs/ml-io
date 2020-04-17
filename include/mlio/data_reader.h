@@ -42,22 +42,37 @@ enum class last_batch_handling {
     none,
     /// Drop the last @ref example.
     drop,
+    /// Drop the last @ref example and warn.
+    drop_warn,
     /// Pad the feature tensors with zero so that the size of the batch
     /// dimension equals the requested batch size.
     ///
     /// @remark
     ///     The @ref example::padding field will indicate how much
     ///     padding was applied to the @ref example.
-    pad
+    pad,
+    /// Pad the feature tensors with zero so that the size of the batch
+    /// dimension equals the requested batch size and warn.
+    ///
+    /// @remark
+    ///     The @ref example::padding field will indicate how much
+    ///     padding was applied to the @ref example.
+    pad_warn
 };
 
 /// Specifies how a batch that contains erroneous data should be
 /// handled.
 enum class bad_batch_handling {
-    error,  ///< Throw an exception.
-    skip,   ///< Skip the batch.
-    /// Skip bad instances and pad the batch to the specified batch size.
-    pad
+    /// Throw exception.
+    error,
+    /// Skip the batch.
+    skip,
+    /// Skip the batch and warn.
+    skip_warn,
+    /// Skip bad instances, pad the batch to the batch size.
+    pad,
+    /// Skip bad instances, pad the batch to the batch size, and warn.
+    pad_warn
 };
 
 /// Contains the parameters that are common to all @ref data_reader

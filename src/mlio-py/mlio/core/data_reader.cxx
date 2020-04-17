@@ -279,11 +279,19 @@ register_data_readers(py::module &m)
             "Return an ``example`` where the size of the batch dimension is "
             "less than the requested batch size.")
         .value("DROP", last_batch_handling::drop, "Drop the last ``example``.")
+        .value("DROP_WARN",
+               last_batch_handling::drop_warn,
+               "Drop the last ``example`` and warn.")
         .value(
             "PAD",
             last_batch_handling::pad,
             "Pad the feature tensors with zero so that the size of the batch "
-            "dimension equals the requested batch size.");
+            "dimension equals the requested batch size.")
+        .value(
+            "PAD_WARN",
+            last_batch_handling::pad_warn,
+            "Pad the feature tensors with zero so that the size of the batch "
+            "dimension equals the requested batch size and warn.");
 
     py::enum_<bad_batch_handling>(
         m,
@@ -292,10 +300,16 @@ register_data_readers(py::module &m)
         "handled.")
         .value("ERROR", bad_batch_handling::error, "Raise an error.")
         .value("SKIP", bad_batch_handling::skip, "Skip the batch.")
+        .value("SKIP_WARN",
+               bad_batch_handling::skip_warn,
+               "Skip the batch and warn.")
         .value("PAD",
                bad_batch_handling::pad,
-               "Skip bad instances and pad the batch to the specified batch "
-               "size.");
+               "Skip bad instances, pad the batch to the batch size.")
+        .value(
+            "PAD_WARN",
+            bad_batch_handling::pad_warn,
+            "Skip bad instances, pad the batch to the batch size, and warn.");
 
     py::enum_<max_field_length_handling>(
         m,
@@ -306,7 +320,10 @@ register_data_readers(py::module &m)
                "Treat the corresponding row as bad.")
         .value("TRUNCATE",
                max_field_length_handling::truncate,
-               "Truncate the field.");
+               "Truncate the field.")
+        .value("TRUNCATE_WARN",
+               max_field_length_handling::truncate_warn,
+               "Truncate the field and warn.");
 
     py::enum_<image_frame>(
         m, "ImageFrame", "Specifies the image_frame parameter value")

@@ -66,16 +66,28 @@ instance_batch_reader::read_instance_batch()
         instances.emplace_back(std::move(*ins));
     }
 
+    if (instances.empty()) {
+        return {};
+    }
+
     if (instances.size() != params_->batch_size) {
         if (params_->last_batch_hnd == last_batch_handling::drop) {
-            logger::debug("The last batch has been dropped.");
+            return {};
+        }
+        if (params_->last_batch_hnd == last_batch_handling::drop_warn) {
+            logger::warn("The last example has been dropped as it had only "
+                         "{0:n} instance(s) while the batch size is {1:n}.",
+                         instances.size(),
+                         params_->batch_size);
 
             return {};
         }
-    }
-
-    if (instances.empty()) {
-        return {};
+        if (params_->last_batch_hnd == last_batch_handling::pad_warn) {
+            logger::warn("The last example has been padded as it had only "
+                         "{0:n} instance(s) while the batch size is {1:n}.",
+                         instances.size(),
+                         params_->batch_size);
+        }
     }
 
     for (std::size_t i = 0; i < num_instances_to_skip_; i++) {

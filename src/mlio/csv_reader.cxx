@@ -434,6 +434,8 @@ csv_reader::decode(instance_batch const &batch) const
 
     decoder_state state{*this, tensors};
 
+    std::size_t num_instances = batch.instances().size();
+
     constexpr std::size_t cut_off = 10'000'000;
 
     bool serial =
@@ -441,11 +443,12 @@ csv_reader::decode(instance_batch const &batch) const
         // decoding as good records must be stacked together without
         // any gap in between.
         params().bad_batch_hnd == bad_batch_handling::pad ||
+        params().bad_batch_hnd == bad_batch_handling::pad_warn ||
         // If the number of values (e.g. integers, floating-points) we
         // need to decode is below the cut-off, avoid parallel
         // execution; otherwise the threading overhead will slow down
         // the performance.
-        column_names_.size() * batch.instances().size() < cut_off;
+        column_names_.size() * num_instances < cut_off;
 
     std::optional<std::size_t> num_instances_read{};
     if (serial) {
@@ -458,7 +461,22 @@ csv_reader::decode(instance_batch const &batch) const
     // Check if we failed to decode the batch and return a null pointer
     // if that is the case.
     if (num_instances_read == std::nullopt) {
+        if (params().bad_batch_hnd == bad_batch_handling::skip_warn) {
+            logger::warn("The example #{0:n} has been skipped as it had at "
+                         "least one bad instance.",
+                         batch.index());
+        }
+
         return nullptr;
+    }
+
+    if (num_instances != *num_instances_read) {
+        if (params().bad_batch_hnd == bad_batch_handling::pad_warn) {
+            logger::warn("The example #{0:n} has been padded as it had {1:n} "
+                         "bad instance(s).",
+                         batch.index(),
+                         num_instances - *num_instances_read);
+        }
     }
 
     auto exm = make_intrusive<example>(get_schema(), std::move(tensors));
@@ -547,14 +565,12 @@ csv_reader::decode_ser(decoder_state &state, instance_batch const &batch) const
         else {
             // If the user requested to skip the batch in case of an
             // error, shortcut the loop and return immediately.
-            if (params().bad_batch_hnd == bad_batch_handling::skip) {
+            if (params().bad_batch_hnd == bad_batch_handling::skip ||
+                params().bad_batch_hnd == bad_batch_handling::skip_warn) {
                 return {};
             }
-            // We do not increment the row index if the requested bad
-            // batch handling mode is pad. This way we make sure that
-            // corrupt records are skipped and good records are stacked
-            // together.
-            if (params().bad_batch_hnd != bad_batch_handling::pad) {
+            if (params().bad_batch_hnd != bad_batch_handling::pad &&
+                params().bad_batch_hnd != bad_batch_handling::pad_warn) {
                 throw std::invalid_argument{
                     "The specified bad batch handling is invalid."};
             }
@@ -596,7 +612,8 @@ csv_reader::decode_prl(decoder_state &state, instance_batch const &batch) const
             if (!dc.decode(std::get<0>(ins_zip), std::get<1>(ins_zip))) {
                 // If we failed to decode the instance, we can
                 // terminate the task and skip this batch.
-                if (params().bad_batch_hnd == bad_batch_handling::skip) {
+                if (params().bad_batch_hnd == bad_batch_handling::skip ||
+                    params().bad_batch_hnd == bad_batch_handling::skip_warn) {
                     skip_batch = true;
 
                     return;
@@ -650,31 +667,37 @@ csv_reader::decoder<ColIt>::decode(std::size_t row_idx, instance const &ins)
         // Check if we truncated the field.
         if (tokenizer_->is_truncated()) {
             auto mflh = state_->reader->params_.max_field_length_hnd;
-            if (mflh == max_field_length_handling::treat_as_bad) {
-                if (state_->warn_bad_instance || state_->error_bad_batch) {
-                    std::string const &name = std::get<1>(*col_pos);
 
-                    auto msg = fmt::format(
-                        "The column '{2}' of the row #{1:n} in the data store "
-                        "'{0}' is too long. Its truncated value is '{3:.64}'.",
-                        ins.get_data_store().id(),
-                        ins.index(),
-                        name,
-                        tokenizer_->value());
+            if (mflh == max_field_length_handling::treat_as_bad ||
+                mflh == max_field_length_handling::truncate_warn) {
+                std::string const &name = std::get<1>(*col_pos);
 
-                    if (state_->warn_bad_instance) {
-                        logger::warn(msg);
-                    }
+                auto msg = fmt::format(
+                    "The column '{2}' of the row #{1:n} in the data store "
+                    "'{0}' is too long. Its truncated value is '{3:.64}'.",
+                    ins.get_data_store().id(),
+                    ins.index(),
+                    name,
+                    tokenizer_->value());
 
-                    if (state_->error_bad_batch) {
-                        throw invalid_instance_error{msg};
-                    }
+                if (mflh == max_field_length_handling::truncate_warn) {
+                    logger::warn(msg);
                 }
+                else {
+                    if (state_->warn_bad_instance || state_->error_bad_batch) {
+                        if (state_->warn_bad_instance) {
+                            logger::warn(msg);
+                        }
 
-                return false;
+                        if (state_->error_bad_batch) {
+                            throw invalid_instance_error{msg};
+                        }
+                    }
+
+                    return false;
+                }
             }
-
-            if (mflh != max_field_length_handling::truncate) {
+            else if (mflh != max_field_length_handling::truncate) {
                 throw std::invalid_argument{
                     "The specified maximum field length handling is invalid."};
             }

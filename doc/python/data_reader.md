@@ -301,20 +301,24 @@ Gets a boolean value indicating whether the attribute is sparse or dense.
 ### LastBatchHandling
 Specifies how the last batch read from a dataset should be handled if the dataset size is not evenly divisible by the batch size.
 
-| Value  | Description                                            |
-|--------|--------------------------------------------------------|
-| `NONE` | Return an [`Example`](#Example) where the size of the batch dimension is less that the requested batch size. |
-| `DROP` | Drop the last [`Example`](#Example). |
-| `PAD`  | Pad the features of the [`Example`](#Example) with zero so that the size of the batch dimension equals the requested batch size. |
+| Value      | Description                                                                                                                               |
+|------------|-------------------------------------------------------------------------------------------------------------------------------------------|
+| `NONE`     | Return an [`Example`](#Example) where the size of the batch dimension is less that the requested batch size.                              |
+| `DROP`     | Drop the last [`Example`](#Example).                                                                                                      |
+| `DROP_WARN`| Drop the last [`Example`](#Example) and warn.                                                                                             |
+| `PAD`      | Pad the features of the [`Example`](#Example) with zero so that the size of the batch dimension equals the requested batch size.          |
+| `PAD_WARN` | Pad the features of the [`Example`](#Example) with zero so that the size of the batch dimension equals the requested batch size and warn. |
 
 ### BadBatchHandling
 Specifies how a batch that contains erroneous data should be handled.
 
-| Value   | Description                                                       |
-|---------|-------------------------------------------------------------------|
-| `ERROR` | Raise an error.                                                   |
-| `SKIP`  | Skip the batch.                                                   |
-| `PAD`   | Skip bad instances and pad the batch to the specified batch size. |
+| Value       | Description                                                    |
+|-------------|----------------------------------------------------------------|
+| `ERROR`     | Raise an error.                                                |
+| `SKIP`      | Skip the batch.                                                |
+| `SKIP_WARN` | Skip the batch and warn.                                       |
+| `PAD`       | Skip bad instances, pad the batch to the batch size.           |
+| `PAD_WARN`  | Skip bad instances, pad the batch to the batch size, and warn. |
 
 ### ImageFrame
 Specifies what image frame to use for reading an image dataset.
@@ -327,10 +331,11 @@ Specifies what image frame to use for reading an image dataset.
 ### MaxFieldLengthHandling
 Specifies how field and columns should be handled when breached.
 
-| Value          | Description                                   |
-|----------------|-----------------------------------------------|
-| `TREAT_AS_BAD` | Treat the corresponding row as bad.           |
-| `TRUNCATE`     | Truncate the field.                           |
+| Value           | Description                         |
+|-----------------|-------------------------------------|
+| `TREAT_AS_BAD`  | Treat the corresponding row as bad. |
+| `TRUNCATE`      | Truncate the field.                 |
+| `TRUNCATE_WARN` | Truncate the field and warn.        |
 
 
 ## Exceptions

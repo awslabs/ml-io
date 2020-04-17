@@ -37,7 +37,8 @@ inline namespace v1 {
 /// Specifies how field limits should be enforced.
 enum class max_field_length_handling {
     treat_as_bad,  ///< Treat the corresponding row as bad.
-    truncate       ///< Truncate the field.
+    truncate,      ///< Truncate the field.
+    truncate_warn  ///< Truncate the field and warn.
 };
 
 /// @addtogroup data_readers Data Readers

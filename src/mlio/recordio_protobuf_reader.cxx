@@ -302,6 +302,8 @@ recordio_protobuf_reader::decode(instance_batch const &batch) const
 {
     decoder_state state{*this, batch.size()};
 
+    std::size_t num_instances = batch.instances().size();
+
     constexpr std::size_t cut_off = 10'000'000;
 
     bool serial =
@@ -313,11 +315,12 @@ recordio_protobuf_reader::decode(instance_batch const &batch) const
         // decoding as good records must be stacked together without
         // any gap in between.
         params().bad_batch_hnd == bad_batch_handling::pad ||
+        params().bad_batch_hnd == bad_batch_handling::pad_warn ||
         // If the number of values (e.g. integers, floating-points) we
         // need to decode is below the cut-off, avoid parallel
         // execution; otherwise the threading overhead will slow down
         // the performance.
-        num_values_per_instance_ * batch.instances().size() < cut_off;
+        num_values_per_instance_ * num_instances < cut_off;
 
     std::optional<std::size_t> num_instances_read{};
     if (serial) {
@@ -330,7 +333,22 @@ recordio_protobuf_reader::decode(instance_batch const &batch) const
     // Check if we failed to decode the batch and return a null pointer
     // if that is the case.
     if (num_instances_read == std::nullopt) {
+        if (params().bad_batch_hnd == bad_batch_handling::skip_warn) {
+            logger::warn("The example #{0:n} has been skipped as it had at "
+                         "least one bad instance.",
+                         batch.index());
+        }
+
         return nullptr;
+    }
+
+    if (num_instances != *num_instances_read) {
+        if (params().bad_batch_hnd == bad_batch_handling::pad_warn) {
+            logger::warn("The example #{0:n} has been padded as it had {1:n} "
+                         "bad instance(s).",
+                         batch.index(),
+                         num_instances - *num_instances_read);
+        }
     }
 
     auto tsr_beg = state.tensors.begin();
@@ -373,14 +391,12 @@ recordio_protobuf_reader::decode_ser(decoder_state &state,
         else {
             // If the user requested to skip the batch in case of an
             // error, shortcut the loop and return immediately.
-            if (params().bad_batch_hnd == bad_batch_handling::skip) {
+            if (params().bad_batch_hnd == bad_batch_handling::skip ||
+                params().bad_batch_hnd == bad_batch_handling::skip_warn) {
                 return {};
             }
-            // We do not increment the row index if the requested bad
-            // batch handling mode is pad. This way we make sure that
-            // corrupt records are skipped and good records are stacked
-            // together.
-            if (params().bad_batch_hnd != bad_batch_handling::pad) {
+            if (params().bad_batch_hnd != bad_batch_handling::pad &&
+                params().bad_batch_hnd != bad_batch_handling::pad_warn) {
                 throw std::invalid_argument{
                     "The specified bad batch handling is invalid."};
             }
@@ -415,7 +431,8 @@ recordio_protobuf_reader::decode_prl(decoder_state &state,
             if (!dc.decode(std::get<0>(ins_zip), std::get<1>(ins_zip))) {
                 // If we failed to decode the instance, we can
                 // terminate the task and skip this batch.
-                if (params().bad_batch_hnd == bad_batch_handling::skip) {
+                if (params().bad_batch_hnd == bad_batch_handling::skip ||
+                    params().bad_batch_hnd == bad_batch_handling::skip_warn) {
                     skip_batch = true;
 
                     return;
