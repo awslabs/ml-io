@@ -68,7 +68,7 @@ TEST_F(test_recordio_protobuf_reader, test_corrupt_split_records_patH)
     prm.batch_size = 10;
     prm.num_prefetched_batches = 1;
 
-    std::string error_substring = "The record 13 in the data store";
+    std::string error_substring = "The record #13 in the data store";
 
     auto reader = mlio::make_intrusive<mlio::recordio_protobuf_reader>(prm);
     mlio::intrusive_ptr<mlio::example> exm;

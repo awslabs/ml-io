@@ -64,7 +64,6 @@ text_line_reader::decode(instance_batch const &batch) const
     intrusive_ptr<dense_tensor> tsr = make_tensor(batch.size());
 
     auto row_pos = tsr->data().as<std::string>().begin();
-
     for (instance const &ins : batch.instances()) {
         *row_pos++ = as_string_view(ins.bits());
     }

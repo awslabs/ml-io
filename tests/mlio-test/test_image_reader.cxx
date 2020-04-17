@@ -57,7 +57,7 @@ protected:
         "height, width) format."};
     std::string invalid_image_dimensions_exception_{
         "The input image dimensions (rows: 166, cols: 190) are smaller than "
-        "the output image dimensions (rows: 500, cols: 500) for the image 0 "
+        "the output image dimensions (rows: 500, cols: 500) for the image #0 "
         "in the data store"};
 
 public:

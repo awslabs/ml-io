@@ -64,7 +64,7 @@ recordio_record_reader::decode_record(memory_slice &chunk,
         }
 
         throw corrupt_header_error{fmt::format(
-            "The record payload has a size of {0:n} byte(s), while the size "
+            "The record payload has a size of {0:n} byte(s) while the size "
             "specified in the RecordIO header is {1:n} byte(s).",
             chunk.size() - hdr->size(),
             aligned_payload_size)};

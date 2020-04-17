@@ -151,11 +151,11 @@ recordio_protobuf_reader::infer_schema(std::optional<instance> const &ins)
 
     Record const *proto_msg = parse_proto(*ins);
     if (proto_msg == nullptr) {
-        throw schema_error{fmt::format(
-            "The instance {1:n} in the data store {0} contains a corrupt "
-            "RecordIO-protobuf message.",
-            ins->get_data_store(),
-            ins->index() + 1)};
+        throw schema_error{
+            fmt::format("The instance #{1:n} in the data store '{0}' contains "
+                        "a corrupt RecordIO-protobuf message.",
+                        ins->get_data_store().id(),
+                        ins->index())};
     }
 
     std::vector<attribute> attrs{};
@@ -176,7 +176,7 @@ recordio_protobuf_reader::infer_schema(std::optional<instance> const &ins)
     // amount of data we need to process is worth to parallelize.
     for (attribute const &attr : shm->attributes()) {
         if (!attr.sparse()) {
-            // The stride of the batch dimension.
+            // Add the stride of the batch dimension.
             num_values_per_instance_ += as_size(attr.strides()[0]);
         }
     }
@@ -210,12 +210,12 @@ recordio_protobuf_reader::make_attribute(instance const &ins,
         break;
     }
 
-    throw schema_error{fmt::format(
-        "The feature '{2}' of the instance {1:n} in the data store {0} has an "
-        "unsupported data type.",
-        ins.get_data_store(),
-        ins.index() + 1,
-        name)};
+    throw schema_error{
+        fmt::format("The feature '{2}' of the instance #{1:n} in the data "
+                    "store '{0}' has an unsupported data type.",
+                    ins.get_data_store().id(),
+                    ins.index(),
+                    name)};
 }
 
 template<data_type dt, typename ProtobufTensor>
@@ -251,10 +251,10 @@ recordio_protobuf_reader::make_attribute(instance const &ins,
 
         if (tsr.shape().empty()) {
             throw schema_error{fmt::format(
-                "The sparse feature '{2}' of the instance {1:n} in the data "
-                "store {0} has no shape specified.",
-                ins.get_data_store(),
-                ins.index() + 1,
+                "The sparse feature '{2}' of the instance #{1:n} in the data "
+                "store '{0}' has no shape specified.",
+                ins.get_data_store().id(),
+                ins.index(),
                 name)};
         }
 
@@ -283,13 +283,14 @@ recordio_protobuf_reader::copy_shape(instance const &ins,
             std::size_t s =
                 std::numeric_limits<std::byte>::digits * sizeof(std::size_t);
 
-            throw schema_error{fmt::format(
-                "The shape of the feature '{2}' of the instance {1:n} in the "
-                "data store {0} has a dimension that is larger than {3}-bits.",
-                ins.get_data_store(),
-                ins.index() + 1,
-                name,
-                s)};
+            throw schema_error{
+                fmt::format("The shape of the feature '{2}' of the instance "
+                            "#{1:n} in the data store '{0}' has a dimension "
+                            "that is larger than {3}-bits.",
+                            ins.get_data_store().id(),
+                            ins.index(),
+                            name,
+                            s)};
         }
 
         shp.emplace_back(d);
@@ -344,9 +345,8 @@ recordio_protobuf_reader::decode(instance_batch const &batch) const
     for (auto ftr_pos = ftr_beg; ftr_pos < ftr_end; ++ftr_pos) {
         intrusive_ptr<tensor> &tsr = std::get<0>(*ftr_pos);
 
-        // If no tensor exists at the specified location, it means the
-        // corresponding feature was sparse. We should build its tensor
-        // as we processed the whole batch now.
+        // If no tensor exists at the specified index, it means the
+        // corresponding feature was sparse. We should build its tensor.
         if (tsr == nullptr) {
             tsr = std::get<1>(*ftr_pos)->build();
         }
@@ -537,18 +537,18 @@ recordio_protobuf_reader::decoder::decode(std::size_t row_idx,
 
     auto const &shm = state_->reader->get_schema();
 
-    // Make sure that we read all the features for which we
-    // have an attribute in the schema.
+    // Make sure that we read all the features for which we have an
+    // attribute in the schema.
     if (num_features_read == shm->attributes().size()) {
         return true;
     }
 
     if (state_->warn_bad_instance || state_->error_bad_batch) {
         auto msg = fmt::format(
-            "The instance {1:n} in the data store {0} has {2:n} feature(s) "
+            "The instance #{1:n} in the data store '{0}' has {2:n} feature(s) "
             "while the expected number of features is {3:n}.",
-            instance_->get_data_store(),
-            instance_->index() + 1,
+            instance_->get_data_store().id(),
+            instance_->index(),
             num_features_read,
             shm->attributes().size());
 
@@ -574,10 +574,10 @@ recordio_protobuf_reader::decoder::parse_proto(instance const &ins) const
 
     if (state_->warn_bad_instance || state_->error_bad_batch) {
         auto msg = fmt::format(
-            "The instance {1:n} in the data store {0} contains a corrupt "
+            "The instance #{1:n} in the data store '{0}' contains a corrupt "
             "RecordIO-protobuf message.",
-            instance_->get_data_store(),
-            instance_->index() + 1);
+            instance_->get_data_store().id(),
+            instance_->index());
 
         if (state_->warn_bad_instance) {
             logger::warn(msg);
@@ -601,10 +601,10 @@ recordio_protobuf_reader::decoder::decode_feature(std::string const &name,
     if (attr_idx == std::nullopt) {
         if (state_->warn_bad_instance || state_->error_bad_batch) {
             auto msg = fmt::format(
-                "The instance {1:n} in the data store {0} has an unknown "
+                "The instance #{1:n} in the data store '{0}' has an unknown "
                 "feature named '{2}'.",
-                instance_->get_data_store(),
-                instance_->index() + 1,
+                instance_->get_data_store().id(),
+                instance_->index(),
                 name);
 
             if (state_->warn_bad_instance) {
@@ -640,10 +640,10 @@ recordio_protobuf_reader::decoder::decode_feature(std::string const &name,
 
     if (state_->warn_bad_instance || state_->error_bad_batch) {
         auto msg = fmt::format(
-            "The feature '{2}' of the instance {1:n} in the data store {0} "
+            "The feature '{2}' of the instance #{1:n} in the data store '{0}' "
             "has an unexpected data type.",
-            instance_->get_data_store(),
-            instance_->index() + 1,
+            instance_->get_data_store().id(),
+            instance_->index(),
             attr_->name());
 
         if (state_->warn_bad_instance) {
@@ -665,11 +665,11 @@ recordio_protobuf_reader::decoder::decode_feature(ProtobufTensor const &tsr)
     if (attr_->dtype() != dt) {
         if (state_->warn_bad_instance || state_->error_bad_batch) {
             auto msg = fmt::format(
-                "The feature '{2}' of the instance {1:n} in the data store "
-                "{0} has the data type {3}, while the expected data type is "
+                "The feature '{2}' of the instance #{1:n} in the data store "
+                "'{0}' has the data type {3} while the expected data type is "
                 "{4}.",
-                instance_->get_data_store(),
-                instance_->index() + 1,
+                instance_->get_data_store().id(),
+                instance_->index(),
                 attr_->name(),
                 dt,
                 attr_->dtype());
@@ -690,18 +690,19 @@ recordio_protobuf_reader::decoder::decode_feature(ProtobufTensor const &tsr)
         if (state_->warn_bad_instance || state_->error_bad_batch) {
             char const *ft{};
             if (attr_->sparse()) {
-                ft = "The feature '{2}' of the instance {1:n} in the data "
-                     "store {0} is sparse, while the expected storage type is "
-                     "dense.";
+                ft =
+                    "The feature '{2}' of the instance #{1:n} in the data "
+                    "store '{0}' is sparse while the expected storage type is "
+                    "dense.";
             }
             else {
-                ft = "The feature '{2}' of the instance {1:n} in the data "
-                     "store {0} is dense, while the expected storage type is "
+                ft = "The feature '{2}' of the instance #{1:n} in the data "
+                     "store '{0}' is dense while the expected storage type is "
                      "sparse.";
             }
             auto msg = fmt::format(ft,
-                                   instance_->get_data_store(),
-                                   instance_->index() + 1,
+                                   instance_->get_data_store().id(),
+                                   instance_->index(),
                                    attr_->name());
 
             if (state_->warn_bad_instance) {
@@ -729,10 +730,10 @@ recordio_protobuf_reader::decoder::decode_feature(ProtobufTensor const &tsr)
             size_vector const &shape = attr_->shape();
 
             auto msg = fmt::format(
-                "The feature '{2}' of the instance {1:n} in the data store "
-                "{0} has the shape ({3}), while the expected shape is ({4}).",
-                instance_->get_data_store(),
-                instance_->index() + 1,
+                "The feature '{2}' of the instance #{1:n} in the data store "
+                "'{0}' has the shape ({3}) while the expected shape is ({4}).",
+                instance_->get_data_store().id(),
+                instance_->index(),
                 attr_->name(),
                 pshp,
                 fmt::join(shape.begin() + 1, shape.end(), ", "));
@@ -785,8 +786,7 @@ recordio_protobuf_reader::decoder::shape_equals(
     }
 
     auto shp_size = static_cast<std::size_t>(tsr.shape().size());
-    // Note that we should skip the batch dimension while comparing the
-    // two shapes.
+    // We should skip the batch dimension while comparing the shapes.
     if (shape.size() - 1 != shp_size) {
         return false;
     }
@@ -818,10 +818,10 @@ recordio_protobuf_reader::decoder::copy_to_tensor(
             size_vector const &shape = attr_->shape();
 
             auto msg = fmt::format(
-                "The feature '{2}' of the instance {1:n} in the data store "
-                "{0} has {3:n} values(s) but a shape of ({4:n}).",
-                instance_->get_data_store(),
-                instance_->index() + 1,
+                "The feature '{2}' of the instance #{1:n} in the data store "
+                "'{0}' has {3:n} values(s) but a shape of ({4:n}).",
+                instance_->get_data_store().id(),
+                instance_->index(),
                 attr_->name(),
                 tsr.values_size(),
                 fmt::join(shape.begin() + 1, shape.end(), ", "));
@@ -857,10 +857,10 @@ recordio_protobuf_reader::decoder::append_to_builder(
     if (tsr.keys_size() != tsr.values_size()) {
         if (state_->warn_bad_instance || state_->error_bad_batch) {
             auto msg = fmt::format(
-                "The sparse feature '{2}' of the instance {1:n} in the data "
-                "store {0} has {3:n} key(s) but {4:n} value(s).",
-                instance_->get_data_store(),
-                instance_->index() + 1,
+                "The sparse feature '{2}' of the instance #{1:n} in the data "
+                "store '{0}' has {3:n} key(s) but {4:n} value(s).",
+                instance_->get_data_store().id(),
+                instance_->index(),
                 attr_->name(),
                 tsr.keys_size(),
                 tsr.values_size());
@@ -885,12 +885,12 @@ recordio_protobuf_reader::decoder::append_to_builder(
     }
 
     if (state_->warn_bad_instance || state_->error_bad_batch) {
-        auto msg = fmt::format(
-            "The sparse feature '{2}' of the instance {1:n} in the data store "
-            "{0} has one or more invalid keys.",
-            instance_->get_data_store(),
-            instance_->index() + 1,
-            attr_->name());
+        auto msg =
+            fmt::format("The sparse feature '{2}' of the instance #{1:n} in "
+                        "the data store '{0}' has one or more invalid keys.",
+                        instance_->get_data_store().id(),
+                        instance_->index(),
+                        attr_->name());
 
         if (state_->warn_bad_instance) {
             logger::warn(msg);

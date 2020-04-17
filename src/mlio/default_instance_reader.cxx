@@ -127,36 +127,35 @@ default_instance_reader::handle_nested_errors()
     }
     catch (record_too_large_error const &) {
         std::throw_with_nested(data_reader_error{
-            fmt::format("The record {1:n} in the data store {0} is too large. "
-                        "See nested exception for details.",
-                        *store_,
+            fmt::format("The record #{1:n} in the data store '{0}' is too "
+                        "large. See nested exception for details.",
+                        store_->id(),
                         store_record_idx_)});
     }
     catch (corrupt_record_error const &) {
         std::throw_with_nested(data_reader_error{
-            fmt::format("The record {1:n} in the data store {0} is corrupt. "
-                        "See nested exception for details.",
-                        *store_,
+            fmt::format("The record #{1:n} in the data store '{0}' is "
+                        "corrupt. See nested exception for details.",
+                        store_->id(),
                         store_record_idx_)});
     }
     catch (stream_error const &) {
         std::throw_with_nested(data_reader_error{
-            fmt::format("The data store {0} contains corrupt data. "
-                        "See nested exception for details.",
-                        *store_)});
+            fmt::format("The data store '{0}' contains corrupt data. See "
+                        "nested exception for details.",
+                        store_->id())});
     }
     catch (not_supported_error const &) {
-        std::throw_with_nested(
-            data_reader_error{fmt::format("The data store {0} cannot be read. "
-                                          "See nested exception for details.",
-                                          *store_)});
+        std::throw_with_nested(data_reader_error{
+            fmt::format("The data store '{0}' cannot be read. See nested "
+                        "exception for details.",
+                        store_->id())});
     }
     catch (std::system_error const &) {
         std::throw_with_nested(data_reader_error{fmt::format(
             "A system error occurred while trying to read from the data store "
-            "{0}. "
-            "See nested exception for details.",
-            *store_)});
+            "'{0}'. See nested exception for details.",
+            store_->id())});
     }
 }
 
@@ -254,14 +253,14 @@ default_instance_reader::init_next_record_reader()
     }
     catch (std::system_error const &e) {
         if (e.code() == std::errc::no_such_file_or_directory) {
-            throw data_reader_error{
-                fmt::format("The data store {0} does not exist.", *store_)};
+            throw data_reader_error{fmt::format(
+                "The data store '{0}' does not exist.", store_->id())};
         }
 
         if (e.code() == std::errc::permission_denied) {
             throw data_reader_error{fmt::format(
-                "The permission to read the data store {0} is denied.",
-                *store_)};
+                "The permission to read the data store '{0}' is denied.",
+                store_->id())};
         }
 
         throw;

@@ -145,9 +145,9 @@ csv_reader::read_names_from_header(data_store const &ds, record_reader &rdr)
     }
     catch (corrupt_record_error const &) {
         std::throw_with_nested(schema_error{
-            fmt::format("The header row of the data store {0} cannot be read. "
-                        "See nested exception for details.",
-                        ds)});
+            fmt::format("The header row of the data store '{0}' cannot be "
+                        "read. See nested exception for details.",
+                        ds.id())});
     }
 
     // If the header row was blank, we treat it as a single column with
@@ -221,10 +221,10 @@ csv_reader::infer_column_types(std::optional<instance> const &ins)
             }
         }
         catch (corrupt_record_error const &) {
-            std::throw_with_nested(schema_error{fmt::format(
-                "The schema of the data store {0} cannot be inferred. "
-                "See nested exception for details.",
-                ins->get_data_store())});
+            std::throw_with_nested(schema_error{
+                fmt::format("The schema of the data store '{0}' cannot be "
+                            "inferred. See nested exception for details.",
+                            ins->get_data_store().id())});
         }
     }
 }
@@ -248,13 +248,14 @@ csv_reader::set_or_validate_column_names(std::optional<instance> const &ins)
     }
     else {
         if (column_names_.size() != column_types_.size()) {
-            throw schema_error{fmt::format(
-                "The number of columns ({3:n}) read from the row {1:n} in the "
-                "data store {0} does not match the number of headers ({2:n}).",
-                ins->get_data_store(),
-                ins->index() + 1,
-                column_names_.size(),
-                column_types_.size())};
+            throw schema_error{
+                fmt::format("The number of columns ({3:n}) read from the row "
+                            "#{1:n} in the data store '{0}' does not match "
+                            "the number of headers ({2:n}).",
+                            ins->get_data_store().id(),
+                            ins->index(),
+                            column_names_.size(),
+                            column_types_.size())};
         }
     }
 }
@@ -488,14 +489,14 @@ csv_reader::make_tensors(std::size_t batch_size) const
             continue;
         }
 
+        size_vector shp{batch_size, 1};
+
         data_type dt = std::get<0>(*col_pos);
 
         std::unique_ptr<device_array> arr = make_cpu_array(dt, batch_size);
 
-        auto tsr = make_intrusive<dense_tensor>(size_vector{batch_size, 1},
-                                                std::move(arr));
-
-        tensors.emplace_back(std::move(tsr));
+        tensors.emplace_back(
+            make_intrusive<dense_tensor>(std::move(shp), std::move(arr)));
     }
 
     return tensors;
@@ -654,10 +655,10 @@ csv_reader::decoder<ColIt>::decode(std::size_t row_idx, instance const &ins)
                     std::string const &name = std::get<1>(*col_pos);
 
                     auto msg = fmt::format(
-                        "The column '{2}' of the row {1:n} in the data store "
-                        "{0} is too long. Its truncated value is '{3:.64}'.",
-                        ins.get_data_store(),
-                        ins.index() + 1,
+                        "The column '{2}' of the row #{1:n} in the data store "
+                        "'{0}' is too long. Its truncated value is '{3:.64}'.",
+                        ins.get_data_store().id(),
+                        ins.index(),
                         name,
                         tokenizer_->value());
 
@@ -697,10 +698,10 @@ csv_reader::decoder<ColIt>::decode(std::size_t row_idx, instance const &ins)
             data_type dt = std::get<2>(*col_pos);
 
             auto msg = fmt::format(
-                "The column '{2}' of the row {1:n} in the data store {0} "
+                "The column '{2}' of the row #{1:n} in the data store '{0}' "
                 "cannot be parsed as {3}. Its string value is '{4:.64}'.",
-                ins.get_data_store(),
-                ins.index() + 1,
+                ins.get_data_store().id(),
+                ins.index(),
                 name,
                 dt,
                 tokenizer_->value());
@@ -734,10 +735,10 @@ csv_reader::decoder<ColIt>::decode(std::size_t row_idx, instance const &ins)
         }
 
         auto msg = fmt::format(
-            "The row {1:n} in the data store {0} has {2:n} column(s), while "
+            "The row #{1:n} in the data store '{0}' has {2:n} column(s) while "
             "the expected number of column(s) is {3:n}.",
-            ins.get_data_store(),
-            ins.index() + 1,
+            ins.get_data_store().id(),
+            ins.index(),
             num_actual_cols,
             num_columns);
 

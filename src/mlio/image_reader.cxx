@@ -46,8 +46,8 @@ image_reader::image_reader(data_reader_params prm, image_reader_params img_prm)
 {
     if (params_.image_dimensions.size() != image_dimensions_size_) {
         throw std::invalid_argument{
-            "The dimensions of the output image must be entered in "
-            "(channels, height, width) format."};
+            "The dimensions of the output image must be entered in (channels, "
+            "height, width) format."};
     }
 
     std::copy(params_.image_dimensions.begin(),
@@ -94,7 +94,7 @@ intrusive_ptr<example>
 image_reader::decode(instance_batch const &batch) const
 {
     // The stride of the batch dimension corresponds to the byte size
-    // of the contained images.
+    // of the images.
     auto batch_stride = as_size(get_schema()->attributes()[0].strides()[0]);
 
     auto tsr = make_tensor(batch.size(), batch_stride);
@@ -115,7 +115,6 @@ image_reader::decode(instance_batch const &batch) const
             if (params().bad_batch_hnd == bad_batch_handling::skip) {
                 return {};
             }
-
             if (params().bad_batch_hnd != bad_batch_handling::pad) {
                 throw std::invalid_argument{
                     "The specified bad batch handling is invalid."};
@@ -153,10 +152,9 @@ image_reader::decode_core(stdx::span<std::uint8_t> out,
 {
     memory_slice img_buf{};
     if (params_.img_frame == image_frame::recordio) {
-        // This is to skip the 24 byte header as mentioned in
-        // image_recordio.h in the mxnet github repository. This
-        // header does not contain data related to image pixel
-        // values, but rather contains image metadata.
+        // Skip the 24-byte header defined in image_recordio.h in the
+        // MXNet GitHub repository. This header contains metadata and
+        // is not relevant.
         img_buf = ins.bits().subslice(recordio_image_header_offset_);
     }
     else {
@@ -187,8 +185,8 @@ image_reader::decode_core(stdx::span<std::uint8_t> out,
         break;
     default:
         throw std::invalid_argument{
-            fmt::format("The specified image dimensions have an "
-                        "unsupported number of channels ({0:n}).",
+            fmt::format("The specified image dimensions have an unsupported "
+                        "number of channels ({0:n}).",
                         img_dims_[0])};
     }
 
@@ -209,13 +207,12 @@ image_reader::decode_core(stdx::span<std::uint8_t> out,
         }
         catch (cv::Exception const &e) {
             if (warn_bad_instances() || error_bad_batch_) {
-                auto msg =
-                    fmt::format("The BGR2RGB operation for the image "
-                                "{0:n} in the data store {1} failed with "
-                                "the following exception: {2}",
-                                ins.index(),
-                                ins.get_data_store(),
-                                e.what());
+                auto msg = fmt::format(
+                    "The BGR2RGB operation for the image #{1:n} in the data "
+                    "store '{0}' failed with the following exception: {2}",
+                    ins.get_data_store().id(),
+                    ins.index(),
+                    e.what());
 
                 if (warn_bad_instances()) {
                     logger::warn(msg);
@@ -247,10 +244,10 @@ image_reader::decode_image(cv::Mat const &buf,
     catch (cv::Exception const &e) {
         if (warn_bad_instances() || error_bad_batch_) {
             auto msg = fmt::format(
-                "The image decode operation failed for the image {0:n} in the "
-                "data store {1} with the following exception: {2}",
+                "The image decode operation failed for the image #{1:n} in "
+                "the data store '{0}' with the following exception: {2}",
+                ins.get_data_store().id(),
                 ins.index(),
-                ins.get_data_store(),
                 e.what());
 
             if (warn_bad_instances()) {
@@ -269,9 +266,9 @@ image_reader::decode_image(cv::Mat const &buf,
         if (warn_bad_instances() || error_bad_batch_) {
             auto msg =
                 fmt::format("The image decode operation failed for the image "
-                            "{0:n} in the data store {1}.",
-                            ins.index(),
-                            ins.get_data_store());
+                            "#{1:n} in the data store '{0}'.",
+                            ins.get_data_store().id(),
+                            ins.index());
 
             if (warn_bad_instances()) {
                 logger::warn(msg);
@@ -288,10 +285,10 @@ image_reader::decode_image(cv::Mat const &buf,
     if (mode == cv::ImreadModes::IMREAD_UNCHANGED &&
         decoded_img.channels() != 4) {
         throw std::invalid_argument{fmt::format(
-            "The image {0:n} in the data store {1} is expected to have 4 "
+            "The image #{1:n} in the data store '{0}' is expected to have 4 "
             "channels. However it contains {2:n} channels.",
+            ins.get_data_store().id(),
             ins.index(),
-            ins.get_data_store(),
             decoded_img.channels())};
     }
 
@@ -321,10 +318,10 @@ image_reader::resize(cv::Mat &src, cv::Mat &dst, instance const &ins) const
     catch (cv::Exception const &e) {
         if (warn_bad_instances() || error_bad_batch_) {
             auto msg = fmt::format(
-                "The image resize operation failed for the image {0:n} in the "
-                "data store {1} with the following exception: {2}",
+                "The image resize operation failed for the image #{2:n} in "
+                "the data store '{0}' with the following exception: {2}",
+                ins.get_data_store().id(),
                 ins.index(),
-                ins.get_data_store(),
                 e.what());
 
             if (warn_bad_instances()) {
@@ -348,15 +345,15 @@ image_reader::crop(cv::Mat &src, cv::Mat &dst, instance const &ins) const
     if (src.rows < img_dims_[1] || src.cols < img_dims_[2]) {
         if (warn_bad_instances() || error_bad_batch_) {
             auto msg = fmt::format(
-                "The input image dimensions (rows: {0:n}, cols: {1:n}) are "
-                "smaller than the output image dimensions (rows: {2:n}, cols: "
-                "{3:n}) for the image {4:n} in the data store {5}.",
+                "The input image dimensions (rows: {2:n}, cols: {3:n}) are "
+                "smaller than the output image dimensions (rows: {4:n}, cols: "
+                "{5:n}) for the image #{1:n} in the data store '{0}'.",
+                ins.get_data_store().id(),
+                ins.index(),
                 src.rows,
                 src.cols,
                 img_dims_[1],
-                img_dims_[2],
-                ins.index(),
-                ins.get_data_store());
+                img_dims_[2]);
 
             if (warn_bad_instances()) {
                 logger::warn(msg);
@@ -381,10 +378,10 @@ image_reader::crop(cv::Mat &src, cv::Mat &dst, instance const &ins) const
     catch (cv::Exception const &e) {
         if (warn_bad_instances() || error_bad_batch_) {
             auto msg = fmt::format(
-                "The image crop operation failed for the image {0:n} in the "
-                "data store {1} with the following exception: {2}",
+                "The image crop operation failed for the image #{1:n} in the "
+                "data store '{0}' with the following exception: {2}",
+                ins.get_data_store().id(),
                 ins.index(),
-                ins.get_data_store(),
                 e.what());
 
             if (warn_bad_instances()) {
