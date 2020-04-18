@@ -29,10 +29,12 @@
 #include "mlio/instance_batch.h"
 #include "mlio/instance_batch_reader.h"
 #include "mlio/instance_reader.h"
+#include "mlio/sampled_instance_reader.h"
 #include "mlio/shuffled_instance_reader.h"
 
 using mlio::detail::default_instance_reader;
 using mlio::detail::instance_batch_reader;
+using mlio::detail::sampled_instance_reader;
 using mlio::detail::shuffled_instance_reader;
 
 namespace mlio {
@@ -66,6 +68,11 @@ parallel_data_reader::parallel_data_reader(data_reader_params &&prm)
         prms, [this](data_store const &ds) {
             return make_record_reader(ds);
         });
+
+    if (prms.sample_ratio) {
+        reader_ = std::make_unique<sampled_instance_reader>(
+            prms, std::move(reader_));
+    }
 
     if (prms.shuffle_instances) {
         reader_ = std::make_unique<shuffled_instance_reader>(

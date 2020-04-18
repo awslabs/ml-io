@@ -110,6 +110,10 @@ struct MLIO_API data_reader_params {
     /// The number of shards the dataset should be split into. The
     /// reader will only read 1/num_shards of the dataset.
     std::size_t num_shards{};
+    /// A ratio between zero and one indicating how much of the dataset
+    /// should be read. The dataset will be sampled based on this
+    /// number.
+    std::optional<float> sample_ratio{};
     /// A boolean value indicating whether to shuffle the @ref instance
     /// "data instances" while reading from the dataset.
     bool shuffle_instances = false;
@@ -127,15 +131,6 @@ struct MLIO_API data_reader_params {
     /// A boolean value indicating whether the dataset should be
     /// reshuffled after every @ref data_reader::reset() call.
     bool reshuffle_each_epoch = true;
-    /// A ratio between zero and one indicating how much of the dataset
-    /// should be read. The dataset will be subsampled based on this
-    /// number.
-    ///
-    /// @note
-    ///     Note that, as the size of a dataset is not always known in
-    ///     advance, the ratio will be used as an approximation for the
-    ///     actual amount of data to read.
-    std::optional<float> subsample_ratio{};
 };
 
 /// Represents an interface for classes that read @ref example "examples"

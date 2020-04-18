@@ -107,11 +107,11 @@ DataReaderParams(dataset : Sequence[DataStore],
                  num_instances_to_read : Optional[int] = None,
                  shard_index : int = 0,
                  num_shards : int = 0,
+                 sample_ratio: Optional[float] : None,
                  shuffle_instances : bool = False,
                  shuffle_window : int = 0,
                  shuffle_seed : Optional[int] = None,
-                 reshuffle_each_epoch : bool = True,
-                 subsample_ratio: Optional[float] : None)
+                 reshuffle_each_epoch : bool = True)
 ```
 
 - `dataset`: A sequence of [`DataStore`](data_store.md#DataStore) instances that together form the dataset to read from.
@@ -125,11 +125,11 @@ DataReaderParams(dataset : Sequence[DataStore],
 - `num_instances_to_read`: The number of data instances to read. The rest of the dataset will be ignored.
 - `shard_index`: The index of the shard to read.
 - `num_shards`: The number of shards the dataset should be split into. The reader will only read `1/num_shards` of the dataset.
+- `sample_ratio`: A ratio between zero and one indicating how much of the dataset should be read. The dataset will be sampled based on this number.
 - `shuffle_instances`: A boolean value indicating whether to shuffle the data instances while reading from the dataset.
 - `shuffle_window`: The number of data instances to buffer and sample from. The selected data instances will be replaced with new data instances read from the dataset. A value of zero means perfect shuffling and requires loading the whole dataset into memory first.
 - `shuffle_seed`: The seed that will be used for initializing the sampling distribution. If not specified, a random seed will be generated internally.
 - `reshuffle_each_epoch`: A boolean value indicating whether the dataset should be reshuffled after every [`reset()`](#reset) call.
-- `subsample_ratio`: A ratio between zero and one indicating how much of the dataset (after sharding) should be read. The dataset will be subsampled based on this number. Note that, as the size of a dataset is not always known in advance, the ratio will be used as an approximation for the actual amount of data to read.
 
 ## CsvParams
 Contains the parameters used by [`CsvReader`](#CsvReader).

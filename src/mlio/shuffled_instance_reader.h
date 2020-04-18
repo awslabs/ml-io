@@ -41,7 +41,7 @@ private:
     read_instance_core() final;
 
     void
-    buffer_instances();
+    fill_buffer_from_inner();
 
     std::optional<instance>
     pop_random_instance_from_buffer();
@@ -62,7 +62,7 @@ private:
     std::unique_ptr<instance_reader> inner_;
     std::size_t shuffle_window_;
     std::vector<instance> buffer_{};
-    bool inner_has_instances_ = true;
+    bool inner_has_instance_ = true;
     std::random_device rd_{};
     std::uint_fast64_t seed_{rd_()};
     std::mt19937_64 mt_{seed_};

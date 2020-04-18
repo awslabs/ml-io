@@ -16,36 +16,49 @@
 #pragma once
 
 #include <cstddef>
+#include <memory>
 #include <optional>
+#include <vector>
 
-#include "mlio/data_reader.h"
 #include "mlio/fwd.h"
+#include "mlio/instance.h"
 #include "mlio/instance_reader.h"
+#include "mlio/instance_reader_base.h"
 
 namespace mlio {
 inline namespace v1 {
 namespace detail {
 
-class instance_batch_reader {
-public:
-    explicit instance_batch_reader(data_reader_params const &prm,
-                                   instance_reader &rdr);
+class sampled_instance_reader final : public instance_reader_base {
+    static constexpr std::size_t num_instances_to_read_ = 100;
 
 public:
-    std::optional<instance_batch>
-    read_instance_batch();
-
-    void
-    reset() noexcept;
+    explicit sampled_instance_reader(data_reader_params const &prm,
+                                     std::unique_ptr<instance_reader> &&inner);
 
 private:
+    std::optional<instance>
+    read_instance_core() final;
+
     void
-    init_num_instances_to_skip();
+    fill_buffer_from_inner();
+
+public:
+    void
+    reset() noexcept final;
+
+public:
+    std::size_t
+    num_bytes_read() const noexcept final
+    {
+        return inner_->num_bytes_read();
+    }
 
 private:
     data_reader_params const *params_;
-    instance_reader *reader_;
-    std::size_t batch_idx_{};
+    std::unique_ptr<instance_reader> inner_;
+    std::vector<std::optional<instance>> buffer_{};
+    std::vector<std::optional<instance>>::iterator buffer_pos_{};
 };
 
 }  // namespace detail

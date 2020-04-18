@@ -44,6 +44,7 @@ shuffled_instance_reader::shuffled_instance_reader(
 
     if (params_->shuffle_seed != std::nullopt) {
         seed_ = *params_->shuffle_seed;
+
         mt_.seed(seed_);
     }
 }
@@ -55,13 +56,13 @@ shuffled_instance_reader::read_instance_core()
         return inner_->read_instance();
     }
 
-    buffer_instances();
+    fill_buffer_from_inner();
 
     if (buffer_.empty()) {
         return {};
     }
 
-    if (inner_has_instances_) {
+    if (inner_has_instance_) {
         return pop_random_instance_from_buffer();
     }
 
@@ -73,12 +74,12 @@ shuffled_instance_reader::read_instance_core()
 }
 
 void
-shuffled_instance_reader::buffer_instances()
+shuffled_instance_reader::fill_buffer_from_inner()
 {
-    while (inner_has_instances_ && buffer_.size() < shuffle_window_) {
+    while (inner_has_instance_ && buffer_.size() < shuffle_window_) {
         std::optional<instance> ins = inner_->read_instance();
         if (ins == std::nullopt) {
-            inner_has_instances_ = false;
+            inner_has_instance_ = false;
 
             std::shuffle(buffer_.begin(), buffer_.end(), mt_);
 
@@ -112,10 +113,10 @@ shuffled_instance_reader::reset() noexcept
 
     buffer_.clear();
 
-    inner_has_instances_ = true;
+    inner_has_instance_ = true;
 
     // Make sure that we reset the random number generator engine to
-    // its initial state if reshuffling is not desired.
+    // its initial state if reshuffling is not requested.
     if (!params_->reshuffle_each_epoch) {
         mt_.seed(seed_);
     }

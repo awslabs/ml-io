@@ -81,6 +81,7 @@ add_library(mlio
     parser.cxx
     recordio_protobuf_reader.cxx
     s3_client.cxx
+    sampled_instance_reader.cxx
     schema.cxx
     shuffled_instance_reader.cxx
     tensor.cxx

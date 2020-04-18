@@ -127,11 +127,11 @@ make_data_reader_params(std::vector<intrusive_ptr<data_store>> dataset,
                         std::optional<std::size_t> num_instances_to_read,
                         std::size_t shard_index,
                         std::size_t num_shards,
+                        std::optional<float> sample_ratio,
                         bool shuffle_instances,
                         std::size_t shuffle_window,
                         std::optional<std::size_t> shuffle_seed,
-                        bool reshuffle_each_epoch,
-                        std::optional<float> subsample_ratio)
+                        bool reshuffle_each_epoch)
 {
     data_reader_params prm{};
 
@@ -146,11 +146,11 @@ make_data_reader_params(std::vector<intrusive_ptr<data_store>> dataset,
     prm.num_instances_to_read = num_instances_to_read;
     prm.shard_index = shard_index;
     prm.num_shards = num_shards;
+    prm.sample_ratio = sample_ratio;
     prm.shuffle_instances = shuffle_instances;
     prm.shuffle_window = shuffle_window;
     prm.shuffle_seed = shuffle_seed;
     prm.reshuffle_each_epoch = reshuffle_each_epoch;
-    prm.subsample_ratio = subsample_ratio;
 
     return prm;
 }
@@ -353,11 +353,11 @@ register_data_readers(py::module &m)
              "num_instances_to_read"_a = std::nullopt,
              "shard_index"_a = 0,
              "num_shards"_a = 0,
+             "sample_ratio"_a = std::nullopt,
              "shuffle_instances"_a = false,
              "shuffle_window"_a = 0,
              "shuffle_seed"_a = std::nullopt,
              "reshuffle_each_epoch"_a = true,
-             "subsample_ratio"_a = std::nullopt,
              R"(
             Parameters
             ----------
@@ -393,6 +393,10 @@ register_data_readers(py::module &m)
             num_shards : int, optional
                 The number of shards the dataset should be split into. The
                 reader will only read 1/num_shards of the dataset.
+            sample_ratio : float, optional
+                A ratio between zero and one indicating how much of the dataset
+                should be read. The dataset will be sampled based on this
+                number.
             shuffle_instances : bool
                 A boolean value indicating whether to shuffle the data instances
                 while reading from the dataset.
@@ -410,14 +414,6 @@ register_data_readers(py::module &m)
             reshuffle_each_epoch : bool, optional
                 A boolean value indicating whether the dataset should be
                 reshuffled after every `data_reader.reset()` call.
-            subsample_ratio : float, optional
-                A ratio between zero and one indicating how much of the dataset
-                should be read. The dataset will be subsampled based on this
-                number.
-
-                Note that, as the size of a dataset is not always known in
-                advance, the ratio will be used as an approximation for the
-                actual amount of data to read.
             )")
         .def_readwrite("dataset", &data_reader_params::dataset)
         .def_readwrite("batch_size", &data_reader_params::batch_size)
@@ -435,14 +431,13 @@ register_data_readers(py::module &m)
                        &data_reader_params::num_instances_to_read)
         .def_readwrite("shard_index", &data_reader_params::shard_index)
         .def_readwrite("num_shards", &data_reader_params::num_shards)
+        .def_readwrite("sample_ratio", &data_reader_params::sample_ratio)
         .def_readwrite("shuffle_instances",
                        &data_reader_params::shuffle_instances)
         .def_readwrite("shuffle_window", &data_reader_params::shuffle_window)
         .def_readwrite("shuffle_seed", &data_reader_params::shuffle_seed)
         .def_readwrite("reshuffle_each_epoch",
-                       &data_reader_params::reshuffle_each_epoch)
-        .def_readwrite("subsample_ratio",
-                       &data_reader_params::subsample_ratio);
+                       &data_reader_params::reshuffle_each_epoch);
 
     py::class_<csv_params>(
         m,
