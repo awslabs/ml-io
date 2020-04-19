@@ -16,52 +16,29 @@
 #pragma once
 
 #include <cstddef>
-#include <functional>
+#include <memory>
 #include <optional>
-#include <vector>
 
-#include "mlio/data_stores/data_store.h"
 #include "mlio/fwd.h"
+#include "mlio/instance.h"
+#include "mlio/instance_reader.h"
 #include "mlio/instance_reader_base.h"
-#include "mlio/intrusive_ptr.h"
-#include "mlio/record_readers/record_reader.h"
 
 namespace mlio {
 inline namespace v1 {
 namespace detail {
 
-using record_reader_factory =
-    std::function<intrusive_ptr<record_reader>(data_store const &ds)>;
-
-class default_instance_reader final : public instance_reader_base {
+class ranged_instance_reader final : public instance_reader_base {
 public:
-    explicit default_instance_reader(data_reader_params const &prm,
-                                     record_reader_factory &&fct);
+    explicit ranged_instance_reader(data_reader_params const &prm,
+                                    std::unique_ptr<instance_reader> &&inner);
 
 private:
     std::optional<instance>
     read_instance_core() final;
 
-    void
-    skip_instances();
-
     bool
     should_stop_reading() const noexcept;
-
-    std::optional<instance>
-    read_instance_internal();
-
-    [[noreturn]] void
-    handle_nested_errors();
-
-    std::optional<memory_slice>
-    read_record_payload();
-
-    std::optional<record>
-    read_record();
-
-    bool
-    init_next_record_reader();
 
 public:
     void
@@ -71,19 +48,14 @@ public:
     std::size_t
     num_bytes_read() const noexcept final
     {
-        return num_bytes_read_;
+        return inner_->num_bytes_read();
     }
 
 private:
     data_reader_params const *params_;
-    record_reader_factory record_reader_factory_;
-    std::vector<intrusive_ptr<data_store>>::const_iterator store_iter_{};
-    data_store *store_{};
-    intrusive_ptr<record_reader> record_reader_{};
-    std::size_t instance_idx_{};
-    std::size_t record_idx_{};
-    std::size_t num_bytes_read_{};
-    bool has_corrupt_split_record_{};
+    std::unique_ptr<instance_reader> inner_;
+    bool first_read_ = true;
+    std::size_t num_instances_read_{};
 };
 
 }  // namespace detail

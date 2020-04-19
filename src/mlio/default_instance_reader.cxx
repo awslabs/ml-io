@@ -56,52 +56,6 @@ default_instance_reader::default_instance_reader(data_reader_params const &prm,
 std::optional<instance>
 default_instance_reader::read_instance_core()
 {
-    skip_instances();
-
-    if (should_stop_reading()) {
-        return {};
-    }
-
-    std::optional<instance> ins = read_instance_internal();
-    if (ins == std::nullopt) {
-        return {};
-    }
-
-    num_instances_read_++;
-
-    return ins;
-}
-
-void
-default_instance_reader::skip_instances()
-{
-    if (skipped_instances_) {
-        return;
-    }
-
-    skipped_instances_ = true;
-
-    for (std::size_t i = 0; i < params_->num_instances_to_skip; i++) {
-        std::optional<instance> ins = read_instance_internal();
-        if (ins == std::nullopt) {
-            break;
-        }
-    }
-}
-
-bool
-default_instance_reader::should_stop_reading() const noexcept
-{
-    if (params_->num_instances_to_read == std::nullopt) {
-        return false;
-    }
-
-    return num_instances_read_ == *params_->num_instances_to_read;
-}
-
-std::optional<instance>
-default_instance_reader::read_instance_internal()
-{
     std::optional<memory_slice> payload;
     try {
         payload = read_record_payload();
@@ -286,11 +240,7 @@ default_instance_reader::reset() noexcept
 
     record_reader_ = nullptr;
 
-    skipped_instances_ = false;
-
     instance_idx_ = 0;
-
-    num_instances_read_ = 0;
 
     record_idx_ = 0;
 
