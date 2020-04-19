@@ -58,7 +58,7 @@ sharded_instance_reader::read_instance_core()
 }
 
 void
-sharded_instance_reader::reset() noexcept
+sharded_instance_reader::reset_core() noexcept
 {
     inner_->reset();
 

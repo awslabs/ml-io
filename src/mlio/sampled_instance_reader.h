@@ -43,16 +43,8 @@ private:
     void
     fill_buffer_from_inner();
 
-public:
     void
-    reset() noexcept final;
-
-public:
-    std::size_t
-    num_bytes_read() const noexcept final
-    {
-        return inner_->num_bytes_read();
-    }
+    reset_core() noexcept final;
 
 private:
     data_reader_params const *params_;

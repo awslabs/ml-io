@@ -76,7 +76,7 @@ sampled_instance_reader::fill_buffer_from_inner()
 }
 
 void
-sampled_instance_reader::reset() noexcept
+sampled_instance_reader::reset_core() noexcept
 {
     inner_->reset();
 

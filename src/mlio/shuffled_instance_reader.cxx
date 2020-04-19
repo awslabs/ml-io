@@ -107,7 +107,7 @@ shuffled_instance_reader::pop_random_instance_from_buffer()
 }
 
 void
-shuffled_instance_reader::reset() noexcept
+shuffled_instance_reader::reset_core() noexcept
 {
     inner_->reset();
 

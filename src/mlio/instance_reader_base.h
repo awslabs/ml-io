@@ -15,6 +15,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include <optional>
 
 #include "mlio/instance.h"
@@ -32,12 +33,26 @@ public:
     std::optional<instance>
     peek_instance() final;
 
+    void
+    reset() noexcept final;
+
 private:
     virtual std::optional<instance>
     read_instance_core() = 0;
 
+    virtual void
+    reset_core() noexcept = 0;
+
+public:
+    std::size_t
+    num_bytes_read() const noexcept final
+    {
+        return num_bytes_read_;
+    }
+
 private:
     std::optional<instance> peeked_instance_{};
+    std::size_t num_bytes_read_{};
 };
 
 }  // namespace detail

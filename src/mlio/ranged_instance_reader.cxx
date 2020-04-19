@@ -67,7 +67,7 @@ ranged_instance_reader::should_stop_reading() const noexcept
 }
 
 void
-ranged_instance_reader::reset() noexcept
+ranged_instance_reader::reset_core() noexcept
 {
     inner_->reset();
 

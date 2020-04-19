@@ -22,10 +22,19 @@ namespace detail {
 std::optional<instance>
 instance_reader_base::read_instance()
 {
+    std::optional<instance> ins{};
     if (peeked_instance_) {
-        return std::exchange(peeked_instance_, std::nullopt);
+        ins = std::exchange(peeked_instance_, std::nullopt);
     }
-    return read_instance_core();
+    else {
+        ins = read_instance_core();
+    }
+
+    if (ins) {
+        num_bytes_read_ += ins->bits().size();
+    }
+
+    return ins;
 }
 
 std::optional<instance>
@@ -35,6 +44,16 @@ instance_reader_base::peek_instance()
         peeked_instance_ = read_instance_core();
     }
     return peeked_instance_;
+}
+
+void
+instance_reader_base::reset() noexcept
+{
+    reset_core();
+
+    peeked_instance_ = {};
+
+    num_bytes_read_ = 0;
 }
 
 }  // namespace detail

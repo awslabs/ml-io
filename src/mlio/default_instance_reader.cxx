@@ -124,8 +124,6 @@ default_instance_reader::read_record_payload()
     }
 
     if (rec->kind() == record_kind::complete) {
-        num_bytes_read_ += rec->size();
-
         return std::move(*rec).payload();
     }
 
@@ -164,8 +162,6 @@ default_instance_reader::read_record_payload()
                                split_rec.payload().end(),
                                copied_pos);
     }
-
-    num_bytes_read_ += total_record_size;
 
     return std::move(combined_blk);
 }
@@ -232,7 +228,7 @@ default_instance_reader::init_next_record_reader()
 }
 
 void
-default_instance_reader::reset() noexcept
+default_instance_reader::reset_core() noexcept
 {
     store_iter_ = params_->dataset.begin();
 
@@ -243,8 +239,6 @@ default_instance_reader::reset() noexcept
     instance_idx_ = 0;
 
     record_idx_ = 0;
-
-    num_bytes_read_ = 0;
 
     has_corrupt_split_record_ = false;
 }

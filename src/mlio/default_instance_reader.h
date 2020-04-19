@@ -42,15 +42,6 @@ private:
     std::optional<instance>
     read_instance_core() final;
 
-    void
-    skip_instances();
-
-    bool
-    should_stop_reading() const noexcept;
-
-    std::optional<instance>
-    read_instance_internal();
-
     [[noreturn]] void
     handle_nested_errors();
 
@@ -63,16 +54,8 @@ private:
     bool
     init_next_record_reader();
 
-public:
     void
-    reset() noexcept final;
-
-public:
-    std::size_t
-    num_bytes_read() const noexcept final
-    {
-        return num_bytes_read_;
-    }
+    reset_core() noexcept final;
 
 private:
     data_reader_params const *params_;
@@ -82,7 +65,6 @@ private:
     intrusive_ptr<record_reader> record_reader_{};
     std::size_t instance_idx_{};
     std::size_t record_idx_{};
-    std::size_t num_bytes_read_{};
     bool has_corrupt_split_record_{};
 };
 
