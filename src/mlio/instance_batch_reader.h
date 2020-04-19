@@ -20,7 +20,6 @@
 
 #include "mlio/data_reader.h"
 #include "mlio/fwd.h"
-#include "mlio/instance_reader.h"
 
 namespace mlio {
 inline namespace v1 {

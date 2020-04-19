@@ -48,6 +48,12 @@ private:
     std::optional<memory_slice>
     read_record_payload();
 
+    std::optional<memory_slice>
+    read_split_record_payload(std::optional<record> rec);
+
+    [[noreturn]] void
+    throw_corrupt_split_record_error();
+
     std::optional<record>
     read_record();
 

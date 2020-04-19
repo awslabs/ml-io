@@ -105,7 +105,7 @@ read_line(memory_slice &chunk,
         chunk = {};
     }
 
-    return record{std::move(payload), offset};
+    return record{std::move(payload)};
 }
 
 }  // namespace detail

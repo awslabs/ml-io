@@ -18,6 +18,7 @@
 #include <utility>
 
 #include "mlio/data_reader.h"
+#include "mlio/instance.h"
 
 namespace mlio {
 inline namespace v1 {

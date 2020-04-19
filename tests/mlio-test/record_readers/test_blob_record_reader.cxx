@@ -27,7 +27,7 @@ TEST_F(test_blob_record_reader, test_read_record)
     auto record_2 = rdr->read_record();
 
     ASSERT_EQ(record_1->kind(), record_kind::complete);
-    ASSERT_EQ(record_1->size(), expected_size);
+    ASSERT_EQ(record_1->payload().size(), expected_size);
     ASSERT_NE(record_1->payload().data(), nullptr);
     ASSERT_EQ(record_2.has_value(), false);
     auto unread_stream = strm->read(strm->size());
@@ -44,7 +44,7 @@ TEST_F(test_blob_record_reader, test_peek_record)
     auto record_2 = rdr->peek_record();
 
     ASSERT_EQ(record_1->kind(), record_kind::complete);
-    ASSERT_EQ(record_1->size(), expected_size);
+    ASSERT_EQ(record_1->payload().size(), expected_size);
     ASSERT_NE(record_1->payload().data(), nullptr);
     ASSERT_EQ(record_2.has_value(), true);
     auto unread_stream = strm->read(strm->size());

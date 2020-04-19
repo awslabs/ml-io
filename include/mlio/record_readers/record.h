@@ -45,10 +45,8 @@ enum class record_kind {
 ///     between records and data instances is not always true.
 class MLIO_API record {
 public:
-    explicit record(memory_slice payload,
-                    std::size_t size,
-                    record_kind knd = record_kind::complete) noexcept
-        : payload_{std::move(payload)}, size_{size}, kind_{knd}
+    explicit record(memory_slice payload, record_kind knd = {}) noexcept
+        : payload_{std::move(payload)}, kind_{knd}
     {}
 
     record(record const &) noexcept = default;
@@ -81,12 +79,6 @@ public:
 
     // clang-format on
 
-    std::size_t
-    size() const noexcept
-    {
-        return size_;
-    }
-
     record_kind
     kind() const noexcept
     {
@@ -95,7 +87,6 @@ public:
 
 private:
     memory_slice payload_;
-    std::size_t size_;
     record_kind kind_;
 };
 

@@ -35,9 +35,7 @@ blob_record_reader::decode_record(memory_slice &chunk, bool)
         return {};
     }
 
-    auto size = chunk.size();
-
-    return record{std::exchange(chunk, {}), size};
+    return record{std::exchange(chunk, {})};
 }
 
 }  // namespace v1

@@ -21,7 +21,6 @@
 #include <stdexcept>
 
 #include <fmt/format.h>
-#include <fmt/ostream.h>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 

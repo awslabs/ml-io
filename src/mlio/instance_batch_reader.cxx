@@ -20,6 +20,7 @@
 
 #include "mlio/instance.h"
 #include "mlio/instance_batch.h"
+#include "mlio/instance_reader.h"
 #include "mlio/logger.h"
 
 namespace mlio {

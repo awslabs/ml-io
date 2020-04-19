@@ -210,7 +210,7 @@ new_line : {
 
     chunk = chunk.subslice(offset);
 
-    return record{std::move(payload), offset};
+    return record{std::move(payload)};
 }
 
 end:
@@ -221,8 +221,6 @@ end:
     if (ignore_leftover) {
         return {};
     }
-
-    std::size_t size = chunk.size();
 
     memory_slice payload;
 
@@ -243,7 +241,7 @@ end:
 
     chunk = {};
 
-    return record{std::move(payload), size};
+    return record{std::move(payload)};
 }
 
 inline bool

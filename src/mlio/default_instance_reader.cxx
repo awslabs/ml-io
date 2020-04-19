@@ -16,18 +16,14 @@
 #include "mlio/default_instance_reader.h"
 
 #include <exception>
-#include <iostream>
 #include <system_error>
-#include <type_traits>
 #include <utility>
 
 #include <fmt/format.h>
-#include <fmt/ostream.h>
 
 #include "mlio/data_reader.h"
 #include "mlio/data_reader_error.h"
 #include "mlio/instance.h"
-#include "mlio/instance_batch.h"
 #include "mlio/memory/memory_allocator.h"
 #include "mlio/memory/memory_block.h"
 #include "mlio/memory/memory_slice.h"
@@ -39,12 +35,6 @@
 namespace mlio {
 inline namespace v1 {
 namespace detail {
-namespace {
-
-constexpr char const *corrupt_split_error_msg =
-    "Corrupt split record encountered.";
-
-}  // namespace
 
 default_instance_reader::default_instance_reader(data_reader_params const &prm,
                                                  record_reader_factory &&fct)
@@ -115,7 +105,7 @@ std::optional<memory_slice>
 default_instance_reader::read_record_payload()
 {
     if (has_corrupt_split_record_) {
-        throw corrupt_record_error{corrupt_split_error_msg};
+        throw_corrupt_split_record_error();
     }
 
     std::optional<record> rec = read_record();
@@ -127,43 +117,61 @@ default_instance_reader::read_record_payload()
         return std::move(*rec).payload();
     }
 
-    if (rec->kind() != record_kind::begin) {
-        has_corrupt_split_record_ = true;
+    return read_split_record_payload(std::move(rec));
+}
 
-        throw corrupt_record_error{corrupt_split_error_msg};
-    }
+std::optional<memory_slice>
+default_instance_reader::read_split_record_payload(std::optional<record> rec)
+{
+    std::vector<record> records{};
 
-    std::size_t total_record_size = rec->size();
+    std::size_t payload_size = 0;
 
-    std::vector<record> split_records{std::move(*rec)};
+    // A split record must start with a 'begin' record...
+    if (rec->kind() == record_kind::begin) {
+        payload_size += rec->payload().size();
 
-    while ((rec = read_record()) && rec->kind() == record_kind::middle) {
-        total_record_size += rec->size();
-
-        split_records.emplace_back(std::move(*rec));
-    }
-
-    if (rec && rec->kind() == record_kind::end) {
-        total_record_size += rec->size();
-
-        split_records.emplace_back(std::move(*rec));
+        records.emplace_back(std::move(*rec));
     }
     else {
-        has_corrupt_split_record_ = true;
-
-        throw corrupt_record_error(corrupt_split_error_msg);
+        throw_corrupt_split_record_error();
     }
 
-    auto combined_blk = get_memory_allocator().allocate(total_record_size);
+    // continue with zero or more 'middle' records...
+    while ((rec = read_record()) && rec->kind() == record_kind::middle) {
+        payload_size += rec->payload().size();
 
-    auto copied_pos = combined_blk->begin();
-    for (record &split_rec : split_records) {
-        copied_pos = std::copy(split_rec.payload().begin(),
-                               split_rec.payload().end(),
-                               copied_pos);
+        records.emplace_back(std::move(*rec));
     }
 
-    return std::move(combined_blk);
+    // and end with an 'end' record.
+    if (rec && rec->kind() == record_kind::end) {
+        payload_size += rec->payload().size();
+
+        records.emplace_back(std::move(*rec));
+    }
+    else {
+        throw_corrupt_split_record_error();
+    }
+
+    // Once we have collected all records we merge their payloads in a
+    // single buffer.
+    auto payload = get_memory_allocator().allocate(payload_size);
+
+    auto pos = payload->begin();
+    for (record const &r : records) {
+        pos = std::copy(r.payload().begin(), r.payload().end(), pos);
+    }
+
+    return std::move(payload);
+}
+
+void
+default_instance_reader::throw_corrupt_split_record_error()
+{
+    has_corrupt_split_record_ = true;
+
+    throw corrupt_record_error{"Corrupt split record encountered."};
 }
 
 std::optional<record>

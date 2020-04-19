@@ -20,7 +20,6 @@
 #include <optional>
 
 #include "mlio/fwd.h"
-#include "mlio/instance.h"
 #include "mlio/instance_reader.h"
 #include "mlio/instance_reader_base.h"
 

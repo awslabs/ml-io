@@ -79,11 +79,9 @@ parquet_record_reader::decode_record(memory_slice &chunk, bool ignore_leftover)
 
             auto payload = chunk.first(pos);
 
-            std::size_t size = payload.size();
-
             chunk = chunk.subslice(pos);
 
-            return record{std::move(payload), size};
+            return record{std::move(payload)};
         }
     }
 
