@@ -13,7 +13,7 @@
  * language governing permissions and limitations under the License.
  */
 
-#include "mlio/default_instance_reader.h"
+#include "mlio/instance_readers/core_instance_reader.h"
 
 #include <exception>
 #include <system_error>
@@ -36,15 +36,15 @@ namespace mlio {
 inline namespace v1 {
 namespace detail {
 
-default_instance_reader::default_instance_reader(data_reader_params const &prm,
-                                                 record_reader_factory &&fct)
+core_instance_reader::core_instance_reader(data_reader_params const &prm,
+                                           record_reader_factory &&fct)
     : params_{&prm}, record_reader_factory_{std::move(fct)}
 {
     store_iter_ = params_->dataset.begin();
 }
 
 std::optional<instance>
-default_instance_reader::read_instance_core()
+core_instance_reader::read_instance_core()
 {
     std::optional<memory_slice> payload;
     try {
@@ -62,7 +62,7 @@ default_instance_reader::read_instance_core()
 }
 
 void
-default_instance_reader::handle_nested_errors()
+core_instance_reader::handle_nested_errors()
 {
     try {
         throw;
@@ -102,7 +102,7 @@ default_instance_reader::handle_nested_errors()
 }
 
 std::optional<memory_slice>
-default_instance_reader::read_record_payload()
+core_instance_reader::read_record_payload()
 {
     if (has_corrupt_split_record_) {
         throw_corrupt_split_record_error();
@@ -121,7 +121,7 @@ default_instance_reader::read_record_payload()
 }
 
 std::optional<memory_slice>
-default_instance_reader::read_split_record_payload(std::optional<record> rec)
+core_instance_reader::read_split_record_payload(std::optional<record> rec)
 {
     std::vector<record> records{};
 
@@ -167,7 +167,7 @@ default_instance_reader::read_split_record_payload(std::optional<record> rec)
 }
 
 void
-default_instance_reader::throw_corrupt_split_record_error()
+core_instance_reader::throw_corrupt_split_record_error()
 {
     has_corrupt_split_record_ = true;
 
@@ -175,7 +175,7 @@ default_instance_reader::throw_corrupt_split_record_error()
 }
 
 std::optional<record>
-default_instance_reader::read_record()
+core_instance_reader::read_record()
 {
     if (record_reader_ == nullptr) {
         if (!init_next_record_reader()) {
@@ -197,7 +197,7 @@ default_instance_reader::read_record()
 }
 
 bool
-default_instance_reader::init_next_record_reader()
+core_instance_reader::init_next_record_reader()
 {
     if (store_iter_ == params_->dataset.end()) {
         return false;
@@ -236,7 +236,7 @@ default_instance_reader::init_next_record_reader()
 }
 
 void
-default_instance_reader::reset_core() noexcept
+core_instance_reader::reset_core() noexcept
 {
     store_iter_ = params_->dataset.begin();
 

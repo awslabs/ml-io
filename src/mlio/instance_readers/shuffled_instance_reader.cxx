@@ -13,7 +13,7 @@
  * language governing permissions and limitations under the License.
  */
 
-#include "mlio/shuffled_instance_reader.h"
+#include "mlio/instance_readers/shuffled_instance_reader.h"
 
 #include <algorithm>
 #include <limits>

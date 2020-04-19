@@ -23,23 +23,14 @@
 #include <tbb/tbb.h>
 
 #include "mlio/data_reader.h"
-#include "mlio/default_instance_reader.h"
 #include "mlio/detail/thread.h"
 #include "mlio/example.h"
 #include "mlio/instance_batch.h"
 #include "mlio/instance_batch_reader.h"
-#include "mlio/instance_reader.h"
-#include "mlio/ranged_instance_reader.h"
-#include "mlio/sampled_instance_reader.h"
-#include "mlio/sharded_instance_reader.h"
-#include "mlio/shuffled_instance_reader.h"
+#include "mlio/instance_readers/instance_reader.h"
+#include "mlio/record_readers/record_reader.h"
 
-using mlio::detail::default_instance_reader;
 using mlio::detail::instance_batch_reader;
-using mlio::detail::ranged_instance_reader;
-using mlio::detail::sampled_instance_reader;
-using mlio::detail::sharded_instance_reader;
-using mlio::detail::shuffled_instance_reader;
 
 namespace mlio {
 inline namespace v1 {
@@ -66,34 +57,13 @@ struct parallel_data_reader::graph_data {
 parallel_data_reader::parallel_data_reader(data_reader_params &&prm)
     : data_reader_base{std::move(prm)}, graph_{std::make_unique<graph_data>()}
 {
-    data_reader_params const &prms = params();
-
-    reader_ = std::make_unique<default_instance_reader>(
-        prms, [this](data_store const &ds) {
+    reader_ =
+        detail::make_instance_reader(params(), [this](data_store const &ds) {
             return make_record_reader(ds);
         });
 
-    if (prms.num_instances_to_skip > 0 || prms.num_instances_to_read) {
-        reader_ =
-            std::make_unique<ranged_instance_reader>(prms, std::move(reader_));
-    }
-
-    if (prms.num_shards > 1) {
-        reader_ = std::make_unique<sharded_instance_reader>(
-            prms, std::move(reader_));
-    }
-
-    if (prms.sample_ratio) {
-        reader_ = std::make_unique<sampled_instance_reader>(
-            prms, std::move(reader_));
-    }
-
-    if (prms.shuffle_instances) {
-        reader_ = std::make_unique<shuffled_instance_reader>(
-            prms, std::move(reader_));
-    }
-
-    batch_reader_ = std::make_unique<instance_batch_reader>(prms, *reader_);
+    batch_reader_ =
+        std::make_unique<instance_batch_reader>(params(), *reader_);
 }
 
 parallel_data_reader::~parallel_data_reader() = default;

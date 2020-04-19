@@ -15,45 +15,38 @@
 
 #pragma once
 
+#include <cstddef>
+#include <memory>
 #include <optional>
 
 #include "mlio/fwd.h"
+#include "mlio/instance_readers/instance_reader.h"
+#include "mlio/instance_readers/instance_reader_base.h"
 
 namespace mlio {
 inline namespace v1 {
 namespace detail {
 
-// Reads data instances from a dataset.
-class instance_reader {
+class ranged_instance_reader final : public instance_reader_base {
 public:
-    instance_reader() noexcept = default;
+    explicit ranged_instance_reader(data_reader_params const &prm,
+                                    std::unique_ptr<instance_reader> &&inner);
 
-    instance_reader(instance_reader const &) = delete;
+private:
+    std::optional<instance>
+    read_instance_core() final;
 
-    instance_reader(instance_reader &&) = delete;
+    bool
+    should_stop_reading() const noexcept;
 
-    virtual ~instance_reader();
+    void
+    reset_core() noexcept final;
 
-public:
-    instance_reader &
-    operator=(instance_reader const &) = delete;
-
-    instance_reader &
-    operator=(instance_reader &&) = delete;
-
-public:
-    virtual std::optional<instance>
-    read_instance() = 0;
-
-    virtual std::optional<instance>
-    peek_instance() = 0;
-
-    virtual void
-    reset() noexcept = 0;
-
-public:
-    virtual std::size_t
-    num_bytes_read() const noexcept = 0;
+private:
+    data_reader_params const *params_;
+    std::unique_ptr<instance_reader> inner_;
+    bool first_read_ = true;
+    std::size_t num_instances_read_{};
 };
 
 }  // namespace detail

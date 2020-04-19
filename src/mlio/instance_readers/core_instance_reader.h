@@ -16,13 +16,13 @@
 #pragma once
 
 #include <cstddef>
-#include <functional>
 #include <optional>
 #include <vector>
 
 #include "mlio/data_stores/data_store.h"
 #include "mlio/fwd.h"
-#include "mlio/instance_reader_base.h"
+#include "mlio/instance_readers/instance_reader.h"
+#include "mlio/instance_readers/instance_reader_base.h"
 #include "mlio/intrusive_ptr.h"
 #include "mlio/record_readers/record_reader.h"
 
@@ -30,13 +30,10 @@ namespace mlio {
 inline namespace v1 {
 namespace detail {
 
-using record_reader_factory =
-    std::function<intrusive_ptr<record_reader>(data_store const &ds)>;
-
-class default_instance_reader final : public instance_reader_base {
+class core_instance_reader final : public instance_reader_base {
 public:
-    explicit default_instance_reader(data_reader_params const &prm,
-                                     record_reader_factory &&fct);
+    explicit core_instance_reader(data_reader_params const &prm,
+                                  record_reader_factory &&fct);
 
 private:
     std::optional<instance>

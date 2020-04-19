@@ -13,7 +13,7 @@
  * language governing permissions and limitations under the License.
  */
 
-#include "mlio/sampled_instance_reader.h"
+#include "mlio/instance_readers/sampled_instance_reader.h"
 
 #include <utility>
 

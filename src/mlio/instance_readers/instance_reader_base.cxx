@@ -13,47 +13,48 @@
  * language governing permissions and limitations under the License.
  */
 
-#pragma once
-
-#include <cstddef>
-#include <optional>
-
-#include "mlio/instance.h"
-#include "mlio/instance_reader.h"
+#include "mlio/instance_readers/instance_reader_base.h"
 
 namespace mlio {
 inline namespace v1 {
 namespace detail {
 
-class instance_reader_base : public instance_reader {
-public:
-    std::optional<instance>
-    read_instance() final;
-
-    std::optional<instance>
-    peek_instance() final;
-
-    void
-    reset() noexcept final;
-
-private:
-    virtual std::optional<instance>
-    read_instance_core() = 0;
-
-    virtual void
-    reset_core() noexcept = 0;
-
-public:
-    std::size_t
-    num_bytes_read() const noexcept final
-    {
-        return num_bytes_read_;
+std::optional<instance>
+instance_reader_base::read_instance()
+{
+    std::optional<instance> ins{};
+    if (peeked_instance_) {
+        ins = std::exchange(peeked_instance_, std::nullopt);
+    }
+    else {
+        ins = read_instance_core();
     }
 
-private:
-    std::optional<instance> peeked_instance_{};
-    std::size_t num_bytes_read_{};
-};
+    if (ins) {
+        num_bytes_read_ += ins->bits().size();
+    }
+
+    return ins;
+}
+
+std::optional<instance>
+instance_reader_base::peek_instance()
+{
+    if (peeked_instance_ == std::nullopt) {
+        peeked_instance_ = read_instance_core();
+    }
+    return peeked_instance_;
+}
+
+void
+instance_reader_base::reset() noexcept
+{
+    reset_core();
+
+    peeked_instance_ = {};
+
+    num_bytes_read_ = 0;
+}
 
 }  // namespace detail
 }  // namespace v1

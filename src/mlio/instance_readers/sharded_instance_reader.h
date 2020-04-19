@@ -13,48 +13,37 @@
  * language governing permissions and limitations under the License.
  */
 
-#include "mlio/instance_reader_base.h"
+#pragma once
+
+#include <cstddef>
+#include <memory>
+#include <optional>
+
+#include "mlio/fwd.h"
+#include "mlio/instance_readers/instance_reader.h"
+#include "mlio/instance_readers/instance_reader_base.h"
 
 namespace mlio {
 inline namespace v1 {
 namespace detail {
 
-std::optional<instance>
-instance_reader_base::read_instance()
-{
-    std::optional<instance> ins{};
-    if (peeked_instance_) {
-        ins = std::exchange(peeked_instance_, std::nullopt);
-    }
-    else {
-        ins = read_instance_core();
-    }
+class sharded_instance_reader final : public instance_reader_base {
+public:
+    explicit sharded_instance_reader(data_reader_params const &prm,
+                                     std::unique_ptr<instance_reader> &&inner);
 
-    if (ins) {
-        num_bytes_read_ += ins->bits().size();
-    }
+private:
+    std::optional<instance>
+    read_instance_core() final;
 
-    return ins;
-}
+    void
+    reset_core() noexcept final;
 
-std::optional<instance>
-instance_reader_base::peek_instance()
-{
-    if (peeked_instance_ == std::nullopt) {
-        peeked_instance_ = read_instance_core();
-    }
-    return peeked_instance_;
-}
-
-void
-instance_reader_base::reset() noexcept
-{
-    reset_core();
-
-    peeked_instance_ = {};
-
-    num_bytes_read_ = 0;
-}
+private:
+    data_reader_params const *params_;
+    std::unique_ptr<instance_reader> inner_;
+    bool first_read_ = true;
+};
 
 }  // namespace detail
 }  // namespace v1

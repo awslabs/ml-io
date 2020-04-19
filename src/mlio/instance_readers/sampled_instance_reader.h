@@ -18,23 +18,23 @@
 #include <cstddef>
 #include <memory>
 #include <optional>
-#include <random>
 #include <vector>
 
 #include "mlio/fwd.h"
 #include "mlio/instance.h"
-#include "mlio/instance_reader.h"
-#include "mlio/instance_reader_base.h"
+#include "mlio/instance_readers/instance_reader.h"
+#include "mlio/instance_readers/instance_reader_base.h"
 
 namespace mlio {
 inline namespace v1 {
 namespace detail {
 
-class shuffled_instance_reader final : public instance_reader_base {
+class sampled_instance_reader final : public instance_reader_base {
+    static constexpr std::size_t num_instances_to_read_ = 100;
+
 public:
-    explicit shuffled_instance_reader(
-        data_reader_params const &prm,
-        std::unique_ptr<instance_reader> &&inner);
+    explicit sampled_instance_reader(data_reader_params const &prm,
+                                     std::unique_ptr<instance_reader> &&inner);
 
 private:
     std::optional<instance>
@@ -43,22 +43,14 @@ private:
     void
     fill_buffer_from_inner();
 
-    std::optional<instance>
-    pop_random_instance_from_buffer();
-
     void
     reset_core() noexcept final;
 
 private:
     data_reader_params const *params_;
     std::unique_ptr<instance_reader> inner_;
-    std::size_t shuffle_window_;
-    std::vector<instance> buffer_{};
-    bool inner_has_instance_ = true;
-    std::random_device rd_{};
-    std::uint_fast64_t seed_{rd_()};
-    std::mt19937_64 mt_{seed_};
-    std::uniform_int_distribution<std::size_t> dist_;
+    std::vector<std::optional<instance>> buffer_{};
+    std::vector<std::optional<instance>>::iterator buffer_pos_{};
 };
 
 }  // namespace detail

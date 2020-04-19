@@ -13,7 +13,7 @@
  * language governing permissions and limitations under the License.
  */
 
-#include "mlio/sharded_instance_reader.h"
+#include "mlio/instance_readers/ranged_instance_reader.h"
 
 #include <utility>
 
@@ -24,46 +24,57 @@ namespace mlio {
 inline namespace v1 {
 namespace detail {
 
-sharded_instance_reader::sharded_instance_reader(
+ranged_instance_reader::ranged_instance_reader(
     data_reader_params const &prm, std::unique_ptr<instance_reader> &&inner)
     : params_{&prm}, inner_{std::move(inner)}
-{
-    if (params_->shard_index >= params_->num_shards) {
-        throw std::invalid_argument{
-            "The shard index must be less than the number of shards."};
-    }
-}
+{}
 
 std::optional<instance>
-sharded_instance_reader::read_instance_core()
+ranged_instance_reader::read_instance_core()
 {
-    std::size_t num_instances_to_skip{};
-
     if (first_read_) {
         first_read_ = false;
 
-        num_instances_to_skip = params_->shard_index;
-    }
-    else {
-        num_instances_to_skip = params_->num_shards - 1;
-    }
-
-    for (std::size_t i = 0; i < num_instances_to_skip; i++) {
-        std::optional<instance> ins = inner_->read_instance();
-        if (ins == std::nullopt) {
-            return {};
+        for (std::size_t i = 0; i < params_->num_instances_to_skip; i++) {
+            std::optional<instance> ins = inner_->read_instance();
+            if (ins == std::nullopt) {
+                return {};
+            }
         }
     }
 
-    return inner_->read_instance();
+    if (should_stop_reading()) {
+        return {};
+    }
+
+    std::optional<instance> ins = inner_->read_instance();
+    if (ins == std::nullopt) {
+        return {};
+    }
+
+    num_instances_read_++;
+
+    return ins;
+}
+
+inline bool
+ranged_instance_reader::should_stop_reading() const noexcept
+{
+    if (params_->num_instances_to_read == std::nullopt) {
+        return false;
+    }
+
+    return num_instances_read_ == *params_->num_instances_to_read;
 }
 
 void
-sharded_instance_reader::reset_core() noexcept
+ranged_instance_reader::reset_core() noexcept
 {
     inner_->reset();
 
     first_read_ = true;
+
+    num_instances_read_ = 0;
 }
 
 }  // namespace detail

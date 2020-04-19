@@ -17,6 +17,13 @@ add_library(mlio
     detail/pathname.cxx
     detail/s3_utils.cxx
     detail/system_info.cxx
+    instance_readers/core_instance_reader.cxx
+    instance_readers/instance_reader.cxx
+    instance_readers/instance_reader_base.cxx
+    instance_readers/ranged_instance_reader.cxx
+    instance_readers/sampled_instance_reader.cxx
+    instance_readers/sharded_instance_reader.cxx
+    instance_readers/shuffled_instance_reader.cxx
     integ/dlpack.cxx
     memory/external_memory_block.cxx
     memory/file_backed_memory_block.cxx
@@ -64,7 +71,6 @@ add_library(mlio
     data_reader.cxx
     data_reader_error.cxx
     data_type.cxx
-    default_instance_reader.cxx
     device_array.cxx
     device.cxx
     example.cxx
@@ -72,20 +78,14 @@ add_library(mlio
     init.cxx
     init_aws.cxx
     instance_batch_reader.cxx
-    instance_reader.cxx
-    instance_reader_base.cxx
     logger.cxx
     mlio_error.cxx
     not_supported_error.cxx
     parallel_data_reader.cxx
     parser.cxx
-    ranged_instance_reader.cxx
     recordio_protobuf_reader.cxx
     s3_client.cxx
-    sampled_instance_reader.cxx
     schema.cxx
-    sharded_instance_reader.cxx
-    shuffled_instance_reader.cxx
     tensor.cxx
     tensor_visitor.cxx
     text_encoding.cxx
