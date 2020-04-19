@@ -15,7 +15,6 @@
 
 #include "mlio/default_instance_reader.h"
 
-#include <algorithm>
 #include <exception>
 #include <iostream>
 #include <system_error>
@@ -49,56 +48,44 @@ constexpr char const *corrupt_split_error_msg =
 
 default_instance_reader::default_instance_reader(data_reader_params const &prm,
                                                  record_reader_factory &&fct)
-    : params_{&prm}
-    , record_reader_factory_{std::move(fct)}
-    , num_shards_{std::max(params_->num_shards, 1UL)}
-    , instance_to_read_{params_->num_instances_to_skip + params_->shard_index}
+    : params_{&prm}, record_reader_factory_{std::move(fct)}
 {
-    if (params_->shard_index >= num_shards_) {
-        throw std::invalid_argument{
-            "The shard index must be less than the number of shards."};
-    }
-
     store_iter_ = params_->dataset.begin();
 }
 
 std::optional<instance>
 default_instance_reader::read_instance_core()
 {
-    std::optional<memory_slice> payload;
+    skip_instances();
 
-    try {
-        // We skip to the next element in our shard.
-        while (instance_idx_ < instance_to_read_) {
-            if (should_stop_reading()) {
-                return {};
-            }
-
-            if ((payload = read_record_payload()) == std::nullopt) {
-                return {};
-            }
-
-            instance_idx_++;
-
-            store_instance_idx_++;
-        }
-
-        if (should_stop_reading()) {
-            return {};
-        }
-
-        if ((payload = read_record_payload()) == std::nullopt) {
-            return {};
-        }
-
-        instance_idx_++;
-
-        instance_to_read_ += num_shards_;
-
-        return instance{*store_, store_instance_idx_++, std::move(*payload)};
+    if (should_stop_reading()) {
+        return {};
     }
-    catch (std::exception const &) {
-        handle_nested_errors();
+
+    std::optional<instance> ins = read_instance_internal();
+    if (ins == std::nullopt) {
+        return {};
+    }
+
+    num_instances_read_++;
+
+    return ins;
+}
+
+void
+default_instance_reader::skip_instances()
+{
+    if (skipped_instances_) {
+        return;
+    }
+
+    skipped_instances_ = true;
+
+    for (std::size_t i = 0; i < params_->num_instances_to_skip; i++) {
+        std::optional<instance> ins = read_instance_internal();
+        if (ins == std::nullopt) {
+            break;
+        }
     }
 }
 
@@ -109,14 +96,25 @@ default_instance_reader::should_stop_reading() const noexcept
         return false;
     }
 
-    std::size_t num_instances_read{};
-    if (instance_idx_ <= params_->num_instances_to_skip) {
-        num_instances_read = 0;
+    return num_instances_read_ == *params_->num_instances_to_read;
+}
+
+std::optional<instance>
+default_instance_reader::read_instance_internal()
+{
+    std::optional<memory_slice> payload;
+    try {
+        payload = read_record_payload();
     }
-    else {
-        num_instances_read = instance_idx_ - params_->num_instances_to_skip;
+    catch (std::exception const &) {
+        handle_nested_errors();
     }
-    return num_instances_read == *params_->num_instances_to_read;
+
+    if (payload == std::nullopt) {
+        return {};
+    }
+
+    return instance{*store_, instance_idx_++, std::move(*payload)};
 }
 
 void
@@ -130,14 +128,14 @@ default_instance_reader::handle_nested_errors()
             fmt::format("The record #{1:n} in the data store '{0}' is too "
                         "large. See nested exception for details.",
                         store_->id(),
-                        store_record_idx_)});
+                        record_idx_)});
     }
     catch (corrupt_record_error const &) {
         std::throw_with_nested(data_reader_error{
             fmt::format("The record #{1:n} in the data store '{0}' is "
                         "corrupt. See nested exception for details.",
                         store_->id(),
-                        store_record_idx_)});
+                        record_idx_)});
     }
     catch (stream_error const &) {
         std::throw_with_nested(data_reader_error{
@@ -221,16 +219,21 @@ default_instance_reader::read_record_payload()
 std::optional<record>
 default_instance_reader::read_record()
 {
-    std::optional<record> rec{};
-
-    while (record_reader_ == nullptr ||
-           (rec = record_reader_->read_record()) == std::nullopt) {
+    if (record_reader_ == nullptr) {
         if (!init_next_record_reader()) {
             return {};
         }
     }
 
-    store_record_idx_++;
+    std::optional<record> rec{};
+
+    while ((rec = record_reader_->read_record()) == std::nullopt) {
+        if (!init_next_record_reader()) {
+            return {};
+        }
+    }
+
+    record_idx_++;
 
     return rec;
 }
@@ -242,9 +245,9 @@ default_instance_reader::init_next_record_reader()
         return false;
     }
 
-    store_record_idx_ = 0;
+    instance_idx_ = 0;
 
-    store_instance_idx_ = 0;
+    record_idx_ = 0;
 
     store_ = store_iter_->get();
 
@@ -283,15 +286,15 @@ default_instance_reader::reset() noexcept
 
     record_reader_ = nullptr;
 
-    num_bytes_read_ = 0;
-
-    store_record_idx_ = 0;
-
-    store_instance_idx_ = 0;
+    skipped_instances_ = false;
 
     instance_idx_ = 0;
 
-    instance_to_read_ = params_->shard_index;
+    num_instances_read_ = 0;
+
+    record_idx_ = 0;
+
+    num_bytes_read_ = 0;
 
     has_corrupt_split_record_ = false;
 }

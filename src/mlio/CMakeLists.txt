@@ -83,6 +83,7 @@ add_library(mlio
     s3_client.cxx
     sampled_instance_reader.cxx
     schema.cxx
+    sharded_instance_reader.cxx
     shuffled_instance_reader.cxx
     tensor.cxx
     tensor_visitor.cxx

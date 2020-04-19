@@ -42,8 +42,14 @@ private:
     std::optional<instance>
     read_instance_core() final;
 
+    void
+    skip_instances();
+
     bool
     should_stop_reading() const noexcept;
+
+    std::optional<instance>
+    read_instance_internal();
 
     [[noreturn]] void
     handle_nested_errors();
@@ -71,15 +77,14 @@ public:
 private:
     data_reader_params const *params_;
     record_reader_factory record_reader_factory_;
-    std::vector<intrusive_ptr<data_store>>::const_iterator store_iter_;
+    std::vector<intrusive_ptr<data_store>>::const_iterator store_iter_{};
     data_store *store_{};
     intrusive_ptr<record_reader> record_reader_{};
-    std::size_t num_shards_;
-    std::size_t num_bytes_read_{};
-    std::size_t store_record_idx_{};
-    std::size_t store_instance_idx_{};
+    bool skipped_instances_{};
     std::size_t instance_idx_{};
-    std::size_t instance_to_read_;
+    std::size_t num_instances_read_{};
+    std::size_t record_idx_{};
+    std::size_t num_bytes_read_{};
     bool has_corrupt_split_record_{};
 };
 
