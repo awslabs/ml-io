@@ -29,8 +29,7 @@ inline namespace v1 {
 namespace detail {
 namespace {
 
-std::string
-repr(tensor const &tsr, std::string_view type_name)
+std::string repr(tensor const &tsr, std::string_view type_name)
 {
     return fmt::format("<{0} data_type='{1}' shape=({2}) strides=({3})>",
                        type_name,
@@ -56,8 +55,7 @@ tensor::tensor(data_type dt, size_vector &&shape, ssize_vector &&strides)
 
 tensor::~tensor() = default;
 
-ssize_vector
-tensor::default_strides(size_vector const &shape)
+ssize_vector tensor::default_strides(size_vector const &shape)
 {
     if (shape.empty()) {
         return {};
@@ -76,14 +74,12 @@ tensor::default_strides(size_vector const &shape)
 dense_tensor::dense_tensor(size_vector shape,
                            std::unique_ptr<device_array> &&data,
                            ssize_vector strides)
-    : tensor{data->dtype(), std::move(shape), std::move(strides)}
-    , data_{std::move(data)}
+    : tensor{data->dtype(), std::move(shape), std::move(strides)}, data_{std::move(data)}
 {
     validate_data_size();
 }
 
-void
-dense_tensor::validate_data_size() const
+void dense_tensor::validate_data_size() const
 {
     if (shape().empty()) {
         return;
@@ -105,20 +101,17 @@ dense_tensor::validate_data_size() const
     }
 }
 
-std::string
-dense_tensor::repr() const
+std::string dense_tensor::repr() const
 {
     return detail::repr(*this, "dense_tensor");
 }
 
-void
-dense_tensor::accept(tensor_visitor &vst)
+void dense_tensor::accept(tensor_visitor &vst)
 {
     vst.visit(*this);
 }
 
-void
-dense_tensor::accept(tensor_visitor &vst) const
+void dense_tensor::accept(tensor_visitor &vst) const
 {
     vst.visit(*this);
 }
@@ -132,33 +125,28 @@ coo_tensor::coo_tensor(size_vector shape,
 {
     if (this->shape().size() != coordinates_.size()) {
         throw std::invalid_argument{
-            "The number of coordinate vectors does not match the number of "
-            "dimensions."};
+            "The number of coordinate vectors does not match the number of dimensions."};
     }
 
     for (auto &indices : coordinates_) {
         if (indices->size() != data_->size()) {
             throw std::invalid_argument{
-                "The size of at least one coordinate vector does not match "
-                "the size of the data array."};
+                "The size of at least one coordinate vector does not match the size of the data array."};
         }
     }
 }
 
-std::string
-coo_tensor::repr() const
+std::string coo_tensor::repr() const
 {
     return detail::repr(*this, "coo_tensor");
 }
 
-void
-coo_tensor::accept(tensor_visitor &vst)
+void coo_tensor::accept(tensor_visitor &vst)
 {
     vst.visit(*this);
 }
 
-void
-coo_tensor::accept(tensor_visitor &vst) const
+void coo_tensor::accept(tensor_visitor &vst) const
 {
     vst.visit(*this);
 }
@@ -175,14 +163,12 @@ csr_tensor::csr_tensor(size_vector shape,
     size_vector const &shp = this->shape();
 
     if (shp.size() > 2) {
-        throw std::invalid_argument{
-            "A CSR tensor cannot have a rank greater than 2."};
+        throw std::invalid_argument{"A CSR tensor cannot have a rank greater than 2."};
     }
 
     if (data_->size() != indices_->size()) {
         throw std::invalid_argument{
-            "The size of the data array does not match the size of the index "
-            "array."};
+            "The size of the data array does not match the size of the index array."};
     }
 
     std::size_t num_rows{};
@@ -198,25 +184,21 @@ csr_tensor::csr_tensor(size_vector shape,
 
     if (indptr->size() != num_rows + 1) {
         throw std::invalid_argument{
-            "The size of the index pointer array does not match the size of "
-            "the row dimension."};
+            "The size of the index pointer array does not match the size of the row dimension."};
     }
 }
 
-std::string
-csr_tensor::repr() const
+std::string csr_tensor::repr() const
 {
     return detail::repr(*this, "csr_tensor");
 }
 
-void
-csr_tensor::accept(tensor_visitor &vst)
+void csr_tensor::accept(tensor_visitor &vst)
 {
     vst.visit(*this);
 }
 
-void
-csr_tensor::accept(tensor_visitor &vst) const
+void csr_tensor::accept(tensor_visitor &vst) const
 {
     vst.visit(*this);
 }

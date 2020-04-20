@@ -26,8 +26,7 @@ namespace mlio {
 inline namespace v1 {
 namespace detail {
 
-memory_slice
-default_chunk_reader::read_chunk(memory_span leftover)
+memory_slice default_chunk_reader::read_chunk(memory_span leftover)
 {
     if (eof_) {
         return {};
@@ -95,8 +94,7 @@ default_chunk_reader::read_chunk(memory_span leftover)
     return memory_slice{chunk}.first(chunk->end() - stdx::ssize(remaining));
 }
 
-void
-default_chunk_reader::set_chunk_size_hint(std::size_t value) noexcept
+void default_chunk_reader::set_chunk_size_hint(std::size_t value) noexcept
 {
     while (value > next_chunk_size_) {
         next_chunk_size_ <<= 1;

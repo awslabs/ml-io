@@ -34,25 +34,20 @@ public:
     ~zlib_inflater();
 
 public:
-    zlib_inflater &
-    operator=(zlib_inflater const &) = delete;
+    zlib_inflater &operator=(zlib_inflater const &) = delete;
 
-    zlib_inflater &
-    operator=(zlib_inflater &&) = delete;
+    zlib_inflater &operator=(zlib_inflater &&) = delete;
 
 public:
-    void
-    inflate(memory_span &inp, mutable_memory_span &out);
+    void inflate(memory_span &inp, mutable_memory_span &out);
 
-    bool
-    eof() const noexcept
+    bool eof() const noexcept
     {
         return state_ == Z_STREAM_END;
     }
 
 private:
-    void
-    validate_state() const;
+    void validate_state() const;
 
 private:
     ::z_stream stream_{};

@@ -45,12 +45,9 @@ namespace detail {
 
 struct sagemaker_pipe_input_stream_access {
     static inline intrusive_ptr<sagemaker_pipe_input_stream>
-    make(std::string &&pathname,
-         std::chrono::seconds timeout,
-         std::optional<std::size_t> fifo_id)
+    make(std::string &&pathname, std::chrono::seconds timeout, std::optional<std::size_t> fifo_id)
     {
-        auto *ptr = new sagemaker_pipe_input_stream{
-            std::move(pathname), timeout, fifo_id};
+        auto *ptr = new sagemaker_pipe_input_stream{std::move(pathname), timeout, fifo_id};
 
         auto strm = wrap_intrusive(ptr);
 
@@ -73,19 +70,15 @@ std::unordered_map<std::string, std::atomic_ptrdiff_t> fifo_ids_{};
 }  // namespace
 }  // namespace detail
 
-intrusive_ptr<sagemaker_pipe_input_stream>
-make_sagemaker_pipe_input_stream(std::string pathname,
-                                 std::chrono::seconds timeout,
-                                 std::optional<std::size_t> fifo_id)
+intrusive_ptr<sagemaker_pipe_input_stream> make_sagemaker_pipe_input_stream(
+    std::string pathname, std::chrono::seconds timeout, std::optional<std::size_t> fifo_id)
 {
-    return sagemaker_pipe_input_stream_access::make(
-        std::move(pathname), timeout, fifo_id);
+    return sagemaker_pipe_input_stream_access::make(std::move(pathname), timeout, fifo_id);
 }
 
-sagemaker_pipe_input_stream::sagemaker_pipe_input_stream(
-    std::string &&pathname,
-    std::chrono::seconds timeout,
-    std::optional<std::size_t> fifo_id)
+sagemaker_pipe_input_stream::sagemaker_pipe_input_stream(std::string &&pathname,
+                                                         std::chrono::seconds timeout,
+                                                         std::optional<std::size_t> fifo_id)
     : pathname_{std::move(pathname)}, timeout_{timeout}
 {
     detail::validate_file_pathname(pathname_);
@@ -93,8 +86,7 @@ sagemaker_pipe_input_stream::sagemaker_pipe_input_stream(
     fifo_id_ = detail::fifo_ids_[pathname_].exchange(-1);
     if (fifo_id_ == -1) {
         auto err = std::make_error_code(std::errc::permission_denied);
-        throw std::system_error{err,
-                                "The SageMaker pipe channel is already open."};
+        throw std::system_error{err, "The SageMaker pipe channel is already open."};
     }
 
     // Overwrite the stored FIFO id with the specified one.
@@ -108,8 +100,7 @@ sagemaker_pipe_input_stream::~sagemaker_pipe_input_stream()
     close();
 }
 
-void
-sagemaker_pipe_input_stream::open_fifo()
+void sagemaker_pipe_input_stream::open_fifo()
 {
     std::string fifo_name = fmt::format("{0}_{1}", pathname_, fifo_id_);
 
@@ -124,13 +115,10 @@ sagemaker_pipe_input_stream::open_fifo()
         // We open the read end of the FIFO in non-blocking mode to make
         // sure that we do not block indefinitely in case SageMaker
         // fails to open the write end.
-        fifo_fd_ =
-            ::open(fifo_name.c_str(), O_RDONLY | O_NONBLOCK | O_CLOEXEC);
+        fifo_fd_ = ::open(fifo_name.c_str(), O_RDONLY | O_NONBLOCK | O_CLOEXEC);
         if (fifo_fd_ != -1) {
             logger::debug(
-                "FIFO {0:n} of the SageMaker pipe channel '{1}' is opened.",
-                fifo_id_,
-                pathname_);
+                "FIFO {0:n} of the SageMaker pipe channel '{1}' is opened.", fifo_id_, pathname_);
 
             fifo_id_++;
 
@@ -152,14 +140,10 @@ sagemaker_pipe_input_stream::open_fifo()
 
     std::error_code err = current_error_code();
     throw std::system_error{
-        err,
-        fmt::format(
-            "FIFO {0:n} of the SageMaker pipe channel cannot be opened.",
-            fifo_id_)};
+        err, fmt::format("FIFO {0:n} of the SageMaker pipe channel cannot be opened.", fifo_id_)};
 }
 
-void
-sagemaker_pipe_input_stream::sleep() noexcept
+void sagemaker_pipe_input_stream::sleep() noexcept
 {
     constexpr std::chrono::seconds attempt_pause{1};
 
@@ -172,8 +156,7 @@ sagemaker_pipe_input_stream::sleep() noexcept
     ::nanosleep(&req, nullptr);
 }
 
-std::size_t
-sagemaker_pipe_input_stream::read(mutable_memory_span dest)
+std::size_t sagemaker_pipe_input_stream::read(mutable_memory_span dest)
 {
     check_if_closed();
 
@@ -189,8 +172,7 @@ sagemaker_pipe_input_stream::read(mutable_memory_span dest)
         // to read from the FIFO before checking if there is any data
         // available. As long as the write end behaves as expected this
         // call won't fail and it will spare us the costly system calls.
-        ssize_t num_bytes_read =
-            ::read(fifo_fd_.get(), dest.data(), dest.size());
+        ssize_t num_bytes_read = ::read(fifo_fd_.get(), dest.data(), dest.size());
         if (num_bytes_read == -1) {
             if (errno == EAGAIN) {
                 attempt_count++;
@@ -215,17 +197,14 @@ sagemaker_pipe_input_stream::read(mutable_memory_span dest)
             std::error_code err = current_error_code();
             throw std::system_error{
                 err,
-                fmt::format(
-                    "FIFO {0:n} of the SageMaker pipe channel cannot be read.",
-                    fifo_id_)};
+                fmt::format("FIFO {0:n} of the SageMaker pipe channel cannot be read.", fifo_id_)};
         }
 
         return static_cast<std::size_t>(num_bytes_read);
     }
 }
 
-void
-sagemaker_pipe_input_stream::wait_for_data()
+void sagemaker_pipe_input_stream::wait_for_data()
 {
     ::fd_set readfds{};
     // NOLINTNEXTLINE(readability-isolate-declaration)
@@ -251,37 +230,30 @@ sagemaker_pipe_input_stream::wait_for_data()
     // timeout is modified to indicate the remaining time. This means we
     // do not need to keep track of it. Note that this is not compliant
     // with SUSv3.
-    int ready = detail::temp_failure_retry(
-        ::select, fifo_fd_.get() + 1, &readfds, nullptr, nullptr, &tv);
+    int ready =
+        detail::temp_failure_retry(::select, fifo_fd_.get() + 1, &readfds, nullptr, nullptr, &tv);
 
     if (ready == 0) {
         std::error_code err = std::make_error_code(std::errc::timed_out);
         throw std::system_error{
-            err,
-            fmt::format("FIFO {0:n} of the SageMaker pipe channel timed out.",
-                        fifo_id_)};
+            err, fmt::format("FIFO {0:n} of the SageMaker pipe channel timed out.", fifo_id_)};
     }
 
     if (ready == -1) {
         std::error_code err = current_error_code();
         throw std::system_error{
-            err,
-            fmt::format(
-                "FIFO {0:n} of the SageMaker pipe channel cannot be read.",
-                fifo_id_)};
+            err, fmt::format("FIFO {0:n} of the SageMaker pipe channel cannot be read.", fifo_id_)};
     }
 }
 
-void
-sagemaker_pipe_input_stream::close() noexcept
+void sagemaker_pipe_input_stream::close() noexcept
 {
     fifo_fd_ = {};
 
     detail::fifo_ids_[pathname_].exchange(fifo_id_);
 }
 
-void
-sagemaker_pipe_input_stream::check_if_closed() const
+void sagemaker_pipe_input_stream::check_if_closed() const
 {
     if (fifo_fd_.is_open()) {
         return;

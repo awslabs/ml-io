@@ -30,14 +30,12 @@ inline namespace v1 {
 /// @{
 
 MLIO_API
-intrusive_ptr<mutable_memory_block>
-resize_memory_block(intrusive_ptr<mutable_memory_block> &blk,
-                    std::size_t size);
+intrusive_ptr<mutable_memory_block> resize_memory_block(intrusive_ptr<mutable_memory_block> &blk,
+                                                        std::size_t size);
 
 template<typename T>
 MLIO_API
-std::unique_ptr<T>
-wrap_unique(T *ptr) noexcept
+std::unique_ptr<T> wrap_unique(T *ptr) noexcept
 {
     static_assert(!std::is_array<T>::value, "T must be a non-array type.");
 

@@ -13,7 +13,7 @@
  * language governing permissions and limitations under the License.
  */
 
-#include "mlio/data_stores/detail/file_util.h"
+#include "mlio/data_stores/detail/util.h"
 
 #include <cstddef>
 
@@ -21,8 +21,7 @@ namespace mlio {
 inline namespace v1 {
 namespace detail {
 
-compression
-infer_compression(std::string_view pathname) noexcept
+compression infer_compression(std::string_view pathname) noexcept
 {
     std::size_t len = pathname.size();
 
@@ -34,13 +33,11 @@ infer_compression(std::string_view pathname) noexcept
     }
 
     if (len > 4 && pathname[len - 4] == '.') {
-        if (pathname[len - 3] == 'b' && pathname[len - 2] == 'z' &&
-            pathname[len - 1] == '2') {
+        if (pathname[len - 3] == 'b' && pathname[len - 2] == 'z' && pathname[len - 1] == '2') {
             return compression::bzip2;
         }
 
-        if (pathname[len - 3] == 'z' && pathname[len - 2] == 'i' &&
-            pathname[len - 1] == 'p') {
+        if (pathname[len - 3] == 'z' && pathname[len - 2] == 'i' && pathname[len - 1] == 'p') {
             return compression::zip;
         }
     }

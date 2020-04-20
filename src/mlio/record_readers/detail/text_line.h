@@ -24,10 +24,9 @@ namespace mlio {
 inline namespace v1 {
 namespace detail {
 
-std::optional<record>
-read_line(memory_slice &chunk,
-          bool ignore_leftover,
-          std::optional<std::size_t> max_line_length = {});
+std::optional<record> read_line(memory_slice &chunk,
+                                bool ignore_leftover,
+                                std::optional<std::size_t> max_line_length = {});
 
 }  // namespace detail
 }  // namespace v1

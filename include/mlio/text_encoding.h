@@ -44,8 +44,7 @@ public:
     {}
 
 public:
-    std::string const &
-    name() const noexcept
+    std::string const &name() const noexcept
     {
         return name_;
     }
@@ -55,15 +54,13 @@ private:
 };
 
 MLIO_API
-inline bool
-operator==(text_encoding const &lhs, text_encoding const &rhs) noexcept
+inline bool operator==(text_encoding const &lhs, text_encoding const &rhs) noexcept
 {
     return lhs.name() == rhs.name();
 }
 
 MLIO_API
-inline bool
-operator!=(text_encoding const &lhs, text_encoding const &rhs) noexcept
+inline bool operator!=(text_encoding const &lhs, text_encoding const &rhs) noexcept
 {
     return lhs.name() != rhs.name();
 }
@@ -75,8 +72,7 @@ namespace std {
 
 template<>
 struct MLIO_API hash<mlio::text_encoding> {
-    inline size_t
-    operator()(mlio::text_encoding const &enc) const noexcept
+    inline size_t operator()(mlio::text_encoding const &enc) const noexcept
     {
         return hash<string>{}(enc.name());
     }

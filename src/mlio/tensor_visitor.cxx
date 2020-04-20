@@ -23,52 +23,42 @@ inline namespace v1 {
 
 tensor_visitor::~tensor_visitor() = default;
 
-void
-tensor_visitor::visit(tensor &)
+void tensor_visitor::visit(tensor &)
 {
-    throw not_supported_error{
-        "The operation is not supported for the specified tensor."};
+    throw not_supported_error{"The operation is not supported for the specified tensor."};
 }
 
-void
-tensor_visitor::visit(tensor const &)
+void tensor_visitor::visit(tensor const &)
 {
-    throw not_supported_error{
-        "The operation is not supported for the specified tensor."};
+    throw not_supported_error{"The operation is not supported for the specified tensor."};
 }
 
-void
-tensor_visitor::visit(dense_tensor &tsr)
+void tensor_visitor::visit(dense_tensor &tsr)
 {
     visit(static_cast<tensor &>(tsr));
 }
 
-void
-tensor_visitor::visit(dense_tensor const &tsr)
+void tensor_visitor::visit(dense_tensor const &tsr)
 {
     visit(static_cast<tensor const &>(tsr));
 }
 
-void
-tensor_visitor::visit(coo_tensor &tsr)
+void tensor_visitor::visit(coo_tensor &tsr)
 {
     visit(static_cast<tensor &>(tsr));
 }
 
-void
-tensor_visitor::visit(coo_tensor const &tsr)
+void tensor_visitor::visit(coo_tensor const &tsr)
 {
     visit(static_cast<tensor const &>(tsr));
 }
 
-void
-tensor_visitor::visit(csr_tensor &tsr)
+void tensor_visitor::visit(csr_tensor &tsr)
 {
     visit(static_cast<tensor &>(tsr));
 }
 
-void
-tensor_visitor::visit(csr_tensor const &tsr)
+void tensor_visitor::visit(csr_tensor const &tsr)
 {
     visit(static_cast<tensor const &>(tsr));
 }

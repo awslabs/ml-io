@@ -27,18 +27,15 @@ namespace mlio {
 inline namespace v1 {
 namespace detail {
 
-instance_batch_reader::instance_batch_reader(data_reader_params const &prm,
-                                             instance_reader &rdr)
+instance_batch_reader::instance_batch_reader(data_reader_params const &prm, instance_reader &rdr)
     : params_{&prm}, reader_{&rdr}
 {
     if (params_->batch_size == 0) {
-        throw std::invalid_argument{
-            "The batch size must be greater than zero."};
+        throw std::invalid_argument{"The batch size must be greater than zero."};
     }
 }
 
-std::optional<instance_batch>
-instance_batch_reader::read_instance_batch()
+std::optional<instance_batch> instance_batch_reader::read_instance_batch()
 {
     std::vector<instance> instances{};
     instances.reserve(params_->batch_size);
@@ -61,18 +58,18 @@ instance_batch_reader::read_instance_batch()
             return {};
         }
         if (params_->last_batch_hnd == last_batch_handling::drop_warn) {
-            logger::warn("The last example has been dropped as it had only "
-                         "{0:n} instance(s) while the batch size is {1:n}.",
-                         instances.size(),
-                         params_->batch_size);
+            logger::warn(
+                "The last example has been dropped as it had only {0:n} instance(s) while the batch size is {1:n}.",
+                instances.size(),
+                params_->batch_size);
 
             return {};
         }
         if (params_->last_batch_hnd == last_batch_handling::pad_warn) {
-            logger::warn("The last example has been padded as it had only "
-                         "{0:n} instance(s) while the batch size is {1:n}.",
-                         instances.size(),
-                         params_->batch_size);
+            logger::warn(
+                "The last example has been padded as it had only {0:n} instance(s) while the batch size is {1:n}.",
+                instances.size(),
+                params_->batch_size);
         }
     }
 
@@ -87,8 +84,7 @@ instance_batch_reader::read_instance_batch()
     return instance_batch{batch_idx_++, std::move(instances), size};
 }
 
-void
-instance_batch_reader::reset() noexcept
+void instance_batch_reader::reset() noexcept
 {
     reader_->reset();
 

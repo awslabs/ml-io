@@ -60,46 +60,37 @@ public:
     virtual ~tensor();
 
 public:
-    tensor &
-    operator=(tensor const &) = delete;
+    tensor &operator=(tensor const &) = delete;
 
-    tensor &
-    operator=(tensor &&) = delete;
+    tensor &operator=(tensor &&) = delete;
 
 private:
-    static ssize_vector
-    default_strides(size_vector const &shape);
+    static ssize_vector default_strides(size_vector const &shape);
 
 public:
-    virtual std::string
-    repr() const = 0;
+    virtual std::string repr() const = 0;
 
 public:
-    data_type
-    dtype() const noexcept
+    data_type dtype() const noexcept
     {
         return data_type_;
     }
 
-    size_vector const &
-    shape() const noexcept
+    size_vector const &shape() const noexcept
     {
         return shape_;
     }
 
-    ssize_vector const &
-    strides() const noexcept
+    ssize_vector const &strides() const noexcept
     {
         return strides_;
     }
 
 public:
     /// Invokes the specific visit function for this tensor type.
-    virtual void
-    accept(tensor_visitor &vst) = 0;
+    virtual void accept(tensor_visitor &vst) = 0;
 
-    virtual void
-    accept(tensor_visitor &vst) const = 0;
+    virtual void accept(tensor_visitor &vst) const = 0;
 
 private:
     data_type data_type_;
@@ -108,8 +99,7 @@ private:
 };
 
 MLIO_API
-inline std::ostream &
-operator<<(std::ostream &strm, tensor const &tsr)
+inline std::ostream &operator<<(std::ostream &strm, tensor const &tsr)
 {
     return strm << tsr.repr();
 }
@@ -129,32 +119,26 @@ public:
                           ssize_vector strides = {});
 
 private:
-    void
-    validate_data_size() const;
+    void validate_data_size() const;
 
 public:
-    std::string
-    repr() const final;
+    std::string repr() const final;
 
 public:
-    device_array_span
-    data() noexcept
+    device_array_span data() noexcept
     {
         return device_array_span{*data_};
     }
 
-    device_array_view
-    data() const noexcept
+    device_array_view data() const noexcept
     {
         return device_array_view{*data_};
     }
 
 public:
-    void
-    accept(tensor_visitor &vst) final;
+    void accept(tensor_visitor &vst) final;
 
-    void
-    accept(tensor_visitor &vst) const final;
+    void accept(tensor_visitor &vst) const final;
 
 private:
     std::unique_ptr<device_array> data_;
@@ -171,40 +155,33 @@ public:
                         std::vector<std::unique_ptr<device_array>> &&coords);
 
 public:
-    std::string
-    repr() const final;
+    std::string repr() const final;
 
 public:
-    device_array_span
-    data() noexcept
+    device_array_span data() noexcept
     {
         return device_array_span{*data_};
     }
 
-    device_array_view
-    data() const noexcept
+    device_array_view data() const noexcept
     {
         return device_array_view{*data_};
     }
 
-    device_array_span
-    indices(std::size_t dim) noexcept
+    device_array_span indices(std::size_t dim) noexcept
     {
         return *coordinates_.at(dim);
     }
 
-    device_array_view
-    indices(std::size_t dim) const noexcept
+    device_array_view indices(std::size_t dim) const noexcept
     {
         return *coordinates_.at(dim);
     }
 
 public:
-    void
-    accept(tensor_visitor &vst) final;
+    void accept(tensor_visitor &vst) final;
 
-    void
-    accept(tensor_visitor &vst) const final;
+    void accept(tensor_visitor &vst) const final;
 
 private:
     std::unique_ptr<device_array> data_;
@@ -227,40 +204,33 @@ public:
                         std::unique_ptr<device_array> &&indptr);
 
 public:
-    std::string
-    repr() const final;
+    std::string repr() const final;
 
 public:
-    device_array_span
-    data() noexcept
+    device_array_span data() noexcept
     {
         return device_array_span{*data_};
     }
 
-    device_array_view
-    data() const noexcept
+    device_array_view data() const noexcept
     {
         return device_array_view{*data_};
     }
 
-    device_array_view
-    indices() const noexcept
+    device_array_view indices() const noexcept
     {
         return device_array_view{*indices_};
     }
 
-    device_array_view
-    indptr() const noexcept
+    device_array_view indptr() const noexcept
     {
         return device_array_view{*indptr_};
     }
 
 public:
-    void
-    accept(tensor_visitor &vst) final;
+    void accept(tensor_visitor &vst) final;
 
-    void
-    accept(tensor_visitor &vst) const final;
+    void accept(tensor_visitor &vst) const final;
 
 private:
     std::unique_ptr<device_array> data_;

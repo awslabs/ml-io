@@ -43,8 +43,7 @@ core_instance_reader::core_instance_reader(data_reader_params const &prm,
     store_iter_ = params_->dataset.begin();
 }
 
-std::optional<instance>
-core_instance_reader::read_instance_core()
+std::optional<instance> core_instance_reader::read_instance_core()
 {
     std::optional<memory_slice> payload;
     try {
@@ -61,48 +60,41 @@ core_instance_reader::read_instance_core()
     return instance{*store_, instance_idx_++, std::move(*payload)};
 }
 
-void
-core_instance_reader::handle_nested_errors()
+void core_instance_reader::handle_nested_errors()
 {
     try {
         throw;
     }
     catch (record_too_large_error const &) {
-        std::throw_with_nested(data_reader_error{
-            fmt::format("The record #{1:n} in the data store '{0}' is too "
-                        "large. See nested exception for details.",
-                        store_->id(),
-                        record_idx_)});
+        std::throw_with_nested(data_reader_error{fmt::format(
+            "The record #{1:n} in the data store '{0}' is too large. See nested exception for details.",
+            store_->id(),
+            record_idx_)});
     }
     catch (corrupt_record_error const &) {
-        std::throw_with_nested(data_reader_error{
-            fmt::format("The record #{1:n} in the data store '{0}' is "
-                        "corrupt. See nested exception for details.",
-                        store_->id(),
-                        record_idx_)});
+        std::throw_with_nested(data_reader_error{fmt::format(
+            "The record #{1:n} in the data store '{0}' is corrupt. See nested exception for details.",
+            store_->id(),
+            record_idx_)});
     }
     catch (stream_error const &) {
-        std::throw_with_nested(data_reader_error{
-            fmt::format("The data store '{0}' contains corrupt data. See "
-                        "nested exception for details.",
-                        store_->id())});
+        std::throw_with_nested(data_reader_error{fmt::format(
+            "The data store '{0}' contains corrupt data. See nested exception for details.",
+            store_->id())});
     }
     catch (not_supported_error const &) {
         std::throw_with_nested(data_reader_error{
-            fmt::format("The data store '{0}' cannot be read. See nested "
-                        "exception for details.",
+            fmt::format("The data store '{0}' cannot be read. See nested exception for details.",
                         store_->id())});
     }
     catch (std::system_error const &) {
         std::throw_with_nested(data_reader_error{fmt::format(
-            "A system error occurred while trying to read from the data store "
-            "'{0}'. See nested exception for details.",
+            "A system error occurred while trying to read from the data store '{0}'. See nested exception for details.",
             store_->id())});
     }
 }
 
-std::optional<memory_slice>
-core_instance_reader::read_record_payload()
+std::optional<memory_slice> core_instance_reader::read_record_payload()
 {
     if (has_corrupt_split_record_) {
         throw_corrupt_split_record_error();
@@ -166,16 +158,14 @@ core_instance_reader::read_split_record_payload(std::optional<record> rec)
     return std::move(payload);
 }
 
-void
-core_instance_reader::throw_corrupt_split_record_error()
+void core_instance_reader::throw_corrupt_split_record_error()
 {
     has_corrupt_split_record_ = true;
 
     throw corrupt_record_error{"Corrupt split record encountered."};
 }
 
-std::optional<record>
-core_instance_reader::read_record()
+std::optional<record> core_instance_reader::read_record()
 {
     if (record_reader_ == nullptr) {
         if (!init_next_record_reader()) {
@@ -196,8 +186,7 @@ core_instance_reader::read_record()
     return rec;
 }
 
-bool
-core_instance_reader::init_next_record_reader()
+bool core_instance_reader::init_next_record_reader()
 {
     if (store_iter_ == params_->dataset.end()) {
         return false;
@@ -214,14 +203,13 @@ core_instance_reader::init_next_record_reader()
     }
     catch (std::system_error const &e) {
         if (e.code() == std::errc::no_such_file_or_directory) {
-            throw data_reader_error{fmt::format(
-                "The data store '{0}' does not exist.", store_->id())};
+            throw data_reader_error{
+                fmt::format("The data store '{0}' does not exist.", store_->id())};
         }
 
         if (e.code() == std::errc::permission_denied) {
             throw data_reader_error{fmt::format(
-                "The permission to read the data store '{0}' is denied.",
-                store_->id())};
+                "The permission to read the data store '{0}' is denied.", store_->id())};
         }
 
         throw;
@@ -235,8 +223,7 @@ core_instance_reader::init_next_record_reader()
     return true;
 }
 
-void
-core_instance_reader::reset_core() noexcept
+void core_instance_reader::reset_core() noexcept
 {
     store_iter_ = params_->dataset.begin();
 

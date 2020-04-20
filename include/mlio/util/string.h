@@ -10,16 +10,13 @@ namespace mlio {
 inline namespace v1 {
 
 MLIO_API
-std::string_view
-trim(std::string_view s) noexcept;
+std::string_view trim(std::string_view s) noexcept;
 
 MLIO_API
-bool
-is_only_whitespace(std::string_view s) noexcept;
+bool is_whitespace_only(std::string_view s) noexcept;
 
 MLIO_API
-inline std::string_view
-as_string_view(stdx::span<std::byte const> bits) noexcept
+inline std::string_view as_string_view(stdx::span<std::byte const> bits) noexcept
 {
     auto chrs = as_span<char const>(bits);
 

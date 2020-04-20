@@ -50,20 +50,17 @@ public:
     {}
 
 public:
-    std::size_t
-    index() const noexcept
+    std::size_t index() const noexcept
     {
         return index_;
     }
 
-    std::vector<instance> const &
-    instances() const noexcept
+    std::vector<instance> const &instances() const noexcept
     {
         return instances_;
     }
 
-    std::size_t
-    size() const noexcept
+    std::size_t size() const noexcept
     {
         return size_;
     }

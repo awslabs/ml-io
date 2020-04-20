@@ -34,8 +34,7 @@ log_level level_{log_level::warning};
 
 namespace detail {
 
-void
-handle_message(log_level lvl, std::string_view msg) noexcept
+void handle_message(log_level lvl, std::string_view msg) noexcept
 {
     if (msg_handler_ != nullptr) {
         try {
@@ -46,10 +45,7 @@ handle_message(log_level lvl, std::string_view msg) noexcept
     }
 }
 
-void
-handle_message(log_level lvl,
-               std::string_view fmt,
-               fmt::format_args args) noexcept
+void handle_message(log_level lvl, std::string_view fmt, fmt::format_args args) noexcept
 {
     fmt::memory_buffer buf;
     try {
@@ -64,22 +60,19 @@ handle_message(log_level lvl,
 
 }  // namespace detail
 
-bool
-is_enabled_for(log_level lvl) noexcept
+bool is_enabled_for(log_level lvl) noexcept
 {
     return lvl <= level_;
 }
 
 }  // namespace logger
 
-log_message_handler
-set_log_message_handler(log_message_handler hdl) noexcept
+log_message_handler set_log_message_handler(log_message_handler hdl) noexcept
 {
     return std::exchange(logger::msg_handler_, std::move(hdl));
 }
 
-void
-set_log_level(log_level lvl) noexcept
+void set_log_level(log_level lvl) noexcept
 {
     logger::level_ = lvl;
 }

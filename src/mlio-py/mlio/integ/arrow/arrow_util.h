@@ -28,8 +28,7 @@
 namespace pymlio {
 namespace detail {
 
-inline arrow::Status
-convert_exception()
+inline arrow::Status convert_exception()
 {
     try {
         throw;
@@ -57,8 +56,7 @@ convert_exception()
 }  // namespace detail
 
 template<typename Function, typename... Args>
-arrow::Status
-arrow_boundary(Function &&f, Args &&... args) noexcept
+arrow::Status arrow_boundary(Function &&f, Args &&... args) noexcept
 {
     try {
         std::forward<Function>(f)(std::forward<Args>(args)...);
@@ -71,8 +69,7 @@ arrow_boundary(Function &&f, Args &&... args) noexcept
 }
 
 template<typename T, typename Function, typename... Args>
-arrow::Result<T>
-arrow_boundary(Function &&f, Args &&... args) noexcept
+arrow::Result<T> arrow_boundary(Function &&f, Args &&... args) noexcept
 {
     try {
         return std::forward<Function>(f)(std::forward<Args>(args)...);

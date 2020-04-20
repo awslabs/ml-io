@@ -38,21 +38,17 @@ public:
     ~external_memory_block() override;
 
 public:
-    external_memory_block &
-    operator=(external_memory_block const &) = delete;
+    external_memory_block &operator=(external_memory_block const &) = delete;
 
-    external_memory_block &
-    operator=(external_memory_block &&) = delete;
+    external_memory_block &operator=(external_memory_block &&) = delete;
 
 public:
-    const_pointer
-    data() const noexcept final
+    const_pointer data() const noexcept final
     {
         return data_;
     }
 
-    size_type
-    size() const noexcept final
+    size_type size() const noexcept final
     {
         return size_;
     }

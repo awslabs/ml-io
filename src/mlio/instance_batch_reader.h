@@ -27,19 +27,15 @@ namespace detail {
 
 class instance_batch_reader {
 public:
-    explicit instance_batch_reader(data_reader_params const &prm,
-                                   instance_reader &rdr);
+    explicit instance_batch_reader(data_reader_params const &prm, instance_reader &rdr);
 
 public:
-    std::optional<instance_batch>
-    read_instance_batch();
+    std::optional<instance_batch> read_instance_batch();
 
-    void
-    reset() noexcept;
+    void reset() noexcept;
 
 private:
-    void
-    init_num_instances_to_skip();
+    void init_num_instances_to_skip();
 
 private:
     data_reader_params const *params_;

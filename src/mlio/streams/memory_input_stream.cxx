@@ -24,8 +24,7 @@
 namespace mlio {
 inline namespace v1 {
 
-std::size_t
-memory_input_stream::read(mutable_memory_span dest)
+std::size_t memory_input_stream::read(mutable_memory_span dest)
 {
     check_if_closed();
 
@@ -42,8 +41,7 @@ memory_input_stream::read(mutable_memory_span dest)
     return as_size(last - dest.begin());
 }
 
-memory_slice
-memory_input_stream::read(std::size_t size)
+memory_slice memory_input_stream::read(std::size_t size)
 {
     check_if_closed();
 
@@ -58,8 +56,7 @@ memory_input_stream::read(std::size_t size)
     return source_.subslice(old_pos, pos_);
 }
 
-void
-memory_input_stream::seek(std::size_t position)
+void memory_input_stream::seek(std::size_t position)
 {
     check_if_closed();
 
@@ -68,38 +65,33 @@ memory_input_stream::seek(std::size_t position)
     advance_position(position);
 }
 
-void
-memory_input_stream::close() noexcept
+void memory_input_stream::close() noexcept
 {
     source_ = {};
 
     closed_ = true;
 }
 
-void
-memory_input_stream::advance_position(std::size_t dist) noexcept
+void memory_input_stream::advance_position(std::size_t dist) noexcept
 {
     pos_ = std::min(pos_ + as_ssize(dist), source_.end());
 }
 
-void
-memory_input_stream::check_if_closed() const
+void memory_input_stream::check_if_closed() const
 {
     if (closed_) {
         throw stream_error{"The input stream is closed."};
     }
 }
 
-std::size_t
-memory_input_stream::size() const
+std::size_t memory_input_stream::size() const
 {
     check_if_closed();
 
     return source_.size();
 }
 
-std::size_t
-memory_input_stream::position() const
+std::size_t memory_input_stream::position() const
 {
     check_if_closed();
 

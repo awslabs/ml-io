@@ -25,8 +25,7 @@ namespace detail {
 
 template<typename T>
 MLIO_API
-inline void
-hash_combine(std::size_t &seed, T const &v)
+inline void hash_combine(std::size_t &seed, T const &v)
 {
     // Taken from the Boost hash_combine function.
     seed ^= std::hash<T>{}(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
@@ -34,8 +33,7 @@ hash_combine(std::size_t &seed, T const &v)
 
 template<typename Cont>
 MLIO_API
-inline void
-hash_range(std::size_t &seed, Cont const &cont)
+inline void hash_range(std::size_t &seed, Cont const &cont)
 {
     for (auto const &e : cont) {
         hash_combine(seed, e);
@@ -44,8 +42,7 @@ hash_range(std::size_t &seed, Cont const &cont)
 
 template<typename Cont>
 MLIO_API
-inline std::size_t
-hash_range(Cont const &cont)
+inline std::size_t hash_range(Cont const &cont)
 {
     std::size_t seed = 0;
 

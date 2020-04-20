@@ -36,11 +36,9 @@ public:
     ~record_error() override;
 
 public:
-    record_error &
-    operator=(record_error const &) = default;
+    record_error &operator=(record_error const &) = default;
 
-    record_error &
-    operator=(record_error &&) = default;
+    record_error &operator=(record_error &&) = default;
 };
 
 class MLIO_API corrupt_record_error : public record_error {
@@ -55,11 +53,9 @@ public:
     ~corrupt_record_error() override;
 
 public:
-    corrupt_record_error &
-    operator=(corrupt_record_error const &) = default;
+    corrupt_record_error &operator=(corrupt_record_error const &) = default;
 
-    corrupt_record_error &
-    operator=(corrupt_record_error &&) = default;
+    corrupt_record_error &operator=(corrupt_record_error &&) = default;
 };
 
 class MLIO_API corrupt_header_error : public corrupt_record_error {
@@ -74,11 +70,9 @@ public:
     ~corrupt_header_error() override;
 
 public:
-    corrupt_header_error &
-    operator=(corrupt_header_error const &) = default;
+    corrupt_header_error &operator=(corrupt_header_error const &) = default;
 
-    corrupt_header_error &
-    operator=(corrupt_header_error &&) = default;
+    corrupt_header_error &operator=(corrupt_header_error &&) = default;
 };
 
 class MLIO_API corrupt_footer_error : public corrupt_record_error {
@@ -93,11 +87,9 @@ public:
     ~corrupt_footer_error() override;
 
 public:
-    corrupt_footer_error &
-    operator=(corrupt_footer_error const &) = default;
+    corrupt_footer_error &operator=(corrupt_footer_error const &) = default;
 
-    corrupt_footer_error &
-    operator=(corrupt_footer_error &&) = default;
+    corrupt_footer_error &operator=(corrupt_footer_error &&) = default;
 };
 
 class MLIO_API record_too_large_error : public record_error {
@@ -112,11 +104,9 @@ public:
     ~record_too_large_error() override;
 
 public:
-    record_too_large_error &
-    operator=(record_too_large_error const &) = default;
+    record_too_large_error &operator=(record_too_large_error const &) = default;
 
-    record_too_large_error &
-    operator=(record_too_large_error &&) = default;
+    record_too_large_error &operator=(record_too_large_error &&) = default;
 };
 
 /// @}

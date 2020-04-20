@@ -25,8 +25,7 @@ namespace {
 
 class py_log_message_handler {
 public:
-    explicit py_log_message_handler(py::function hdl) noexcept
-        : hdl_{std::move(hdl)}
+    explicit py_log_message_handler(py::function hdl) noexcept : hdl_{std::move(hdl)}
     {}
 
     py_log_message_handler(py_log_message_handler const &) = default;
@@ -41,15 +40,12 @@ public:
     }
 
 public:
-    py_log_message_handler &
-    operator=(py_log_message_handler const &) = default;
+    py_log_message_handler &operator=(py_log_message_handler const &) = default;
 
-    py_log_message_handler &
-    operator=(py_log_message_handler &&) = delete;
+    py_log_message_handler &operator=(py_log_message_handler &&) = delete;
 
 public:
-    void
-    operator()(log_level lvl, std::string_view msg) const
+    void operator()(log_level lvl, std::string_view msg) const
     {
         py::gil_scoped_acquire acq_gil;
 
@@ -60,21 +56,18 @@ private:
     py::function hdl_;
 };
 
-log_message_handler
-py_set_log_message_handler(py::function hdl)
+log_message_handler py_set_log_message_handler(py::function hdl)
 {
     py_log_message_handler py_hdl{std::move(hdl)};
 
-    return set_log_message_handler(
-        [py_hdl](log_level lvl, std::string_view msg) {
-            py_hdl(lvl, msg);
-        });
+    return set_log_message_handler([py_hdl](log_level lvl, std::string_view msg) {
+        py_hdl(lvl, msg);
+    });
 }
 
 }  // namespace
 
-void
-register_logging(py::module &m)
+void register_logging(py::module &m)
 {
     py::enum_<log_level>(m, "LogLevel")
         .value("OFF", log_level::off)

@@ -146,35 +146,29 @@ public:
     virtual ~data_reader();
 
 public:
-    data_reader &
-    operator=(data_reader const &) = delete;
+    data_reader &operator=(data_reader const &) = delete;
 
-    data_reader &
-    operator=(data_reader &&) = delete;
+    data_reader &operator=(data_reader &&) = delete;
 
 public:
     /// Returns the @ref schema of the dataset.
-    virtual intrusive_ptr<schema const>
-    read_schema() = 0;
+    virtual intrusive_ptr<schema const> read_schema() = 0;
 
     /// Returns the next @ref example read from the dataset.
     ///
     /// @remark
     ///     If the end of the dataset is reached, returns an
     ///     @c std::nullptr.
-    virtual intrusive_ptr<example>
-    read_example() = 0;
+    virtual intrusive_ptr<example> read_example() = 0;
 
     /// Returns the next @ref example read from the dataset without
     /// consuming it.
-    virtual intrusive_ptr<example>
-    peek_example() = 0;
+    virtual intrusive_ptr<example> peek_example() = 0;
 
     /// Resets the state of the reader. Calling @ref read_example()
     /// the next time will start reading from the beginning of the
     /// dataset.
-    virtual void
-    reset() noexcept = 0;
+    virtual void reset() noexcept = 0;
 
 public:
     /// Gets the number of bytes read from the dataset.
@@ -186,8 +180,7 @@ public:
     /// @remark
     ///     The returned number can be greater than expected as ML-IO
     ///     reads ahead the dataset in background.
-    virtual std::size_t
-    num_bytes_read() const noexcept = 0;
+    virtual std::size_t num_bytes_read() const noexcept = 0;
 };
 
 /// @}

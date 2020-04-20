@@ -32,22 +32,17 @@ namespace detail {
 
 class shuffled_instance_reader final : public instance_reader_base {
 public:
-    explicit shuffled_instance_reader(
-        data_reader_params const &prm,
-        std::unique_ptr<instance_reader> &&inner);
+    explicit shuffled_instance_reader(data_reader_params const &prm,
+                                      std::unique_ptr<instance_reader> &&inner);
 
 private:
-    std::optional<instance>
-    read_instance_core() final;
+    std::optional<instance> read_instance_core() final;
 
-    void
-    fill_buffer_from_inner();
+    void fill_buffer_from_inner();
 
-    std::optional<instance>
-    pop_random_instance_from_buffer();
+    std::optional<instance> pop_random_instance_from_buffer();
 
-    void
-    reset_core() noexcept final;
+    void reset_core() noexcept final;
 
 private:
     data_reader_params const *params_;

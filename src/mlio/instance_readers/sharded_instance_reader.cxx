@@ -24,18 +24,16 @@ namespace mlio {
 inline namespace v1 {
 namespace detail {
 
-sharded_instance_reader::sharded_instance_reader(
-    data_reader_params const &prm, std::unique_ptr<instance_reader> &&inner)
+sharded_instance_reader::sharded_instance_reader(data_reader_params const &prm,
+                                                 std::unique_ptr<instance_reader> &&inner)
     : params_{&prm}, inner_{std::move(inner)}
 {
     if (params_->shard_index >= params_->num_shards) {
-        throw std::invalid_argument{
-            "The shard index must be less than the number of shards."};
+        throw std::invalid_argument{"The shard index must be less than the number of shards."};
     }
 }
 
-std::optional<instance>
-sharded_instance_reader::read_instance_core()
+std::optional<instance> sharded_instance_reader::read_instance_core()
 {
     std::size_t num_instances_to_skip{};
 
@@ -58,8 +56,7 @@ sharded_instance_reader::read_instance_core()
     return inner_->read_instance();
 }
 
-void
-sharded_instance_reader::reset_core() noexcept
+void sharded_instance_reader::reset_core() noexcept
 {
     inner_->reset();
 

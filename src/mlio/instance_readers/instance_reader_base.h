@@ -27,25 +27,19 @@ namespace detail {
 
 class instance_reader_base : public instance_reader {
 public:
-    std::optional<instance>
-    read_instance() final;
+    std::optional<instance> read_instance() final;
 
-    std::optional<instance>
-    peek_instance() final;
+    std::optional<instance> peek_instance() final;
 
-    void
-    reset() noexcept final;
+    void reset() noexcept final;
 
 private:
-    virtual std::optional<instance>
-    read_instance_core() = 0;
+    virtual std::optional<instance> read_instance_core() = 0;
 
-    virtual void
-    reset_core() noexcept = 0;
+    virtual void reset_core() noexcept = 0;
 
 public:
-    std::size_t
-    num_bytes_read() const noexcept final
+    std::size_t num_bytes_read() const noexcept final
     {
         return num_bytes_read_;
     }

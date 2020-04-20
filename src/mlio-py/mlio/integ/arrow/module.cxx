@@ -43,8 +43,7 @@ struct py_arrow_native_file {
     int own_file;
 };
 
-static py::object
-make_py_arrow_native_file(intrusive_ptr<input_stream> &&strm)
+static py::object make_py_arrow_native_file(intrusive_ptr<input_stream> &&strm)
 {
     auto nf_type = py::module::import("pyarrow").attr("NativeFile");
 
@@ -63,16 +62,14 @@ make_py_arrow_native_file(intrusive_ptr<input_stream> &&strm)
     return nf_inst;
 }
 
-static py::object
-as_arrow_file(data_store const &st)
+static py::object as_arrow_file(data_store const &st)
 {
     auto strm = st.open_read();
 
     return make_py_arrow_native_file(std::move(strm));
 }
 
-static py::object
-as_arrow_file(record const &rec)
+static py::object as_arrow_file(record const &rec)
 {
     auto strm = make_intrusive<memory_input_stream>(rec.payload());
 
@@ -81,13 +78,9 @@ as_arrow_file(record const &rec)
 
 PYBIND11_MODULE(arrow, m)
 {
-    m.def("as_arrow_file",
-          py::overload_cast<data_store const &>(&as_arrow_file),
-          "store"_a);
+    m.def("as_arrow_file", py::overload_cast<data_store const &>(&as_arrow_file), "store"_a);
 
-    m.def("as_arrow_file",
-          py::overload_cast<record const &>(&as_arrow_file),
-          "record"_a);
+    m.def("as_arrow_file", py::overload_cast<record const &>(&as_arrow_file), "record"_a);
 }
 
 }  // namespace pymlio

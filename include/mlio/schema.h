@@ -47,40 +47,33 @@ public:
 private:
     explicit attribute() noexcept = default;
 
-    void
-    init();
+    void init();
 
 public:
-    std::string
-    repr() const;
+    std::string repr() const;
 
 public:
-    std::string const &
-    name() const noexcept
+    std::string const &name() const noexcept
     {
         return name_;
     }
 
-    data_type
-    dtype() const noexcept
+    data_type dtype() const noexcept
     {
         return data_type_;
     }
 
-    size_vector const &
-    shape() const noexcept
+    size_vector const &shape() const noexcept
     {
         return shape_;
     }
 
-    ssize_vector const &
-    strides() const noexcept
+    ssize_vector const &strides() const noexcept
     {
         return strides_;
     }
 
-    bool
-    sparse() const noexcept
+    bool sparse() const noexcept
     {
         return sparse_;
     }
@@ -94,19 +87,16 @@ private:
 };
 
 MLIO_API
-bool
-operator==(attribute const &lhs, attribute const &rhs) noexcept;
+bool operator==(attribute const &lhs, attribute const &rhs) noexcept;
 
 MLIO_API
-inline bool
-operator!=(attribute const &lhs, attribute const &rhs) noexcept
+inline bool operator!=(attribute const &lhs, attribute const &rhs) noexcept
 {
     return !(lhs == rhs);
 }
 
 MLIO_API
-inline std::ostream &
-operator<<(std::ostream &strm, attribute const &attr)
+inline std::ostream &operator<<(std::ostream &strm, attribute const &attr)
 {
     return strm << attr.repr();
 }
@@ -114,9 +104,7 @@ operator<<(std::ostream &strm, attribute const &attr)
 /// Builds a @ref attribute instance.
 class MLIO_API attribute_builder {
 public:
-    explicit attribute_builder(std::string name,
-                               data_type dt,
-                               size_vector shape) noexcept
+    explicit attribute_builder(std::string name, data_type dt, size_vector shape) noexcept
     {
         attr_.name_ = std::move(name);
         attr_.data_type_ = dt;
@@ -124,24 +112,21 @@ public:
     }
 
 public:
-    attribute_builder &
-    with_sparsity(bool value) noexcept
+    attribute_builder &with_sparsity(bool value) noexcept
     {
         attr_.sparse_ = value;
 
         return *this;
     }
 
-    attribute_builder &
-    with_strides(ssize_vector strides) noexcept
+    attribute_builder &with_strides(ssize_vector strides) noexcept
     {
         attr_.strides_ = std::move(strides);
 
         return *this;
     }
 
-    attribute &&
-    build()
+    attribute &&build()
     {
         attr_.init();
 
@@ -166,15 +151,12 @@ public:
 
 public:
     /// Returns the index of the attribute with the specified name.
-    std::optional<std::size_t>
-    get_index(std::string const &name) const noexcept;
+    std::optional<std::size_t> get_index(std::string const &name) const noexcept;
 
-    std::string
-    repr() const;
+    std::string repr() const;
 
 public:
-    std::vector<attribute> const &
-    attributes() const noexcept
+    std::vector<attribute> const &attributes() const noexcept
     {
         return attributes_;
     }
@@ -185,19 +167,16 @@ private:
 };
 
 MLIO_API
-bool
-operator==(schema const &lhs, schema const &rhs) noexcept;
+bool operator==(schema const &lhs, schema const &rhs) noexcept;
 
 MLIO_API
-inline bool
-operator!=(schema const &lhs, schema const &rhs) noexcept
+inline bool operator!=(schema const &lhs, schema const &rhs) noexcept
 {
     return !(lhs == rhs);
 }
 
 MLIO_API
-inline std::ostream &
-operator<<(std::ostream &strm, schema const &shm)
+inline std::ostream &operator<<(std::ostream &strm, schema const &shm)
 {
     return strm << shm.repr();
 }
@@ -211,14 +190,12 @@ namespace std {
 
 template<>
 struct MLIO_API hash<mlio::attribute> {
-    size_t
-    operator()(mlio::attribute const &attr) const noexcept;
+    size_t operator()(mlio::attribute const &attr) const noexcept;
 };
 
 template<>
 struct MLIO_API hash<mlio::schema> {
-    inline size_t
-    operator()(mlio::schema const &shm) const noexcept
+    inline size_t operator()(mlio::schema const &shm) const noexcept
     {
         return mlio::detail::hash_range(shm.attributes());
     }

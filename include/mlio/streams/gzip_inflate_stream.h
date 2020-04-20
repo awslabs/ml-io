@@ -45,29 +45,23 @@ public:
     ~gzip_inflate_stream() final;
 
 public:
-    gzip_inflate_stream &
-    operator=(gzip_inflate_stream const &) = delete;
+    gzip_inflate_stream &operator=(gzip_inflate_stream const &) = delete;
 
-    gzip_inflate_stream &
-    operator=(gzip_inflate_stream &&) = delete;
+    gzip_inflate_stream &operator=(gzip_inflate_stream &&) = delete;
 
 public:
     using input_stream_base::read;
 
-    std::size_t
-    read(mutable_memory_span dest) final;
+    std::size_t read(mutable_memory_span dest) final;
 
-    void
-    close() noexcept final;
+    void close() noexcept final;
 
 private:
     MLIO_HIDDEN
-    void
-    check_if_closed() const;
+    void check_if_closed() const;
 
 public:
-    bool
-    closed() const noexcept final;
+    bool closed() const noexcept final;
 
 private:
     intrusive_ptr<input_stream> inner_;

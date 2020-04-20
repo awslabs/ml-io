@@ -32,25 +32,20 @@ protected:
     explicit data_reader_base(data_reader_params &&prm) noexcept;
 
 public:
-    intrusive_ptr<example>
-    read_example() final;
+    intrusive_ptr<example> read_example() final;
 
-    intrusive_ptr<example>
-    peek_example() final;
+    intrusive_ptr<example> peek_example() final;
 
 private:
     /// When implemented in a derived class, returns the next @ref
     /// example read from the dataset.
-    virtual intrusive_ptr<example>
-    read_example_core() = 0;
+    virtual intrusive_ptr<example> read_example_core() = 0;
 
 public:
-    void
-    reset() noexcept override;
+    void reset() noexcept override;
 
 public:
-    data_reader_params const &
-    params() const noexcept
+    data_reader_params const &params() const noexcept
     {
         return params_;
     }
@@ -58,8 +53,7 @@ public:
 protected:
     /// Gets the effective boolean value indicating whether a warning
     /// will be output for each bad instance.
-    bool
-    warn_bad_instances() const noexcept
+    bool warn_bad_instances() const noexcept
     {
         return warn_bad_instances_;
     }

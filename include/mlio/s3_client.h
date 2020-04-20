@@ -49,29 +49,24 @@ public:
     ~s3_client();
 
 public:
-    s3_client &
-    operator=(s3_client const &) = delete;
+    s3_client &operator=(s3_client const &) = delete;
 
-    s3_client &
-    operator=(s3_client &&) = delete;
+    s3_client &operator=(s3_client &&) = delete;
 
 public:
-    void
-    list_objects(std::string_view bucket,
-                 std::string_view prefix,
-                 std::function<void(std::string uri)> const &callback) const;
+    void list_objects(std::string_view bucket,
+                      std::string_view prefix,
+                      std::function<void(std::string uri)> const &callback) const;
 
-    std::size_t
-    read_object(std::string_view bucket,
-                std::string_view key,
-                std::string_view version_id,
-                std::size_t offset,
-                mutable_memory_span dest) const;
+    std::size_t read_object(std::string_view bucket,
+                            std::string_view key,
+                            std::string_view version_id,
+                            std::size_t offset,
+                            mutable_memory_span dest) const;
 
-    std::size_t
-    read_object_size(std::string_view bucket,
-                     std::string_view key,
-                     std::string_view version_id) const;
+    std::size_t read_object_size(std::string_view bucket,
+                                 std::string_view key,
+                                 std::string_view version_id) const;
 
 private:
     std::unique_ptr<Aws::S3::S3Client> core_;
@@ -79,56 +74,49 @@ private:
 
 class MLIO_API s3_client_builder {
 public:
-    s3_client_builder &
-    with_access_key_id(std::string value) noexcept
+    s3_client_builder &with_access_key_id(std::string value) noexcept
     {
         access_key_id_ = std::move(value);
 
         return *this;
     }
 
-    s3_client_builder &
-    with_secret_key(std::string value) noexcept
+    s3_client_builder &with_secret_key(std::string value) noexcept
     {
         secret_key_ = std::move(value);
 
         return *this;
     }
 
-    s3_client_builder &
-    with_session_token(std::string value) noexcept
+    s3_client_builder &with_session_token(std::string value) noexcept
     {
         session_token_ = std::move(value);
 
         return *this;
     }
 
-    s3_client_builder &
-    with_profile(std::string value) noexcept
+    s3_client_builder &with_profile(std::string value) noexcept
     {
         profile_ = std::move(value);
 
         return *this;
     }
 
-    s3_client_builder &
-    with_region(std::string value) noexcept
+    s3_client_builder &with_region(std::string value) noexcept
     {
         region_ = std::move(value);
 
         return *this;
     }
 
-    s3_client_builder &
-    with_https(bool value) noexcept
+    s3_client_builder &with_https(bool value) noexcept
     {
         https_ = value;
 
         return *this;
     }
 
-    intrusive_ptr<s3_client>
-    build();
+    intrusive_ptr<s3_client> build();
 
 private:
     std::string access_key_id_{};

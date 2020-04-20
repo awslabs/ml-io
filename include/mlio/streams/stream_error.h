@@ -36,11 +36,9 @@ public:
     ~stream_error() override;
 
 public:
-    stream_error &
-    operator=(stream_error const &) = default;
+    stream_error &operator=(stream_error const &) = default;
 
-    stream_error &
-    operator=(stream_error &&) = default;
+    stream_error &operator=(stream_error &&) = default;
 };
 
 class MLIO_API inflate_error : public stream_error {
@@ -55,11 +53,9 @@ public:
     ~inflate_error() override;
 
 public:
-    inflate_error &
-    operator=(inflate_error const &) = default;
+    inflate_error &operator=(inflate_error const &) = default;
 
-    inflate_error &
-    operator=(inflate_error &&) = default;
+    inflate_error &operator=(inflate_error &&) = default;
 };
 
 /// @}

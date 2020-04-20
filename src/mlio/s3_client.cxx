@@ -39,8 +39,7 @@ namespace {
 
 std::once_flag chain_initialized;
 
-Aws::Auth::AWSCredentials
-get_default_aws_credentials()
+Aws::Auth::AWSCredentials get_default_aws_credentials()
 {
     using ProvChain = Aws::Auth::DefaultAWSCredentialsProviderChain;
 
@@ -59,8 +58,7 @@ get_default_aws_credentials()
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wswitch-enum"
 
-[[noreturn]] void
-throw_s3_error(Aws::Client::AWSError<Aws::S3::S3Errors> const &err)
+[[noreturn]] void throw_s3_error(Aws::Client::AWSError<Aws::S3::S3Errors> const &err)
 {
     std::error_code ec;
 
@@ -90,8 +88,7 @@ throw_s3_error(Aws::Client::AWSError<Aws::S3::S3Errors> const &err)
 #pragma GCC diagnostic pop
 
 template<typename Outcome>
-inline void
-check_s3_error(Outcome const &outcome)
+inline void check_s3_error(Outcome const &outcome)
 {
     if (!outcome.IsSuccess()) {
         throw_s3_error(outcome.GetError());
@@ -108,17 +105,14 @@ s3_client::s3_client() : core_{}
     core_ = std::make_unique<Aws::S3::S3Client>(crd);
 }
 
-s3_client::s3_client(std::unique_ptr<Aws::S3::S3Client> clt) noexcept
-    : core_{std::move(clt)}
+s3_client::s3_client(std::unique_ptr<Aws::S3::S3Client> clt) noexcept : core_{std::move(clt)}
 {}
 
 s3_client::~s3_client() = default;
 
-void
-s3_client::list_objects(
-    std::string_view bucket,
-    std::string_view prefix,
-    std::function<void(std::string uri)> const &callback) const
+void s3_client::list_objects(std::string_view bucket,
+                             std::string_view prefix,
+                             std::function<void(std::string uri)> const &callback) const
 {
     Aws::S3::Model::ListObjectsV2Request req{};
     req.SetBucket(Aws::String{bucket});
@@ -147,15 +141,14 @@ s3_client::list_objects(
     }
 }
 
-std::size_t
-s3_client::read_object(std::string_view bucket,
-                       std::string_view key,
-                       std::string_view version_id,
-                       std::size_t offset,
-                       mutable_memory_span dest) const
+std::size_t s3_client::read_object(std::string_view bucket,
+                                   std::string_view key,
+                                   std::string_view version_id,
+                                   std::size_t offset,
+                                   mutable_memory_span dest) const
 {
-    std::string range_str = "bytes=" + std::to_string(offset) + "-" +
-                            std::to_string(offset + dest.size());
+    std::string range_str =
+        "bytes=" + std::to_string(offset) + "-" + std::to_string(offset + dest.size());
 
     Aws::S3::Model::GetObjectRequest req{};
     req.SetBucket(Aws::String{bucket});
@@ -177,10 +170,9 @@ s3_client::read_object(std::string_view bucket,
     return static_cast<std::size_t>(body.gcount()) * sizeof(char);
 }
 
-std::size_t
-s3_client::read_object_size(std::string_view bucket,
-                            std::string_view key,
-                            std::string_view version_id) const
+std::size_t s3_client::read_object_size(std::string_view bucket,
+                                        std::string_view key,
+                                        std::string_view version_id) const
 {
     Aws::S3::Model::HeadObjectRequest req{};
     req.SetBucket(Aws::String{bucket});
@@ -196,17 +188,15 @@ s3_client::read_object_size(std::string_view bucket,
     return as_size(outcome.GetResult().GetContentLength());
 }
 
-intrusive_ptr<s3_client>
-s3_client_builder::build()
+intrusive_ptr<s3_client> s3_client_builder::build()
 {
     Aws::Auth::AWSCredentials crd{};
     if (access_key_id_.empty() && secret_key_.empty()) {
         crd = detail::get_default_aws_credentials();
     }
     else {
-        crd = Aws::Auth::AWSCredentials{Aws::String{access_key_id_},
-                                        Aws::String{secret_key_},
-                                        Aws::String{session_token_}};
+        crd = Aws::Auth::AWSCredentials{
+            Aws::String{access_key_id_}, Aws::String{secret_key_}, Aws::String{session_token_}};
     }
 
     Aws::Client::ClientConfiguration cfg{};

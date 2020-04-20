@@ -37,30 +37,25 @@ public:
     explicit hybrid_memory_block(size_type size, size_type oversize_threshold);
 
 public:
-    void
-    resize(size_type size) final;
+    void resize(size_type size) final;
 
 public:
-    pointer
-    data() noexcept final
+    pointer data() noexcept final
     {
         return inner_->data();
     }
 
-    const_pointer
-    data() const noexcept final
+    const_pointer data() const noexcept final
     {
         return inner_->data();
     }
 
-    size_type
-    size() const noexcept final
+    size_type size() const noexcept final
     {
         return inner_->size();
     }
 
-    bool
-    resizable() const noexcept final
+    bool resizable() const noexcept final
     {
         return true;
     }
@@ -71,15 +66,13 @@ private:
     bool file_backed_{};
 };
 
-hybrid_memory_block::hybrid_memory_block(size_type size,
-                                         size_type oversize_threshold)
+hybrid_memory_block::hybrid_memory_block(size_type size, size_type oversize_threshold)
     : oversize_threshold_{oversize_threshold}
 {
     inner_ = make_intrusive<heap_memory_block>(size);
 }
 
-void
-hybrid_memory_block::resize(size_type size)
+void hybrid_memory_block::resize(size_type size)
 {
     // If the requested size exceeds the threshold, we move the data
     // from the heap to a file-backed block. Note that the reverse is
@@ -87,11 +80,10 @@ hybrid_memory_block::resize(size_type size)
     // need to move back to the heap; once initialized accessing a
     // file-backed memory region has no extra latency.
     if (!file_backed_ && inner_->size() > oversize_threshold_) {
-        logger::debug("The data is being moved from heap to file-backed "
-                      "memory block. Old size was {0:n} byte(s); new size is "
-                      "{1:n} bytes.",
-                      inner_->size(),
-                      size);
+        logger::debug(
+            "The data is being moved from heap to file-backed memory block. Old size was {0:n} byte(s); new size is {1:n} bytes.",
+            inner_->size(),
+            size);
 
         auto blk = make_intrusive<file_backed_memory_block>(size);
 
@@ -106,8 +98,7 @@ hybrid_memory_block::resize(size_type size)
     }
 }
 
-std::size_t
-default_oversize_threshold() noexcept
+std::size_t default_oversize_threshold() noexcept
 {
     constexpr std::size_t max_default_threshold = 0x2000'0000;  // 512 MiB
 
@@ -127,8 +118,7 @@ default_oversize_threshold() noexcept
 
 using mlio::detail::hybrid_memory_block;
 
-file_backed_memory_allocator::file_backed_memory_allocator(
-    std::size_t oversize_threshold) noexcept
+file_backed_memory_allocator::file_backed_memory_allocator(std::size_t oversize_threshold) noexcept
     : oversize_threshold_{oversize_threshold}
 {
     if (oversize_threshold_ == 0) {
@@ -136,8 +126,7 @@ file_backed_memory_allocator::file_backed_memory_allocator(
     }
 }
 
-intrusive_ptr<mutable_memory_block>
-file_backed_memory_allocator::allocate(std::size_t size)
+intrusive_ptr<mutable_memory_block> file_backed_memory_allocator::allocate(std::size_t size)
 {
     if (size > oversize_threshold_) {
         return make_intrusive<file_backed_memory_block>(size);

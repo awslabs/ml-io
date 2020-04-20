@@ -21,8 +21,7 @@ namespace mlio {
 inline namespace v1 {
 namespace detail {
 
-inline constexpr std::size_t
-align(std::size_t s, std::size_t alignment)
+inline constexpr std::size_t align(std::size_t s, std::size_t alignment)
 {
     return (s + alignment - 1) & ~(alignment - 1);
 }

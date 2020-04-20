@@ -57,19 +57,16 @@ struct parallel_data_reader::graph_data {
 parallel_data_reader::parallel_data_reader(data_reader_params &&prm)
     : data_reader_base{std::move(prm)}, graph_{std::make_unique<graph_data>()}
 {
-    reader_ =
-        detail::make_instance_reader(params(), [this](data_store const &ds) {
-            return make_record_reader(ds);
-        });
+    reader_ = detail::make_instance_reader(params(), [this](data_store const &ds) {
+        return make_record_reader(ds);
+    });
 
-    batch_reader_ =
-        std::make_unique<instance_batch_reader>(params(), *reader_);
+    batch_reader_ = std::make_unique<instance_batch_reader>(params(), *reader_);
 }
 
 parallel_data_reader::~parallel_data_reader() = default;
 
-intrusive_ptr<example>
-parallel_data_reader::read_example_core()
+intrusive_ptr<example> parallel_data_reader::read_example_core()
 {
     ensure_schema_inferred();
 
@@ -121,8 +118,7 @@ parallel_data_reader::read_example_core()
     return exm;
 }
 
-void
-parallel_data_reader::ensure_pipeline_running()
+void parallel_data_reader::ensure_pipeline_running()
 {
     if (state_ != run_state::not_started) {
         return;
@@ -133,8 +129,7 @@ parallel_data_reader::ensure_pipeline_running()
     thrd_ = detail::start_thread(&parallel_data_reader::run_pipeline, this);
 }
 
-void
-parallel_data_reader::run_pipeline()
+void parallel_data_reader::run_pipeline()
 {
     if (graph_->src_node == nullptr) {
         init_graph();
@@ -163,21 +158,19 @@ parallel_data_reader::run_pipeline()
     read_cond_.notify_one();
 }
 
-void
-parallel_data_reader::init_graph()
+void parallel_data_reader::init_graph()
 {
     namespace flw = tbb::flow;
 
     std::size_t num_prefetched_batches = params().num_prefetched_batches;
     if (num_prefetched_batches == 0) {
         // Defaults to the number of processor cores.
-        num_prefetched_batches = static_cast<std::size_t>(
-            tbb::task_scheduler_init::default_num_threads());
+        num_prefetched_batches =
+            static_cast<std::size_t>(tbb::task_scheduler_init::default_num_threads());
     }
 
     std::size_t num_parallel_reads = params().num_parallel_reads;
-    if (num_parallel_reads == 0 ||
-        num_parallel_reads > num_prefetched_batches) {
+    if (num_parallel_reads == 0 || num_parallel_reads > num_prefetched_batches) {
         num_parallel_reads = num_prefetched_batches;
     }
 
@@ -187,68 +180,62 @@ parallel_data_reader::init_graph()
     auto src_node = std::make_unique<flw::source_node<batch_msg>>(
         g,
         [this](auto &msg) {
-            std::optional<instance_batch> btch =
-                batch_reader_->read_instance_batch();
+            std::optional<instance_batch> btch = batch_reader_->read_instance_batch();
             if (btch == std::nullopt) {
                 return false;
             }
 
-            msg =
-                batch_msg{std::make_shared<instance_batch>(std::move(*btch))};
+            msg = batch_msg{std::make_shared<instance_batch>(std::move(*btch))};
 
             return true;
         },
         false);
 
     // Limiter
-    auto limit_node =
-        std::make_unique<flw::limiter_node<batch_msg>>(g, num_parallel_reads);
+    auto limit_node = std::make_unique<flw::limiter_node<batch_msg>>(g, num_parallel_reads);
 
     // Decode
-    auto decode_node = std::make_unique<
-        flw::multifunction_node<batch_msg, std::tuple<example_msg>>>(
-        g, flw::unlimited, [this](auto const &msg, auto &ports) {
-            // We send a message to the next node even if the decode()
-            // function fails. This is needed to have correct sequential
-            // ordering of other batches.
-            example_msg out{msg.batch->index(), this->decode(*msg.batch)};
+    auto decode_node =
+        std::make_unique<flw::multifunction_node<batch_msg, std::tuple<example_msg>>>(
+            g, flw::unlimited, [this](auto const &msg, auto &ports) {
+                // We send a message to the next node even if the decode()
+                // function fails. This is needed to have correct sequential
+                // ordering of other batches.
+                example_msg out{msg.batch->index(), this->decode(*msg.batch)};
 
-            std::get<0>(ports).try_put(std::move(out));
-        });
+                std::get<0>(ports).try_put(std::move(out));
+            });
 
     // Order
-    auto order_node = std::make_unique<flw::sequencer_node<example_msg>>(
-        g, [](auto const &msg) {
-            return msg.idx;
-        });
+    auto order_node = std::make_unique<flw::sequencer_node<example_msg>>(g, [](auto const &msg) {
+        return msg.idx;
+    });
 
     // Queue
-    auto queue_node =
-        std::make_unique<flw::function_node<example_msg, flw::continue_msg>>(
-            g, flw::serial, [this, num_prefetched_batches](auto const &msg) {
-                // If the decode() function has failed simply discard the
-                // message.
-                if (msg.exm == nullptr) {
+    auto queue_node = std::make_unique<flw::function_node<example_msg, flw::continue_msg>>(
+        g, flw::serial, [this, num_prefetched_batches](auto const &msg) {
+            // If the decode() function has failed simply discard the
+            // message.
+            if (msg.exm == nullptr) {
+                return;
+            }
+
+            {
+                std::unique_lock<std::mutex> queue_lock{queue_mutex_};
+
+                fill_cond_.wait(queue_lock, [this, num_prefetched_batches] {
+                    return fill_queue_.size() < num_prefetched_batches;
+                });
+
+                if (graph_->ctx.is_group_execution_cancelled()) {
                     return;
                 }
 
-                {
-                    std::unique_lock<std::mutex> queue_lock{queue_mutex_};
+                fill_queue_.push_back(msg.exm);
+            }
 
-                    fill_cond_.wait(
-                        queue_lock, [this, num_prefetched_batches] {
-                            return fill_queue_.size() < num_prefetched_batches;
-                        });
-
-                    if (graph_->ctx.is_group_execution_cancelled()) {
-                        return;
-                    }
-
-                    fill_queue_.push_back(msg.exm);
-                }
-
-                read_cond_.notify_one();
-            });
+            read_cond_.notify_one();
+        });
 
     flw::make_edge(*src_node, *limit_node);
     flw::make_edge(*limit_node, *decode_node);
@@ -265,8 +252,7 @@ parallel_data_reader::init_graph()
     graph_->nodes.emplace_back(std::move(queue_node));
 }
 
-void
-parallel_data_reader::ensure_schema_inferred()
+void parallel_data_reader::ensure_schema_inferred()
 {
     if (schema_) {
         return;
@@ -275,16 +261,14 @@ parallel_data_reader::ensure_schema_inferred()
     schema_ = infer_schema(reader_->peek_instance());
 }
 
-intrusive_ptr<schema const>
-parallel_data_reader::read_schema()
+intrusive_ptr<schema const> parallel_data_reader::read_schema()
 {
     ensure_schema_inferred();
 
     return schema_;
 }
 
-void
-parallel_data_reader::reset() noexcept
+void parallel_data_reader::reset() noexcept
 {
     stop();
 
@@ -301,8 +285,7 @@ parallel_data_reader::reset() noexcept
     data_reader_base::reset();
 }
 
-void
-parallel_data_reader::stop()
+void parallel_data_reader::stop()
 {
     if (state_ == run_state::not_started) {
         return;
@@ -323,8 +306,7 @@ parallel_data_reader::stop()
     thrd_.join();
 }
 
-std::size_t
-parallel_data_reader::num_bytes_read() const noexcept
+std::size_t parallel_data_reader::num_bytes_read() const noexcept
 {
     return reader_->num_bytes_read();
 }

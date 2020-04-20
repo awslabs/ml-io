@@ -32,33 +32,24 @@ namespace detail {
 
 class core_instance_reader final : public instance_reader_base {
 public:
-    explicit core_instance_reader(data_reader_params const &prm,
-                                  record_reader_factory &&fct);
+    explicit core_instance_reader(data_reader_params const &prm, record_reader_factory &&fct);
 
 private:
-    std::optional<instance>
-    read_instance_core() final;
+    std::optional<instance> read_instance_core() final;
 
-    [[noreturn]] void
-    handle_nested_errors();
+    [[noreturn]] void handle_nested_errors();
 
-    std::optional<memory_slice>
-    read_record_payload();
+    std::optional<memory_slice> read_record_payload();
 
-    std::optional<memory_slice>
-    read_split_record_payload(std::optional<record> rec);
+    std::optional<memory_slice> read_split_record_payload(std::optional<record> rec);
 
-    [[noreturn]] void
-    throw_corrupt_split_record_error();
+    [[noreturn]] void throw_corrupt_split_record_error();
 
-    std::optional<record>
-    read_record();
+    std::optional<record> read_record();
 
-    bool
-    init_next_record_reader();
+    bool init_next_record_reader();
 
-    void
-    reset_core() noexcept final;
+    void reset_core() noexcept final;
 
 private:
     data_reader_params const *params_;

@@ -35,14 +35,12 @@ public:
     {}
 
 public:
-    record_kind
-    get_record_kind() const noexcept
+    record_kind get_record_kind() const noexcept
     {
         return static_cast<record_kind>((data_ >> 29U) & 7U);
     }
 
-    std::size_t
-    payload_size() const noexcept
+    std::size_t payload_size() const noexcept
     {
         return data_ & ((1U << 29U) - 1U);
     }
@@ -58,8 +56,7 @@ private:
     std::uint32_t data_;
 };
 
-std::optional<recordio_header>
-decode_recordio_header(memory_span bits);
+std::optional<recordio_header> decode_recordio_header(memory_span bits);
 
 }  // namespace detail
 }  // namespace v1

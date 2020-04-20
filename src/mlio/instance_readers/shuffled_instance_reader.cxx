@@ -25,8 +25,8 @@ namespace mlio {
 inline namespace v1 {
 namespace detail {
 
-shuffled_instance_reader::shuffled_instance_reader(
-    data_reader_params const &prm, std::unique_ptr<instance_reader> &&inner)
+shuffled_instance_reader::shuffled_instance_reader(data_reader_params const &prm,
+                                                   std::unique_ptr<instance_reader> &&inner)
     : params_{&prm}
     , inner_{std::move(inner)}
     , shuffle_window_{params_->shuffle_window}
@@ -49,8 +49,7 @@ shuffled_instance_reader::shuffled_instance_reader(
     }
 }
 
-std::optional<instance>
-shuffled_instance_reader::read_instance_core()
+std::optional<instance> shuffled_instance_reader::read_instance_core()
 {
     if (shuffle_window_ == 1) {
         return inner_->read_instance();
@@ -73,8 +72,7 @@ shuffled_instance_reader::read_instance_core()
     return std::move(ins);
 }
 
-void
-shuffled_instance_reader::fill_buffer_from_inner()
+void shuffled_instance_reader::fill_buffer_from_inner()
 {
     while (inner_has_instance_ && buffer_.size() < shuffle_window_) {
         std::optional<instance> ins = inner_->read_instance();
@@ -90,8 +88,7 @@ shuffled_instance_reader::fill_buffer_from_inner()
     }
 }
 
-std::optional<instance>
-shuffled_instance_reader::pop_random_instance_from_buffer()
+std::optional<instance> shuffled_instance_reader::pop_random_instance_from_buffer()
 {
     std::size_t random_idx = dist_(mt_);
 
@@ -106,8 +103,7 @@ shuffled_instance_reader::pop_random_instance_from_buffer()
     return std::move(ins);
 }
 
-void
-shuffled_instance_reader::reset_core() noexcept
+void shuffled_instance_reader::reset_core() noexcept
 {
     inner_->reset();
 

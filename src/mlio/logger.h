@@ -26,21 +26,15 @@ inline namespace v1 {
 namespace logger {
 namespace detail {
 
-void
-handle_message(log_level lvl, std::string_view msg) noexcept;
+void handle_message(log_level lvl, std::string_view msg) noexcept;
 
-void
-handle_message(log_level lvl,
-               std::string_view fmt,
-               fmt::format_args args) noexcept;
+void handle_message(log_level lvl, std::string_view fmt, fmt::format_args args) noexcept;
 
 }  // namespace detail
 
-bool
-is_enabled_for(log_level lvl) noexcept;
+bool is_enabled_for(log_level lvl) noexcept;
 
-inline void
-log(log_level lvl, std::string_view msg) noexcept
+inline void log(log_level lvl, std::string_view msg) noexcept
 {
     if (is_enabled_for(lvl)) {
         detail::handle_message(lvl, msg);
@@ -48,49 +42,42 @@ log(log_level lvl, std::string_view msg) noexcept
 }
 
 template<typename... Args>
-inline void
-log(log_level lvl, std::string_view fmt, Args const &... args) noexcept
+inline void log(log_level lvl, std::string_view fmt, Args const &... args) noexcept
 {
     if (is_enabled_for(lvl)) {
         detail::handle_message(lvl, fmt, fmt::make_format_args(args...));
     }
 }
 
-inline void
-warn(std::string_view msg) noexcept
+inline void warn(std::string_view msg) noexcept
 {
     log(log_level::warning, msg);
 }
 
 template<typename... Args>
-inline void
-warn(std::string_view fmt, Args const &... args) noexcept
+inline void warn(std::string_view fmt, Args const &... args) noexcept
 {
     log(log_level::warning, fmt, args...);
 }
 
-inline void
-info(std::string_view msg) noexcept
+inline void info(std::string_view msg) noexcept
 {
     log(log_level::info, msg);
 }
 
 template<typename... Args>
-inline void
-info(std::string_view fmt, Args const &... args) noexcept
+inline void info(std::string_view fmt, Args const &... args) noexcept
 {
     log(log_level::info, fmt, args...);
 }
 
-inline void
-debug(std::string_view msg) noexcept
+inline void debug(std::string_view msg) noexcept
 {
     log(log_level::debug, msg);
 }
 
 template<typename... Args>
-inline void
-debug(std::string_view fmt, Args const &... args) noexcept
+inline void debug(std::string_view fmt, Args const &... args) noexcept
 {
     log(log_level::debug, fmt, args...);
 }

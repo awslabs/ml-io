@@ -21,16 +21,14 @@ namespace mlio {
 inline namespace v1 {
 namespace detail {
 
-void
-validate_file_pathname(std::string_view pathname)
+void validate_file_pathname(std::string_view pathname)
 {
     if (pathname.empty()) {
         throw std::invalid_argument{"The pathname cannot be an empty string."};
     }
 
     if (pathname.back() == '/' || pathname.back() == '\\') {
-        throw std::invalid_argument{
-            "The pathname cannot point to a directory."};
+        throw std::invalid_argument{"The pathname cannot point to a directory."};
     }
 }
 

@@ -33,22 +33,17 @@ sagemaker_pipe::sagemaker_pipe(std::string pathname,
                                std::chrono::seconds timeout,
                                std::optional<std::size_t> fifo_id,  // NOLINT
                                compression cmp)
-    : pathname_{std::move(pathname)}
-    , timeout_{timeout}
-    , fifo_id_{fifo_id}
-    , compression_{cmp}
+    : pathname_{std::move(pathname)}, timeout_{timeout}, fifo_id_{fifo_id}, compression_{cmp}
 {
     detail::validate_file_pathname(pathname_);
 
     if (compression_ == compression::infer) {
         throw not_supported_error{
-            "The SageMaker pipe channel does not support inferring "
-            "compression."};
+            "The SageMaker pipe channel does not support inferring compression."};
     }
 }
 
-intrusive_ptr<input_stream>
-sagemaker_pipe::open_read() const
+intrusive_ptr<input_stream> sagemaker_pipe::open_read() const
 {
     logger::info("The SageMaker pipe '{0}' is being opened.", pathname_);
 
@@ -61,12 +56,10 @@ sagemaker_pipe::open_read() const
     return make_inflate_stream(std::move(strm), compression_);
 }
 
-std::string
-sagemaker_pipe::repr() const
+std::string sagemaker_pipe::repr() const
 {
-    return fmt::format("<sagemaker_pipe pathname='{0}' compression='{1}'>",
-                       pathname_,
-                       compression_);
+    return fmt::format(
+        "<sagemaker_pipe pathname='{0}' compression='{1}'>", pathname_, compression_);
 }
 
 }  // namespace v1

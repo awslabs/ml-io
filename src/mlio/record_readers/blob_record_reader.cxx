@@ -28,8 +28,7 @@ blob_record_reader::blob_record_reader(intrusive_ptr<input_stream> strm)
     : stream_record_reader{std::move(strm)}
 {}
 
-std::optional<record>
-blob_record_reader::decode_record(memory_slice &chunk, bool)
+std::optional<record> blob_record_reader::decode_record(memory_slice &chunk, bool)
 {
     if (chunk.empty()) {
         return {};

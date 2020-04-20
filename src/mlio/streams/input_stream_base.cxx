@@ -25,8 +25,7 @@
 namespace mlio {
 inline namespace v1 {
 
-memory_slice
-input_stream_base::read(std::size_t size)
+memory_slice input_stream_base::read(std::size_t size)
 {
     auto blk = get_memory_allocator().allocate(size);
 
@@ -40,14 +39,12 @@ void input_stream_base::seek(std::size_t)
     throw not_supported_error{"The input stream is not seekable."};
 }
 
-std::size_t
-input_stream_base::size() const
+std::size_t input_stream_base::size() const
 {
     throw not_supported_error{"The input stream is not seekable."};
 }
 
-std::size_t
-input_stream_base::position() const
+std::size_t input_stream_base::position() const
 {
     throw not_supported_error{"The input stream is not seekable."};
 }

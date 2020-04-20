@@ -36,35 +36,27 @@ public:
 public:
     using input_stream_base::read;
 
-    std::size_t
-    read(mutable_memory_span dest) final;
+    std::size_t read(mutable_memory_span dest) final;
 
-    void
-    seek(std::size_t position) final;
+    void seek(std::size_t position) final;
 
-    void
-    close() noexcept final;
+    void close() noexcept final;
 
 private:
     MLIO_HIDDEN
-    void
-    check_if_closed() const;
+    void check_if_closed() const;
 
 public:
-    std::size_t
-    size() const final;
+    std::size_t size() const final;
 
-    std::size_t
-    position() const final;
+    std::size_t position() const final;
 
-    bool
-    closed() const noexcept final
+    bool closed() const noexcept final
     {
         return !fd_.is_open();
     }
 
-    bool
-    seekable() const noexcept final
+    bool seekable() const noexcept final
     {
         return true;
     }

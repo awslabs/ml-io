@@ -34,8 +34,7 @@ public:
                     std::size_t max_capture_count) noexcept;
 
 public:
-    void
-    analyze(mlio::example const &exm) const;
+    void analyze(mlio::example const &exm) const;
 
 private:
     std::vector<column_analysis> *columns_;

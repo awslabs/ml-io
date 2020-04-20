@@ -36,22 +36,18 @@ inline namespace v1 {
 /// Represents an Amazon SageMaker pipe channel as a @ref data_store.
 class MLIO_API sagemaker_pipe final : public data_store {
 public:
-    explicit sagemaker_pipe(
-        std::string pathname,
-        std::chrono::seconds timeout = sagemaker_pipe_default_timeout,
-        std::optional<std::size_t> fifo_id = {},
-        compression cmp = {});
+    explicit sagemaker_pipe(std::string pathname,
+                            std::chrono::seconds timeout = sagemaker_pipe_default_timeout,
+                            std::optional<std::size_t> fifo_id = {},
+                            compression cmp = {});
 
 public:
-    intrusive_ptr<input_stream>
-    open_read() const final;
+    intrusive_ptr<input_stream> open_read() const final;
 
-    std::string
-    repr() const final;
+    std::string repr() const final;
 
 public:
-    std::string const &
-    id() const noexcept final
+    std::string const &id() const noexcept final
     {
         return pathname_;
     }

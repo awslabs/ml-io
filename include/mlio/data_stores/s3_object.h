@@ -44,15 +44,12 @@ public:
                        compression cmp = compression::infer);
 
 public:
-    intrusive_ptr<input_stream>
-    open_read() const final;
+    intrusive_ptr<input_stream> open_read() const final;
 
-    std::string
-    repr() const final;
+    std::string repr() const final;
 
 public:
-    std::string const &
-    id() const final;
+    std::string const &id() const final;
 
 private:
     intrusive_ptr<s3_client const> client_;
@@ -80,14 +77,11 @@ struct MLIO_API list_s3_objects_params {
 
 /// Lists all S3 objects residing under the specified URIs.
 MLIO_API
-std::vector<intrusive_ptr<data_store>>
-list_s3_objects(list_s3_objects_params const &prm);
+std::vector<intrusive_ptr<data_store>> list_s3_objects(list_s3_objects_params const &prm);
 
 MLIO_API
 std::vector<intrusive_ptr<data_store>>
-list_s3_objects(s3_client const &client,
-                std::string const &uri,
-                std::string const &pattern = {});
+list_s3_objects(s3_client const &client, std::string const &uri, std::string const &pattern = {});
 
 /// @}
 

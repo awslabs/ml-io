@@ -23,8 +23,7 @@ namespace mlio {
 inline namespace v1 {
 namespace detail {
 
-compression
-infer_compression(std::string_view pathname) noexcept;
+compression infer_compression(std::string_view pathname) noexcept;
 
 }  // namespace detail
 }  // namespace v1

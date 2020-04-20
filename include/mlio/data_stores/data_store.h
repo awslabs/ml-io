@@ -42,43 +42,35 @@ public:
     virtual ~data_store();
 
 public:
-    data_store &
-    operator=(data_store const &) = delete;
+    data_store &operator=(data_store const &) = delete;
 
-    data_store &
-    operator=(data_store &&) = delete;
+    data_store &operator=(data_store &&) = delete;
 
 public:
     /// Returns an @ref input_stream for reading from the data store.
-    virtual intrusive_ptr<input_stream>
-    open_read() const = 0;
+    virtual intrusive_ptr<input_stream> open_read() const = 0;
 
-    virtual std::string
-    repr() const = 0;
+    virtual std::string repr() const = 0;
 
 public:
     /// Returns a unique identifier for the data store.
-    virtual std::string const &
-    id() const = 0;
+    virtual std::string const &id() const = 0;
 };
 
 MLIO_API
-inline bool
-operator==(data_store const &lhs, data_store const &rhs) noexcept
+inline bool operator==(data_store const &lhs, data_store const &rhs) noexcept
 {
     return lhs.id() == rhs.id();
 }
 
 MLIO_API
-inline bool
-operator!=(data_store const &lhs, data_store const &rhs) noexcept
+inline bool operator!=(data_store const &lhs, data_store const &rhs) noexcept
 {
     return lhs.id() != rhs.id();
 }
 
 MLIO_API
-inline std::ostream &
-operator<<(std::ostream &strm, data_store const &ds)
+inline std::ostream &operator<<(std::ostream &strm, data_store const &ds)
 {
     return strm << ds.repr();
 }
@@ -92,8 +84,7 @@ namespace std {
 
 template<>
 struct MLIO_API hash<mlio::data_store> {
-    inline size_t
-    operator()(mlio::data_store const &ds) const noexcept
+    inline size_t operator()(mlio::data_store const &ds) const noexcept
     {
         return hash<string>{}(ds.id());
     }

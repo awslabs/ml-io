@@ -24,8 +24,8 @@ namespace mlio {
 inline namespace v1 {
 namespace detail {
 
-std::optional<record>
-parquet_record_reader::decode_record(memory_slice &chunk, bool ignore_leftover)
+std::optional<record> parquet_record_reader::decode_record(memory_slice &chunk,
+                                                           bool ignore_leftover)
 {
     if (chunk.empty()) {
         return {};
@@ -39,15 +39,13 @@ parquet_record_reader::decode_record(memory_slice &chunk, bool ignore_leftover)
             return {};
         }
 
-        throw corrupt_header_error{
-            "The record does not start with the Parquet magic number."};
+        throw corrupt_header_error{"The record does not start with the Parquet magic number."};
     }
 
     auto pos = chunk.begin();
 
     if (!is_magic_number(pos)) {
-        throw corrupt_header_error{
-            "The record does not start with the Parquet magic number."};
+        throw corrupt_header_error{"The record does not start with the Parquet magic number."};
     }
 
     // The absolute minimum Parquet record can be 12 bytes. Two magic
@@ -58,8 +56,7 @@ parquet_record_reader::decode_record(memory_slice &chunk, bool ignore_leftover)
             return {};
         }
 
-        throw corrupt_footer_error{
-            "The record does not have a valid Parquet footer."};
+        throw corrupt_footer_error{"The record does not have a valid Parquet footer."};
     }
 
     // Advance by the size of the magic number and the metadata length field.
@@ -89,19 +86,16 @@ parquet_record_reader::decode_record(memory_slice &chunk, bool ignore_leftover)
         return {};
     }
 
-    throw corrupt_footer_error{
-        "The record does not have a valid Parquet footer."};
+    throw corrupt_footer_error{"The record does not have a valid Parquet footer."};
 }
 
-inline bool
-parquet_record_reader::is_magic_number(memory_block::iterator pos) noexcept
+inline bool parquet_record_reader::is_magic_number(memory_block::iterator pos) noexcept
 {
     return as<std::uint32_t>(pos) == 0x3152'4150;  // PAR1
 }
 
-bool
-parquet_record_reader::is_footer(memory_slice const &chunk,
-                                 memory_block::iterator pos) noexcept
+bool parquet_record_reader::is_footer(memory_slice const &chunk,
+                                      memory_block::iterator pos) noexcept
 {
     auto metadata_end = pos - as_ssize(sizeof(std::uint32_t));
 
@@ -141,9 +135,7 @@ parquet_record_reader::is_footer(memory_slice const &chunk,
     return true;
 }
 
-inline bool
-parquet_record_reader::is_file_metadata_begin(
-    memory_block::iterator pos) noexcept
+inline bool parquet_record_reader::is_file_metadata_begin(memory_block::iterator pos) noexcept
 {
     auto thrift_field_header = as<std::uint8_t>(pos);
 
@@ -161,8 +153,7 @@ parquet_record_reader::is_file_metadata_begin(
 }
 
 template<typename T>
-inline T
-parquet_record_reader::as(memory_block::iterator pos) noexcept
+inline T parquet_record_reader::as(memory_block::iterator pos) noexcept
 {
     return *reinterpret_cast<T const *>(&*pos);
 }

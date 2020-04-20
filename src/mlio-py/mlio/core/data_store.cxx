@@ -30,38 +30,30 @@ namespace {
 
 class py_data_store : public data_store {
 public:
-    intrusive_ptr<input_stream>
-    open_read() const override;
+    intrusive_ptr<input_stream> open_read() const override;
 
-    std::string
-    repr() const override;
+    std::string repr() const override;
 
 public:
-    std::string const &
-    id() const noexcept override;
+    std::string const &id() const noexcept override;
 };
 
-intrusive_ptr<input_stream>
-py_data_store::open_read() const
+intrusive_ptr<input_stream> py_data_store::open_read() const
 {
     // NOLINTNEXTLINE
-    PYBIND11_OVERLOAD_PURE(
-        intrusive_ptr<input_stream>, data_store, open_read, )
+    PYBIND11_OVERLOAD_PURE(intrusive_ptr<input_stream>, data_store, open_read, )
 }
 
-std::string
-py_data_store::repr() const
+std::string py_data_store::repr() const
 {
     py::gil_scoped_acquire acq_gil;
 
-    auto repr_func =
-        py::module::import("builtins").attr("object").attr("__repr__");
+    auto repr_func = py::module::import("builtins").attr("object").attr("__repr__");
 
     return repr_func(this).cast<std::string>();
 }
 
-std::string const &
-py_data_store::id() const noexcept
+std::string const &py_data_store::id() const noexcept
 {
     try {
         // NOLINTNEXTLINE
@@ -72,11 +64,9 @@ py_data_store::id() const noexcept
     }
 }
 
-intrusive_ptr<in_memory_store>
-make_in_memory_store(py::buffer const &buf, compression cmp)
+intrusive_ptr<in_memory_store> make_in_memory_store(py::buffer const &buf, compression cmp)
 {
-    return make_intrusive<in_memory_store>(
-        make_intrusive<py_memory_block>(buf), cmp);
+    return make_intrusive<in_memory_store>(make_intrusive<py_memory_block>(buf), cmp);
 }
 
 std::vector<intrusive_ptr<data_store>>
@@ -101,11 +91,9 @@ py_list_s3_objects(s3_client const &client,
 
 }  // namespace
 
-void
-register_data_stores(py::module &m)
+void register_data_stores(py::module &m)
 {
-    py::enum_<compression>(
-        m, "Compression", "Specifies the compression type of a data store.")
+    py::enum_<compression>(m, "Compression", "Specifies the compression type of a data store.")
         .value("NONE", compression::none)
         .value("INFER", compression::infer)
         .value("GZIP", compression::gzip)
@@ -129,9 +117,7 @@ register_data_stores(py::module &m)
              })
         .def("__repr__", &data_store::repr)
         .def_property_readonly(
-            "id",
-            &data_store::id,
-            "Returns a unique identifier for the data store.");
+            "id", &data_store::id, "Returns a unique identifier for the data store.");
 
     py::class_<file, data_store, intrusive_ptr<file>>(
         m, "File", "Represents a file as a ``DataStore``.")
@@ -168,10 +154,7 @@ register_data_stores(py::module &m)
 
     py::class_<s3_object, data_store, intrusive_ptr<s3_object>>(
         m, "S3Object", "Represents an S3 object as a ``DataStore``.")
-        .def(py::init<intrusive_ptr<s3_client>,
-                      std::string,
-                      std::string,
-                      compression>(),
+        .def(py::init<intrusive_ptr<s3_client>, std::string, std::string, compression>(),
              "client"_a,
              "uri"_a,
              "version_id"_a = "",
@@ -191,13 +174,8 @@ register_data_stores(py::module &m)
             )");
 
     py::class_<sagemaker_pipe, data_store, intrusive_ptr<sagemaker_pipe>>(
-        m,
-        "SageMakerPipe",
-        "Represents an Amazon SageMaker pipe channel as a ``DataStore``.")
-        .def(py::init<std::string,
-                      std::chrono::seconds,
-                      std::optional<std::size_t>,
-                      compression>(),
+        m, "SageMakerPipe", "Represents an Amazon SageMaker pipe channel as a ``DataStore``.")
+        .def(py::init<std::string, std::chrono::seconds, std::optional<std::size_t>, compression>(),
              "pathname"_a,
              "timeout"_a = sagemaker_pipe_default_timeout,
              "fifo_id"_a = std::nullopt,
@@ -243,8 +221,7 @@ register_data_stores(py::module &m)
         )");
 
     m.def("list_files",
-          py::overload_cast<std::string const &, std::string const &>(
-              &list_files),
+          py::overload_cast<std::string const &, std::string const &>(&list_files),
           "pathname"_a,
           "pattern"_a = "",
           R"(
@@ -284,9 +261,8 @@ register_data_stores(py::module &m)
         )");
 
     m.def("list_s3_objects",
-          py::overload_cast<s3_client const &,
-                            std::string const &,
-                            std::string const &>(&list_s3_objects),
+          py::overload_cast<s3_client const &, std::string const &, std::string const &>(
+              &list_s3_objects),
           "client"_a,
           "uri"_a,
           "pattern"_a = "",

@@ -37,19 +37,15 @@ public:
     ~iconv_desc();
 
 public:
-    iconv_desc &
-    operator=(iconv_desc const &) = delete;
+    iconv_desc &operator=(iconv_desc const &) = delete;
 
-    iconv_desc &
-    operator=(iconv_desc &&) = delete;
+    iconv_desc &operator=(iconv_desc &&) = delete;
 
 public:
-    iconv_status
-    convert(memory_span &inp, mutable_memory_span &out);
+    iconv_status convert(memory_span &inp, mutable_memory_span &out);
 
 public:
-    text_encoding const &
-    encoding() const noexcept
+    text_encoding const &encoding() const noexcept
     {
         return encoding_;
     }

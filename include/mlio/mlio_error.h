@@ -34,11 +34,9 @@ public:
     ~mlio_error() override;
 
 public:
-    mlio_error &
-    operator=(mlio_error const &) = default;
+    mlio_error &operator=(mlio_error const &) = default;
 
-    mlio_error &
-    operator=(mlio_error &&) = default;
+    mlio_error &operator=(mlio_error &&) = default;
 };
 
 }  // namespace v1

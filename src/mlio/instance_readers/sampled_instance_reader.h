@@ -37,14 +37,11 @@ public:
                                      std::unique_ptr<instance_reader> &&inner);
 
 private:
-    std::optional<instance>
-    read_instance_core() final;
+    std::optional<instance> read_instance_core() final;
 
-    void
-    fill_buffer_from_inner();
+    void fill_buffer_from_inner();
 
-    void
-    reset_core() noexcept final;
+    void reset_core() noexcept final;
 
 private:
     data_reader_params const *params_;

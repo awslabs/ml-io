@@ -37,8 +37,7 @@ zlib_inflater::zlib_inflater()
         throw std::bad_alloc{};
     }
     if (r == Z_VERSION_ERROR) {
-        throw not_supported_error{
-            "The zlib library has an unsupported version."};
+        throw not_supported_error{"The zlib library has an unsupported version."};
     }
     assert(false);
 }
@@ -48,8 +47,7 @@ zlib_inflater::~zlib_inflater()
     ::inflateEnd(&stream_);
 }
 
-void
-zlib_inflater::inflate(memory_span &inp, mutable_memory_span &out)
+void zlib_inflater::inflate(memory_span &inp, mutable_memory_span &out)
 {
     validate_state();
 
@@ -77,8 +75,7 @@ zlib_inflater::inflate(memory_span &inp, mutable_memory_span &out)
     out = out.last(stream_.avail_out);
 }
 
-void
-zlib_inflater::validate_state() const
+void zlib_inflater::validate_state() const
 {
     switch (state_) {
     case Z_OK:
@@ -87,8 +84,7 @@ zlib_inflater::validate_state() const
 
     case Z_NEED_DICT:
     case Z_DATA_ERROR:
-        throw inflate_error{
-            "The zlib stream contains invalid or incomplete deflate data."};
+        throw inflate_error{"The zlib stream contains invalid or incomplete deflate data."};
 
     case Z_MEM_ERROR:
         throw std::bad_alloc{};

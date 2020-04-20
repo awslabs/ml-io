@@ -34,8 +34,7 @@ public:
     {}
 
 private:
-    std::optional<record>
-    decode_record(memory_slice &chunk, bool ignore_leftover) final;
+    std::optional<record> decode_record(memory_slice &chunk, bool ignore_leftover) final;
 };
 
 }  // namespace detail

@@ -20,17 +20,14 @@
 namespace mlio {
 inline namespace v1 {
 
-void
-memory_slice::validate_range(memory_block::iterator first,
-                             memory_block::iterator last) const
+void memory_slice::validate_range(memory_block::iterator first, memory_block::iterator last) const
 {
     if (first > last) {
         throw std::invalid_argument{"The specified range is invalid."};
     }
 
     if (first < beg_ || last > end_) {
-        throw std::invalid_argument{
-            "The specified range does not fall within the slice."};
+        throw std::invalid_argument{"The specified range does not fall within the slice."};
     }
 }
 

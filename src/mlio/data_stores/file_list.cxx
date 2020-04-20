@@ -43,8 +43,7 @@ namespace detail {
 namespace {
 
 struct FTS_deleter {
-    void
-    operator()(::FTS *fts)
+    void operator()(::FTS *fts)
     {
         if (fts != nullptr) {
             ::fts_close(fts);
@@ -52,17 +51,14 @@ struct FTS_deleter {
     }
 };
 
-std::vector<char const *>
-get_pathname_c_strs(stdx::span<std::string const> pathnames)
+std::vector<char const *> get_pathname_c_strs(stdx::span<std::string const> pathnames)
 {
     std::vector<char const *> c_strs{};
 
-    std::transform(pathnames.begin(),
-                   pathnames.end(),
-                   std::back_inserter(c_strs),
-                   [](std::string const &pth) {
-                       return pth.c_str();
-                   });
+    std::transform(
+        pathnames.begin(), pathnames.end(), std::back_inserter(c_strs), [](std::string const &pth) {
+            return pth.c_str();
+        });
 
     c_strs.push_back(nullptr);
 
@@ -75,15 +71,13 @@ get_pathname_c_strs(stdx::span<std::string const> pathnames)
 #define mlio_pathname_comparer ::strcmp
 #endif
 
-inline int
-ver_sort(::FTSENT const **a, ::FTSENT const **b)
+inline int ver_sort(::FTSENT const **a, ::FTSENT const **b)
 {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
     return mlio_pathname_comparer((*a)->fts_name, (*b)->fts_name);
 }
 
-auto
-make_fts(stdx::span<std::string const> pathnames)
+auto make_fts(stdx::span<std::string const> pathnames)
 {
     std::vector<char const *> c_strs = get_pathname_c_strs(pathnames);
 
@@ -92,9 +86,8 @@ make_fts(stdx::span<std::string const> pathnames)
 
     ::FTS *fts = ::fts_open(path_argv, FTS_LOGICAL | FTS_NOCHDIR, ver_sort);
     if (fts == nullptr) {
-        throw std::system_error{
-            current_error_code(),
-            "The specified pathnames cannot be traversed."};
+        throw std::system_error{current_error_code(),
+                                "The specified pathnames cannot be traversed."};
     }
 
     return std::unique_ptr<::FTS, detail::FTS_deleter>(fts);
@@ -103,8 +96,7 @@ make_fts(stdx::span<std::string const> pathnames)
 }  // namespace
 }  // namespace detail
 
-std::vector<intrusive_ptr<data_store>>
-list_files(list_files_params const &prm)
+std::vector<intrusive_ptr<data_store>> list_files(list_files_params const &prm)
 {
     auto fts = detail::make_fts(prm.pathnames);
 
@@ -112,13 +104,10 @@ list_files(list_files_params const &prm)
 
     ::FTSENT *e{};
     while ((e = ::fts_read(fts.get())) != nullptr) {
-        if (e->fts_info == FTS_ERR || e->fts_info == FTS_DNR ||
-            e->fts_info == FTS_NS) {
+        if (e->fts_info == FTS_ERR || e->fts_info == FTS_DNR || e->fts_info == FTS_NS) {
             std::error_code err = current_error_code();
             throw std::system_error{
-                err,
-                fmt::format("The file or directory '{0}' cannot be opened.",
-                            e->fts_accpath)};
+                err, fmt::format("The file or directory '{0}' cannot be opened.", e->fts_accpath)};
         }
 
         if (e->fts_info != FTS_F) {
@@ -126,8 +115,7 @@ list_files(list_files_params const &prm)
         }
 
         // We ignore anything but regular and block files.
-        if (!S_ISREG(e->fts_statp->st_mode) &&
-            !S_ISBLK(e->fts_statp->st_mode)) {
+        if (!S_ISREG(e->fts_statp->st_mode) && !S_ISBLK(e->fts_statp->st_mode)) {
             continue;
         }
 
@@ -139,8 +127,7 @@ list_files(list_files_params const &prm)
                 continue;
             }
             if (r != 0) {
-                throw std::invalid_argument{
-                    "The pattern cannot be used for comparison."};
+                throw std::invalid_argument{"The pattern cannot be used for comparison."};
             }
         }
 
@@ -152,21 +139,19 @@ list_files(list_files_params const &prm)
             }
         }
 
-        lst.emplace_back(
-            make_intrusive<file>(e->fts_accpath, prm.mmap, prm.cmp));
+        lst.emplace_back(make_intrusive<file>(e->fts_accpath, prm.mmap, prm.cmp));
     }
 
     if (errno != 0) {
-        throw std::system_error{
-            current_error_code(),
-            "The specified pathnames cannot be traversed."};
+        throw std::system_error{current_error_code(),
+                                "The specified pathnames cannot be traversed."};
     }
 
     return lst;
 }
 
-std::vector<intrusive_ptr<data_store>>
-list_files(std::string const &pathname, std::string const &pattern)
+std::vector<intrusive_ptr<data_store>> list_files(std::string const &pathname,
+                                                  std::string const &pattern)
 {
     stdx::span<std::string const> pathnames{&pathname, 1};
 

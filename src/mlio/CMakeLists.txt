@@ -6,7 +6,7 @@ add_subdirectory(detail/protobuf)
 
 add_library(mlio
     $<TARGET_OBJECTS:mlio-protobuf>
-    data_stores/detail/file_util.cxx
+    data_stores/detail/util.cxx
     data_stores/compression.cxx
     data_stores/data_store.cxx
     data_stores/file.cxx

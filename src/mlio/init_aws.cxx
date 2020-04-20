@@ -31,8 +31,7 @@ bool aws_initialized{};
 }  // namespace
 }  // namespace detail
 
-void
-initialize_aws_sdk()
+void initialize_aws_sdk()
 {
     if (detail::aws_initialized) {
         logger::warn("AWS C++ SDK is already initialized.");
@@ -45,8 +44,7 @@ initialize_aws_sdk()
     detail::aws_initialized = true;
 }
 
-void
-dispose_aws_sdk()
+void dispose_aws_sdk()
 {
     if (detail::aws_initialized) {
         Aws::ShutdownAPI({});
@@ -68,14 +66,12 @@ inline namespace v1 {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmissing-noreturn"
 
-void
-initialize_aws_sdk()
+void initialize_aws_sdk()
 {
     throw not_supported_error{"ML-IO has not been built with S3 support."};
 }
 
-void
-dispose_aws_sdk()
+void dispose_aws_sdk()
 {
     throw not_supported_error{"ML-IO has not been built with S3 support."};
 }

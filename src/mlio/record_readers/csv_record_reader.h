@@ -37,30 +37,24 @@ class csv_record_reader final : public text_record_reader {
     };
 
 public:
-    explicit csv_record_reader(intrusive_ptr<input_stream> strm,
-                               csv_params const &prm)
+    explicit csv_record_reader(intrusive_ptr<input_stream> strm, csv_params const &prm)
         : text_record_reader{std::move(strm)}, params_{&prm}
     {}
 
 private:
-    std::optional<record>
-    decode_text_record(memory_slice &chunk, bool ignore_leftover) final;
+    std::optional<record> decode_text_record(memory_slice &chunk, bool ignore_leftover) final;
 
-    bool
-    is_comment_line(memory_slice const &chunk);
+    bool is_comment_line(memory_slice const &chunk);
 
-    std::optional<record>
-    read_line(memory_slice &chunk, bool ignore_leftover);
+    std::optional<record> read_line(memory_slice &chunk, bool ignore_leftover);
 
-    static bool
-    try_get_next_char(stdx::span<char const> const &chrs,
-                      stdx::span<char const>::iterator &pos,
-                      char &chr) noexcept;
+    static bool try_get_next_char(stdx::span<char const> const &chrs,
+                                  stdx::span<char const>::iterator &pos,
+                                  char &chr) noexcept;
 
-    static void
-    check_line_length(stdx::span<char const> const &chrs,
-                      stdx::span<char const>::iterator &pos,
-                      std::size_t max_line_length);
+    static void check_line_length(stdx::span<char const> const &chrs,
+                                  stdx::span<char const>::iterator &pos,
+                                  std::size_t max_line_length);
 
 private:
     csv_params const *params_;

@@ -36,8 +36,7 @@ protected:
 
 private:
     MLIO_HIDDEN
-    std::optional<record>
-    decode_record(memory_slice &chunk, bool ignore_leftover) final;
+    std::optional<record> decode_record(memory_slice &chunk, bool ignore_leftover) final;
 
     /// When implemented in a derived class, tries to decode a record
     /// from the specified chunk.
@@ -49,12 +48,10 @@ private:
     ///     A boolean value indicating whether to ignore any leftover
     ///     bits than cannot be interpreted as a record. If false, the
     ///     reader should throw an exception with a descriptive message.
-    virtual std::optional<record>
-    decode_text_record(memory_slice &chunk, bool ignore_leftover) = 0;
+    virtual std::optional<record> decode_text_record(memory_slice &chunk, bool ignore_leftover) = 0;
 
     MLIO_HIDDEN
-    static bool
-    skip_utf8_bom(memory_slice &chunk, bool ignore_leftover) noexcept;
+    static bool skip_utf8_bom(memory_slice &chunk, bool ignore_leftover) noexcept;
 };
 
 /// @}

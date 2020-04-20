@@ -33,53 +33,41 @@ inline namespace v1 {
 /// Wraps a @ref memory_slice as an @ref input_stream.
 class MLIO_API memory_input_stream final : public input_stream {
 public:
-    explicit memory_input_stream(memory_slice source) noexcept
-        : source_{std::move(source)}
+    explicit memory_input_stream(memory_slice source) noexcept : source_{std::move(source)}
     {}
 
 public:
-    std::size_t
-    read(mutable_memory_span dest) final;
+    std::size_t read(mutable_memory_span dest) final;
 
-    memory_slice
-    read(std::size_t size) final;
+    memory_slice read(std::size_t size) final;
 
-    void
-    seek(std::size_t position) final;
+    void seek(std::size_t position) final;
 
-    void
-    close() noexcept final;
+    void close() noexcept final;
 
 private:
     MLIO_HIDDEN
-    void
-    advance_position(std::size_t dist) noexcept;
+    void advance_position(std::size_t dist) noexcept;
 
     MLIO_HIDDEN
-    void
-    check_if_closed() const;
+    void check_if_closed() const;
 
 public:
-    std::size_t
-    size() const final;
+    std::size_t size() const final;
 
-    std::size_t
-    position() const final;
+    std::size_t position() const final;
 
-    bool
-    closed() const noexcept final
+    bool closed() const noexcept final
     {
         return closed_;
     }
 
-    bool
-    seekable() const noexcept final
+    bool seekable() const noexcept final
     {
         return true;
     }
 
-    bool
-    supports_zero_copy() const noexcept final
+    bool supports_zero_copy() const noexcept final
     {
         return true;
     }

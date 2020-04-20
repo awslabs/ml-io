@@ -44,96 +44,78 @@ public:
     memory_slice(intrusive_ptr<T> blk) noexcept
         : block_{std::move(blk)}, beg_{block_->begin()}, end_{block_->end()}
     {
-        static_assert(std::is_base_of<memory_block, T>::value,
-                      "T must derive from memory_block.");
+        static_assert(std::is_base_of<memory_block, T>::value, "T must derive from memory_block.");
     }
 
 public:
-    memory_block::iterator
-    begin() const noexcept
+    memory_block::iterator begin() const noexcept
     {
         return beg_;
     }
 
-    memory_block::iterator
-    end() const noexcept
+    memory_block::iterator end() const noexcept
     {
         return end_;
     }
 
-    memory_block::iterator
-    cbegin() const noexcept
+    memory_block::iterator cbegin() const noexcept
     {
         return beg_;
     }
 
-    memory_block::iterator
-    cend() const noexcept
+    memory_block::iterator cend() const noexcept
     {
         return end_;
     }
 
 public:
-    memory_block::pointer
-    data() const noexcept
+    memory_block::pointer data() const noexcept
     {
         return beg_ != end_ ? std::addressof(*beg_) : nullptr;
     }
 
-    memory_block::size_type
-    size() const noexcept
+    memory_block::size_type size() const noexcept
     {
         return static_cast<memory_block::size_type>(end_ - beg_);
     }
 
-    [[nodiscard]] bool
-    empty() const noexcept
+    [[nodiscard]] bool empty() const noexcept
     {
         return beg_ == end_;
     }
 
 public:
-    memory_slice
-    subslice(memory_block::size_type offset) const &
+    memory_slice subslice(memory_block::size_type offset) const &
     {
         return subslice(beg_ + as_ssize(offset), end_);
     }
 
-    memory_slice &&
-    subslice(memory_block::size_type offset) &&
+    memory_slice &&subslice(memory_block::size_type offset) &&
     {
         return std::move(*this).subslice(beg_ + as_ssize(offset), end_);
     }
 
-    memory_slice
-    subslice(memory_block::size_type offset,
-             memory_block::size_type count) const &
+    memory_slice subslice(memory_block::size_type offset, memory_block::size_type count) const &
     {
-        return subslice(beg_ + as_ssize(offset),
-                        beg_ + as_ssize(offset + count));
+        return subslice(beg_ + as_ssize(offset), beg_ + as_ssize(offset + count));
     }
 
-    memory_slice &&
-    subslice(memory_block::size_type offset, memory_block::size_type count) &&
+    memory_slice &&subslice(memory_block::size_type offset, memory_block::size_type count) &&
     {
-        return std::move(*this).subslice(beg_ + as_ssize(offset),
-                                         beg_ + as_ssize(offset + count));
+        return std::move(*this).subslice(beg_ + as_ssize(offset), beg_ + as_ssize(offset + count));
     }
 
-    memory_slice
-    subslice(memory_block::iterator first) const &
+    memory_slice subslice(memory_block::iterator first) const &
     {
         return subslice(first, end_);
     }
 
-    memory_slice &&
-    subslice(memory_block::iterator first) &&
+    memory_slice &&subslice(memory_block::iterator first) &&
     {
         return std::move(*this).subslice(first, end_);
     }
 
-    memory_slice
-    subslice(memory_block::iterator first, memory_block::iterator last) const &
+    memory_slice subslice(memory_block::iterator first, memory_block::iterator last) const &
     {
         validate_range(first, last);
 
@@ -145,8 +127,7 @@ public:
         return cpy;
     }
 
-    memory_slice &&
-    subslice(memory_block::iterator first, memory_block::iterator last) &&
+    memory_slice &&subslice(memory_block::iterator first, memory_block::iterator last) &&
     {
         validate_range(first, last);
 
@@ -156,58 +137,48 @@ public:
         return std::move(*this);
     }
 
-    memory_slice
-    first(memory_block::size_type count) const &
+    memory_slice first(memory_block::size_type count) const &
     {
         return subslice(beg_, beg_ + as_ssize(count));
     }
 
-    memory_slice &&
-    first(memory_block::size_type count) &&
+    memory_slice &&first(memory_block::size_type count) &&
     {
         return std::move(*this).subslice(beg_, beg_ + as_ssize(count));
     }
 
-    memory_slice
-    first(memory_block::iterator to) const &
+    memory_slice first(memory_block::iterator to) const &
     {
         return subslice(beg_, to);
     }
 
-    memory_slice &&
-    first(memory_block::iterator to) &&
+    memory_slice &&first(memory_block::iterator to) &&
     {
         return std::move(*this).subslice(beg_, to);
     }
 
-    memory_slice
-    last(memory_block::size_type count) const &
+    memory_slice last(memory_block::size_type count) const &
     {
         return subslice(end_ - as_ssize(count), end_);
     }
 
-    memory_slice &&
-    last(memory_block::size_type count) &&
+    memory_slice &&last(memory_block::size_type count) &&
     {
         return std::move(*this).subslice(end_ - as_ssize(count), end_);
     }
 
-    memory_slice
-    last(memory_block::iterator from) const &
+    memory_slice last(memory_block::iterator from) const &
     {
         return subslice(from, end_);
     }
 
-    memory_slice &&
-    last(memory_block::iterator from) &&
+    memory_slice &&last(memory_block::iterator from) &&
     {
         return std::move(*this).subslice(from, end_);
     }
 
 private:
-    void
-    validate_range(memory_block::iterator first,
-                   memory_block::iterator last) const;
+    void validate_range(memory_block::iterator first, memory_block::iterator last) const;
 
 private:
     intrusive_ptr<memory_block> block_{};
@@ -217,8 +188,7 @@ private:
 
 template<typename T>
 MLIO_API
-inline stdx::span<T>
-as_span(memory_slice const &ms) noexcept
+inline stdx::span<T> as_span(memory_slice const &ms) noexcept
 {
     return as_span<T>(memory_span{ms});
 }

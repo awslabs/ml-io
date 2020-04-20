@@ -21,8 +21,6 @@
 
 namespace pymlio {
 
-bool
-match_nan_values(std::string_view s,
-                 std::vector<std::string> const &match_values) noexcept;
+bool match_nan_values(std::string_view s, std::vector<std::string> const &match_values) noexcept;
 
 }  // namespace pymlio

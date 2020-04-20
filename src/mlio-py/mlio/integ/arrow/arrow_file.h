@@ -35,41 +35,30 @@ public:
     ~arrow_file() final;
 
 public:
-    arrow_file &
-    operator=(arrow_file const &) = delete;
+    arrow_file &operator=(arrow_file const &) = delete;
 
-    arrow_file &
-    operator=(arrow_file &&) = delete;
+    arrow_file &operator=(arrow_file &&) = delete;
 
 public:
-    arrow::Result<std::int64_t>
-    Read(std::int64_t nbytes, void *out) noexcept final;
+    arrow::Result<std::int64_t> Read(std::int64_t nbytes, void *out) noexcept final;
 
-    arrow::Result<std::shared_ptr<arrow::Buffer>>
-    Read(std::int64_t nbytes) noexcept final;
+    arrow::Result<std::shared_ptr<arrow::Buffer>> Read(std::int64_t nbytes) noexcept final;
 
-    arrow::Status
-    Seek(std::int64_t position) noexcept final;
+    arrow::Status Seek(std::int64_t position) noexcept final;
 
-    arrow::Status
-    Close() noexcept final;
+    arrow::Status Close() noexcept final;
 
-    arrow::Result<std::int64_t>
-    Tell() const noexcept final;
+    arrow::Result<std::int64_t> Tell() const noexcept final;
 
-    arrow::Result<std::int64_t>
-    GetSize() noexcept final;
+    arrow::Result<std::int64_t> GetSize() noexcept final;
 
 private:
-    arrow::Status
-    check_if_closed() const noexcept;
+    arrow::Status check_if_closed() const noexcept;
 
 public:
-    bool
-    supports_zero_copy() const noexcept final;
+    bool supports_zero_copy() const noexcept final;
 
-    bool
-    closed() const noexcept final;
+    bool closed() const noexcept final;
 
 private:
     mlio::intrusive_ptr<mlio::input_stream> stream_;

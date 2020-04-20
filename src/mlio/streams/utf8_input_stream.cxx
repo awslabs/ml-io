@@ -37,16 +37,14 @@ namespace detail {
 
 struct utf8_input_stream_access {
     template<typename... Args>
-    static inline intrusive_ptr<utf8_input_stream>
-    make(Args &&... args)
+    static inline intrusive_ptr<utf8_input_stream> make(Args &&... args)
     {
         auto *ptr = new utf8_input_stream{std::forward<Args>(args)...};
 
         return wrap_intrusive(ptr);
     }
 
-    static inline void
-    set_preamble(utf8_input_stream &strm, memory_span value)
+    static inline void set_preamble(utf8_input_stream &strm, memory_span value)
     {
         strm.set_preamble(value);
     }
@@ -54,8 +52,7 @@ struct utf8_input_stream_access {
 
 namespace {
 
-std::size_t
-fill_buffer(input_stream &strm, mutable_memory_span buffer)
+std::size_t fill_buffer(input_stream &strm, mutable_memory_span buffer)
 {
     mutable_memory_span remaining = buffer;
     while (!remaining.empty()) {
@@ -70,8 +67,7 @@ fill_buffer(input_stream &strm, mutable_memory_span buffer)
     return buffer.size() - remaining.size();
 }
 
-std::optional<text_encoding>
-infer_bom_encoding(memory_span preamble) noexcept
+std::optional<text_encoding> infer_bom_encoding(memory_span preamble) noexcept
 {
     auto chrs = as_span<unsigned char const>(preamble);
 
@@ -82,13 +78,11 @@ infer_bom_encoding(memory_span preamble) noexcept
     }
 
     if (chrs.size() == 4) {
-        if (chrs[0] == 0x00 && chrs[1] == 0x00 && chrs[2] == 0xFE &&
-            chrs[3] == 0xFF) {
+        if (chrs[0] == 0x00 && chrs[1] == 0x00 && chrs[2] == 0xFE && chrs[3] == 0xFF) {
             return text_encoding::utf32_be;
         }
 
-        if (chrs[0] == 0xFF && chrs[1] == 0xFE && chrs[2] == 0x00 &&
-            chrs[3] == 0x00) {
+        if (chrs[0] == 0xFF && chrs[1] == 0xFE && chrs[2] == 0x00 && chrs[3] == 0x00) {
             return text_encoding::utf32_le;
         }
     }
@@ -109,13 +103,11 @@ infer_bom_encoding(memory_span preamble) noexcept
 }  // namespace
 }  // namespace detail
 
-intrusive_ptr<input_stream>
-make_utf8_stream(intrusive_ptr<input_stream> strm,
-                 std::optional<text_encoding> enc)
+intrusive_ptr<input_stream> make_utf8_stream(intrusive_ptr<input_stream> strm,
+                                             std::optional<text_encoding> enc)
 {
     if (enc != std::nullopt) {
-        if (*enc == text_encoding::utf8 ||
-            *enc == text_encoding::ascii_latin1) {
+        if (*enc == text_encoding::utf8 || *enc == text_encoding::ascii_latin1) {
             return strm;
         }
     }
@@ -161,8 +153,7 @@ make_utf8_stream(intrusive_ptr<input_stream> strm,
     return std::move(wrap);
 }
 
-utf8_input_stream::utf8_input_stream(intrusive_ptr<input_stream> inner,
-                                     text_encoding &&enc)
+utf8_input_stream::utf8_input_stream(intrusive_ptr<input_stream> inner, text_encoding &&enc)
     : inner_{std::move(inner)}, is_utf8_{enc == text_encoding::utf8}
 {
     if (is_utf8_) {
@@ -179,8 +170,7 @@ utf8_input_stream::utf8_input_stream(intrusive_ptr<input_stream> inner,
 
 utf8_input_stream::~utf8_input_stream() = default;
 
-std::size_t
-utf8_input_stream::read(mutable_memory_span dest)
+std::size_t utf8_input_stream::read(mutable_memory_span dest)
 {
     check_if_closed();
 
@@ -217,8 +207,7 @@ utf8_input_stream::read(mutable_memory_span dest)
     return copy_from_remainder(dest);
 }
 
-std::size_t
-utf8_input_stream::convert(mutable_memory_span dest)
+std::size_t utf8_input_stream::convert(mutable_memory_span dest)
 {
     auto out = dest;
 
@@ -233,8 +222,7 @@ utf8_input_stream::convert(mutable_memory_span dest)
                 // be converted.
                 if (buffer_pos_ != buffer_->begin()) {
                     throw stream_error{fmt::format(
-                        "An invalid byte sequence encountered while "
-                        "converting from {0} to UTF-8.",
+                        "An invalid byte sequence encountered while converting from {0} to UTF-8.",
                         converter_->encoding().name())};
                 }
 
@@ -281,8 +269,7 @@ utf8_input_stream::convert(mutable_memory_span dest)
     return dest.size() - out.size();
 }
 
-void
-utf8_input_stream::fill_buffer()
+void utf8_input_stream::fill_buffer()
 {
     mutable_memory_span buffer{buffer_pos_, buffer_end_};
 
@@ -291,8 +278,7 @@ utf8_input_stream::fill_buffer()
     buffer_end_ = buffer_pos_ + as_ssize(num_bytes_read);
 }
 
-std::size_t
-utf8_input_stream::copy_from_remainder(mutable_memory_span dest) noexcept
+std::size_t utf8_input_stream::copy_from_remainder(mutable_memory_span dest) noexcept
 {
     std::size_t size = std::min(remaining_bits_.size(), dest.size());
 
@@ -303,8 +289,7 @@ utf8_input_stream::copy_from_remainder(mutable_memory_span dest) noexcept
     return size;
 }
 
-void
-utf8_input_stream::set_preamble(memory_span value) noexcept
+void utf8_input_stream::set_preamble(memory_span value) noexcept
 {
     // If the underlying stream is non-seekable, we first need to serve
     // the preamble bytes that we read during instantiation.
@@ -322,8 +307,7 @@ utf8_input_stream::set_preamble(memory_span value) noexcept
     }
 }
 
-void
-utf8_input_stream::close() noexcept
+void utf8_input_stream::close() noexcept
 {
     inner_->close();
 
@@ -332,16 +316,14 @@ utf8_input_stream::close() noexcept
     buffer_ = {};
 }
 
-void
-utf8_input_stream::check_if_closed() const
+void utf8_input_stream::check_if_closed() const
 {
     if (inner_->closed()) {
         throw stream_error{"The input stream is closed."};
     }
 }
 
-bool
-utf8_input_stream::closed() const noexcept
+bool utf8_input_stream::closed() const noexcept
 {
     return inner_->closed();
 }

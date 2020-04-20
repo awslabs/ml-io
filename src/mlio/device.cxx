@@ -23,22 +23,19 @@
 namespace mlio {
 inline namespace v1 {
 
-device_kind
-device_kind::cpu() noexcept
+device_kind device_kind::cpu() noexcept
 {
     static std::string name = "CPU";
 
     return device_kind{name};
 }
 
-std::string
-device_kind::repr() const
+std::string device_kind::repr() const
 {
     return fmt::format("<device_kind name='{0}'>", name_);
 }
 
-std::string
-device::repr() const
+std::string device::repr() const
 {
     return fmt::format("<device kind={0} id={1}>", kind_, id_);
 }

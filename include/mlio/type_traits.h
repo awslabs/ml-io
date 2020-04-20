@@ -25,9 +25,9 @@ template<typename T, typename = void>
 struct is_container_helper : std::false_type {};
 
 template<typename T>
-struct is_container_helper<T,
-                           std::void_t<decltype(std::declval<T>().data()),
-                                       decltype(std::declval<T>().size())>>
+struct is_container_helper<
+    T,
+    std::void_t<decltype(std::declval<T>().data()), decltype(std::declval<T>().size())>>
     : std::true_type {};
 
 /// Checks if T is a container having data() and size() accessors.

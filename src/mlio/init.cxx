@@ -25,8 +25,7 @@
 namespace mlio {
 inline namespace v1 {
 
-void
-initialize()
+void initialize()
 {
     static bool initialized{};
     if (initialized) {

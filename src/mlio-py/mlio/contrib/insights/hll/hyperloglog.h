@@ -47,8 +47,7 @@
 
 #else
 
-inline uint8_t
-_get_leading_zero_count(uint32_t x, uint8_t b)
+inline uint8_t _get_leading_zero_count(uint32_t x, uint8_t b)
 {
 
 #if defined(_MSC_VER)
@@ -81,24 +80,19 @@ public:
     HyperLogLog(uint8_t b = 4);
 
     /// Adds a string-value to the estimator.
-    void
-    add(std::string_view const &str);
+    void add(std::string_view const &str);
 
     /// Estimates the cardinality.
-    double
-    estimate() const;
+    double estimate() const;
 
     /// Merges two HyperLogLog estimators together.
-    void
-    merge(const HyperLogLog &other);
+    void merge(const HyperLogLog &other);
 
     /// Resets the estimator.
-    void
-    clear();
+    void clear();
 
     // Returns the size of the estimator.
-    uint32_t
-    register_size() const;
+    uint32_t register_size() const;
 
 protected:
     /// register bit width

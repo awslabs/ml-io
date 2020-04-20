@@ -38,29 +38,22 @@ public:
     virtual ~chunk_reader();
 
 public:
-    chunk_reader &
-    operator=(chunk_reader const &) = delete;
+    chunk_reader &operator=(chunk_reader const &) = delete;
 
-    chunk_reader &
-    operator=(chunk_reader &&) = delete;
+    chunk_reader &operator=(chunk_reader &&) = delete;
 
 public:
-    virtual memory_slice
-    read_chunk(memory_span leftover) = 0;
+    virtual memory_slice read_chunk(memory_span leftover) = 0;
 
 public:
-    virtual bool
-    eof() const noexcept = 0;
+    virtual bool eof() const noexcept = 0;
 
-    virtual std::size_t
-    chunk_size_hint() const noexcept = 0;
+    virtual std::size_t chunk_size_hint() const noexcept = 0;
 
-    virtual void
-    set_chunk_size_hint(std::size_t value) noexcept = 0;
+    virtual void set_chunk_size_hint(std::size_t value) noexcept = 0;
 };
 
-std::unique_ptr<chunk_reader>
-make_chunk_reader(intrusive_ptr<input_stream> strm);
+std::unique_ptr<chunk_reader> make_chunk_reader(intrusive_ptr<input_stream> strm);
 
 }  // namespace detail
 }  // namespace v1

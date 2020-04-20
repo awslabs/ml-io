@@ -34,8 +34,7 @@ public:
     {}
 
 public:
-    intrusive_ptr<example>
-    next()
+    intrusive_ptr<example> next()
     {
         intrusive_ptr<example> exm = reader_->read_example();
         if (exm == nullptr) {
@@ -52,47 +51,37 @@ private:
 
 class py_data_reader : public data_reader {
 public:
-    intrusive_ptr<example>
-    read_example() override;
+    intrusive_ptr<example> read_example() override;
 
-    intrusive_ptr<example>
-    peek_example() override;
+    intrusive_ptr<example> peek_example() override;
 
-    intrusive_ptr<schema const>
-    read_schema() override;
+    intrusive_ptr<schema const> read_schema() override;
 
-    void
-    reset() noexcept override;
+    void reset() noexcept override;
 
 public:
-    std::size_t
-    num_bytes_read() const noexcept override;
+    std::size_t num_bytes_read() const noexcept override;
 };
 
-intrusive_ptr<example>
-py_data_reader::read_example()
+intrusive_ptr<example> py_data_reader::read_example()
 {
     // NOLINTNEXTLINE
     PYBIND11_OVERLOAD_PURE(intrusive_ptr<example>, data_reader, read_example, )
 }
 
-intrusive_ptr<example>
-py_data_reader::peek_example()
+intrusive_ptr<example> py_data_reader::peek_example()
 {
     // NOLINTNEXTLINE
     PYBIND11_OVERLOAD_PURE(intrusive_ptr<example>, data_reader, peek_example, )
 }
 
-intrusive_ptr<schema const>
-py_data_reader::read_schema()
+intrusive_ptr<schema const> py_data_reader::read_schema()
 {
     // NOLINTNEXTLINE
-    PYBIND11_OVERLOAD_PURE(
-        intrusive_ptr<schema const>, data_reader, read_schema, )
+    PYBIND11_OVERLOAD_PURE(intrusive_ptr<schema const>, data_reader, read_schema, )
 }
 
-void
-py_data_reader::reset() noexcept
+void py_data_reader::reset() noexcept
 {
     try {
         // NOLINTNEXTLINE
@@ -103,8 +92,7 @@ py_data_reader::reset() noexcept
     }
 }
 
-std::size_t
-py_data_reader::num_bytes_read() const noexcept
+std::size_t py_data_reader::num_bytes_read() const noexcept
 {
     try {
         // NOLINTNEXTLINE
@@ -115,23 +103,22 @@ py_data_reader::num_bytes_read() const noexcept
     }
 }
 
-data_reader_params
-make_data_reader_params(std::vector<intrusive_ptr<data_store>> dataset,
-                        std::size_t batch_size,
-                        std::size_t num_prefetched_batches,
-                        std::size_t num_parallel_reads,
-                        last_batch_handling last_batch_hnd,
-                        bad_batch_handling bad_batch_hnd,
-                        bool warn_bad_instances,
-                        std::size_t num_instances_to_skip,
-                        std::optional<std::size_t> num_instances_to_read,
-                        std::size_t shard_index,
-                        std::size_t num_shards,
-                        std::optional<float> sample_ratio,
-                        bool shuffle_instances,
-                        std::size_t shuffle_window,
-                        std::optional<std::size_t> shuffle_seed,
-                        bool reshuffle_each_epoch)
+data_reader_params make_data_reader_params(std::vector<intrusive_ptr<data_store>> dataset,
+                                           std::size_t batch_size,
+                                           std::size_t num_prefetched_batches,
+                                           std::size_t num_parallel_reads,
+                                           last_batch_handling last_batch_hnd,
+                                           bad_batch_handling bad_batch_hnd,
+                                           bool warn_bad_instances,
+                                           std::size_t num_instances_to_skip,
+                                           std::optional<std::size_t> num_instances_to_read,
+                                           std::size_t shard_index,
+                                           std::size_t num_shards,
+                                           std::optional<float> sample_ratio,
+                                           bool shuffle_instances,
+                                           std::size_t shuffle_window,
+                                           std::optional<std::size_t> shuffle_seed,
+                                           bool reshuffle_each_epoch)
 {
     data_reader_params prm{};
 
@@ -155,28 +142,26 @@ make_data_reader_params(std::vector<intrusive_ptr<data_store>> dataset,
     return prm;
 }
 
-csv_params
-make_csv_reader_params(
-    std::vector<std::string> column_names,
-    std::string name_prefix,
-    std::unordered_set<std::string> use_columns,
-    std::unordered_set<std::size_t> use_columns_by_index,
-    std::optional<data_type> default_data_type,
-    std::unordered_map<std::string, data_type> column_types,
-    std::unordered_map<std::size_t, data_type> column_types_by_index,
-    std::optional<std::size_t> header_row_index,
-    bool has_single_header,
-    bool dedupe_column_names,
-    char delimiter,
-    char quote_char,
-    std::optional<char> comment_char,
-    bool allow_quoted_new_lines,
-    bool skip_blank_lines,
-    std::optional<std::string> encoding,
-    std::optional<std::size_t> max_field_length,
-    max_field_length_handling max_field_length_hnd,
-    std::optional<std::size_t> max_line_length,
-    std::optional<parser_params> parser_prm)
+csv_params make_csv_reader_params(std::vector<std::string> column_names,
+                                  std::string name_prefix,
+                                  std::unordered_set<std::string> use_columns,
+                                  std::unordered_set<std::size_t> use_columns_by_index,
+                                  std::optional<data_type> default_data_type,
+                                  std::unordered_map<std::string, data_type> column_types,
+                                  std::unordered_map<std::size_t, data_type> column_types_by_index,
+                                  std::optional<std::size_t> header_row_index,
+                                  bool has_single_header,
+                                  bool dedupe_column_names,
+                                  char delimiter,
+                                  char quote_char,
+                                  std::optional<char> comment_char,
+                                  bool allow_quoted_new_lines,
+                                  bool skip_blank_lines,
+                                  std::optional<std::string> encoding,
+                                  std::optional<std::size_t> max_field_length,
+                                  max_field_length_handling max_field_length_hnd,
+                                  std::optional<std::size_t> max_line_length,
+                                  std::optional<parser_params> parser_prm)
 {
     csv_params csv_prm{};
 
@@ -208,11 +193,10 @@ make_csv_reader_params(
     return csv_prm;
 }
 
-image_reader_params
-make_image_reader_params(image_frame img_frame,
-                         std::optional<size_t> resize,
-                         std::vector<std::size_t> image_dimensions,
-                         bool to_rgb)
+image_reader_params make_image_reader_params(image_frame img_frame,
+                                             std::optional<size_t> resize,
+                                             std::vector<std::size_t> image_dimensions,
+                                             bool to_rgb)
 {
     image_reader_params img_prm{};
     img_prm.img_frame = img_frame;
@@ -222,8 +206,7 @@ make_image_reader_params(image_frame img_frame,
     return img_prm;
 }
 
-parser_params
-make_parser_params(std::unordered_set<std::string> nan_values, int base)
+parser_params make_parser_params(std::unordered_set<std::string> nan_values, int base)
 {
     parser_params parser_prm{};
 
@@ -233,39 +216,33 @@ make_parser_params(std::unordered_set<std::string> nan_values, int base)
     return parser_prm;
 }
 
-intrusive_ptr<csv_reader>
-make_csv_reader(data_reader_params prm, std::optional<csv_params> csv_prm)
+intrusive_ptr<csv_reader> make_csv_reader(data_reader_params prm, std::optional<csv_params> csv_prm)
 {
     if (csv_prm) {
-        return make_intrusive<csv_reader>(std::move(prm),
-                                          std::move(csv_prm.value()));
+        return make_intrusive<csv_reader>(std::move(prm), std::move(csv_prm.value()));
     }
 
     return make_intrusive<csv_reader>(std::move(prm));
 }
 
-intrusive_ptr<image_reader>
-make_image_reader(data_reader_params prm, image_reader_params img_prm)
+intrusive_ptr<image_reader> make_image_reader(data_reader_params prm, image_reader_params img_prm)
 {
     return make_intrusive<image_reader>(std::move(prm), std::move(img_prm));
 }
 
-intrusive_ptr<recordio_protobuf_reader>
-make_recordio_protobuf_reader(data_reader_params prm)
+intrusive_ptr<recordio_protobuf_reader> make_recordio_protobuf_reader(data_reader_params prm)
 {
     return make_intrusive<recordio_protobuf_reader>(std::move(prm));
 }
 
-intrusive_ptr<text_line_reader>
-make_text_line_reader(data_reader_params prm)
+intrusive_ptr<text_line_reader> make_text_line_reader(data_reader_params prm)
 {
     return make_intrusive<text_line_reader>(std::move(prm));
 }
 
 }  // namespace
 
-void
-register_data_readers(py::module &m)
+void register_data_readers(py::module &m)
 {
     py::enum_<last_batch_handling>(
         m,
@@ -273,43 +250,33 @@ register_data_readers(py::module &m)
         "Specifies how the last batch read from a dataset should to be "
         "handled if the dataset size is not evenly divisible by the batch "
         "size.")
-        .value(
-            "NONE",
-            last_batch_handling::none,
-            "Return an ``example`` where the size of the batch dimension is "
-            "less than the requested batch size.")
+        .value("NONE",
+               last_batch_handling::none,
+               "Return an ``example`` where the size of the batch dimension is "
+               "less than the requested batch size.")
         .value("DROP", last_batch_handling::drop, "Drop the last ``example``.")
-        .value("DROP_WARN",
-               last_batch_handling::drop_warn,
-               "Drop the last ``example`` and warn.")
-        .value(
-            "PAD",
-            last_batch_handling::pad,
-            "Pad the feature tensors with zero so that the size of the batch "
-            "dimension equals the requested batch size.")
-        .value(
-            "PAD_WARN",
-            last_batch_handling::pad_warn,
-            "Pad the feature tensors with zero so that the size of the batch "
-            "dimension equals the requested batch size and warn.");
+        .value("DROP_WARN", last_batch_handling::drop_warn, "Drop the last ``example`` and warn.")
+        .value("PAD",
+               last_batch_handling::pad,
+               "Pad the feature tensors with zero so that the size of the batch "
+               "dimension equals the requested batch size.")
+        .value("PAD_WARN",
+               last_batch_handling::pad_warn,
+               "Pad the feature tensors with zero so that the size of the batch "
+               "dimension equals the requested batch size and warn.");
 
-    py::enum_<bad_batch_handling>(
-        m,
-        "BadBatchHandling",
-        "Specifies how a batch that contains erroneous data should be"
-        "handled.")
+    py::enum_<bad_batch_handling>(m,
+                                  "BadBatchHandling",
+                                  "Specifies how a batch that contains erroneous data should be"
+                                  "handled.")
         .value("ERROR", bad_batch_handling::error, "Raise an error.")
         .value("SKIP", bad_batch_handling::skip, "Skip the batch.")
-        .value("SKIP_WARN",
-               bad_batch_handling::skip_warn,
-               "Skip the batch and warn.")
-        .value("PAD",
-               bad_batch_handling::pad,
-               "Skip bad instances, pad the batch to the batch size.")
+        .value("SKIP_WARN", bad_batch_handling::skip_warn, "Skip the batch and warn.")
         .value(
-            "PAD_WARN",
-            bad_batch_handling::pad_warn,
-            "Skip bad instances, pad the batch to the batch size, and warn.");
+            "PAD", bad_batch_handling::pad, "Skip bad instances, pad the batch to the batch size.")
+        .value("PAD_WARN",
+               bad_batch_handling::pad_warn,
+               "Skip bad instances, pad the batch to the batch size, and warn.");
 
     py::enum_<max_field_length_handling>(
         m,
@@ -318,15 +285,12 @@ register_data_readers(py::module &m)
         .value("TREAT_AS_BAD",
                max_field_length_handling::treat_as_bad,
                "Treat the corresponding row as bad.")
-        .value("TRUNCATE",
-               max_field_length_handling::truncate,
-               "Truncate the field.")
+        .value("TRUNCATE", max_field_length_handling::truncate, "Truncate the field.")
         .value("TRUNCATE_WARN",
                max_field_length_handling::truncate_warn,
                "Truncate the field and warn.");
 
-    py::enum_<image_frame>(
-        m, "ImageFrame", "Specifies the image_frame parameter value")
+    py::enum_<image_frame>(m, "ImageFrame", "Specifies the image_frame parameter value")
         .value("NONE", image_frame::none, "none.")
         .value("RECORDIO", image_frame::recordio, "For recordio files.");
 
@@ -338,9 +302,7 @@ register_data_readers(py::module &m)
         .def("__next__", &py_data_iterator::next);
 
     py::class_<data_reader_params>(
-        m,
-        "DataReaderParams",
-        "Represents the common parameters of a ``data_reader`` object.")
+        m, "DataReaderParams", "Represents the common parameters of a ``data_reader`` object.")
         .def(py::init(&make_data_reader_params),
              "dataset"_a,
              "batch_size"_a,
@@ -417,32 +379,22 @@ register_data_readers(py::module &m)
             )")
         .def_readwrite("dataset", &data_reader_params::dataset)
         .def_readwrite("batch_size", &data_reader_params::batch_size)
-        .def_readwrite("num_prefetched_batches",
-                       &data_reader_params::num_prefetched_batches)
-        .def_readwrite("num_parallel_reads",
-                       &data_reader_params::num_parallel_reads)
-        .def_readwrite("last_batch_handling",
-                       &data_reader_params::last_batch_hnd)
-        .def_readwrite("bad_batch_handling",
-                       &data_reader_params::bad_batch_hnd)
-        .def_readwrite("num_instances_to_skip",
-                       &data_reader_params::num_instances_to_skip)
-        .def_readwrite("num_instances_to_read",
-                       &data_reader_params::num_instances_to_read)
+        .def_readwrite("num_prefetched_batches", &data_reader_params::num_prefetched_batches)
+        .def_readwrite("num_parallel_reads", &data_reader_params::num_parallel_reads)
+        .def_readwrite("last_batch_handling", &data_reader_params::last_batch_hnd)
+        .def_readwrite("bad_batch_handling", &data_reader_params::bad_batch_hnd)
+        .def_readwrite("num_instances_to_skip", &data_reader_params::num_instances_to_skip)
+        .def_readwrite("num_instances_to_read", &data_reader_params::num_instances_to_read)
         .def_readwrite("shard_index", &data_reader_params::shard_index)
         .def_readwrite("num_shards", &data_reader_params::num_shards)
         .def_readwrite("sample_ratio", &data_reader_params::sample_ratio)
-        .def_readwrite("shuffle_instances",
-                       &data_reader_params::shuffle_instances)
+        .def_readwrite("shuffle_instances", &data_reader_params::shuffle_instances)
         .def_readwrite("shuffle_window", &data_reader_params::shuffle_window)
         .def_readwrite("shuffle_seed", &data_reader_params::shuffle_seed)
-        .def_readwrite("reshuffle_each_epoch",
-                       &data_reader_params::reshuffle_each_epoch);
+        .def_readwrite("reshuffle_each_epoch", &data_reader_params::reshuffle_each_epoch);
 
     py::class_<csv_params>(
-        m,
-        "CsvParams",
-        "Represents the optional parameters of a ``CsvReader`` object.")
+        m, "CsvParams", "Represents the optional parameters of a ``CsvReader`` object.")
         .def(py::init(&make_csv_reader_params),
              "column_names"_a = std::vector<std::string>{},
              "name_prefix"_a = "",
@@ -450,8 +402,7 @@ register_data_readers(py::module &m)
              "use_columns_by_index"_a = std::unordered_set<std::size_t>{},
              "default_data_type"_a = std::nullopt,
              "column_types"_a = std::unordered_map<std::string, data_type>{},
-             "column_types_by_index"_a =
-                 std::unordered_map<std::size_t, data_type>{},
+             "column_types_by_index"_a = std::unordered_map<std::size_t, data_type>{},
              "header_row_index"_a = 0,
              "has_single_header"_a = false,
              "dedupe_column_names"_a = true,
@@ -462,8 +413,7 @@ register_data_readers(py::module &m)
              "skip_blank_lines"_a = true,
              "encoding"_a = std::nullopt,
              "max_field_length"_a = std::nullopt,
-             "max_field_length_handling"_a =
-                 max_field_length_handling::treat_as_bad,
+             "max_field_length_handling"_a = max_field_length_handling::treat_as_bad,
              "max_line_length"_a = std::nullopt,
              "parser_params"_a = std::nullopt,
              R"(
@@ -560,32 +510,26 @@ register_data_readers(py::module &m)
         .def_readwrite("column_names", &csv_params::column_names)
         .def_readwrite("name_prefix", &csv_params::name_prefix)
         .def_readwrite("use_columns", &csv_params::use_columns)
-        .def_readwrite("use_columns_by_index",
-                       &csv_params::use_columns_by_index)
+        .def_readwrite("use_columns_by_index", &csv_params::use_columns_by_index)
         .def_readwrite("default_data_type", &csv_params::default_data_type)
         .def_readwrite("column_types", &csv_params::column_types)
-        .def_readwrite("column_types_by_index",
-                       &csv_params::column_types_by_index)
+        .def_readwrite("column_types_by_index", &csv_params::column_types_by_index)
         .def_readwrite("header_row_index", &csv_params::header_row_index)
         .def_readwrite("has_single_header", &csv_params::has_single_header)
         .def_readwrite("dedupe_column_names", &csv_params::dedupe_column_names)
         .def_readwrite("delimiter", &csv_params::delimiter)
         .def_readwrite("quote_char", &csv_params::quote_char)
         .def_readwrite("comment_char", &csv_params::comment_char)
-        .def_readwrite("allow_quoted_new_lines",
-                       &csv_params::allow_quoted_new_lines)
+        .def_readwrite("allow_quoted_new_lines", &csv_params::allow_quoted_new_lines)
         .def_readwrite("skip_blank_lines", &csv_params::skip_blank_lines)
         .def_readwrite("encoding", &csv_params::encoding)
         .def_readwrite("max_field_length", &csv_params::max_field_length)
-        .def_readwrite("max_field_length_handling",
-                       &csv_params::max_field_length_hnd)
+        .def_readwrite("max_field_length_handling", &csv_params::max_field_length_hnd)
         .def_readwrite("max_line_length", &csv_params::max_line_length)
         .def_readwrite("parser_params", &csv_params::parser_prm);
 
     py::class_<image_reader_params>(
-        m,
-        "ImageReaderParams",
-        "Represents the optional parameters of an ``ImageReader`` object.")
+        m, "ImageReaderParams", "Represents the optional parameters of an ``ImageReader`` object.")
         .def(py::init(&make_image_reader_params),
              "img_frame"_a = image_frame::none,
              "resize"_a = std::nullopt,
@@ -608,8 +552,7 @@ register_data_readers(py::module &m)
             )")
         .def_readwrite("img_frame", &image_reader_params::img_frame)
         .def_readwrite("resize", &image_reader_params::resize)
-        .def_readwrite("image_dimensions",
-                       &image_reader_params::image_dimensions)
+        .def_readwrite("image_dimensions", &image_reader_params::image_dimensions)
         .def_readwrite("to_rgb", &image_reader_params::to_rgb);
 
     py::class_<parser_params>(m, "ParserParams")
@@ -673,9 +616,7 @@ register_data_readers(py::module &m)
              reads ahead the dataset in background.)");
 
     py::class_<csv_reader, data_reader, intrusive_ptr<csv_reader>>(
-        m,
-        "CsvReader",
-        "Represents a ``data_reader`` for reading CSV datasets.")
+        m, "CsvReader", "Represents a ``data_reader`` for reading CSV datasets.")
         .def(py::init<>(&make_csv_reader),
              "data_reader_params"_a,
              "csv_params"_a = std::nullopt,
@@ -689,9 +630,7 @@ register_data_readers(py::module &m)
             )");
 
     py::class_<image_reader, data_reader, intrusive_ptr<image_reader>>(
-        m,
-        "ImageReader",
-        "Represents a ``data_reader`` for reading Image datasets.")
+        m, "ImageReader", "Represents a ``data_reader`` for reading Image datasets.")
         .def(py::init<>(&make_image_reader),
              "data_reader_params"_a,
              "image_reader_params"_a = std::nullopt,
@@ -704,9 +643,7 @@ register_data_readers(py::module &m)
                 See ``ImageReaderParams``.
             )");
 
-    py::class_<recordio_protobuf_reader,
-               data_reader,
-               intrusive_ptr<recordio_protobuf_reader>>(
+    py::class_<recordio_protobuf_reader, data_reader, intrusive_ptr<recordio_protobuf_reader>>(
         m, "RecordIOProtobufReader")
         .def(py::init<>(&make_recordio_protobuf_reader),
              "data_reader_params"_a,
@@ -717,8 +654,7 @@ register_data_readers(py::module &m)
                 See ``DataReaderParams``.
             )");
 
-    py::class_<text_line_reader, data_reader, intrusive_ptr<text_line_reader>>(
-        m, "TextLineReader")
+    py::class_<text_line_reader, data_reader, intrusive_ptr<text_line_reader>>(m, "TextLineReader")
         .def(py::init<>(&make_text_line_reader),
              "data_reader_params"_a,
              R"(

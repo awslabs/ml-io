@@ -29,18 +29,14 @@ inline namespace v1 {
 
 class MLIO_API record_reader_base : public record_reader {
 public:
-    std::optional<record>
-    read_record() final;
+    std::optional<record> read_record() final;
 
-    std::optional<record>
-    peek_record() final;
+    std::optional<record> peek_record() final;
 
 private:
-    std::optional<record>
-    read_record_internal();
+    std::optional<record> read_record_internal();
 
-    virtual std::optional<record>
-    read_record_core() = 0;
+    virtual std::optional<record> read_record_core() = 0;
 
 private:
     std::optional<record> peeked_record_{};

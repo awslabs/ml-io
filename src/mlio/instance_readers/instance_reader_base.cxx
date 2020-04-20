@@ -19,8 +19,7 @@ namespace mlio {
 inline namespace v1 {
 namespace detail {
 
-std::optional<instance>
-instance_reader_base::read_instance()
+std::optional<instance> instance_reader_base::read_instance()
 {
     std::optional<instance> ins{};
     if (peeked_instance_) {
@@ -37,8 +36,7 @@ instance_reader_base::read_instance()
     return ins;
 }
 
-std::optional<instance>
-instance_reader_base::peek_instance()
+std::optional<instance> instance_reader_base::peek_instance()
 {
     if (peeked_instance_ == std::nullopt) {
         peeked_instance_ = read_instance_core();
@@ -46,8 +44,7 @@ instance_reader_base::peek_instance()
     return peeked_instance_;
 }
 
-void
-instance_reader_base::reset() noexcept
+void instance_reader_base::reset() noexcept
 {
     reset_core();
 

@@ -30,11 +30,10 @@ using namespace pybind11::literals;
 namespace pymlio {
 namespace {
 
-intrusive_ptr<dense_tensor>
-make_dense_tensor(size_vector shape,
-                  py::buffer &data,
-                  std::optional<ssize_vector> strides,
-                  bool cpy)
+intrusive_ptr<dense_tensor> make_dense_tensor(size_vector shape,
+                                              py::buffer &data,
+                                              std::optional<ssize_vector> strides,
+                                              bool cpy)
 {
     std::unique_ptr<device_array> arr = make_device_array(data, cpy);
 
@@ -43,15 +42,11 @@ make_dense_tensor(size_vector shape,
         strds = std::move(*strides);
     }
 
-    return make_intrusive<dense_tensor>(
-        std::move(shape), std::move(arr), std::move(strds));
+    return make_intrusive<dense_tensor>(std::move(shape), std::move(arr), std::move(strds));
 }
 
 intrusive_ptr<coo_tensor>
-make_coo_tensor(size_vector shape,
-                py::buffer &data,
-                std::vector<py::buffer> &coords,
-                bool cpy)
+make_coo_tensor(size_vector shape, py::buffer &data, std::vector<py::buffer> &coords, bool cpy)
 {
     std::unique_ptr<device_array> arr = make_device_array(data, cpy);
 
@@ -62,12 +57,10 @@ make_coo_tensor(size_vector shape,
         coordinates.emplace_back(make_device_array(indices, cpy));
     }
 
-    return make_intrusive<coo_tensor>(
-        std::move(shape), std::move(arr), std::move(coordinates));
+    return make_intrusive<coo_tensor>(std::move(shape), std::move(arr), std::move(coordinates));
 }
 
-py::buffer_info
-to_py_buffer(dense_tensor &tsr)
+py::buffer_info to_py_buffer(dense_tensor &tsr)
 {
     auto buf = py::cast(tsr).attr("data").cast<py::buffer>();
 
@@ -92,8 +85,7 @@ to_py_buffer(dense_tensor &tsr)
 
 }  // namespace
 
-void
-register_tensors(py::module &m)
+void register_tensors(py::module &m)
 {
     py::enum_<data_type>(m, "DataType")
         .value("SIZE", data_type::size)
@@ -120,8 +112,7 @@ register_tensors(py::module &m)
         in memory.
         )")
         .def("__repr__", &tensor::repr)
-        .def_property_readonly(
-            "dtype", &tensor::dtype, "Gets the data type of the tensor.")
+        .def_property_readonly("dtype", &tensor::dtype, "Gets the data type of the tensor.")
         .def_property_readonly(
             "shape",
             [](tensor &self) -> py::tuple {
@@ -155,14 +146,8 @@ register_tensors(py::module &m)
         .def_buffer(&to_py_buffer);
 
     py::class_<coo_tensor, tensor, intrusive_ptr<coo_tensor>>(
-        m,
-        "CooTensor",
-        "Represents a tensor that stores its data in coordinate format.")
-        .def(py::init<>(&make_coo_tensor),
-             "shape"_a,
-             "data"_a,
-             "coords"_a,
-             "copy"_a = true)
+        m, "CooTensor", "Represents a tensor that stores its data in coordinate format.")
+        .def(py::init<>(&make_coo_tensor), "shape"_a, "data"_a, "coords"_a, "copy"_a = true)
         .def_property_readonly(
             "data",
             [](coo_tensor &self) {
@@ -172,8 +157,7 @@ register_tensors(py::module &m)
         .def(
             "indices",
             [](coo_tensor &self, std::size_t dim) {
-                return py_device_array{wrap_intrusive(&self),
-                                       self.indices(dim)};
+                return py_device_array{wrap_intrusive(&self), self.indices(dim)};
             },
             "dim"_a,
             "Gets the indices for the specified dimension.");

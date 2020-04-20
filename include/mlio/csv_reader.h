@@ -109,8 +109,7 @@ struct MLIO_API csv_params final {
     /// strategy in @ref max_field_length_hnd.
     std::optional<std::size_t> max_field_length{};
     /// See @ref max_field_length_handling.
-    max_field_length_handling max_field_length_hnd =
-        max_field_length_handling::treat_as_bad;
+    max_field_length_handling max_field_length_hnd = max_field_length_handling::treat_as_bad;
     /// The maximum size of a text line. If a row is longer than the
     /// specified size, an error will be raised.
     std::optional<std::size_t> max_line_length{};
@@ -135,72 +134,55 @@ public:
     ~csv_reader() final;
 
 public:
-    csv_reader &
-    operator=(csv_reader const &) = delete;
+    csv_reader &operator=(csv_reader const &) = delete;
 
-    csv_reader &
-    operator=(csv_reader &&) = delete;
+    csv_reader &operator=(csv_reader &&) = delete;
 
 private:
     MLIO_HIDDEN
-    intrusive_ptr<record_reader>
-    make_record_reader(data_store const &ds) final;
+    intrusive_ptr<record_reader> make_record_reader(data_store const &ds) final;
 
     MLIO_HIDDEN
-    void
-    read_names_from_header(data_store const &ds, record_reader &rdr);
+    void read_names_from_header(data_store const &ds, record_reader &rdr);
 
     MLIO_HIDDEN
-    void
-    skip_to_header_row(record_reader &rdr);
+    void skip_to_header_row(record_reader &rdr);
 
     MLIO_HIDDEN
-    intrusive_ptr<schema const>
-    infer_schema(std::optional<instance> const &ins) final;
+    intrusive_ptr<schema const> infer_schema(std::optional<instance> const &ins) final;
 
     MLIO_HIDDEN
-    void
-    infer_column_types(std::optional<instance> const &ins);
+    void infer_column_types(std::optional<instance> const &ins);
 
     MLIO_HIDDEN
-    void
-    set_or_validate_column_names(std::optional<instance> const &ins);
+    void set_or_validate_column_names(std::optional<instance> const &ins);
 
     MLIO_HIDDEN
-    void
-    apply_column_type_overrides();
+    void apply_column_type_overrides();
 
     MLIO_HIDDEN
-    intrusive_ptr<schema const>
-    init_parsers_and_make_schema();
+    intrusive_ptr<schema const> init_parsers_and_make_schema();
 
     MLIO_HIDDEN
-    bool
-    should_skip(std::size_t index, std::string const &name) const noexcept;
+    bool should_skip(std::size_t index, std::string const &name) const noexcept;
 
     MLIO_HIDDEN
-    intrusive_ptr<example>
-    decode(instance_batch const &batch) const final;
+    intrusive_ptr<example> decode(instance_batch const &batch) const final;
 
     MLIO_HIDDEN
-    std::vector<intrusive_ptr<tensor>>
-    make_tensors(std::size_t batch_size) const;
+    std::vector<intrusive_ptr<tensor>> make_tensors(std::size_t batch_size) const;
 
     MLIO_HIDDEN
-    std::optional<std::size_t>
-    decode_ser(decoder_state &state, instance_batch const &batch) const;
+    std::optional<std::size_t> decode_ser(decoder_state &state, instance_batch const &batch) const;
 
     MLIO_HIDDEN
-    std::optional<std::size_t>
-    decode_prl(decoder_state &state, instance_batch const &batch) const;
+    std::optional<std::size_t> decode_prl(decoder_state &state, instance_batch const &batch) const;
 
     MLIO_HIDDEN
-    auto
-    make_column_iterators() const noexcept;
+    auto make_column_iterators() const noexcept;
 
 public:
-    void
-    reset() noexcept final;
+    void reset() noexcept final;
 
 private:
     csv_params params_;

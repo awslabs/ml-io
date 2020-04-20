@@ -24,8 +24,7 @@ inline namespace v1 {
 namespace detail {
 namespace {
 
-std::byte *
-allocate_data(std::size_t size, std::byte *old_data = nullptr)
+std::byte *allocate_data(std::size_t size, std::byte *old_data = nullptr)
 {
     void *data = ::realloc(old_data, size);  // NOLINT
     if (data == nullptr) {
@@ -34,8 +33,7 @@ allocate_data(std::size_t size, std::byte *old_data = nullptr)
     return static_cast<std::byte *>(data);
 }
 
-void
-free_data(std::byte *data)
+void free_data(std::byte *data)
 {
     ::free(data);  // NOLINT
 }
@@ -58,8 +56,7 @@ heap_memory_block::~heap_memory_block()
     detail::free_data(data_);
 }
 
-void
-heap_memory_block::resize(size_type size)
+void heap_memory_block::resize(size_type size)
 {
     if (size == 0) {
         detail::free_data(data_);

@@ -38,33 +38,25 @@ public:
     virtual ~instance_reader();
 
 public:
-    instance_reader &
-    operator=(instance_reader const &) = delete;
+    instance_reader &operator=(instance_reader const &) = delete;
 
-    instance_reader &
-    operator=(instance_reader &&) = delete;
+    instance_reader &operator=(instance_reader &&) = delete;
 
 public:
-    virtual std::optional<instance>
-    read_instance() = 0;
+    virtual std::optional<instance> read_instance() = 0;
 
-    virtual std::optional<instance>
-    peek_instance() = 0;
+    virtual std::optional<instance> peek_instance() = 0;
 
-    virtual void
-    reset() noexcept = 0;
+    virtual void reset() noexcept = 0;
 
 public:
-    virtual std::size_t
-    num_bytes_read() const noexcept = 0;
+    virtual std::size_t num_bytes_read() const noexcept = 0;
 };
 
-using record_reader_factory =
-    std::function<intrusive_ptr<record_reader>(data_store const &ds)>;
+using record_reader_factory = std::function<intrusive_ptr<record_reader>(data_store const &ds)>;
 
-std::unique_ptr<instance_reader>
-make_instance_reader(data_reader_params const &prm,
-                     record_reader_factory &&fct);
+std::unique_ptr<instance_reader> make_instance_reader(data_reader_params const &prm,
+                                                      record_reader_factory &&fct);
 
 }  // namespace detail
 }  // namespace v1

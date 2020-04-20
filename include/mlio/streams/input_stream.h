@@ -40,40 +40,29 @@ public:
     virtual ~input_stream();
 
 public:
-    input_stream &
-    operator=(input_stream const &) = delete;
+    input_stream &operator=(input_stream const &) = delete;
 
-    input_stream &
-    operator=(input_stream &&) = delete;
+    input_stream &operator=(input_stream &&) = delete;
 
 public:
-    virtual std::size_t
-    read(mutable_memory_span dest) = 0;
+    virtual std::size_t read(mutable_memory_span dest) = 0;
 
-    virtual memory_slice
-    read(std::size_t size) = 0;
+    virtual memory_slice read(std::size_t size) = 0;
 
-    virtual void
-    seek(std::size_t position) = 0;
+    virtual void seek(std::size_t position) = 0;
 
-    virtual void
-    close() noexcept = 0;
+    virtual void close() noexcept = 0;
 
 public:
-    virtual std::size_t
-    size() const = 0;
+    virtual std::size_t size() const = 0;
 
-    virtual std::size_t
-    position() const = 0;
+    virtual std::size_t position() const = 0;
 
-    virtual bool
-    closed() const noexcept = 0;
+    virtual bool closed() const noexcept = 0;
 
-    virtual bool
-    seekable() const noexcept = 0;
+    virtual bool seekable() const noexcept = 0;
 
-    virtual bool
-    supports_zero_copy() const noexcept = 0;
+    virtual bool supports_zero_copy() const noexcept = 0;
 };
 
 /// @}

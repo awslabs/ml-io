@@ -28,23 +28,19 @@ namespace detail {
 
 class in_memory_chunk_reader : public chunk_reader {
 public:
-    explicit in_memory_chunk_reader(memory_slice &&chunk) noexcept
-        : chunk_{std::move(chunk)}
+    explicit in_memory_chunk_reader(memory_slice &&chunk) noexcept : chunk_{std::move(chunk)}
     {}
 
 public:
-    memory_slice
-    read_chunk(memory_span leftover) final;
+    memory_slice read_chunk(memory_span leftover) final;
 
 public:
-    bool
-    eof() const noexcept final
+    bool eof() const noexcept final
     {
         return chunk_.empty();
     }
 
-    std::size_t
-    chunk_size_hint() const noexcept final
+    std::size_t chunk_size_hint() const noexcept final
     {
         return 0;
     }

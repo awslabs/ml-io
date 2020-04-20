@@ -38,18 +38,14 @@ public:
     virtual ~record_reader();
 
 public:
-    record_reader &
-    operator=(record_reader const &) = delete;
+    record_reader &operator=(record_reader const &) = delete;
 
-    record_reader &
-    operator=(record_reader &&) = delete;
+    record_reader &operator=(record_reader &&) = delete;
 
 public:
-    virtual std::optional<record>
-    read_record() = 0;
+    virtual std::optional<record> read_record() = 0;
 
-    virtual std::optional<record>
-    peek_record() = 0;
+    virtual std::optional<record> peek_record() = 0;
 };
 
 /// @}

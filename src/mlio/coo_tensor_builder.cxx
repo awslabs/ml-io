@@ -23,8 +23,7 @@ namespace detail {
 
 coo_tensor_builder::~coo_tensor_builder() = default;
 
-bool
-coo_tensor_builder::append_core(stdx::span<std::uint64_t const> keys)
+bool coo_tensor_builder::append_core(stdx::span<std::uint64_t const> keys)
 {
     // The first element of the shape and the strides corresponds to the
     // batch dimension. We do not need it for computing the indices.
@@ -76,8 +75,7 @@ coo_tensor_builder::append_core(stdx::span<std::uint64_t const> keys)
     return true;
 }
 
-intrusive_ptr<tensor>
-coo_tensor_builder::build_core(std::unique_ptr<device_array> &&data)
+intrusive_ptr<tensor> coo_tensor_builder::build_core(std::unique_ptr<device_array> &&data)
 {
     // Wrap index lists into device arrays.
     std::vector<std::unique_ptr<device_array>> layout{};
@@ -94,8 +92,7 @@ coo_tensor_builder::build_core(std::unique_ptr<device_array> &&data)
     // there is padding.
     shape[0] = batch_size_;
 
-    return make_intrusive<coo_tensor>(
-        std::move(shape), std::move(data), std::move(layout));
+    return make_intrusive<coo_tensor>(std::move(shape), std::move(data), std::move(layout));
 }
 
 }  // namespace detail

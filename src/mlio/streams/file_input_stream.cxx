@@ -33,29 +33,24 @@ using mlio::detail::current_error_code;
 namespace mlio {
 inline namespace v1 {
 
-file_input_stream::file_input_stream(std::string pathname)
-    : pathname_{std::move(pathname)}
+file_input_stream::file_input_stream(std::string pathname) : pathname_{std::move(pathname)}
 {
     detail::validate_file_pathname(pathname_);
 
     fd_ = ::open(pathname_.c_str(), O_RDONLY | O_CLOEXEC);
     if (fd_ == -1) {
-        throw std::system_error{current_error_code(),
-                                "The file cannot be opened."};
+        throw std::system_error{current_error_code(), "The file cannot be opened."};
     }
 
 #ifdef MLIO_PLATFORM_LINUX
     int r = ::posix_fadvise(fd_.get(), 0, 0, POSIX_FADV_SEQUENTIAL);
     if (r != 0) {
-        logger::warn(
-            "The read-ahead size of the file '{0}' cannot be increased.",
-            pathname_);
+        logger::warn("The read-ahead size of the file '{0}' cannot be increased.", pathname_);
     }
 #endif
 }
 
-std::size_t
-file_input_stream::read(mutable_memory_span dest)
+std::size_t file_input_stream::read(mutable_memory_span dest)
 {
     check_if_closed();
 
@@ -65,14 +60,12 @@ file_input_stream::read(mutable_memory_span dest)
 
     ssize_t num_bytes_read = ::read(fd_.get(), dest.data(), dest.size());
     if (num_bytes_read == -1) {
-        throw std::system_error{current_error_code(),
-                                "The file cannot be read."};
+        throw std::system_error{current_error_code(), "The file cannot be read."};
     }
     return static_cast<std::size_t>(num_bytes_read);
 }
 
-void
-file_input_stream::seek(std::size_t position)
+void file_input_stream::seek(std::size_t position)
 {
     check_if_closed();
 
@@ -94,14 +87,12 @@ file_input_stream::seek(std::size_t position)
     }
 }
 
-void
-file_input_stream::close() noexcept
+void file_input_stream::close() noexcept
 {
     fd_ = {};
 }
 
-void
-file_input_stream::check_if_closed() const
+void file_input_stream::check_if_closed() const
 {
     if (fd_.is_open()) {
         return;
@@ -110,17 +101,15 @@ file_input_stream::check_if_closed() const
     throw stream_error{"The input stream is closed."};
 }
 
-std::size_t
-file_input_stream::size() const
+std::size_t file_input_stream::size() const
 {
     check_if_closed();
 
     if (size_ == 0) {
         struct ::stat buf {};
         if (::fstat(fd_.get(), &buf) == -1) {
-            throw std::system_error{
-                current_error_code(),
-                "The size of the file cannot be retrieved."};
+            throw std::system_error{current_error_code(),
+                                    "The size of the file cannot be retrieved."};
         }
 
         size_ = static_cast<std::size_t>(buf.st_size);
@@ -128,8 +117,7 @@ file_input_stream::size() const
     return size_;
 }
 
-std::size_t
-file_input_stream::position() const
+std::size_t file_input_stream::position() const
 {
     check_if_closed();
 

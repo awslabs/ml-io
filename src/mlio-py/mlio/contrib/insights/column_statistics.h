@@ -36,16 +36,13 @@ private:
 
 public:
     explicit column_analysis(std::string name)
-        : column_name{std::move(name)}
-        , str_cardinality_estimator_{cardinality_hill_size}
+        : column_name{std::move(name)}, str_cardinality_estimator_{cardinality_hill_size}
     {}
 
 public:
-    std::size_t
-    estimate_string_cardinality() const
+    std::size_t estimate_string_cardinality() const
     {
-        return static_cast<std::size_t>(
-            std::round(str_cardinality_estimator_.estimate()));
+        return static_cast<std::size_t>(std::round(str_cardinality_estimator_.estimate()));
     }
 
 public:

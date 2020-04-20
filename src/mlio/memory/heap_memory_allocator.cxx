@@ -21,8 +21,7 @@
 namespace mlio {
 inline namespace v1 {
 
-intrusive_ptr<mutable_memory_block>
-heap_memory_allocator::allocate(std::size_t size)
+intrusive_ptr<mutable_memory_block> heap_memory_allocator::allocate(std::size_t size)
 {
     return make_intrusive<heap_memory_block>(size);
 }

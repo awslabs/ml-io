@@ -35,8 +35,7 @@ gzip_inflate_stream::gzip_inflate_stream(intrusive_ptr<input_stream> inner)
 
 gzip_inflate_stream::~gzip_inflate_stream() = default;
 
-std::size_t
-gzip_inflate_stream::read(mutable_memory_span dest)
+std::size_t gzip_inflate_stream::read(mutable_memory_span dest)
 {
     check_if_closed();
 
@@ -54,9 +53,7 @@ gzip_inflate_stream::read(mutable_memory_span dest)
 
         if (buffer_.empty()) {
             if (!inflater_->eof()) {
-                throw inflate_error{
-                    "The zlib stream contains invalid or incomplete deflate "
-                    "data."};
+                throw inflate_error{"The zlib stream contains invalid or incomplete deflate data."};
             }
 
             return 0;
@@ -74,8 +71,7 @@ gzip_inflate_stream::read(mutable_memory_span dest)
     return dest.size() - out.size();
 }
 
-void
-gzip_inflate_stream::close() noexcept
+void gzip_inflate_stream::close() noexcept
 {
     inner_->close();
 
@@ -84,16 +80,14 @@ gzip_inflate_stream::close() noexcept
     buffer_ = {};
 }
 
-void
-gzip_inflate_stream::check_if_closed() const
+void gzip_inflate_stream::check_if_closed() const
 {
     if (inner_->closed()) {
         throw stream_error{"The input stream is closed."};
     }
 }
 
-bool
-gzip_inflate_stream::closed() const noexcept
+bool gzip_inflate_stream::closed() const noexcept
 {
     return inner_->closed();
 }

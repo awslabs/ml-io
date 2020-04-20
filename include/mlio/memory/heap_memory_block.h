@@ -36,37 +36,30 @@ public:
     ~heap_memory_block() override;
 
 public:
-    heap_memory_block &
-    operator=(heap_memory_block const &) = delete;
+    heap_memory_block &operator=(heap_memory_block const &) = delete;
 
-    heap_memory_block &
-    operator=(heap_memory_block &&) = delete;
+    heap_memory_block &operator=(heap_memory_block &&) = delete;
 
 public:
-    void
-    resize(size_type size) final;
+    void resize(size_type size) final;
 
 public:
-    pointer
-    data() noexcept final
+    pointer data() noexcept final
     {
         return data_;
     }
 
-    const_pointer
-    data() const noexcept final
+    const_pointer data() const noexcept final
     {
         return data_;
     }
 
-    size_type
-    size() const noexcept final
+    size_type size() const noexcept final
     {
         return size_;
     }
 
-    bool
-    resizable() const noexcept final
+    bool resizable() const noexcept final
     {
         return true;
     }

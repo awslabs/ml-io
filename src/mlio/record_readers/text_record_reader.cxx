@@ -29,8 +29,7 @@ text_record_reader::text_record_reader(intrusive_ptr<input_stream> strm)
     : stream_record_reader{std::move(strm)}
 {}
 
-std::optional<record>
-text_record_reader::decode_record(memory_slice &chunk, bool ignore_leftover)
+std::optional<record> text_record_reader::decode_record(memory_slice &chunk, bool ignore_leftover)
 {
     if (chunk.empty()) {
         return {};
@@ -43,9 +42,7 @@ text_record_reader::decode_record(memory_slice &chunk, bool ignore_leftover)
     return {};
 }
 
-bool
-text_record_reader::skip_utf8_bom(memory_slice &chunk,
-                                  bool ignore_leftover) noexcept
+bool text_record_reader::skip_utf8_bom(memory_slice &chunk, bool ignore_leftover) noexcept
 {
     auto bits = as_span<unsigned char const>(chunk);
     if (bits.size() >= 3) {

@@ -40,50 +40,40 @@ public:
     ~file_backed_memory_block() final;
 
 public:
-    file_backed_memory_block &
-    operator=(file_backed_memory_block const &) = delete;
+    file_backed_memory_block &operator=(file_backed_memory_block const &) = delete;
 
-    file_backed_memory_block &
-    operator=(file_backed_memory_block &&) = delete;
+    file_backed_memory_block &operator=(file_backed_memory_block &&) = delete;
 
 public:
-    void
-    resize(size_type size) final;
+    void resize(size_type size) final;
 
 private:
     MLIO_HIDDEN
-    void
-    make_temporary_file();
+    void make_temporary_file();
 
     MLIO_HIDDEN
-    std::byte *
-    init_memory_map(std::size_t size);
+    std::byte *init_memory_map(std::size_t size);
 
     MLIO_HIDDEN
-    static void
-    validate_mapped_address(void *addr);
+    static void validate_mapped_address(void *addr);
 
 public:
-    pointer
-    data() noexcept final
+    pointer data() noexcept final
     {
         return data_;
     }
 
-    const_pointer
-    data() const noexcept final
+    const_pointer data() const noexcept final
     {
         return data_;
     }
 
-    size_type
-    size() const noexcept final
+    size_type size() const noexcept final
     {
         return size_;
     }
 
-    bool
-    resizable() const noexcept final
+    bool resizable() const noexcept final
     {
         return true;
     }

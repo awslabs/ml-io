@@ -30,8 +30,7 @@ using mlio::detail::current_error_code;
 namespace mlio {
 inline namespace v1 {
 
-file_backed_memory_block::file_backed_memory_block(size_type size)
-    : size_{size}
+file_backed_memory_block::file_backed_memory_block(size_type size) : size_{size}
 {
     make_temporary_file();
 
@@ -50,8 +49,7 @@ file_backed_memory_block::~file_backed_memory_block()
     }
 }
 
-void
-file_backed_memory_block::make_temporary_file()
+void file_backed_memory_block::make_temporary_file()
 {
     std::string pathname{"/tmp/mlio-XXXXXX"};
 
@@ -59,16 +57,14 @@ file_backed_memory_block::make_temporary_file()
 
     auto off = static_cast<::off_t>(size_);
     if (fd_ == -1 || ::ftruncate(fd_.get(), off) != 0) {
-        throw std::system_error{
-            current_error_code(),
-            "The file-backed memory block cannot be allocated."};
+        throw std::system_error{current_error_code(),
+                                "The file-backed memory block cannot be allocated."};
     }
 
     ::unlink(&pathname.front());
 }
 
-void
-file_backed_memory_block::resize(size_type size)
+void file_backed_memory_block::resize(size_type size)
 {
     if (size == size_) {
         return;
@@ -76,9 +72,8 @@ file_backed_memory_block::resize(size_type size)
 
     auto off = static_cast<::off_t>(size);
     if (::ftruncate(fd_.get(), off) != 0) {
-        throw std::system_error{
-            current_error_code(),
-            "The file-backed memory block cannot be resized."};
+        throw std::system_error{current_error_code(),
+                                "The file-backed memory block cannot be resized."};
     }
 
     if (size_ == 0) {
@@ -125,8 +120,7 @@ file_backed_memory_block::resize(size_type size)
     }
 }
 
-std::byte *
-file_backed_memory_block::init_memory_map(std::size_t size)
+std::byte *file_backed_memory_block::init_memory_map(std::size_t size)
 {
     void *addr = ::mmap(/*addr*/ nullptr,
                         size,
@@ -140,8 +134,7 @@ file_backed_memory_block::init_memory_map(std::size_t size)
     return static_cast<std::byte *>(addr);
 }
 
-void
-file_backed_memory_block::validate_mapped_address(void *addr)
+void file_backed_memory_block::validate_mapped_address(void *addr)
 {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
     if (addr != MAP_FAILED) {
@@ -151,8 +144,7 @@ file_backed_memory_block::validate_mapped_address(void *addr)
     if (errno == ENOMEM) {
         throw std::bad_alloc{};
     }
-    throw std::system_error{current_error_code(),
-                            "The file-backed memory block cannot be mapped."};
+    throw std::system_error{current_error_code(), "The file-backed memory block cannot be mapped."};
 }
 
 }  // namespace v1

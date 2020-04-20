@@ -24,13 +24,12 @@ namespace mlio {
 inline namespace v1 {
 namespace detail {
 
-ranged_instance_reader::ranged_instance_reader(
-    data_reader_params const &prm, std::unique_ptr<instance_reader> &&inner)
+ranged_instance_reader::ranged_instance_reader(data_reader_params const &prm,
+                                               std::unique_ptr<instance_reader> &&inner)
     : params_{&prm}, inner_{std::move(inner)}
 {}
 
-std::optional<instance>
-ranged_instance_reader::read_instance_core()
+std::optional<instance> ranged_instance_reader::read_instance_core()
 {
     if (first_read_) {
         first_read_ = false;
@@ -57,8 +56,7 @@ ranged_instance_reader::read_instance_core()
     return ins;
 }
 
-inline bool
-ranged_instance_reader::should_stop_reading() const noexcept
+inline bool ranged_instance_reader::should_stop_reading() const noexcept
 {
     if (params_->num_instances_to_read == std::nullopt) {
         return false;
@@ -67,8 +65,7 @@ ranged_instance_reader::should_stop_reading() const noexcept
     return num_instances_read_ == *params_->num_instances_to_read;
 }
 
-void
-ranged_instance_reader::reset_core() noexcept
+void ranged_instance_reader::reset_core() noexcept
 {
     inner_->reset();
 

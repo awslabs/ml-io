@@ -22,24 +22,21 @@
 
 namespace pymlio {
 
-column_analyzer::column_analyzer(
-    std::vector<column_analysis> &columns,
-    std::vector<std::string> const &null_like_values,
-    std::unordered_set<std::size_t> const &capture_columns,
-    std::size_t max_capture_count) noexcept
+column_analyzer::column_analyzer(std::vector<column_analysis> &columns,
+                                 std::vector<std::string> const &null_like_values,
+                                 std::unordered_set<std::size_t> const &capture_columns,
+                                 std::size_t max_capture_count) noexcept
     : columns_{&columns}
     , null_like_values_{&null_like_values}
     , capture_columns_{&capture_columns}
     , max_capture_count_{max_capture_count}
 {}
 
-void
-column_analyzer::analyze(mlio::example const &exm) const
+void column_analyzer::analyze(mlio::example const &exm) const
 {
     std::size_t feature_idx = 0;
 
-    for (auto pos = exm.features().begin(); pos < exm.features().end();
-         ++pos, feature_idx++) {
+    for (auto pos = exm.features().begin(); pos < exm.features().end(); ++pos, feature_idx++) {
         auto const &tsr = exm.features()[feature_idx];
         auto const &dense_tsr = static_cast<mlio::dense_tensor const &>(*tsr);
         auto cells = dense_tsr.data().as<std::string>();
@@ -72,12 +69,11 @@ column_analyzer::analyze(mlio::example const &exm) const
             stats.str_min_length = std::min(stats.str_min_length, cell.size());
             stats.str_max_length = std::max(stats.str_max_length, cell.size());
 
-            stats.str_min_length_not_empty =
-                std::min(stats.str_min_length_not_empty, cell.size());
+            stats.str_min_length_not_empty = std::min(stats.str_min_length_not_empty, cell.size());
 
             stats.str_cardinality_estimator_.add(cell);
 
-            if (mlio::is_only_whitespace(cell)) {
+            if (mlio::is_whitespace_only(cell)) {
                 stats.str_only_whitespace_count++;
 
                 // All other analysis is irrelevant if we only have whitespace.
@@ -90,8 +86,7 @@ column_analyzer::analyze(mlio::example const &exm) const
 
             // Numeric analyzers
             double as_float{};
-            if (mlio::try_parse_float(cell, as_float) !=
-                mlio::parse_result::ok) {
+            if (mlio::try_parse_float(cell, as_float) != mlio::parse_result::ok) {
                 stats.numeric_nan_count++;
             }
             else {
@@ -113,14 +108,11 @@ column_analyzer::analyze(mlio::example const &exm) const
                 }
             }
 
-            auto should_capture =
-                capture_columns_->find(feature_idx) != capture_columns_->end();
+            auto should_capture = capture_columns_->find(feature_idx) != capture_columns_->end();
 
             // Capture the values if specified.
-            if (should_capture &&
-                !stats.str_captured_unique_values_overflowed) {
-                if (stats.str_captured_unique_values.size() <
-                    max_capture_count_) {
+            if (should_capture && !stats.str_captured_unique_values_overflowed) {
+                if (stats.str_captured_unique_values.size() < max_capture_count_) {
                     stats.str_captured_unique_values.emplace(cell);
                 }
                 else if (stats.str_captured_unique_values.find(cell) ==
@@ -140,8 +132,7 @@ column_analyzer::analyze(mlio::example const &exm) const
 
         double numeric_column_mean = numeric_column_sum / ncc;
 
-        stats.numeric_finite_mean +=
-            (numeric_column_mean - stats.numeric_finite_mean) * ncc / nfc;
+        stats.numeric_finite_mean += (numeric_column_mean - stats.numeric_finite_mean) * ncc / nfc;
     }
 };
 

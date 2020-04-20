@@ -25,13 +25,12 @@ using namespace pybind11::literals;
 namespace pymlio {
 namespace {
 
-intrusive_ptr<s3_client>
-py_make_s3_client(std::string access_key_id,
-                  std::string secret_key,
-                  std::string session_token,
-                  std::string profile,
-                  std::string region,
-                  bool use_https)
+intrusive_ptr<s3_client> py_make_s3_client(std::string access_key_id,
+                                           std::string secret_key,
+                                           std::string session_token,
+                                           std::string profile,
+                                           std::string region,
+                                           bool use_https)
 {
     return s3_client_builder{}
         .with_access_key_id(std::move(access_key_id))
@@ -45,8 +44,7 @@ py_make_s3_client(std::string access_key_id,
 
 }  // namespace
 
-void
-register_s3_client(py::module &m)
+void register_s3_client(py::module &m)
 {
     py::class_<s3_client, intrusive_ptr<s3_client>>(
         m, "S3Client", "Represents a client to access Amazon S3.")

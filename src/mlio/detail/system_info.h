@@ -21,8 +21,7 @@ namespace mlio {
 inline namespace v1 {
 namespace detail {
 
-std::size_t
-get_total_ram() noexcept;
+std::size_t get_total_ram() noexcept;
 
 }  // namespace detail
 }  // namespace v1

@@ -25,8 +25,7 @@
 namespace mlio {
 inline namespace v1 {
 
-intrusive_ptr<input_stream>
-make_inflate_stream(intrusive_ptr<input_stream> &&strm, compression cmp)
+intrusive_ptr<input_stream> make_inflate_stream(intrusive_ptr<input_stream> &&strm, compression cmp)
 {
     switch (cmp) {
     case compression::none:
@@ -38,8 +37,7 @@ make_inflate_stream(intrusive_ptr<input_stream> &&strm, compression cmp)
 
     case compression::bzip2:
     case compression::zip:
-        throw not_supported_error{
-            "bzip2 and zip compressions are not supported yet."};
+        throw not_supported_error{"bzip2 and zip compressions are not supported yet."};
     }
 
     throw std::invalid_argument{"The specified compression is not supported."};

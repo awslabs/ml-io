@@ -50,16 +50,15 @@ struct MLIO_API parser_params {
 /// @param index
 ///     The index in the destination array at which to write the
 ///     output.
-using parser = std::function<parse_result(
-    std::string_view s, device_array_span arr, std::size_t index)>;
+using parser =
+    std::function<parse_result(std::string_view s, device_array_span arr, std::size_t index)>;
 
 /// Constructs a parser function object.
 ///
 /// @param dt
 ///     The data type for which to construct a parser.
 MLIO_API
-parser
-make_parser(data_type dt, parser_params const &prm);
+parser make_parser(data_type dt, parser_params const &prm);
 
 }  // namespace v1
 }  // namespace mlio

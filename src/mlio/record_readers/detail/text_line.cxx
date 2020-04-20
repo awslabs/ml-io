@@ -32,9 +32,7 @@ inline namespace v1 {
 namespace detail {
 
 std::optional<record>
-read_line(memory_slice &chunk,
-          bool ignore_leftover,
-          std::optional<std::size_t> max_line_length)
+read_line(memory_slice &chunk, bool ignore_leftover, std::optional<std::size_t> max_line_length)
 {
     // Assumes chunk is not empty.
     auto chrs = as_span<char const>(chunk);
@@ -43,8 +41,7 @@ read_line(memory_slice &chunk,
             return {};
         }
 
-        throw corrupt_record_error{
-            "The text line ends with a corrupt character."};
+        throw corrupt_record_error{"The text line ends with a corrupt character."};
     }
 
     bool has_carriage = false;
@@ -75,8 +72,7 @@ read_line(memory_slice &chunk,
 
     if (max_line_length && num_chrs_read >= *max_line_length) {
         throw record_too_large_error{
-            fmt::format("The text line exceeds the maximum length of {0:n}.",
-                        *max_line_length)};
+            fmt::format("The text line exceeds the maximum length of {0:n}.", *max_line_length)};
     }
 
     if (pos == chrs.end() && ignore_leftover) {

@@ -33,9 +33,8 @@ namespace mlio {
 inline namespace v1 {
 namespace detail {
 
-std::optional<record>
-csv_record_reader::decode_text_record(memory_slice &chunk,
-                                      bool ignore_leftover)
+std::optional<record> csv_record_reader::decode_text_record(memory_slice &chunk,
+                                                            bool ignore_leftover)
 {
     while (!chunk.empty()) {
         if (is_comment_line(chunk)) {
@@ -49,8 +48,7 @@ csv_record_reader::decode_text_record(memory_slice &chunk,
                 rec = read_line(chunk, ignore_leftover);
             }
             else {
-                rec = detail::read_line(
-                    chunk, ignore_leftover, params_->max_line_length);
+                rec = detail::read_line(chunk, ignore_leftover, params_->max_line_length);
             }
 
             if (rec == std::nullopt) {
@@ -66,8 +64,7 @@ csv_record_reader::decode_text_record(memory_slice &chunk,
     return {};
 }
 
-inline bool
-csv_record_reader::is_comment_line(memory_slice const &chunk)
+inline bool csv_record_reader::is_comment_line(memory_slice const &chunk)
 {
     if (params_->comment_char == std::nullopt) {
         return false;
@@ -77,8 +74,7 @@ csv_record_reader::is_comment_line(memory_slice const &chunk)
     return !chrs.empty() && chrs[0] == *params_->comment_char;
 }
 
-std::optional<record>
-csv_record_reader::read_line(memory_slice &chunk, bool ignore_leftover)
+std::optional<record> csv_record_reader::read_line(memory_slice &chunk, bool ignore_leftover)
 {
     auto chrs = as_span<char const>(chunk);
     if (chrs.empty()) {
@@ -86,8 +82,7 @@ csv_record_reader::read_line(memory_slice &chunk, bool ignore_leftover)
             return {};
         }
 
-        throw corrupt_record_error{
-            "The text line ends with a corrupt character."};
+        throw corrupt_record_error{"The text line ends with a corrupt character."};
     }
 
     auto pos = chrs.begin();
@@ -244,10 +239,9 @@ end:
     return record{std::move(payload)};
 }
 
-inline bool
-csv_record_reader::try_get_next_char(stdx::span<char const> const &chrs,
-                                     stdx::span<char const>::iterator &pos,
-                                     char &chr) noexcept
+inline bool csv_record_reader::try_get_next_char(stdx::span<char const> const &chrs,
+                                                 stdx::span<char const>::iterator &pos,
+                                                 char &chr) noexcept
 {
     if (pos == chrs.end()) {
         return false;
@@ -260,16 +254,14 @@ csv_record_reader::try_get_next_char(stdx::span<char const> const &chrs,
     return true;
 }
 
-inline void
-csv_record_reader::check_line_length(stdx::span<char const> const &chrs,
-                                     stdx::span<char const>::iterator &pos,
-                                     std::size_t max_line_length)
+inline void csv_record_reader::check_line_length(stdx::span<char const> const &chrs,
+                                                 stdx::span<char const>::iterator &pos,
+                                                 std::size_t max_line_length)
 {
     std::size_t num_chrs_read = as_size(pos - chrs.begin());
     if (num_chrs_read >= max_line_length) {
         throw record_too_large_error{
-            fmt::format("The text line exceeds the maximum length of {0:n}.",
-                        max_line_length)};
+            fmt::format("The text line exceeds the maximum length of {0:n}.", max_line_length)};
     }
 }
 

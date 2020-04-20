@@ -22,21 +22,15 @@
 
 namespace pymlio {
 
-bool
-match_nan_values(std::string_view s,
-                 std::vector<std::string> const &match_values) noexcept
+bool match_nan_values(std::string_view s, std::vector<std::string> const &match_values) noexcept
 {
     s = mlio::trim(s);
 
     for (auto const &needle : match_values) {
-        bool matches = std::equal(needle.begin(),
-                                  needle.end(),
-                                  s.begin(),
-                                  s.end(),
-                                  [](int c1, int c2) {
-                                      return c1 == c2 || std::tolower(c1) ==
-                                                             std::tolower(c2);
-                                  });
+        bool matches =
+            std::equal(needle.begin(), needle.end(), s.begin(), s.end(), [](int c1, int c2) {
+                return c1 == c2 || std::tolower(c1) == std::tolower(c2);
+            });
         if (matches) {
             return true;
         }

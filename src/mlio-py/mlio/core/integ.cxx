@@ -25,8 +25,7 @@ using namespace pybind11::literals;
 namespace pymlio {
 namespace {
 
-py::capsule
-to_dlpack_capsule(tensor &tsr, std::size_t version)
+py::capsule to_dlpack_capsule(tensor &tsr, std::size_t version)
 {
     void const *managed_tensor = as_dlpack(tsr, version);
 
@@ -47,8 +46,7 @@ to_dlpack_capsule(tensor &tsr, std::size_t version)
 
 }  // namespace
 
-void
-register_integ(py::module &m)
+void register_integ(py::module &m)
 {
     m.def("as_dlpack",
           &to_dlpack_capsule,

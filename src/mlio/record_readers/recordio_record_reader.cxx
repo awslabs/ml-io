@@ -29,9 +29,8 @@ namespace mlio {
 inline namespace v1 {
 namespace detail {
 
-std::optional<record>
-recordio_record_reader::decode_record(memory_slice &chunk,
-                                      bool ignore_leftover)
+std::optional<record> recordio_record_reader::decode_record(memory_slice &chunk,
+                                                            bool ignore_leftover)
 {
     if (chunk.empty()) {
         return {};
@@ -43,8 +42,7 @@ recordio_record_reader::decode_record(memory_slice &chunk,
             return {};
         }
 
-        throw corrupt_header_error{
-            "The record does not have a valid RecordIO header."};
+        throw corrupt_header_error{"The record does not have a valid RecordIO header."};
     }
 
     std::size_t payload_size = hdr->payload_size();
@@ -64,8 +62,7 @@ recordio_record_reader::decode_record(memory_slice &chunk,
         }
 
         throw corrupt_header_error{fmt::format(
-            "The record payload has a size of {0:n} byte(s) while the size "
-            "specified in the RecordIO header is {1:n} byte(s).",
+            "The record payload has a size of {0:n} byte(s) while the size specified in the RecordIO header is {1:n} byte(s).",
             chunk.size() - hdr->size(),
             aligned_payload_size)};
     }

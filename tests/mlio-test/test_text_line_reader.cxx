@@ -28,8 +28,7 @@ TEST_F(test_text_line_reader, test_text_line_reader_happy_path)
     for (auto i = 0; i < 2; i++) {
         mlio::intrusive_ptr<mlio::example> exm;
         while ((exm = reader->read_example()) != nullptr) {
-            auto lbl =
-                static_cast<dense_tensor *>(exm->find_feature("value").get());
+            auto lbl = static_cast<dense_tensor *>(exm->find_feature("value").get());
             auto strings = lbl->data().as<std::string>();
             EXPECT_EQ(strings[0], expected_line_1_);
             EXPECT_EQ(strings[1], expected_line_2_);
@@ -41,8 +40,7 @@ TEST_F(test_text_line_reader, test_text_line_reader_happy_path)
     EXPECT_TRUE(true);
 }
 
-TEST_F(test_text_line_reader,
-       test_text_line_reader_batch_greater_than_features)
+TEST_F(test_text_line_reader, test_text_line_reader_batch_greater_than_features)
 {
     mlio::data_reader_params prm{};
     prm.dataset.emplace_back(mlio::make_intrusive<mlio::file>(file_path_));
@@ -52,8 +50,7 @@ TEST_F(test_text_line_reader,
     for (auto i = 0; i < 2; i++) {
         mlio::intrusive_ptr<mlio::example> exm;
         while ((exm = reader->read_example()) != nullptr) {
-            auto lbl =
-                static_cast<dense_tensor *>(exm->find_feature("value").get());
+            auto lbl = static_cast<dense_tensor *>(exm->find_feature("value").get());
             auto strings = lbl->data().as<std::string>();
             EXPECT_EQ(strings[0], expected_line_1_);
             EXPECT_EQ(strings[1], expected_line_2_);
@@ -75,8 +72,7 @@ TEST_F(test_text_line_reader, test_text_line_reader_batch_less_than_features)
         mlio::intrusive_ptr<mlio::example> exm;
         int batch_no = 1;
         while ((exm = reader->read_example()) != nullptr) {
-            auto lbl =
-                static_cast<dense_tensor *>(exm->find_feature("value").get());
+            auto lbl = static_cast<dense_tensor *>(exm->find_feature("value").get());
             auto strings = lbl->data().as<std::string>();
             if (batch_no == 1) {
                 EXPECT_EQ(strings[0], expected_line_1_);

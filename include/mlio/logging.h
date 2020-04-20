@@ -34,12 +34,10 @@ using log_message_handler = std::function<void(log_level, std::string_view)>;
 /// The passsed handler can be called by multiple threads
 /// simultaneously; therefore it should be thread-safe.
 MLIO_API
-log_message_handler
-set_log_message_handler(log_message_handler hdl) noexcept;
+log_message_handler set_log_message_handler(log_message_handler hdl) noexcept;
 
 MLIO_API
-void
-set_log_level(log_level lvl) noexcept;
+void set_log_level(log_level lvl) noexcept;
 
 }  // namespace v1
 }  // namespace mlio

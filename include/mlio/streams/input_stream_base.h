@@ -31,27 +31,21 @@ class MLIO_API input_stream_base : public input_stream {
 public:
     using input_stream::read;
 
-    memory_slice
-    read(std::size_t size) override;
+    memory_slice read(std::size_t size) override;
 
-    void
-    seek(std::size_t position) override;
+    void seek(std::size_t position) override;
 
 public:
-    std::size_t
-    size() const override;
+    std::size_t size() const override;
 
-    std::size_t
-    position() const override;
+    std::size_t position() const override;
 
-    bool
-    seekable() const noexcept override
+    bool seekable() const noexcept override
     {
         return false;
     }
 
-    bool
-    supports_zero_copy() const noexcept override
+    bool supports_zero_copy() const noexcept override
     {
         return false;
     }

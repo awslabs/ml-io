@@ -56,8 +56,7 @@ HyperLogLog::HyperLogLog(uint8_t b) : b_(b), m_(1 << b), M_(m_, 0)
     alpha_mm_ = alpha * m_ * m_;
 }
 
-void
-HyperLogLog::add(std::string_view const &str)
+void HyperLogLog::add(std::string_view const &str)
 {
     // Hash the value to add.
     uint32_t hash;
@@ -73,8 +72,7 @@ HyperLogLog::add(std::string_view const &str)
     }
 }
 
-double
-HyperLogLog::estimate() const
+double HyperLogLog::estimate() const
 {
     double estimate;
     double sum = 0.0;
@@ -99,13 +97,11 @@ HyperLogLog::estimate() const
     return estimate;
 }
 
-void
-HyperLogLog::merge(const HyperLogLog &other)
+void HyperLogLog::merge(const HyperLogLog &other)
 {
     if (m_ != other.m_) {
         std::stringstream ss;
-        ss << "number of registers doesn't match: " << m_
-           << " != " << other.m_;
+        ss << "number of registers doesn't match: " << m_ << " != " << other.m_;
         throw std::invalid_argument(ss.str().c_str());
     }
     for (uint32_t r = 0; r < m_; ++r) {
@@ -115,14 +111,12 @@ HyperLogLog::merge(const HyperLogLog &other)
     }
 }
 
-void
-HyperLogLog::clear()
+void HyperLogLog::clear()
 {
     std::fill(M_.begin(), M_.end(), 0);
 }
 
-uint32_t
-HyperLogLog::register_size() const
+uint32_t HyperLogLog::register_size() const
 {
     return m_;
 }

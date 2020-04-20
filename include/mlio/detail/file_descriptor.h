@@ -50,11 +50,9 @@ public:
     }
 
 public:
-    file_descriptor &
-    operator=(file_descriptor const &other) = delete;
+    file_descriptor &operator=(file_descriptor const &other) = delete;
 
-    file_descriptor &
-    operator=(file_descriptor &&other) noexcept
+    file_descriptor &operator=(file_descriptor &&other) noexcept
     {
         close_fd();
 
@@ -64,21 +62,18 @@ public:
     }
 
 public:
-    int
-    get() const noexcept
+    int get() const noexcept
     {
         return fd_;
     }
 
-    bool
-    is_open() const noexcept
+    bool is_open() const noexcept
     {
         return fd_ != invalid_fd_;
     }
 
 private:
-    void
-    close_fd() noexcept
+    void close_fd() noexcept
     {
         if (fd_ == invalid_fd_) {
             return;
@@ -94,15 +89,13 @@ private:
 };
 
 MLIO_API
-inline bool
-operator==(file_descriptor const &lhs, file_descriptor const &rhs) noexcept
+inline bool operator==(file_descriptor const &lhs, file_descriptor const &rhs) noexcept
 {
     return lhs.get() == rhs.get();
 }
 
 MLIO_API
-inline bool
-operator!=(file_descriptor const &lhs, file_descriptor const &rhs) noexcept
+inline bool operator!=(file_descriptor const &lhs, file_descriptor const &rhs) noexcept
 {
     return lhs.get() != rhs.get();
 }
@@ -115,8 +108,7 @@ namespace std {
 
 template<>
 struct MLIO_API hash<mlio::detail::file_descriptor> {
-    inline size_t
-    operator()(mlio::detail::file_descriptor const &desc) const noexcept
+    inline size_t operator()(mlio::detail::file_descriptor const &desc) const noexcept
     {
         return hash<int>{}(desc.get());
     }

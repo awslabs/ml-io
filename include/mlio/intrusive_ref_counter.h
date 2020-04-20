@@ -44,30 +44,26 @@ public:
         return *this;
     }
 
-    intrusive_ref_counter &
-    operator=(intrusive_ref_counter &&) noexcept
+    intrusive_ref_counter &operator=(intrusive_ref_counter &&) noexcept
     {
         return *this;
     }
 
 public:
-    std::size_t
-    use_count() const noexcept
+    std::size_t use_count() const noexcept
     {
         return ref_count_.load();
     }
 
 public:
     MLIO_API
-    friend inline void
-    intrusive_ptr_inc_ref(intrusive_ref_counter const *ptr) noexcept
+    friend inline void intrusive_ptr_inc_ref(intrusive_ref_counter const *ptr) noexcept
     {
         ptr->ref_count_.fetch_add(1, std::memory_order_acq_rel);
     }
 
     MLIO_API
-    friend inline void
-    intrusive_ptr_dec_ref(intrusive_ref_counter const *ptr) noexcept
+    friend inline void intrusive_ptr_dec_ref(intrusive_ref_counter const *ptr) noexcept
     {
         if (ptr->ref_count_.fetch_sub(1, std::memory_order_acq_rel) == 1) {
             delete static_cast<T const *>(ptr);

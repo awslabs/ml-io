@@ -32,8 +32,7 @@ public:
     {}
 
 public:
-    std::optional<record>
-    next()
+    std::optional<record> next()
     {
         std::optional<record> rec = reader_->read_record();
         if (rec == std::nullopt) {
@@ -50,8 +49,7 @@ private:
 
 }  // namespace
 
-void
-register_record_readers(py::module &m)
+void register_record_readers(py::module &m)
 {
     py::enum_<record_kind>(m, "RecordKind")
         .value("COMPLETE", record_kind::complete)
@@ -59,10 +57,8 @@ register_record_readers(py::module &m)
         .value("MIDDLE", record_kind::middle)
         .value("END", record_kind::end);
 
-    py::class_<record>(m,
-                       "Record",
-                       py::buffer_protocol(),
-                       "Represents an encoded record read from a data store.")
+    py::class_<record>(
+        m, "Record", py::buffer_protocol(), "Represents an encoded record read from a data store.")
         .def_property_readonly("kind", &record::kind)
         .def_buffer([](record &r) {
             // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
@@ -82,12 +78,8 @@ register_record_readers(py::module &m)
         .def("__next__", &py_record_iterator::next);
 
     py::class_<record_reader, intrusive_ptr<record_reader>>(m, "RecordReader")
-        .def("read_record",
-             &record_reader::read_record,
-             py::call_guard<py::gil_scoped_release>())
-        .def("peek_record",
-             &record_reader::peek_record,
-             py::call_guard<py::gil_scoped_release>())
+        .def("read_record", &record_reader::read_record, py::call_guard<py::gil_scoped_release>())
+        .def("peek_record", &record_reader::peek_record, py::call_guard<py::gil_scoped_release>())
         .def("__iter__", [](py::object &rdr) {
             return py_record_iterator(rdr.cast<record_reader &>(), rdr);
         });
@@ -95,9 +87,7 @@ register_record_readers(py::module &m)
     py::class_<mlio::detail::parquet_record_reader,
                record_reader,
                intrusive_ptr<mlio::detail::parquet_record_reader>>(
-        m,
-        "ParquetRecordReader",
-        "Represents a ``record_reader`` for reading Parquet records.")
+        m, "ParquetRecordReader", "Represents a ``record_reader`` for reading Parquet records.")
         .def(py::init<intrusive_ptr<input_stream>>(), "strm"_a);
 }
 

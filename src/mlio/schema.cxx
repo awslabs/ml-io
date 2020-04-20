@@ -35,8 +35,7 @@ attribute::attribute(std::string &&name, data_type dt, size_vector &&shape)
     init();
 }
 
-void
-attribute::init()
+void attribute::init()
 {
     if (strides_.empty()) {
         strides_ = tensor::default_strides(shape_);
@@ -47,24 +46,21 @@ attribute::init()
     }
 }
 
-std::string
-attribute::repr() const
+std::string attribute::repr() const
 {
-    return fmt::format("<attribute name='{0}' data_type='{1}' "
-                       "shape=({2}) strides=({3}) sparse='{4}'>",
-                       name_,
-                       data_type_,
-                       fmt::join(shape_, ", "),
-                       fmt::join(strides_, ", "),
-                       sparse_);
+    return fmt::format(
+        "<attribute name='{0}' data_type='{1}' shape=({2}) strides=({3}) sparse='{4}'>",
+        name_,
+        data_type_,
+        fmt::join(shape_, ", "),
+        fmt::join(strides_, ", "),
+        sparse_);
 }
 
-bool
-operator==(attribute const &lhs, attribute const &rhs) noexcept
+bool operator==(attribute const &lhs, attribute const &rhs) noexcept
 {
-    return lhs.name() == rhs.name() && lhs.dtype() == rhs.dtype() &&
-           lhs.sparse() == rhs.sparse() && lhs.shape() == rhs.shape() &&
-           lhs.strides() == rhs.strides();
+    return lhs.name() == rhs.name() && lhs.dtype() == rhs.dtype() && lhs.sparse() == rhs.sparse() &&
+           lhs.shape() == rhs.shape() && lhs.strides() == rhs.strides();
 }
 
 schema::schema(std::vector<attribute> attrs) : attributes_{std::move(attrs)}
@@ -75,15 +71,13 @@ schema::schema(std::vector<attribute> attrs) : attributes_{std::move(attrs)}
         auto pr = name_index_map_.emplace(attr.name(), idx++);
         if (!pr.second) {
             throw std::invalid_argument{fmt::format(
-                "The attribute list contains more than one element with the "
-                "name '{0}'.",
+                "The attribute list contains more than one element with the name '{0}'.",
                 attr.name())};
         }
     }
 }
 
-std::optional<std::size_t>
-schema::get_index(std::string const &name) const noexcept
+std::optional<std::size_t> schema::get_index(std::string const &name) const noexcept
 {
     auto pos = name_index_map_.find(name);
     if (pos == name_index_map_.end()) {
@@ -92,15 +86,12 @@ schema::get_index(std::string const &name) const noexcept
     return pos->second;
 }
 
-std::string
-schema::repr() const
+std::string schema::repr() const
 {
-    return fmt::format("<schema attributes={{{0}}}>",
-                       fmt::join(attributes_, ", "));
+    return fmt::format("<schema attributes={{{0}}}>", fmt::join(attributes_, ", "));
 }
 
-bool
-operator==(schema const &lhs, schema const &rhs) noexcept
+bool operator==(schema const &lhs, schema const &rhs) noexcept
 {
     return lhs.attributes() == rhs.attributes();
 }
@@ -110,8 +101,7 @@ operator==(schema const &lhs, schema const &rhs) noexcept
 
 namespace std {  // NOLINT(cert-dcl58-cpp)
 
-size_t
-hash<mlio::attribute>::operator()(mlio::attribute const &attr) const noexcept
+size_t hash<mlio::attribute>::operator()(mlio::attribute const &attr) const noexcept
 {
     size_t seed = 0;
 

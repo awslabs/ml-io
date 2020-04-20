@@ -38,12 +38,10 @@ public:
     ///     If the threshold is zero, the actual threshold will be
     ///     determined dynamically based on the available physical
     ///     memory of the system.
-    explicit file_backed_memory_allocator(
-        std::size_t oversize_threshold = 0) noexcept;
+    explicit file_backed_memory_allocator(std::size_t oversize_threshold = 0) noexcept;
 
 public:
-    intrusive_ptr<mutable_memory_block>
-    allocate(std::size_t size) final;
+    intrusive_ptr<mutable_memory_block> allocate(std::size_t size) final;
 
 private:
     std::size_t oversize_threshold_{};

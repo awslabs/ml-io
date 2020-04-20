@@ -32,8 +32,7 @@ stream_record_reader::stream_record_reader(intrusive_ptr<input_stream> strm)
 
 stream_record_reader::~stream_record_reader() = default;
 
-std::optional<record>
-stream_record_reader::read_record_core()
+std::optional<record> stream_record_reader::read_record_core()
 {
     std::optional<record> rec{};
 
@@ -52,14 +51,12 @@ stream_record_reader::read_record_core()
     return rec;
 }
 
-std::size_t
-stream_record_reader::record_size_hint() const noexcept
+std::size_t stream_record_reader::record_size_hint() const noexcept
 {
     return chunk_reader_->chunk_size_hint();
 }
 
-void
-stream_record_reader::set_record_size_hint(std::size_t value) noexcept
+void stream_record_reader::set_record_size_hint(std::size_t value) noexcept
 {
     chunk_reader_->set_chunk_size_hint(value);
 }

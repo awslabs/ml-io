@@ -21,8 +21,7 @@ namespace mlio {
 inline namespace v1 {
 namespace detail {
 
-void
-validate_file_pathname(std::string_view pathname);
+void validate_file_pathname(std::string_view pathname);
 
 }  // namespace detail
 }  // namespace v1

@@ -56,11 +56,9 @@ public:
     ~record() = default;
 
 public:
-    record &
-    operator=(record const &) noexcept = default;
+    record &operator=(record const &) noexcept = default;
 
-    record &
-    operator=(record &&) noexcept = default;
+    record &operator=(record &&) noexcept = default;
 
 public:
     // clang-format off
@@ -79,8 +77,7 @@ public:
 
     // clang-format on
 
-    record_kind
-    kind() const noexcept
+    record_kind kind() const noexcept
     {
         return kind_;
     }

@@ -164,12 +164,10 @@ dispatch(data_type dt, Args &&...args)
 ///
 /// @return The inferred data type; otherwise @ref data_type::string.
 MLIO_API
-data_type
-infer_data_type(std::string_view s) noexcept;
+data_type infer_data_type(std::string_view s) noexcept;
 
 MLIO_API
-inline std::ostream &
-operator<<(std::ostream &strm, data_type dt)
+inline std::ostream &operator<<(std::ostream &strm, data_type dt)
 {
     switch (dt) {
     case data_type::size:
@@ -224,8 +222,7 @@ namespace std {
 
 template<>
 struct MLIO_API hash<mlio::data_type> {
-    inline size_t
-    operator()(mlio::data_type const &dt) const noexcept
+    inline size_t operator()(mlio::data_type const &dt) const noexcept
     {
         using T = underlying_type_t<mlio::data_type>;
 

@@ -23,8 +23,7 @@ namespace mlio {
 inline namespace v1 {
 namespace detail {
 
-inline std::error_code
-current_error_code() noexcept
+inline std::error_code current_error_code() noexcept
 {
     return std::error_code{errno, std::generic_category()};
 }

@@ -45,13 +45,10 @@ image_reader::image_reader(data_reader_params prm, image_reader_params img_prm)
 {
     if (params_.image_dimensions.size() != image_dimensions_size_) {
         throw std::invalid_argument{
-            "The dimensions of the output image must be entered in (channels, "
-            "height, width) format."};
+            "The dimensions of the output image must be entered in (channels, height, width) format."};
     }
 
-    std::copy(params_.image_dimensions.begin(),
-              params_.image_dimensions.end(),
-              img_dims_.begin());
+    std::copy(params_.image_dimensions.begin(), params_.image_dimensions.end(), img_dims_.begin());
 
     error_bad_batch_ = params().bad_batch_hnd == bad_batch_handling::error;
 }
@@ -61,8 +58,7 @@ image_reader::~image_reader()
     stop();
 }
 
-intrusive_ptr<record_reader>
-image_reader::make_record_reader(data_store const &ds)
+intrusive_ptr<record_reader> image_reader::make_record_reader(data_store const &ds)
 {
     switch (params_.img_frame) {
     case image_frame::none:
@@ -74,8 +70,7 @@ image_reader::make_record_reader(data_store const &ds)
     throw std::invalid_argument{"The specified image frame is invalid."};
 }
 
-intrusive_ptr<schema const>
-image_reader::infer_schema(std::optional<instance> const &)
+intrusive_ptr<schema const> image_reader::infer_schema(std::optional<instance> const &)
 {
     std::vector<attribute> attrs{};
     // The schema follows the NHWC convention.
@@ -89,8 +84,7 @@ image_reader::infer_schema(std::optional<instance> const &)
     return make_intrusive<schema>(std::move(attrs));
 }
 
-intrusive_ptr<example>
-image_reader::decode(instance_batch const &batch) const
+intrusive_ptr<example> image_reader::decode(instance_batch const &batch) const
 {
     // The stride of the batch dimension corresponds to the byte size
     // of the images.
@@ -115,24 +109,22 @@ image_reader::decode(instance_batch const &batch) const
                 return {};
             }
             if (params().bad_batch_hnd == bad_batch_handling::skip_warn) {
-                logger::warn("The example #{0:n} has been skipped as it had "
-                             "at least one bad instance.",
-                             batch.index());
+                logger::warn(
+                    "The example #{0:n} has been skipped as it had at least one bad instance.",
+                    batch.index());
 
                 return {};
             }
             if (params().bad_batch_hnd != bad_batch_handling::pad &&
                 params().bad_batch_hnd != bad_batch_handling::pad_warn) {
-                throw std::invalid_argument{
-                    "The specified bad batch handling is invalid."};
+                throw std::invalid_argument{"The specified bad batch handling is invalid."};
             }
         }
     }
 
     if (batch.instances().size() != num_instances_read) {
         if (params().bad_batch_hnd == bad_batch_handling::pad_warn) {
-            logger::warn("The example #{0:n} has been padded as it had {1:n} "
-                         "bad instance(s).",
+            logger::warn("The example #{0:n} has been padded as it had {1:n} bad instance(s).",
                          batch.index(),
                          batch.instances().size() - num_instances_read);
         }
@@ -148,9 +140,8 @@ image_reader::decode(instance_batch const &batch) const
     return exm;
 }
 
-intrusive_ptr<dense_tensor>
-image_reader::make_tensor(std::size_t batch_size,
-                          std::size_t batch_stride) const
+intrusive_ptr<dense_tensor> image_reader::make_tensor(std::size_t batch_size,
+                                                      std::size_t batch_stride) const
 {
     size_vector shp{batch_size,
                     params_.image_dimensions[1],
@@ -162,9 +153,7 @@ image_reader::make_tensor(std::size_t batch_size,
     return make_intrusive<dense_tensor>(std::move(shp), std::move(arr));
 }
 
-bool
-image_reader::decode_core(stdx::span<std::uint8_t> out,
-                          instance const &ins) const
+bool image_reader::decode_core(stdx::span<std::uint8_t> out, instance const &ins) const
 {
     memory_slice img_buf{};
     if (params_.img_frame == image_frame::recordio) {
@@ -200,10 +189,9 @@ image_reader::decode_core(stdx::span<std::uint8_t> out,
         type = CV_8UC4;
         break;
     default:
-        throw std::invalid_argument{
-            fmt::format("The specified image dimensions have an unsupported "
-                        "number of channels ({0:n}).",
-                        img_dims_[0])};
+        throw std::invalid_argument{fmt::format(
+            "The specified image dimensions have an unsupported number of channels ({0:n}).",
+            img_dims_[0])};
     }
 
     cv::Mat tmp = decode_image(mat, mode, ins);
@@ -224,8 +212,7 @@ image_reader::decode_core(stdx::span<std::uint8_t> out,
         catch (cv::Exception const &e) {
             if (warn_bad_instances() || error_bad_batch_) {
                 auto msg = fmt::format(
-                    "The BGR2RGB operation for the image #{1:n} in the data "
-                    "store '{0}' failed with the following exception: {2}",
+                    "The BGR2RGB operation for the image #{1:n} in the data store '{0}' failed with the following exception: {2}",
                     ins.get_data_store().id(),
                     ins.index(),
                     e.what());
@@ -248,10 +235,7 @@ image_reader::decode_core(stdx::span<std::uint8_t> out,
     return crop(tmp, dst, ins);
 }
 
-cv::Mat
-image_reader::decode_image(cv::Mat const &buf,
-                           int mode,
-                           instance const &ins) const
+cv::Mat image_reader::decode_image(cv::Mat const &buf, int mode, instance const &ins) const
 {
     cv::Mat decoded_img{};
     try {
@@ -260,8 +244,7 @@ image_reader::decode_image(cv::Mat const &buf,
     catch (cv::Exception const &e) {
         if (warn_bad_instances() || error_bad_batch_) {
             auto msg = fmt::format(
-                "The image decode operation failed for the image #{1:n} in "
-                "the data store '{0}' with the following exception: {2}",
+                "The image decode operation failed for the image #{1:n} in the data store '{0}' with the following exception: {2}",
                 ins.get_data_store().id(),
                 ins.index(),
                 e.what());
@@ -280,11 +263,10 @@ image_reader::decode_image(cv::Mat const &buf,
 
     if (decoded_img.empty()) {
         if (warn_bad_instances() || error_bad_batch_) {
-            auto msg =
-                fmt::format("The image decode operation failed for the image "
-                            "#{1:n} in the data store '{0}'.",
-                            ins.get_data_store().id(),
-                            ins.index());
+            auto msg = fmt::format(
+                "The image decode operation failed for the image #{1:n} in the data store '{0}'.",
+                ins.get_data_store().id(),
+                ins.index());
 
             if (warn_bad_instances()) {
                 logger::warn(msg);
@@ -298,11 +280,9 @@ image_reader::decode_image(cv::Mat const &buf,
         return decoded_img;
     }
 
-    if (mode == cv::ImreadModes::IMREAD_UNCHANGED &&
-        decoded_img.channels() != 4) {
+    if (mode == cv::ImreadModes::IMREAD_UNCHANGED && decoded_img.channels() != 4) {
         throw std::invalid_argument{fmt::format(
-            "The image #{1:n} in the data store '{0}' is expected to have 4 "
-            "channels. However it contains {2:n} channels.",
+            "The image #{1:n} in the data store '{0}' is expected to have 4 channels. However it contains {2:n} channels.",
             ins.get_data_store().id(),
             ins.index(),
             decoded_img.channels())};
@@ -311,8 +291,7 @@ image_reader::decode_image(cv::Mat const &buf,
     return decoded_img;
 }
 
-bool
-image_reader::resize(cv::Mat &src, cv::Mat &dst, instance const &ins) const
+bool image_reader::resize(cv::Mat &src, cv::Mat &dst, instance const &ins) const
 {
     int new_cols{};
     int new_rows{};
@@ -334,8 +313,7 @@ image_reader::resize(cv::Mat &src, cv::Mat &dst, instance const &ins) const
     catch (cv::Exception const &e) {
         if (warn_bad_instances() || error_bad_batch_) {
             auto msg = fmt::format(
-                "The image resize operation failed for the image #{2:n} in "
-                "the data store '{0}' with the following exception: {2}",
+                "The image resize operation failed for the image #{2:n} in the data store '{0}' with the following exception: {2}",
                 ins.get_data_store().id(),
                 ins.index(),
                 e.what());
@@ -355,15 +333,12 @@ image_reader::resize(cv::Mat &src, cv::Mat &dst, instance const &ins) const
     return true;
 }
 
-bool
-image_reader::crop(cv::Mat &src, cv::Mat &dst, instance const &ins) const
+bool image_reader::crop(cv::Mat &src, cv::Mat &dst, instance const &ins) const
 {
     if (src.rows < img_dims_[1] || src.cols < img_dims_[2]) {
         if (warn_bad_instances() || error_bad_batch_) {
             auto msg = fmt::format(
-                "The input image dimensions (rows: {2:n}, cols: {3:n}) are "
-                "smaller than the output image dimensions (rows: {4:n}, cols: "
-                "{5:n}) for the image #{1:n} in the data store '{0}'.",
+                "The input image dimensions (rows: {2:n}, cols: {3:n}) are smaller than the output image dimensions (rows: {4:n}, cols: {5:n}) for the image #{1:n} in the data store '{0}'.",
                 ins.get_data_store().id(),
                 ins.index(),
                 src.rows,
@@ -394,8 +369,7 @@ image_reader::crop(cv::Mat &src, cv::Mat &dst, instance const &ins) const
     catch (cv::Exception const &e) {
         if (warn_bad_instances() || error_bad_batch_) {
             auto msg = fmt::format(
-                "The image crop operation failed for the image #{1:n} in the "
-                "data store '{0}' with the following exception: {2}",
+                "The image crop operation failed for the image #{1:n} in the data store '{0}' with the following exception: {2}",
                 ins.get_data_store().id(),
                 ins.index(),
                 e.what());

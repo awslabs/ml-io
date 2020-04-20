@@ -39,26 +39,21 @@ public:
     virtual ~memory_allocator();
 
 public:
-    memory_allocator &
-    operator=(memory_allocator const &) = delete;
+    memory_allocator &operator=(memory_allocator const &) = delete;
 
-    memory_allocator &
-    operator=(memory_allocator &&) = delete;
+    memory_allocator &operator=(memory_allocator &&) = delete;
 
 public:
-    virtual intrusive_ptr<mutable_memory_block>
-    allocate(std::size_t size) = 0;
+    virtual intrusive_ptr<mutable_memory_block> allocate(std::size_t size) = 0;
 };
 
 /// Gets the default memory allocator.
 MLIO_API
-memory_allocator &
-get_memory_allocator() noexcept;
+memory_allocator &get_memory_allocator() noexcept;
 
 /// Sets the default memory allocator.
 MLIO_API
-void
-set_memory_allocator(std::unique_ptr<memory_allocator> &&alloc) noexcept;
+void set_memory_allocator(std::unique_ptr<memory_allocator> &&alloc) noexcept;
 
 /// @}
 

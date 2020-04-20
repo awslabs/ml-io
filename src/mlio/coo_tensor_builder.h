@@ -44,22 +44,17 @@ public:
     virtual ~coo_tensor_builder();
 
 public:
-    coo_tensor_builder &
-    operator=(coo_tensor_builder const &) = delete;
+    coo_tensor_builder &operator=(coo_tensor_builder const &) = delete;
 
-    coo_tensor_builder &
-    operator=(coo_tensor_builder &&) = delete;
+    coo_tensor_builder &operator=(coo_tensor_builder &&) = delete;
 
 public:
-    virtual intrusive_ptr<tensor>
-    build() = 0;
+    virtual intrusive_ptr<tensor> build() = 0;
 
 protected:
-    bool
-    append_core(stdx::span<std::uint64_t const> keys);
+    bool append_core(stdx::span<std::uint64_t const> keys);
 
-    intrusive_ptr<tensor>
-    build_core(std::unique_ptr<device_array> &&data);
+    intrusive_ptr<tensor> build_core(std::unique_ptr<device_array> &&data);
 
 private:
     attribute const *attr_;
@@ -77,21 +72,17 @@ public:
     using coo_tensor_builder::coo_tensor_builder;
 
 public:
-    bool
-    append(stdx::span<value_type const> data,
-           stdx::span<std::uint64_t const> keys);
+    bool append(stdx::span<value_type const> data, stdx::span<std::uint64_t const> keys);
 
-    intrusive_ptr<tensor>
-    build() final;
+    intrusive_ptr<tensor> build() final;
 
 private:
     std::vector<value_type> data_{};
 };
 
 template<data_type dt>
-bool
-coo_tensor_builder_impl<dt>::append(stdx::span<value_type const> data,
-                                    stdx::span<std::uint64_t const> keys)
+bool coo_tensor_builder_impl<dt>::append(stdx::span<value_type const> data,
+                                         stdx::span<std::uint64_t const> keys)
 {
     data_.insert(data_.end(), data.begin(), data.end());
 
@@ -99,8 +90,7 @@ coo_tensor_builder_impl<dt>::append(stdx::span<value_type const> data,
 }
 
 template<data_type dt>
-intrusive_ptr<tensor>
-coo_tensor_builder_impl<dt>::build()
+intrusive_ptr<tensor> coo_tensor_builder_impl<dt>::build()
 {
     auto data = wrap_cpu_array<dt>(std::move(data_));
 
@@ -109,18 +99,16 @@ coo_tensor_builder_impl<dt>::build()
 
 template<data_type dt>
 struct make_coo_tensor_builder_op {
-    std::unique_ptr<coo_tensor_builder>
-    operator()(attribute const &attr, std::size_t batch_size)
+    std::unique_ptr<coo_tensor_builder> operator()(attribute const &attr, std::size_t batch_size)
     {
         return std::make_unique<coo_tensor_builder_impl<dt>>(attr, batch_size);
     }
 };
 
-inline std::unique_ptr<coo_tensor_builder>
-make_coo_tensor_builder(attribute const &attr, std::size_t batch_size)
+inline std::unique_ptr<coo_tensor_builder> make_coo_tensor_builder(attribute const &attr,
+                                                                   std::size_t batch_size)
 {
-    return dispatch<make_coo_tensor_builder_op>(
-        attr.dtype(), attr, batch_size);
+    return dispatch<make_coo_tensor_builder_op>(attr.dtype(), attr, batch_size);
 }
 
 }  // namespace detail

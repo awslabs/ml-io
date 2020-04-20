@@ -36,24 +36,20 @@ public:
     {}
 
 public:
-    memory_slice
-    read_chunk(memory_span leftover) final;
+    memory_slice read_chunk(memory_span leftover) final;
 
 public:
-    bool
-    eof() const noexcept final
+    bool eof() const noexcept final
     {
         return eof_;
     }
 
-    std::size_t
-    chunk_size_hint() const noexcept final
+    std::size_t chunk_size_hint() const noexcept final
     {
         return next_chunk_size_;
     }
 
-    void
-    set_chunk_size_hint(std::size_t value) noexcept final;
+    void set_chunk_size_hint(std::size_t value) noexcept final;
 
 private:
     intrusive_ptr<input_stream> stream_;

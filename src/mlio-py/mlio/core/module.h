@@ -30,43 +30,30 @@ PYBIND11_MAKE_OPAQUE(std::vector<mlio::attribute>);
 
 namespace pymlio {
 
-void
-register_exceptions(pybind11::module &m);
+void register_exceptions(pybind11::module &m);
 
-void
-register_logging(pybind11::module &m);
+void register_logging(pybind11::module &m);
 
-void
-register_s3_client(pybind11::module &m);
+void register_s3_client(pybind11::module &m);
 
-void
-register_memory_slice(pybind11::module &m);
+void register_memory_slice(pybind11::module &m);
 
-void
-register_device_array(pybind11::module &m);
+void register_device_array(pybind11::module &m);
 
-void
-register_tensors(pybind11::module &m);
+void register_tensors(pybind11::module &m);
 
-void
-register_integ(pybind11::module &m);
+void register_integ(pybind11::module &m);
 
-void
-register_streams(pybind11::module &m);
+void register_streams(pybind11::module &m);
 
-void
-register_data_stores(pybind11::module &m);
+void register_data_stores(pybind11::module &m);
 
-void
-register_record_readers(pybind11::module &m);
+void register_record_readers(pybind11::module &m);
 
-void
-register_schema(pybind11::module &m);
+void register_schema(pybind11::module &m);
 
-void
-register_example(pybind11::module &m);
+void register_example(pybind11::module &m);
 
-void
-register_data_readers(pybind11::module &m);
+void register_data_readers(pybind11::module &m);
 
 }  // namespace pymlio

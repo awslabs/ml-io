@@ -37,27 +37,22 @@ public:
     ~py_memory_block() final;
 
 public:
-    py_memory_block &
-    operator=(py_memory_block const &) = delete;
+    py_memory_block &operator=(py_memory_block const &) = delete;
 
-    py_memory_block &
-    operator=(py_memory_block &&) = delete;
+    py_memory_block &operator=(py_memory_block &&) = delete;
 
 public:
-    const_pointer
-    data() const noexcept final
+    const_pointer data() const noexcept final
     {
         return static_cast<const_pointer>(buffer_.buf);
     }
 
-    size_type
-    size() const noexcept final
+    size_type size() const noexcept final
     {
         return static_cast<size_type>(buffer_.len);
     }
 
-    Py_buffer const &
-    buffer() const noexcept
+    Py_buffer const &buffer() const noexcept
     {
         return buffer_;
     }
@@ -82,40 +77,33 @@ public:
     ~py_mutable_memory_block() final;
 
 public:
-    py_mutable_memory_block &
-    operator=(py_mutable_memory_block const &) = delete;
+    py_mutable_memory_block &operator=(py_mutable_memory_block const &) = delete;
 
-    py_mutable_memory_block &
-    operator=(py_mutable_memory_block &&) = delete;
+    py_mutable_memory_block &operator=(py_mutable_memory_block &&) = delete;
 
 public:
     void resize(size_type) final
     {
-        throw mlio::not_supported_error{
-            "The Python buffer does not support resizing."};
+        throw mlio::not_supported_error{"The Python buffer does not support resizing."};
     }
 
 public:
-    pointer
-    data() noexcept final
+    pointer data() noexcept final
     {
         return static_cast<pointer>(buffer_.buf);
     }
 
-    const_pointer
-    data() const noexcept final
+    const_pointer data() const noexcept final
     {
         return static_cast<const_pointer>(buffer_.buf);
     }
 
-    size_type
-    size() const noexcept final
+    size_type size() const noexcept final
     {
         return static_cast<size_type>(buffer_.len);
     }
 
-    bool
-    resizable() const noexcept final
+    bool resizable() const noexcept final
     {
         return false;
     }

@@ -45,8 +45,7 @@ class MLIO_API utf8_input_stream final : public input_stream_base {
     friend struct detail::utf8_input_stream_access;
 
 private:
-    explicit utf8_input_stream(intrusive_ptr<input_stream> inner,
-                               text_encoding &&enc);
+    explicit utf8_input_stream(intrusive_ptr<input_stream> inner, text_encoding &&enc);
 
 public:
     utf8_input_stream(utf8_input_stream const &) = delete;
@@ -56,45 +55,35 @@ public:
     ~utf8_input_stream() final;
 
 public:
-    utf8_input_stream &
-    operator=(utf8_input_stream const &) = delete;
+    utf8_input_stream &operator=(utf8_input_stream const &) = delete;
 
-    utf8_input_stream &
-    operator=(utf8_input_stream &&) = delete;
+    utf8_input_stream &operator=(utf8_input_stream &&) = delete;
 
 public:
     using input_stream_base::read;
 
-    std::size_t
-    read(mutable_memory_span dest) final;
+    std::size_t read(mutable_memory_span dest) final;
 
-    void
-    close() noexcept final;
+    void close() noexcept final;
 
 private:
     MLIO_HIDDEN
-    std::size_t
-    convert(mutable_memory_span dest);
+    std::size_t convert(mutable_memory_span dest);
 
     MLIO_HIDDEN
-    void
-    fill_buffer();
+    void fill_buffer();
 
     MLIO_HIDDEN
-    std::size_t
-    copy_from_remainder(mutable_memory_span dest) noexcept;
+    std::size_t copy_from_remainder(mutable_memory_span dest) noexcept;
 
     MLIO_HIDDEN
-    void
-    set_preamble(memory_span value) noexcept;
+    void set_preamble(memory_span value) noexcept;
 
     MLIO_HIDDEN
-    void
-    check_if_closed() const;
+    void check_if_closed() const;
 
 public:
-    bool
-    closed() const noexcept final;
+    bool closed() const noexcept final;
 
 private:
     intrusive_ptr<input_stream> inner_;
@@ -113,9 +102,8 @@ private:
 /// from the preamble of the underlying stream. If no preamble is found,
 /// falls back to UTF-8.
 MLIO_API
-intrusive_ptr<input_stream>
-make_utf8_stream(intrusive_ptr<input_stream> strm,
-                 std::optional<text_encoding> enc = {});
+intrusive_ptr<input_stream> make_utf8_stream(intrusive_ptr<input_stream> strm,
+                                             std::optional<text_encoding> enc = {});
 
 /// @}
 

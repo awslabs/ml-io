@@ -27,8 +27,7 @@ namespace pymlio {
 
 class py_device_array {
 public:
-    explicit py_device_array(mlio::intrusive_ptr<mlio::tensor> tsr,
-                             mlio::device_array_span s)
+    explicit py_device_array(mlio::intrusive_ptr<mlio::tensor> tsr, mlio::device_array_span s)
         : tensor_{std::move(tsr)}, span_{s}
     {}
 
@@ -39,43 +38,35 @@ public:
     ~py_device_array();
 
 public:
-    py_device_array &
-    operator=(py_device_array const &) = delete;
+    py_device_array &operator=(py_device_array const &) = delete;
 
-    py_device_array &
-    operator=(py_device_array &&) noexcept = default;
+    py_device_array &operator=(py_device_array &&) noexcept = default;
 
 public:
-    void *
-    data() noexcept;
+    void *data() noexcept;
 
-    std::size_t
-    size() const noexcept
+    std::size_t size() const noexcept
     {
         return span_.size();
     }
 
-    [[nodiscard]] bool
-    empty() const noexcept
+    [[nodiscard]] bool empty() const noexcept
     {
         return span_.empty();
     }
 
-    mlio::data_type
-    dtype() const noexcept
+    mlio::data_type dtype() const noexcept
     {
         return span_.dtype();
     }
 
-    mlio::device
-    get_device() const noexcept
+    mlio::device get_device() const noexcept
     {
         return span_.get_device();
     }
 
 private:
-    void *
-    make_or_get_string_buffer();
+    void *make_or_get_string_buffer();
 
 private:
     mlio::intrusive_ptr<mlio::tensor> tensor_;

@@ -32,8 +32,7 @@ using mlio::detail::text_line_record_reader;
 namespace mlio {
 inline namespace v1 {
 
-text_line_reader::text_line_reader(data_reader_params prm)
-    : parallel_data_reader{std::move(prm)}
+text_line_reader::text_line_reader(data_reader_params prm) : parallel_data_reader{std::move(prm)}
 {}
 
 text_line_reader::~text_line_reader()
@@ -41,25 +40,21 @@ text_line_reader::~text_line_reader()
     stop();
 }
 
-intrusive_ptr<record_reader>
-text_line_reader::make_record_reader(data_store const &ds)
+intrusive_ptr<record_reader> text_line_reader::make_record_reader(data_store const &ds)
 {
     auto strm = make_utf8_stream(ds.open_read());
     return make_intrusive<text_line_record_reader>(std::move(strm), false);
 }
 
-intrusive_ptr<schema const>
-text_line_reader::infer_schema(std::optional<instance> const &)
+intrusive_ptr<schema const> text_line_reader::infer_schema(std::optional<instance> const &)
 {
     std::vector<attribute> attrs{};
-    attrs.emplace_back(
-        "value", data_type::string, size_vector{params().batch_size, 1});
+    attrs.emplace_back("value", data_type::string, size_vector{params().batch_size, 1});
 
     return make_intrusive<schema>(std::move(attrs));
 }
 
-intrusive_ptr<example>
-text_line_reader::decode(instance_batch const &batch) const
+intrusive_ptr<example> text_line_reader::decode(instance_batch const &batch) const
 {
     intrusive_ptr<dense_tensor> tsr = make_tensor(batch.size());
 
@@ -78,8 +73,7 @@ text_line_reader::decode(instance_batch const &batch) const
     return exm;
 }
 
-intrusive_ptr<dense_tensor>
-text_line_reader::make_tensor(std::size_t batch_size)
+intrusive_ptr<dense_tensor> text_line_reader::make_tensor(std::size_t batch_size)
 {
     size_vector shp{batch_size, 1};
 

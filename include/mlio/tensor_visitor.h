@@ -37,36 +37,26 @@ public:
     virtual ~tensor_visitor();
 
 public:
-    tensor_visitor &
-    operator=(tensor_visitor const &) = delete;
+    tensor_visitor &operator=(tensor_visitor const &) = delete;
 
-    tensor_visitor &
-    operator=(tensor_visitor &&) = delete;
+    tensor_visitor &operator=(tensor_visitor &&) = delete;
 
 public:
-    virtual void
-    visit(tensor &tsr);
+    virtual void visit(tensor &tsr);
 
-    virtual void
-    visit(tensor const &tsr);
+    virtual void visit(tensor const &tsr);
 
-    virtual void
-    visit(dense_tensor &tsr);
+    virtual void visit(dense_tensor &tsr);
 
-    virtual void
-    visit(dense_tensor const &tsr);
+    virtual void visit(dense_tensor const &tsr);
 
-    virtual void
-    visit(coo_tensor &tsr);
+    virtual void visit(coo_tensor &tsr);
 
-    virtual void
-    visit(coo_tensor const &tsr);
+    virtual void visit(coo_tensor const &tsr);
 
-    virtual void
-    visit(csr_tensor &tsr);
+    virtual void visit(csr_tensor &tsr);
 
-    virtual void
-    visit(csr_tensor const &tsr);
+    virtual void visit(csr_tensor const &tsr);
 };
 
 // @}

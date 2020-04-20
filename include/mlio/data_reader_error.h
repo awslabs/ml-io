@@ -36,11 +36,9 @@ public:
     ~data_reader_error() override;
 
 public:
-    data_reader_error &
-    operator=(data_reader_error const &) = default;
+    data_reader_error &operator=(data_reader_error const &) = default;
 
-    data_reader_error &
-    operator=(data_reader_error &&) = default;
+    data_reader_error &operator=(data_reader_error &&) = default;
 };
 
 class MLIO_API schema_error : public data_reader_error {
@@ -55,11 +53,9 @@ public:
     ~schema_error() override;
 
 public:
-    schema_error &
-    operator=(schema_error const &) = default;
+    schema_error &operator=(schema_error const &) = default;
 
-    schema_error &
-    operator=(schema_error &&) = default;
+    schema_error &operator=(schema_error &&) = default;
 };
 
 class MLIO_API invalid_instance_error : public data_reader_error {
@@ -74,11 +70,9 @@ public:
     ~invalid_instance_error() override;
 
 public:
-    invalid_instance_error &
-    operator=(invalid_instance_error const &) = default;
+    invalid_instance_error &operator=(invalid_instance_error const &) = default;
 
-    invalid_instance_error &
-    operator=(invalid_instance_error &&) = default;
+    invalid_instance_error &operator=(invalid_instance_error &&) = default;
 };
 
 /// @}

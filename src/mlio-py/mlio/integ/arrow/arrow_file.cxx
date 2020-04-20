@@ -28,8 +28,7 @@ using namespace mlio;
 
 namespace pymlio {
 
-arrow_file::arrow_file(intrusive_ptr<input_stream> strm)
-    : stream_{std::move(strm)}
+arrow_file::arrow_file(intrusive_ptr<input_stream> strm) : stream_{std::move(strm)}
 {
     if (!stream_->seekable()) {
         throw std::invalid_argument{"The input stream is not seekable."};
@@ -38,8 +37,7 @@ arrow_file::arrow_file(intrusive_ptr<input_stream> strm)
 
 arrow_file::~arrow_file() = default;
 
-arrow::Result<std::int64_t>
-arrow_file::Read(std::int64_t nbytes, void *out) noexcept
+arrow::Result<std::int64_t> arrow_file::Read(std::int64_t nbytes, void *out) noexcept
 {
     RETURN_NOT_OK(check_if_closed());
 
@@ -54,8 +52,7 @@ arrow_file::Read(std::int64_t nbytes, void *out) noexcept
     });
 }
 
-arrow::Result<std::shared_ptr<arrow::Buffer>>
-arrow_file::Read(std::int64_t nbytes) noexcept
+arrow::Result<std::shared_ptr<arrow::Buffer>> arrow_file::Read(std::int64_t nbytes) noexcept
 {
     RETURN_NOT_OK(check_if_closed());
 
@@ -66,8 +63,7 @@ arrow_file::Read(std::int64_t nbytes) noexcept
     });
 }
 
-arrow::Status
-arrow_file::Seek(std::int64_t position) noexcept
+arrow::Status arrow_file::Seek(std::int64_t position) noexcept
 {
     RETURN_NOT_OK(check_if_closed());
 
@@ -76,16 +72,14 @@ arrow_file::Seek(std::int64_t position) noexcept
     });
 }
 
-arrow::Status
-arrow_file::Close() noexcept
+arrow::Status arrow_file::Close() noexcept
 {
     stream_->close();
 
     return arrow::Status::OK();
 }
 
-arrow::Result<std::int64_t>
-arrow_file::Tell() const noexcept
+arrow::Result<std::int64_t> arrow_file::Tell() const noexcept
 {
     RETURN_NOT_OK(check_if_closed());
 
@@ -94,8 +88,7 @@ arrow_file::Tell() const noexcept
     });
 }
 
-arrow::Result<std::int64_t>
-arrow_file::GetSize() noexcept
+arrow::Result<std::int64_t> arrow_file::GetSize() noexcept
 {
     RETURN_NOT_OK(check_if_closed());
 
@@ -104,8 +97,7 @@ arrow_file::GetSize() noexcept
     });
 }
 
-arrow::Status
-arrow_file::check_if_closed() const noexcept
+arrow::Status arrow_file::check_if_closed() const noexcept
 {
     if (stream_->closed()) {
         return arrow::Status::Invalid("Invalid operation on closed file.");
@@ -113,14 +105,12 @@ arrow_file::check_if_closed() const noexcept
     return arrow::Status::OK();
 }
 
-bool
-arrow_file::supports_zero_copy() const noexcept
+bool arrow_file::supports_zero_copy() const noexcept
 {
     return stream_->supports_zero_copy();
 }
 
-bool
-arrow_file::closed() const noexcept
+bool arrow_file::closed() const noexcept
 {
     return stream_->closed();
 }

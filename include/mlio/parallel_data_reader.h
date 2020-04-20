@@ -53,37 +53,29 @@ public:
     ~parallel_data_reader() override;
 
 public:
-    parallel_data_reader &
-    operator=(parallel_data_reader const &) = delete;
+    parallel_data_reader &operator=(parallel_data_reader const &) = delete;
 
-    parallel_data_reader &
-    operator=(parallel_data_reader &&) = delete;
+    parallel_data_reader &operator=(parallel_data_reader &&) = delete;
 
 private:
     /// When implemented in a derived class, constructs a @ref
     /// record_reader from the specified data store.
-    virtual intrusive_ptr<record_reader>
-    make_record_reader(data_store const &ds) = 0;
+    virtual intrusive_ptr<record_reader> make_record_reader(data_store const &ds) = 0;
 
     MLIO_HIDDEN
-    intrusive_ptr<example>
-    read_example_core() final;
+    intrusive_ptr<example> read_example_core() final;
 
     MLIO_HIDDEN
-    void
-    ensure_pipeline_running();
+    void ensure_pipeline_running();
 
     MLIO_HIDDEN
-    void
-    run_pipeline();
+    void run_pipeline();
 
     MLIO_HIDDEN
-    void
-    init_graph();
+    void init_graph();
 
     MLIO_HIDDEN
-    void
-    ensure_schema_inferred();
+    void ensure_schema_inferred();
 
     /// When implemented in a derived class, infers the schema of the
     /// dataset from the specified data instance.
@@ -92,37 +84,30 @@ private:
     ///     This function will be called once throughout the lifetime
     ///     of the data reader before any calls to the @ref decode()
     ///     function.
-    virtual intrusive_ptr<schema const>
-    infer_schema(std::optional<instance> const &ins) = 0;
+    virtual intrusive_ptr<schema const> infer_schema(std::optional<instance> const &ins) = 0;
 
     /// When implemented in a derived class, converts the specified
     /// @ref instance_batch into an @ref example.
-    virtual intrusive_ptr<example>
-    decode(instance_batch const &batch) const = 0;
+    virtual intrusive_ptr<example> decode(instance_batch const &batch) const = 0;
 
 public:
-    intrusive_ptr<schema const>
-    read_schema() final;
+    intrusive_ptr<schema const> read_schema() final;
 
-    void
-    reset() noexcept override;
+    void reset() noexcept override;
 
 protected:
     /// Stops the background threads. This function must be called in
     /// the destructor of the derived class to ensure that all
     /// resources are properly disposed.
-    void
-    stop();
+    void stop();
 
-    intrusive_ptr<schema const>
-    get_schema() const noexcept
+    intrusive_ptr<schema const> get_schema() const noexcept
     {
         return schema_;
     }
 
 public:
-    std::size_t
-    num_bytes_read() const noexcept final;
+    std::size_t num_bytes_read() const noexcept final;
 
 private:
     data_reader_params params_;

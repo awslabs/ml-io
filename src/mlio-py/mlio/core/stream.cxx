@@ -29,40 +29,30 @@ namespace {
 
 class py_input_stream : public input_stream {
 public:
-    std::size_t
-    read(mutable_memory_span dest) override;
+    std::size_t read(mutable_memory_span dest) override;
 
-    memory_slice
-    read(std::size_t size) override;
+    memory_slice read(std::size_t size) override;
 
-    void
-    seek(std::size_t position) override;
+    void seek(std::size_t position) override;
 
-    void
-    close() noexcept override;
+    void close() noexcept override;
 
 public:
-    std::size_t
-    size() const override;
+    std::size_t size() const override;
 
-    std::size_t
-    position() const override;
+    std::size_t position() const override;
 
-    bool
-    seekable() const noexcept override;
+    bool seekable() const noexcept override;
 
-    bool
-    supports_zero_copy() const noexcept override
+    bool supports_zero_copy() const noexcept override
     {
         return false;
     }
 
-    bool
-    closed() const noexcept override;
+    bool closed() const noexcept override;
 };
 
-std::size_t
-py_input_stream::read(mutable_memory_span dest)
+std::size_t py_input_stream::read(mutable_memory_span dest)
 {
     auto bits = as_span<char>(dest);
 
@@ -70,8 +60,7 @@ py_input_stream::read(mutable_memory_span dest)
 
     py::gil_scoped_release acq_gil{};
 
-    ::PyObject *buf =
-        ::PyMemoryView_FromMemory(bits.data(), size, PyBUF_WRITE);
+    ::PyObject *buf = ::PyMemoryView_FromMemory(bits.data(), size, PyBUF_WRITE);
     if (buf == nullptr) {
         throw py::error_already_set();
     }
@@ -87,8 +76,7 @@ memory_slice py_input_stream::read(std::size_t)
     return {};  // TODO(balioglu): Implement!
 }
 
-void
-py_input_stream::seek(std::size_t position)
+void py_input_stream::seek(std::size_t position)
 {
     try {
         // NOLINTNEXTLINE
@@ -99,8 +87,7 @@ py_input_stream::seek(std::size_t position)
     }
 }
 
-void
-py_input_stream::close() noexcept
+void py_input_stream::close() noexcept
 {
     try {
         // NOLINTNEXTLINE
@@ -111,22 +98,19 @@ py_input_stream::close() noexcept
     }
 }
 
-std::size_t
-py_input_stream::size() const
+std::size_t py_input_stream::size() const
 {
     // NOLINTNEXTLINE
     PYBIND11_OVERLOAD_PURE(std::size_t, input_stream, "size", )
 }
 
-std::size_t
-py_input_stream::position() const
+std::size_t py_input_stream::position() const
 {
     // NOLINTNEXTLINE
     PYBIND11_OVERLOAD_PURE(std::size_t, input_stream, "position", )
 }
 
-bool
-py_input_stream::seekable() const noexcept
+bool py_input_stream::seekable() const noexcept
 {
     try {
         // NOLINTNEXTLINE
@@ -137,8 +121,7 @@ py_input_stream::seekable() const noexcept
     }
 }
 
-bool
-py_input_stream::closed() const noexcept
+bool py_input_stream::closed() const noexcept
 {
     try {
         // NOLINTNEXTLINE
@@ -149,8 +132,7 @@ py_input_stream::closed() const noexcept
     }
 }
 
-std::size_t
-read_input_stream(input_stream &strm, py::buffer const &buf)
+std::size_t read_input_stream(input_stream &strm, py::buffer const &buf)
 {
     py_mutable_memory_block blk{buf};
 
@@ -161,8 +143,7 @@ read_input_stream(input_stream &strm, py::buffer const &buf)
 
 }  // namespace
 
-void
-register_streams(py::module &m)
+void register_streams(py::module &m)
 {
     py::class_<input_stream, py_input_stream, intrusive_ptr<input_stream>>(
         m, "InputStream", "Represents an input stream of bytes.")
@@ -171,9 +152,7 @@ register_streams(py::module &m)
              &read_input_stream,
              "buf"_a,
              "Fills the specified buffer with data read from the stream.")
-        .def("read",
-             py::overload_cast<std::size_t>(&input_stream::read),
-             "size"_a)
+        .def("read", py::overload_cast<std::size_t>(&input_stream::read), "size"_a)
         .def("seek",
              &input_stream::seek,
              "position"_a,
@@ -187,24 +166,19 @@ register_streams(py::module &m)
              [](input_stream &self, py::args const &) {
                  self.close();
              })
+        .def_property_readonly("size", &input_stream::size, "Gets the size of the stream.")
         .def_property_readonly(
-            "size", &input_stream::size, "Gets the size of the stream.")
-        .def_property_readonly("position",
-                               &input_stream::position,
-                               "Gets the current position in the stream.")
-        .def_property_readonly(
-            "seekable",
-            &input_stream::seekable,
-            "Gets a boolean value indicating whether the stream is seekable.")
-        .def_property_readonly(
-            "supports_zero_copy",
-            &input_stream::supports_zero_copy,
-            "Gets a boolean value indicating whether the stream supports "
-            "zero-copy reading.")
-        .def_property_readonly(
-            "closed",
-            &input_stream::closed,
-            "Gets a boolean value indicating whether the stream is closed.");
+            "position", &input_stream::position, "Gets the current position in the stream.")
+        .def_property_readonly("seekable",
+                               &input_stream::seekable,
+                               "Gets a boolean value indicating whether the stream is seekable.")
+        .def_property_readonly("supports_zero_copy",
+                               &input_stream::supports_zero_copy,
+                               "Gets a boolean value indicating whether the stream supports "
+                               "zero-copy reading.")
+        .def_property_readonly("closed",
+                               &input_stream::closed,
+                               "Gets a boolean value indicating whether the stream is closed.");
 }
 
 }  // namespace pymlio

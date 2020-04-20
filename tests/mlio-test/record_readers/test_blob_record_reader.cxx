@@ -11,8 +11,7 @@ protected:
 
 protected:
     std::string const file_path_ = "../resources/test.txt";
-    intrusive_ptr<file> data_store =
-        mlio::make_intrusive<mlio::file>(file_path_);
+    intrusive_ptr<file> data_store = mlio::make_intrusive<mlio::file>(file_path_);
 };
 
 test_blob_record_reader::~test_blob_record_reader() = default;

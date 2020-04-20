@@ -20,7 +20,7 @@
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 
-#include "mlio/data_stores/detail/file_util.h"
+#include "mlio/data_stores/detail/util.h"
 #include "mlio/detail/pathname.h"
 #include "mlio/logger.h"
 #include "mlio/memory/file_mapped_memory_block.h"
@@ -41,8 +41,7 @@ file::file(std::string pathname, bool mmap, compression cmp)
     }
 }
 
-intrusive_ptr<input_stream>
-file::open_read() const
+intrusive_ptr<input_stream> file::open_read() const
 {
     logger::info("The file '{0}' is being opened.", pathname_);
 
@@ -61,14 +60,12 @@ file::open_read() const
     return make_inflate_stream(std::move(strm), compression_);
 }
 
-std::string
-file::repr() const
+std::string file::repr() const
 {
-    return fmt::format(
-        "<file pathname='{0}' memory_mapped='{1}' compression='{2}'>",
-        pathname_,
-        mmap_,
-        compression_);
+    return fmt::format("<file pathname='{0}' memory_mapped='{1}' compression='{2}'>",
+                       pathname_,
+                       mmap_,
+                       compression_);
 }
 
 }  // namespace v1

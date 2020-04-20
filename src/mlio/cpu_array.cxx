@@ -22,8 +22,7 @@ namespace {
 
 template<data_type dt>
 struct make_cpu_array_op {
-    std::unique_ptr<device_array>
-    operator()(std::size_t size)
+    std::unique_ptr<device_array> operator()(std::size_t size)
     {
         return cpu_array_access::wrap(dt, std::vector<data_type_t<dt>>(size));
     }
@@ -32,8 +31,7 @@ struct make_cpu_array_op {
 }  // namespace
 }  // namespace detail
 
-std::unique_ptr<device_array>
-make_cpu_array(data_type dt, std::size_t size)
+std::unique_ptr<device_array> make_cpu_array(data_type dt, std::size_t size)
 {
     return dispatch<detail::make_cpu_array_op>(dt, size);
 }

@@ -39,26 +39,21 @@ public:
     ~file_mapped_memory_block() final;
 
 public:
-    file_mapped_memory_block &
-    operator=(file_mapped_memory_block const &) = delete;
+    file_mapped_memory_block &operator=(file_mapped_memory_block const &) = delete;
 
-    file_mapped_memory_block &
-    operator=(file_mapped_memory_block &&) = delete;
+    file_mapped_memory_block &operator=(file_mapped_memory_block &&) = delete;
 
 private:
     MLIO_HIDDEN
-    void
-    init_memory_map();
+    void init_memory_map();
 
 public:
-    const_pointer
-    data() const noexcept final
+    const_pointer data() const noexcept final
     {
         return data_;
     }
 
-    size_type
-    size() const noexcept final
+    size_type size() const noexcept final
     {
         return size_;
     }

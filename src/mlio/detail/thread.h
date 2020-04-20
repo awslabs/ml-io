@@ -29,8 +29,7 @@ inline namespace v1 {
 namespace detail {
 
 template<typename Func, typename... Args>
-std::thread
-start_thread(Func &&f, Args &&... args)
+std::thread start_thread(Func &&f, Args &&... args)
 {
     // Block all asynchronous signals on the new thread.
     ::sigset_t mask{};

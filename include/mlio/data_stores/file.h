@@ -42,20 +42,15 @@ public:
     /// @param cmp
     ///     The compression type of the file. If set to @c infer, the
     ///     compression will be inferred from the filename.
-    explicit file(std::string pathname,
-                  bool mmap = true,
-                  compression cmp = compression::infer);
+    explicit file(std::string pathname, bool mmap = true, compression cmp = compression::infer);
 
 public:
-    intrusive_ptr<input_stream>
-    open_read() const final;
+    intrusive_ptr<input_stream> open_read() const final;
 
-    std::string
-    repr() const final;
+    std::string repr() const final;
 
 public:
-    std::string const &
-    id() const noexcept final
+    std::string const &id() const noexcept final
     {
         return pathname_;
     }
@@ -85,12 +80,11 @@ struct MLIO_API list_files_params {
 
 /// Recursively lists all files residing under the specified pathnames.
 MLIO_API
-std::vector<intrusive_ptr<data_store>>
-list_files(list_files_params const &prm);
+std::vector<intrusive_ptr<data_store>> list_files(list_files_params const &prm);
 
 MLIO_API
-std::vector<intrusive_ptr<data_store>>
-list_files(std::string const &pathname, std::string const &pattern = {});
+std::vector<intrusive_ptr<data_store>> list_files(std::string const &pathname,
+                                                  std::string const &pattern = {});
 
 /// @}
 

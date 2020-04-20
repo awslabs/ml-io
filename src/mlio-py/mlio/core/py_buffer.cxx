@@ -42,76 +42,63 @@ public:
     using const_iterator = T const *;
 
 public:
-    explicit py_buffer_container(T *data,
-                                 size_type size,
-                                 py::buffer_info &&info) noexcept
+    explicit py_buffer_container(T *data, size_type size, py::buffer_info &&info) noexcept
         : data_{data}, size_{size}, info_{std::move(info)}
     {}
 
 public:
-    iterator
-    begin() noexcept
+    iterator begin() noexcept
     {
         return data_;
     }
 
-    const_iterator
-    begin() const noexcept
+    const_iterator begin() const noexcept
     {
         return data_;
     }
 
-    iterator
-    end() noexcept
+    iterator end() noexcept
     {
         return data_ + size_;
     }
 
-    const_iterator
-    end() const noexcept
+    const_iterator end() const noexcept
     {
         return data_ + size_;
     }
 
-    const_iterator
-    cbegin() const noexcept
+    const_iterator cbegin() const noexcept
     {
         return data_;
     }
 
-    const_iterator
-    cend() const noexcept
+    const_iterator cend() const noexcept
     {
         return data_ + size_;
     }
 
 public:
-    pointer
-    data() noexcept
+    pointer data() noexcept
     {
         return data_;
     }
 
-    const_pointer
-    data() const noexcept
+    const_pointer data() const noexcept
     {
         return data_;
     }
 
-    size_type
-    size() noexcept
+    size_type size() noexcept
     {
         return size_;
     }
 
-    size_type
-    size() const noexcept
+    size_type size() const noexcept
     {
         return size_;
     }
 
-    bool
-    empty() const noexcept
+    bool empty() const noexcept
     {
         return size_ == 0;
     }
@@ -122,8 +109,7 @@ private:
     py::buffer_info info_;
 };
 
-std::optional<data_type>
-get_data_type(py::buffer_info const &info)
+std::optional<data_type> get_data_type(py::buffer_info const &info)
 {
     std::string const &fmt_str = info.format;
 
@@ -237,8 +223,7 @@ template<data_type dt>
 struct make_cpu_array_op {
     using T = data_type_t<dt>;
 
-    std::unique_ptr<device_array>
-    operator()(py::buffer_info &&info, bool cpy)
+    std::unique_ptr<device_array> operator()(py::buffer_info &&info, bool cpy)
     {
         auto *data = static_cast<T *>(info.ptr);
 
@@ -260,8 +245,7 @@ struct make_cpu_array_op {
 
 template<>
 struct make_cpu_array_op<data_type::string> {
-    static std::vector<std::string>
-    make_string_list(py::buffer_info const &info)
+    static std::vector<std::string> make_string_list(py::buffer_info const &info)
     {
         auto size = static_cast<std::size_t>(info.size);
 
@@ -277,12 +261,10 @@ struct make_cpu_array_op<data_type::string> {
         return lst;
     }
 
-    std::unique_ptr<device_array>
-    operator()(py::buffer_info &&info, bool cpy)
+    std::unique_ptr<device_array> operator()(py::buffer_info &&info, bool cpy)
     {
         if (!cpy) {
-            throw std::invalid_argument{
-                "A Python string buffer cannot be used without copying."};
+            throw std::invalid_argument{"A Python string buffer cannot be used without copying."};
         }
 
         std::vector<std::string> lst = make_string_list(info);
@@ -293,8 +275,7 @@ struct make_cpu_array_op<data_type::string> {
 
 }  // namespace
 
-std::unique_ptr<device_array>
-make_device_array(py::buffer &buf, bool cpy)
+std::unique_ptr<device_array> make_device_array(py::buffer &buf, bool cpy)
 {
     bool writable = !cpy;
 
@@ -302,8 +283,7 @@ make_device_array(py::buffer &buf, bool cpy)
 
     std::optional<data_type> dt = get_data_type(info);
     if (dt == std::nullopt) {
-        throw std::invalid_argument{
-            "The Python buffer contains an unsupported data type."};
+        throw std::invalid_argument{"The Python buffer contains an unsupported data type."};
     }
 
     return dispatch<make_cpu_array_op>(*dt, std::move(info), cpy);

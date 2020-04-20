@@ -31,8 +31,7 @@ inline namespace v1 {
 /// Represents a memory allocator that allocates from the process heap.
 class MLIO_API heap_memory_allocator final : public memory_allocator {
 public:
-    intrusive_ptr<mutable_memory_block>
-    allocate(std::size_t size) final;
+    intrusive_ptr<mutable_memory_block> allocate(std::size_t size) final;
 };
 
 /// @}

@@ -28,20 +28,13 @@ namespace detail {
 
 class csv_record_tokenizer {
 private:
-    enum class parser_state {
-        new_field,
-        in_field,
-        in_quoted_field,
-        quote_in_quoted_field
-    };
+    enum class parser_state { new_field, in_field, in_quoted_field, quote_in_quoted_field };
 
 public:
-    explicit csv_record_tokenizer(csv_params const &prm) noexcept
-        : csv_record_tokenizer{prm, {}}
+    explicit csv_record_tokenizer(csv_params const &prm) noexcept : csv_record_tokenizer{prm, {}}
     {}
 
-    explicit csv_record_tokenizer(csv_params const &prm,
-                                  memory_span blob) noexcept
+    explicit csv_record_tokenizer(csv_params const &prm, memory_span blob) noexcept
         : text_{as_span<char const>(blob)}
         , delimiter_{prm.delimiter}
         , quote_char_{prm.quote_char}
@@ -49,34 +42,27 @@ public:
     {}
 
 public:
-    bool
-    next();
+    bool next();
 
-    void
-    reset(memory_span blob);
+    void reset(memory_span blob);
 
 private:
-    bool
-    try_get_next_char(char &chr) noexcept;
+    bool try_get_next_char(char &chr) noexcept;
 
-    void
-    push_char(char chr) noexcept;
+    void push_char(char chr) noexcept;
 
 public:
-    std::string const &
-    value() const noexcept
+    std::string const &value() const noexcept
     {
         return value_;
     }
 
-    bool
-    is_truncated() const noexcept
+    bool is_truncated() const noexcept
     {
         return is_truncated_;
     }
 
-    bool
-    eof() const noexcept
+    bool eof() const noexcept
     {
         return eof_;
     }

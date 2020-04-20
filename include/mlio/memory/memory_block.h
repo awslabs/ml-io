@@ -48,43 +48,35 @@ public:
     virtual ~memory_block();
 
 public:
-    memory_block &
-    operator=(memory_block const &) = delete;
+    memory_block &operator=(memory_block const &) = delete;
 
-    memory_block &
-    operator=(memory_block &&) = delete;
+    memory_block &operator=(memory_block &&) = delete;
 
 public:
-    const_iterator
-    begin() const noexcept
+    const_iterator begin() const noexcept
     {
         return data();
     }
 
-    const_iterator
-    end() const noexcept
+    const_iterator end() const noexcept
     {
         return data() + size();
     }
 
-    const_iterator
-    cbegin() const noexcept
+    const_iterator cbegin() const noexcept
     {
         return begin();
     }
 
-    const_iterator
-    cend() const noexcept
+    const_iterator cend() const noexcept
     {
         return end();
     }
 
 public:
-    virtual const_pointer
-    data() const noexcept = 0;
+    virtual const_pointer data() const noexcept = 0;
 
-    virtual size_type
-    size() const noexcept = 0;
+    virtual size_type size() const noexcept = 0;
 };
 
 class MLIO_API mutable_memory_block : public memory_block {
@@ -103,36 +95,29 @@ public:
     ~mutable_memory_block() override;
 
 public:
-    mutable_memory_block &
-    operator=(mutable_memory_block const &) = delete;
+    mutable_memory_block &operator=(mutable_memory_block const &) = delete;
 
-    mutable_memory_block &
-    operator=(mutable_memory_block &&) = delete;
+    mutable_memory_block &operator=(mutable_memory_block &&) = delete;
 
 public:
-    iterator
-    begin() noexcept
+    iterator begin() noexcept
     {
         return data();
     }
 
-    iterator
-    end() noexcept
+    iterator end() noexcept
     {
         return data() + size();
     }
 
-    virtual void
-    resize(size_type size) = 0;
+    virtual void resize(size_type size) = 0;
 
 public:
     using memory_block::data;
 
-    virtual pointer
-    data() noexcept = 0;
+    virtual pointer data() noexcept = 0;
 
-    virtual bool
-    resizable() const noexcept = 0;
+    virtual bool resizable() const noexcept = 0;
 };
 
 /// @}

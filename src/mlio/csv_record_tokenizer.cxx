@@ -22,8 +22,7 @@ namespace mlio {
 inline namespace v1 {
 namespace detail {
 
-bool
-csv_record_tokenizer::next()
+bool csv_record_tokenizer::next()
 {
     value_.clear();
 
@@ -120,8 +119,7 @@ end_field:
     return true;
 }
 
-inline bool
-csv_record_tokenizer::try_get_next_char(char &chr) noexcept
+inline bool csv_record_tokenizer::try_get_next_char(char &chr) noexcept
 {
     if (text_pos_ == text_.end()) {
         return false;
@@ -134,8 +132,7 @@ csv_record_tokenizer::try_get_next_char(char &chr) noexcept
     return true;
 }
 
-inline void
-csv_record_tokenizer::push_char(char chr) noexcept
+inline void csv_record_tokenizer::push_char(char chr) noexcept
 {
     if (max_field_length_ && value_.size() == *max_field_length_) {
         is_truncated_ = true;
@@ -145,8 +142,7 @@ csv_record_tokenizer::push_char(char chr) noexcept
     }
 }
 
-void
-csv_record_tokenizer::reset(memory_span blob)
+void csv_record_tokenizer::reset(memory_span blob)
 {
     text_ = as_span<char const>(blob);
 

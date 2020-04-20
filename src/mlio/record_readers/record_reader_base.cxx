@@ -20,8 +20,7 @@
 namespace mlio {
 inline namespace v1 {
 
-std::optional<record>
-record_reader_base::read_record()
+std::optional<record> record_reader_base::read_record()
 {
     if (peeked_record_) {
         return std::exchange(peeked_record_, std::nullopt);
@@ -29,8 +28,7 @@ record_reader_base::read_record()
     return read_record_core();
 }
 
-std::optional<record>
-record_reader_base::peek_record()
+std::optional<record> record_reader_base::peek_record()
 {
     if (peeked_record_ == std::nullopt) {
         peeked_record_ = read_record_core();

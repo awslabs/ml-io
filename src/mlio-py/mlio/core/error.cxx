@@ -29,21 +29,18 @@ namespace {
 std::unordered_map<std::string, py::object> py_exc_types{};
 
 template<typename T>
-inline PyObject *
-register_exception(py::module &m, char const *name, PyObject *base)
+inline PyObject *register_exception(py::module &m, char const *name, PyObject *base)
 {
     auto r = py_exc_types.emplace(name, py::exception<T>{m, name, base});
 
     return r.first->second.ptr();
 }
 
-void
-throw_nested_error(std::exception const &exc, py::object const &py_exc);
+void throw_nested_error(std::exception const &exc, py::object const &py_exc);
 
-void
-set_nested_error(py::object const &outer_py_exc,
-                 std::exception const &nested_exc,
-                 char const *name)
+void set_nested_error(py::object const &outer_py_exc,
+                      std::exception const &nested_exc,
+                      char const *name)
 {
     py::object nested_py_exc = py_exc_types[name](nested_exc.what());
 
@@ -52,20 +49,17 @@ set_nested_error(py::object const &outer_py_exc,
     ::PyException_SetCause(outer_py_exc.ptr(), nested_py_exc.release().ptr());
 }
 
-void
-set_nested_system_error(py::object const &outer_py_exc,
-                        std::system_error const &nested_exc)
+void set_nested_system_error(py::object const &outer_py_exc, std::system_error const &nested_exc)
 {
-    py::object nested_py_exc = py::handle{::PyExc_OSError}(
-        nested_exc.code().value(), nested_exc.what());
+    py::object nested_py_exc =
+        py::handle{::PyExc_OSError}(nested_exc.code().value(), nested_exc.what());
 
     throw_nested_error(nested_exc, nested_py_exc);
 
     ::PyException_SetCause(outer_py_exc.ptr(), nested_py_exc.release().ptr());
 }
 
-void
-throw_nested_error(std::exception const &exc, py::object const &py_exc)
+void throw_nested_error(std::exception const &exc, py::object const &py_exc)
 {
     try {
         std::rethrow_if_nested(exc);
@@ -111,8 +105,7 @@ throw_nested_error(std::exception const &exc, py::object const &py_exc)
     }
 }
 
-void
-set_error(std::exception const &exc, char const *name)
+void set_error(std::exception const &exc, char const *name)
 {
     py::handle &py_exc_type = py_exc_types[name];
 
@@ -123,11 +116,9 @@ set_error(std::exception const &exc, char const *name)
     ::PyErr_SetObject(py_exc_type.ptr(), py_exc.ptr());
 }
 
-void
-set_system_error(std::system_error const &exc)
+void set_system_error(std::system_error const &exc)
 {
-    py::object py_exc =
-        py::handle{::PyExc_OSError}(exc.code().value(), exc.what());
+    py::object py_exc = py::handle{::PyExc_OSError}(exc.code().value(), exc.what());
 
     throw_nested_error(exc, py_exc);
 
@@ -136,8 +127,7 @@ set_system_error(std::system_error const &exc)
 
 }  // namespace
 
-void
-register_exceptions(py::module &m)
+void register_exceptions(py::module &m)
 {
     // clang-format off
 

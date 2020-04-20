@@ -33,8 +33,7 @@ py_device_array::~py_device_array()
     }
 }
 
-void *
-py_device_array::data() noexcept
+void *py_device_array::data() noexcept
 {
     if (span_.dtype() == data_type::string) {
         return make_or_get_string_buffer();
@@ -42,8 +41,7 @@ py_device_array::data() noexcept
     return span_.data();
 }
 
-void *
-py_device_array::make_or_get_string_buffer()
+void *py_device_array::make_or_get_string_buffer()
 {
     if (string_buf_.empty()) {
         string_buf_.reserve(span_.size());
@@ -58,8 +56,7 @@ py_device_array::make_or_get_string_buffer()
 
 namespace {
 
-py::buffer_info
-to_py_buffer(py_device_array &arr)
+py::buffer_info to_py_buffer(py_device_array &arr)
 {
     auto size = static_cast<py::ssize_t>(arr.size());
 
@@ -134,14 +131,12 @@ to_py_buffer(py_device_array &arr)
 
 }  // namespace
 
-void
-register_device_array(py::module &m)
+void register_device_array(py::module &m)
 {
-    py::class_<device_kind>(
-        m,
-        "DeviceKind",
-        "Represents a device kind that has data processing capabilities such "
-        "as CPU or CUDA.")
+    py::class_<device_kind>(m,
+                            "DeviceKind",
+                            "Represents a device kind that has data processing capabilities such "
+                            "as CPU or CUDA.")
         .def("__eq__",
              [](device_kind const &self, device_kind const &other) {
                  return self == other;
@@ -157,13 +152,10 @@ register_device_array(py::module &m)
                 return device_kind::cpu();
             },
             "Gets an instance for the CPU device kind.")
-        .def_property_readonly(
-            "name", &device_kind::name, "Gets the name of the device kind.");
+        .def_property_readonly("name", &device_kind::name, "Gets the name of the device kind.");
 
     py::class_<device>(
-        m,
-        "Device",
-        "Represents a particular data processing unit on the host system.")
+        m, "Device", "Represents a particular data processing unit on the host system.")
         .def(py::init<device_kind, std::size_t>(), "kind"_a, "id"_a)
         .def("__eq__",
              [](device const &self, device const &other) {
@@ -174,25 +166,18 @@ register_device_array(py::module &m)
                  return std::hash<device>{}(self);
              })
         .def("__repr__", &device::repr)
-        .def_property_readonly(
-            "kind", &device::kind, "Gets the kind of the device.")
-        .def_property_readonly(
-            "id", &device::id, "Gets the id of the device.");
+        .def_property_readonly("kind", &device::kind, "Gets the kind of the device.")
+        .def_property_readonly("id", &device::id, "Gets the id of the device.");
 
-    py::class_<py_device_array>(
-        m,
-        "DeviceArray",
-        py::buffer_protocol(),
-        "Represents a memory region of a specific data type that is stored "
-        "on a ``device``.")
+    py::class_<py_device_array>(m,
+                                "DeviceArray",
+                                py::buffer_protocol(),
+                                "Represents a memory region of a specific data type that is stored "
+                                "on a ``device``.")
+        .def_property_readonly("size", &py_device_array::size, "Gets the size of the array.")
+        .def_property_readonly("dtype", &py_device_array::dtype, "Gets the data type of the array.")
         .def_property_readonly(
-            "size", &py_device_array::size, "Gets the size of the array.")
-        .def_property_readonly("dtype",
-                               &py_device_array::dtype,
-                               "Gets the data type of the array.")
-        .def_property_readonly("device",
-                               &py_device_array::get_device,
-                               "Gets the device on which the array is stored.")
+            "device", &py_device_array::get_device, "Gets the device on which the array is stored.")
         .def_buffer(&to_py_buffer);
 }
 

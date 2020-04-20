@@ -45,16 +45,13 @@ public:
     ~stream_record_reader() override;
 
 public:
-    stream_record_reader &
-    operator=(stream_record_reader const &) = delete;
+    stream_record_reader &operator=(stream_record_reader const &) = delete;
 
-    stream_record_reader &
-    operator=(stream_record_reader &&) = delete;
+    stream_record_reader &operator=(stream_record_reader &&) = delete;
 
 private:
     MLIO_HIDDEN
-    std::optional<record>
-    read_record_core() final;
+    std::optional<record> read_record_core() final;
 
     /// When implemented in a derived class, tries to decode a record
     /// from the specified chunk.
@@ -65,20 +62,17 @@ private:
     ///     A boolean value indicating whether to ignore any leftover
     ///     bits than cannot be interpreted as a record. If false, the
     ///     reader should throw an exception with a descriptive message.
-    virtual std::optional<record>
-    decode_record(memory_slice &chunk, bool ignore_leftover) = 0;
+    virtual std::optional<record> decode_record(memory_slice &chunk, bool ignore_leftover) = 0;
 
 public:
     /// Gets the expected size of records read from the underlying @ref
     /// input_stream.
-    std::size_t
-    record_size_hint() const noexcept;
+    std::size_t record_size_hint() const noexcept;
 
     /// @remark
     ///     Helps the @ref stream_record_reader to optimize how much it
     ///     should read-ahead from the underlying @ref input_stream.
-    void
-    set_record_size_hint(std::size_t value) noexcept;
+    void set_record_size_hint(std::size_t value) noexcept;
 
 private:
     std::unique_ptr<detail::chunk_reader> chunk_reader_;

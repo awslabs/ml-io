@@ -31,11 +31,9 @@ public:
     ~arrow_buffer() final;
 
 public:
-    arrow_buffer &
-    operator=(arrow_buffer const &) = delete;
+    arrow_buffer &operator=(arrow_buffer const &) = delete;
 
-    arrow_buffer &
-    operator=(arrow_buffer &&) = delete;
+    arrow_buffer &operator=(arrow_buffer &&) = delete;
 
 private:
     mlio::memory_slice slice_;

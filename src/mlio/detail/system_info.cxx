@@ -27,8 +27,7 @@ namespace mlio {
 inline namespace v1 {
 namespace detail {
 
-std::size_t
-get_total_ram() noexcept
+std::size_t get_total_ram() noexcept
 {
     struct ::sysinfo info {};
     if (::sysinfo(&info) == -1) {
@@ -52,8 +51,7 @@ namespace mlio {
 inline namespace v1 {
 namespace detail {
 
-std::size_t
-get_total_ram() noexcept
+std::size_t get_total_ram() noexcept
 {
     std::array<int, 2> name{CTL_HW, HW_MEMSIZE};
 

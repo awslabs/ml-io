@@ -33,11 +33,9 @@ public:
     ~not_supported_error() override;
 
 public:
-    not_supported_error &
-    operator=(not_supported_error const &) = default;
+    not_supported_error &operator=(not_supported_error const &) = default;
 
-    not_supported_error &
-    operator=(not_supported_error &&) = default;
+    not_supported_error &operator=(not_supported_error &&) = default;
 };
 
 }  // namespace v1

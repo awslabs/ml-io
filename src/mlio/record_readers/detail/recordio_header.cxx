@@ -23,8 +23,7 @@ namespace mlio {
 inline namespace v1 {
 namespace detail {
 
-std::optional<recordio_header>
-decode_recordio_header(memory_span bits)
+std::optional<recordio_header> decode_recordio_header(memory_span bits)
 {
     auto ints = as_span<std::uint32_t const>(bits);
     if (ints.size() < 2) {
@@ -37,8 +36,7 @@ decode_recordio_header(memory_span bits)
         (byte_order::host == byte_order::little ? 0xced7'230a : 0x0a23'd7ce);
 
     if (ints[0] != magic) {
-        throw corrupt_header_error{
-            "The header does not start with the RecordIO magic number."};
+        throw corrupt_header_error{"The header does not start with the RecordIO magic number."};
     }
 
     auto data = little_to_host_order(ints[1]);

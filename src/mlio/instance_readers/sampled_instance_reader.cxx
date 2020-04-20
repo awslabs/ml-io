@@ -23,13 +23,12 @@ namespace mlio {
 inline namespace v1 {
 namespace detail {
 
-sampled_instance_reader::sampled_instance_reader(
-    data_reader_params const &prm, std::unique_ptr<instance_reader> &&inner)
+sampled_instance_reader::sampled_instance_reader(data_reader_params const &prm,
+                                                 std::unique_ptr<instance_reader> &&inner)
     : params_{&prm}, inner_{std::move(inner)}
 {
     if (params_->sample_ratio <= 0.0F || params_->sample_ratio >= 1.0F) {
-        throw std::invalid_argument{
-            "The sample ratio must be greater than 0 and less than 1."};
+        throw std::invalid_argument{"The sample ratio must be greater than 0 and less than 1."};
     }
 
     buffer_.reserve(num_instances_to_read_);
@@ -37,8 +36,7 @@ sampled_instance_reader::sampled_instance_reader(
     buffer_pos_ = buffer_.end();
 }
 
-std::optional<instance>
-sampled_instance_reader::read_instance_core()
+std::optional<instance> sampled_instance_reader::read_instance_core()
 {
     if (buffer_pos_ == buffer_.end()) {
         fill_buffer_from_inner();
@@ -51,8 +49,7 @@ sampled_instance_reader::read_instance_core()
     return std::exchange(*buffer_pos_++, {});
 }
 
-void
-sampled_instance_reader::fill_buffer_from_inner()
+void sampled_instance_reader::fill_buffer_from_inner()
 {
     buffer_.clear();
 
@@ -66,8 +63,8 @@ sampled_instance_reader::fill_buffer_from_inner()
     }
 
     if (!buffer_.empty()) {
-        auto num_keep = static_cast<std::ptrdiff_t>(
-            *params_->sample_ratio * static_cast<float>(buffer_.size()));
+        auto num_keep = static_cast<std::ptrdiff_t>(*params_->sample_ratio *
+                                                    static_cast<float>(buffer_.size()));
 
         buffer_.erase(buffer_.begin() + num_keep, buffer_.end());
     }
@@ -75,8 +72,7 @@ sampled_instance_reader::fill_buffer_from_inner()
     buffer_pos_ = buffer_.begin();
 }
 
-void
-sampled_instance_reader::reset_core() noexcept
+void sampled_instance_reader::reset_core() noexcept
 {
     inner_->reset();
 

@@ -31,19 +31,16 @@
 namespace mlio {
 inline namespace v1 {
 
-example::example(intrusive_ptr<schema const> shm,
-                 std::vector<intrusive_ptr<tensor>> &&features)
+example::example(intrusive_ptr<schema const> shm, std::vector<intrusive_ptr<tensor>> &&features)
     : schema_{std::move(shm)}, features_{std::move(features)}
 {
     if (schema_->attributes().size() != features_.size()) {
         throw std::invalid_argument{
-            "The number of attributes does not match the number of "
-            "specified features."};
+            "The number of attributes does not match the number of specified features."};
     }
 }
 
-intrusive_ptr<tensor>
-example::find_feature(std::string const &name) const noexcept
+intrusive_ptr<tensor> example::find_feature(std::string const &name) const noexcept
 {
     std::optional<std::size_t> idx = schema_->get_index(name);
     if (idx == std::nullopt) {
@@ -52,8 +49,7 @@ example::find_feature(std::string const &name) const noexcept
     return features_[*idx];
 }
 
-std::string
-example::repr() const
+std::string example::repr() const
 {
     auto dsc_beg = schema_->attributes().begin();
     auto dsc_end = schema_->attributes().end();

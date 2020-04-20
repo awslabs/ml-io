@@ -27,8 +27,7 @@ namespace detail {
 
 chunk_reader::~chunk_reader() = default;
 
-std::unique_ptr<chunk_reader>
-make_chunk_reader(intrusive_ptr<input_stream> strm)
+std::unique_ptr<chunk_reader> make_chunk_reader(intrusive_ptr<input_stream> strm)
 {
     // See if we can zero-copy read the whole stream (e.g. a
     // memory-mapped file). In such case we can simply return a single

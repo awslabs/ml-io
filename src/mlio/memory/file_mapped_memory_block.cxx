@@ -50,19 +50,16 @@ file_mapped_memory_block::~file_mapped_memory_block()
     }
 }
 
-void
-file_mapped_memory_block::init_memory_map()
+void file_mapped_memory_block::init_memory_map()
 {
     file_descriptor fd = ::open(pathname_.c_str(), O_RDONLY | O_CLOEXEC);
     if (fd == -1) {
-        throw std::system_error{current_error_code(),
-                                "The file cannot be opened."};
+        throw std::system_error{current_error_code(), "The file cannot be opened."};
     }
 
     struct ::stat buf {};
     if (::fstat(fd.get(), &buf) == -1) {
-        throw std::system_error{current_error_code(),
-                                "The size of the file cannot be retrieved."};
+        throw std::system_error{current_error_code(), "The size of the file cannot be retrieved."};
     }
 
     size_ = static_cast<std::size_t>(buf.st_size);
@@ -70,12 +67,10 @@ file_mapped_memory_block::init_memory_map()
         return;
     }
 
-    void *address =
-        ::mmap(nullptr, size_, PROT_READ, MAP_PRIVATE, fd.get(), 0);
+    void *address = ::mmap(nullptr, size_, PROT_READ, MAP_PRIVATE, fd.get(), 0);
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
     if (address == MAP_FAILED) {
-        throw std::system_error{current_error_code(),
-                                "The file cannot be memory mapped."};
+        throw std::system_error{current_error_code(), "The file cannot be memory mapped."};
     }
 
     data_ = static_cast<std::byte *>(address);

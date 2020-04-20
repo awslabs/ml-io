@@ -25,12 +25,11 @@ using namespace pybind11::literals;
 namespace pymlio {
 namespace {
 
-attribute
-make_attribute(std::string name,
-               data_type dt,
-               size_vector shape,
-               std::optional<ssize_vector> strides,
-               bool sparse)
+attribute make_attribute(std::string name,
+                         data_type dt,
+                         size_vector shape,
+                         std::optional<ssize_vector> strides,
+                         bool sparse)
 {
     attribute_builder bld{std::move(name), dt, std::move(shape)};
 
@@ -43,8 +42,7 @@ make_attribute(std::string name,
 
 }  // namespace
 
-void
-register_schema(py::module &m)
+void register_schema(py::module &m)
 {
     py::class_<attribute>(m,
                           "Attribute",
@@ -82,9 +80,7 @@ register_schema(py::module &m)
     py::implicitly_convertible<py::list, std::vector<attribute>>();
 
     py::class_<schema, intrusive_ptr<schema>>(
-        m,
-        "Schema",
-        "Represents a schema that contains the attributes of a dataset.")
+        m, "Schema", "Represents a schema that contains the attributes of a dataset.")
         .def(py::init<std::vector<attribute>>(), "attrs"_a)
         .def("get_index",
              &schema::get_index,

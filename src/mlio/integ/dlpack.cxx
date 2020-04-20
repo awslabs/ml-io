@@ -34,8 +34,7 @@ inline namespace v1 {
 namespace detail {
 namespace {
 
-inline ::DLDeviceType
-as_dl_device(device_kind knd)
+inline ::DLDeviceType as_dl_device(device_kind knd)
 {
     if (knd == device_kind::cpu()) {
         return ::kDLCPU;
@@ -44,20 +43,17 @@ as_dl_device(device_kind knd)
     throw not_supported_error{"The device kind is not supported by DLPack."};
 }
 
-inline ::DLContext
-as_dl_context(device dev)
+inline ::DLContext as_dl_context(device dev)
 {
     return ::DLContext{as_dl_device(dev.kind()), static_cast<int>(dev.id())};
 }
 
 template<data_type dt>
-inline ::DLDataType
-as_dl_data_type(::DLDataTypeCode code)
+inline ::DLDataType as_dl_data_type(::DLDataTypeCode code)
 {
     auto uint_code = static_cast<std::uint8_t>(code);
 
-    std::uint8_t bit_size =
-        std::numeric_limits<std::byte>::digits * sizeof(data_type_t<dt>);
+    std::uint8_t bit_size = std::numeric_limits<std::byte>::digits * sizeof(data_type_t<dt>);
 
     return ::DLDataType{uint_code, bit_size, 1};
 }
@@ -102,20 +98,17 @@ as_dl_data_type(data_type dt)
 
 // clang-format on
 
-std::int64_t *
-cast_shape(size_vector const &shape) noexcept
+std::int64_t *cast_shape(size_vector const &shape) noexcept
 {
     if (shape.empty()) {
         return nullptr;
     }
 
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
-    return const_cast<std::int64_t *>(
-        reinterpret_cast<std::int64_t const *>(shape.data()));
+    return const_cast<std::int64_t *>(reinterpret_cast<std::int64_t const *>(shape.data()));
 }
 
-std::int64_t *
-cast_strides(ssize_vector const &strides) noexcept
+std::int64_t *cast_strides(ssize_vector const &strides) noexcept
 {
     if (strides.empty()) {
         return nullptr;
@@ -127,8 +120,7 @@ cast_strides(ssize_vector const &strides) noexcept
 #endif
 
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
-    return const_cast<std::int64_t *>(
-        reinterpret_cast<std::int64_t const *>(strides.data()));
+    return const_cast<std::int64_t *>(reinterpret_cast<std::int64_t const *>(strides.data()));
 
 #if defined(__GNUC__) && !defined(__clang__)
 #pragma GCC diagnostic pop
@@ -146,21 +138,17 @@ struct dl_pack_context {
 struct as_dlpack_op : public tensor_visitor {
     using tensor_visitor::visit;
 
-    void
-    visit(tensor &) override
+    void visit(tensor &) override
     {
-        throw std::invalid_argument{
-            "DLPack is only supported for dense tensors."};
+        throw std::invalid_argument{"DLPack is only supported for dense tensors."};
     }
 
-    void
-    visit(dense_tensor &tsr) override;
+    void visit(dense_tensor &tsr) override;
 
     ::DLManagedTensor *mt{};
 };
 
-void
-as_dlpack_op::visit(dense_tensor &tsr)
+void as_dlpack_op::visit(dense_tensor &tsr)
 {
     auto ctx = std::make_unique<dl_pack_context>();
 
@@ -188,15 +176,13 @@ as_dlpack_op::visit(dense_tensor &tsr)
 }  // namespace
 }  // namespace detail
 
-::DLManagedTensor *
-as_dlpack(tensor &tsr, std::size_t version)
+::DLManagedTensor *as_dlpack(tensor &tsr, std::size_t version)
 {
 #if SIZE_MAX != UINT64_MAX
     throw not_supported_error{"DLPack is only supported on 64-bit platforms."};
 #else
     if (version != DLPACK_VERSION) {
-        throw not_supported_error{
-            "The requested DLPack version is not supported."};
+        throw not_supported_error{"The requested DLPack version is not supported."};
     }
 
     detail::as_dlpack_op op{};
@@ -205,12 +191,6 @@ as_dlpack(tensor &tsr, std::size_t version)
 
     return op.mt;
 #endif
-}
-
-intrusive_ptr<tensor>
-as_tensor(::DLManagedTensor *, std::size_t)
-{
-    throw not_supported_error{"Importing DLPack is not supported yet!"};
 }
 
 }  // namespace v1

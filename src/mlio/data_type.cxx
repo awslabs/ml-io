@@ -21,8 +21,7 @@
 namespace mlio {
 inline namespace v1 {
 
-data_type
-infer_data_type(std::string_view s) noexcept
+data_type infer_data_type(std::string_view s) noexcept
 {
     if (s.empty()) {
         return data_type::string;

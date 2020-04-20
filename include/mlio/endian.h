@@ -28,22 +28,19 @@ inline namespace v1 {
 namespace detail {
 
 MLIO_API
-inline std::uint16_t
-reverse_bytes(std::uint16_t value) noexcept
+inline std::uint16_t reverse_bytes(std::uint16_t value) noexcept
 {
     return __builtin_bswap16(value);
 }
 
 MLIO_API
-inline std::uint32_t
-reverse_bytes(std::uint32_t value) noexcept
+inline std::uint32_t reverse_bytes(std::uint32_t value) noexcept
 {
     return __builtin_bswap32(value);
 }
 
 MLIO_API
-inline std::uint64_t
-reverse_bytes(std::uint64_t value) noexcept
+inline std::uint64_t reverse_bytes(std::uint64_t value) noexcept
 {
     return __builtin_bswap64(value);
 }
@@ -53,22 +50,19 @@ reverse_bytes(std::uint64_t value) noexcept
 #if MLIO_BYTE_ORDER_HOST == MLIO_BYTE_ORDER_LITTLE
 
 MLIO_API
-inline std::uint16_t
-little_to_host_order(std::uint16_t value) noexcept
+inline std::uint16_t little_to_host_order(std::uint16_t value) noexcept
 {
     return value;
 }
 
 MLIO_API
-inline std::uint32_t
-little_to_host_order(std::uint32_t value) noexcept
+inline std::uint32_t little_to_host_order(std::uint32_t value) noexcept
 {
     return value;
 }
 
 MLIO_API
-inline std::uint64_t
-little_to_host_order(std::uint64_t value) noexcept
+inline std::uint64_t little_to_host_order(std::uint64_t value) noexcept
 {
     return value;
 }
@@ -76,22 +70,19 @@ little_to_host_order(std::uint64_t value) noexcept
 #else
 
 MLIO_API
-inline std::uint16_t
-little_to_host_order(std::uint16_t value) noexcept
+inline std::uint16_t little_to_host_order(std::uint16_t value) noexcept
 {
     return detail::reverse_bytes(value);
 }
 
 MLIO_API
-inline std::uint32_t
-little_to_host_order(std::uint32_t value) noexcept
+inline std::uint32_t little_to_host_order(std::uint32_t value) noexcept
 {
     return detail::reverse_bytes(value);
 }
 
 MLIO_API
-inline std::uint64_t
-little_to_host_order(std::uint64_t value) noexcept
+inline std::uint64_t little_to_host_order(std::uint64_t value) noexcept
 {
     return detail::reverse_bytes(value);
 }

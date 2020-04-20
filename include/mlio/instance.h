@@ -37,27 +37,22 @@ public:
     ///     The position of the instance in the data store.
     /// @param bits
     ///     The raw data of the instance.
-    explicit instance(data_store const &ds,
-                      std::size_t index,
-                      memory_slice &&bits) noexcept
+    explicit instance(data_store const &ds, std::size_t index, memory_slice &&bits) noexcept
         : data_store_{&ds}, index_{index}, bits_{std::move(bits)}
     {}
 
 public:
-    data_store const &
-    get_data_store() const noexcept
+    data_store const &get_data_store() const noexcept
     {
         return *data_store_;
     }
 
-    std::size_t
-    index() const noexcept
+    std::size_t index() const noexcept
     {
         return index_;
     }
 
-    memory_slice const &
-    bits() const noexcept
+    memory_slice const &bits() const noexcept
     {
         return bits_;
     }
