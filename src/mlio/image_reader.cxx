@@ -394,8 +394,6 @@ bool image_reader::crop(cv::Mat &src, cv::Mat &dst, instance const &ins) const
 
 #else
 
-// clang-format off
-
 #include "mlio/not_supported_error.h"
 #include "mlio/record_readers/record_reader.h"
 
@@ -415,26 +413,22 @@ inline namespace v1 {
 image_reader::image_reader(data_reader_params prm, image_reader_params)
     : parallel_data_reader{std::move(prm)}, params_{}, error_bad_batch_{}
 {
-    throw not_supported_error{
-        "ML-IO has not been built with image reader support."};
+    throw not_supported_error{"ML-IO has not been built with image reader support."};
 }
 
 image_reader::~image_reader() = default;
 
-intrusive_ptr<record_reader>
-image_reader::make_record_reader(data_store const &)
-{
-   return nullptr;
-}
-
-intrusive_ptr<schema const>
-image_reader::infer_schema(std::optional<instance> const &)
+intrusive_ptr<record_reader> image_reader::make_record_reader(data_store const &)
 {
     return nullptr;
 }
 
-intrusive_ptr<example>
-image_reader::decode(instance_batch const &) const
+intrusive_ptr<schema const> image_reader::infer_schema(std::optional<instance> const &)
+{
+    return nullptr;
+}
+
+intrusive_ptr<example> image_reader::decode(instance_batch const &) const
 {
     return nullptr;
 }

@@ -220,8 +220,6 @@ intrusive_ptr<s3_client> s3_client_builder::build()
 
 #else
 
-// clang-format off
-
 #include "mlio/not_supported_error.h"
 
 namespace Aws::S3 {
@@ -246,36 +244,30 @@ s3_client::s3_client(std::unique_ptr<Aws::S3::S3Client>) noexcept : core_{}
 
 s3_client::~s3_client() = default;
 
-void
 // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
-s3_client::list_objects(std::string_view,
-                        std::string_view,
-                        std::function<void(std::string)> const &) const
+void s3_client::list_objects(std::string_view,
+                             std::string_view,
+                             std::function<void(std::string)> const &) const
 {}
 
-std::size_t
 // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
-s3_client::read_object(std::string_view,
-                       std::string_view,
-                       std::string_view,
-                       std::size_t,
-                       mutable_memory_span) const
+std::size_t s3_client::read_object(std::string_view,
+                                   std::string_view,
+                                   std::string_view,
+                                   std::size_t,
+                                   mutable_memory_span) const
 {
     return 0;
 }
 
-std::size_t
 // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
-s3_client::read_object_size(std::string_view,
-                            std::string_view,
-                            std::string_view) const
+std::size_t s3_client::read_object_size(std::string_view, std::string_view, std::string_view) const
 {
     return 0;
 }
 
-intrusive_ptr<s3_client>
 // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
-s3_client_builder::build()
+intrusive_ptr<s3_client> s3_client_builder::build()
 {
     throw not_supported_error{"ML-IO has not been built with S3 support."};
 }
@@ -284,7 +276,5 @@ s3_client_builder::build()
 
 }  // namespace v1
 }  // namespace mlio
-
-// clang-format on
 
 #endif

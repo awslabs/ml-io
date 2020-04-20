@@ -70,8 +70,10 @@ std::unordered_map<std::string, std::atomic_ptrdiff_t> fifo_ids_{};
 }  // namespace
 }  // namespace detail
 
-intrusive_ptr<sagemaker_pipe_input_stream> make_sagemaker_pipe_input_stream(
-    std::string pathname, std::chrono::seconds timeout, std::optional<std::size_t> fifo_id)
+intrusive_ptr<sagemaker_pipe_input_stream>
+make_sagemaker_pipe_input_stream(std::string pathname,
+                                 std::chrono::seconds timeout,
+                                 std::optional<std::size_t> fifo_id)
 {
     return sagemaker_pipe_input_stream_access::make(std::move(pathname), timeout, fifo_id);
 }

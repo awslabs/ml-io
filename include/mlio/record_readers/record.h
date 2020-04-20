@@ -63,14 +63,12 @@ public:
 public:
     // clang-format off
 
-    memory_slice const &
-    payload() const & noexcept
+    memory_slice const & payload() const & noexcept
     {
         return payload_;
     }
 
-    memory_slice &&
-    payload() && noexcept
+    memory_slice && payload() && noexcept
     {
         return std::move(payload_);
     }

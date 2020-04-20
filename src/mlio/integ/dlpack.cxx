@@ -89,8 +89,7 @@ as_dl_data_type(data_type dt)
     case data_type::uint64:
         return as_dl_data_type<data_type::uint64> (::kDLUInt);
     case data_type::string:
-        throw not_supported_error{
-            "The string data type is not supported by DLPack."};
+        throw not_supported_error{"The string data type is not supported by DLPack."};
     }
 
     throw not_supported_error{"The tensor has an unknown data type."};
