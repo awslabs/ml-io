@@ -58,11 +58,11 @@ def test_data_reader_params_members():
     assert rdr_prm.num_instances_to_read is None
     assert rdr_prm.shard_index == 0
     assert rdr_prm.num_shards == 0
+    assert rdr_prm.sample_ratio is None
     assert rdr_prm.shuffle_instances is False
     assert rdr_prm.shuffle_window == 0
     assert rdr_prm.shuffle_seed is None
     assert rdr_prm.reshuffle_each_epoch is True
-    assert rdr_prm.subsample_ratio is None
 
     rdr_prm.batch_size = 2
     assert rdr_prm.batch_size == 2
