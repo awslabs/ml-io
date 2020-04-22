@@ -570,14 +570,16 @@ std::optional<std::size_t> csv_reader::decode_prl(decoder_state &state,
     auto worker = [this, &state, &skip_batch](auto &sub_range) {
         csv_record_tokenizer tokenizer{params_};
 
-        auto [col_beg, col_end] = make_column_iterators();
+        // Both GCC and clang have trouble handling structured bindings
+        // in lambdas.
+        auto iter_pair = make_column_iterators();
+
+        using ColIt = std::remove_reference_t<decltype(std::get<0>(iter_pair))>;
 
         for (auto ins_zip : sub_range) {
-            using ColIt = std::remove_reference_t<decltype(col_beg)>;
-
             // Both GCC and clang have a bug that prevents using class
             // template argument deduction (CTAD) with nested types.
-            decoder<ColIt> dc{state, tokenizer, col_beg, col_end};
+            decoder<ColIt> dc{state, tokenizer, std::get<0>(iter_pair), std::get<1>(iter_pair)};
             if (!dc.decode(std::get<0>(ins_zip), std::get<1>(ins_zip))) {
                 // If we failed to decode the instance, we can
                 // terminate the task and skip this batch.
