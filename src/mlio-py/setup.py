@@ -55,7 +55,7 @@ setup(distclass=Distribution,
 
       # Metadata
       name='mlio',
-      version=stamp_dev_version('0.4.1.dev'),
+      version=stamp_dev_version('0.5.0'),
       description='A high performance data access library for machine learning tasks',  # noqa: E501
       long_description=long_description,
       long_description_content_type='text/markdown',
@@ -87,7 +87,7 @@ setup(distclass=Distribution,
           'tensorflow': ['tensorflow>=1.9.0'],
           'torch': ['torch>=1.0.0'],
           'mxnet': ['mxnet>=1.4.1'],
-          'pyarrow': ['pyarrow==0.15.1'],
+          'pyarrow': ['pyarrow==0.16.0'],
       },
 
       # Add our externally-built extension modules to the package.
