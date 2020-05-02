@@ -17,7 +17,6 @@
 
 #include <algorithm>
 #include <cerrno>
-#include <cstring>
 #include <iterator>
 #include <memory>
 #include <stdexcept>
@@ -28,6 +27,7 @@
 #include <sys/stat.h>
 
 #include <fmt/format.h>
+#include <strnatcmp.h>
 
 #include "mlio/config.h"
 #include "mlio/data_stores/data_store.h"
@@ -65,16 +65,9 @@ std::vector<char const *> get_pathname_c_strs(stdx::span<std::string const> path
     return c_strs;
 }
 
-#ifdef MLIO_PLATFORM_LINUX
-#define mlio_pathname_comparer ::strverscmp
-#else
-#define mlio_pathname_comparer ::strcmp
-#endif
-
 inline int ver_sort(::FTSENT const **a, ::FTSENT const **b)
 {
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
-    return mlio_pathname_comparer((*a)->fts_name, (*b)->fts_name);
+    return ::strnatcmp((*a)->fts_name, (*b)->fts_name);
 }
 
 auto make_fts(stdx::span<std::string const> pathnames)

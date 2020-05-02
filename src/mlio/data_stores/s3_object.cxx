@@ -16,13 +16,14 @@
 #include "mlio/data_stores/s3_object.h"
 
 #include <algorithm>
-#include <cstring>
 #include <stdexcept>
 #include <utility>
 
+#include <fnmatch.h>
+
 #include <fmt/format.h>
 #include <fmt/ostream.h>
-#include <fnmatch.h>
+#include <strnatcmp.h>
 
 #include "mlio/data_stores/detail/util.h"
 #include "mlio/detail/s3_utils.h"
@@ -119,12 +120,6 @@ void list_s3_objects(list_s3_objects_params const &prm,
 }  // namespace
 }  // namespace detail
 
-#ifdef MLIO_PLATFORM_LINUX
-#define mlio_uri_comparer ::strverscmp
-#else
-#define mlio_uri_comparer ::strcmp
-#endif
-
 std::vector<intrusive_ptr<data_store>> list_s3_objects(list_s3_objects_params const &prm)
 {
     std::vector<std::string> object_uris{};
@@ -134,7 +129,7 @@ std::vector<intrusive_ptr<data_store>> list_s3_objects(list_s3_objects_params co
     }
 
     std::sort(object_uris.begin(), object_uris.end(), [](auto const &a, auto const &b) {
-        return mlio_uri_comparer(a.c_str(), b.c_str()) < 0;
+        return ::strnatcmp(a.c_str(), b.c_str()) < 0;
     });
 
     auto clt = wrap_intrusive(prm.client);

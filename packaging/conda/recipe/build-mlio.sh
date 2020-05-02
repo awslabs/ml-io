@@ -15,7 +15,7 @@ cmake -GNinja\
       -DCMAKE_TOOLCHAIN_FILE="$_toolchain_file"\
       "$SRC_DIR/third-party"
 
-for _dep in absl dlpack fmt gtest pybind11; do
+for _dep in absl dlpack fmt gtest natsort pybind11; do
     cmake --build . --target $_dep
 done
 

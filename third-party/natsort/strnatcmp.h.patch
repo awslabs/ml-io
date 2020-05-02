@@ -1,0 +1,24 @@
+*** strnatcmp.h	2020-05-02 02:29:41.043873565 +0000
+--- strnatcmp_patched.h	2020-05-02 02:29:33.783857005 +0000
+***************
+*** 20,25 ****
+--- 20,28 ----
+    3. This notice may not be removed or altered from any source distribution.
+  */
+  
++ #ifdef __cplusplus
++ extern "C" {
++ #endif
+  
+  /* CUSTOMIZATION SECTION
+   *
+***************
+*** 29,31 ****
+--- 32,38 ----
+  
+  int strnatcmp(nat_char const *a, nat_char const *b);
+  int strnatcasecmp(nat_char const *a, nat_char const *b);
++ 
++ #ifdef __cplusplus
++ }
++ #endif

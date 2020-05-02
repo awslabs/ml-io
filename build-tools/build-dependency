@@ -8,6 +8,7 @@ declare -r _valid_dependencies=(
     dlpack
     fmt
     gtest
+    natsort
     protobuf
     pybind11
     tbb)

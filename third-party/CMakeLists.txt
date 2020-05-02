@@ -105,6 +105,21 @@ ExternalProject_Add(
         -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
 )
 
+ExternalProject_Add(
+    #NAME
+        natsort
+    PREFIX
+        ${CMAKE_CURRENT_BINARY_DIR}
+    DOWNLOAD_COMMAND
+        ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/natsort <SOURCE_DIR>
+    PATCH_COMMAND
+        patch < strnatcmp.h.patch
+    CMAKE_ARGS
+        -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
+)
+
 include(ProcessorCount)
 
 ProcessorCount(N)

@@ -114,7 +114,8 @@ endif()
 
 target_link_libraries(mlio
     PRIVATE
-        absl::strings dlpack::dlpack fmt::fmt protobuf::libprotobuf TBB::tbb
+        absl::strings dlpack::dlpack fmt::fmt natsort::strnatcmp
+        protobuf::libprotobuf TBB::tbb
 )
 
 target_link_libraries(mlio
