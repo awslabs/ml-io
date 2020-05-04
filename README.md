@@ -187,8 +187,8 @@ for epoch in range(num_epochs):
         ...
     reader.reset()
     
- # Optionally dispose internal data structures used by AWS C++ SDK (recommended).
- mlio.dispose_aws_sdk()
+ # Optionally deallocate internal data structures used by AWS C++ SDK (recommended).
+ mlio.deallocate_aws_sdk()
  ```
 
 ### Reading Parquet Files over Amazon SageMaker Pipe Mode with Apache Arrow

@@ -2,36 +2,35 @@
 
 set -o errexit
 
-declare -r _valid_dependencies=(
-    absl
-    awssdk
-    dlpack
-    fmt
-    gtest
-    natsort
-    protobuf
-    pybind11
-    tbb)
+declare -r _valid_dependencies=(absl
+                                awssdk
+                                dlpack
+                                fmt
+                                gtest
+                                natsort
+                                protobuf
+                                pybind11
+                                tbb)
 
 function _print_usage
 {
-    local _dep
+    local dep
 
     printf "Usage: %s DIRECTORY [all|DEPENDENCY...]\n\nDependencies:\n" "$(basename "$0")"
 
-    for _dep in "${_valid_dependencies[@]}"; do
-        printf "  %s\n" "$_dep"
+    for dep in "${_valid_dependencies[@]}"; do
+        printf "  %s\n" "$dep"
     done
 }
 
-function _exit_usage
+function _exit
 {
     _print_usage
 
     exit 0
 }
 
-function _exit_usage_error
+function _exit_error
 {
     _print_usage >&2
 
@@ -40,52 +39,52 @@ function _exit_usage_error
 
 function _check_dependency
 {
-    local _dep
+    local dep
 
-    for _dep in "${_valid_dependencies[@]}"; do
-        if [[ $1 == "$_dep" ]]; then
+    for dep in "${_valid_dependencies[@]}"; do
+        if [[ $1 == "$dep" ]]; then
             return
         fi
     done
 
     printf "%s is not a valid dependency name.\n\n" "$1" >&2
 
-    _exit_usage_error
+    _exit_error
 }
 
 function _check_dependencies
 {
-    local _dep
+    local dep
 
-    for _dep; do
-        _check_dependency "$_dep"
+    for dep; do
+        _check_dependency "$dep"
     done
 }
 
 function _build_dependencies
 {
-    local _dep
+    local dep
 
     cmake -GNinja -S "$(cd "$(dirname "$0")" && pwd)/../third-party" -B "$_target_dir"
 
-    for _dep; do
-        cmake --build "$_target_dir" --target "$_dep"
+    for dep; do
+        cmake --build "$_target_dir" --target "$dep"
     done
 }
 
 function _main
 {
-    local _deps
+    local deps
 
     if [[ $# -eq 0 ]]; then
-        _exit_usage_error
+        _exit_error
     fi
 
     if [[ $# -eq 1 ]]; then
         if [[ $1 == -h || $1 == --help ]]; then
-            _exit_usage
+            _exit
         else
-            _exit_usage_error
+            _exit_error
         fi
     fi
 
@@ -94,13 +93,13 @@ function _main
     shift
 
     if [[ $# -eq 1 && $1 == all ]]; then
-        _deps=("${_valid_dependencies[@]}")
+        deps=("${_valid_dependencies[@]}")
     else
-        _deps=("$@")
+        deps=("$@")
     fi
 
-    _check_dependencies "${_deps[@]}"
-    _build_dependencies "${_deps[@]}"
+    _check_dependencies "${deps[@]}"
+    _build_dependencies "${deps[@]}"
 }
 
 _main "$@"

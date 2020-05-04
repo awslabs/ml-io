@@ -15,7 +15,7 @@ if(@MLIO_STATIC_LIB@)
     find_dependency(Threads)
     find_dependency(ZLIB)
 
-    if(@MLIO_BUILD_S3_SUPPORT@)
+    if(@MLIO_BUILD_S3@)
         find_dependency(AWSSDK 1.7 COMPONENTS s3)
     endif()
 endif()

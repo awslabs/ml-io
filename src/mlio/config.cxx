@@ -13,25 +13,28 @@
  * language governing permissions and limitations under the License.
  */
 
-#pragma once
-
 #include "mlio/config.h"
 
 namespace mlio {
 inline namespace v1 {
 
-/// Initializes the internal data structures needed for the proper
-/// operation of the library.
-MLIO_API
-void initialize();
+bool supports_s3() noexcept
+{
+#ifdef MLIO_BUILD_S3
+    return true;
+#else
+    return false;
+#endif
+}
 
-/// Initializes AWS C++ SDK.
-MLIO_API
-void initialize_aws_sdk();
-
-/// Deallocates the internal data structures used by AWS C++ SDK.
-MLIO_API
-void deallocate_aws_sdk();
+bool supports_image_reader() noexcept
+{
+#ifdef MLIO_BUILD_IMAGE_READER
+    return true;
+#else
+    return false;
+#endif
+}
 
 }  // namespace v1
 }  // namespace mlio

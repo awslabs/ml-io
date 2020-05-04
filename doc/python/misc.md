@@ -3,7 +3,7 @@
   * [S3Client](#S3Client)
 * [Functions](#Functions)
     * [initialize_aws_sdk](#initialize_aws_sdk)
-    * [dispose_aws_sdk](#dispose_aws_sdk)
+    * [deallocate_aws_sdk](#dispose_aws_sdk)
 
 This page describes a list of types and functions that do not fall under a specific category.
 
@@ -34,9 +34,9 @@ Initializes AWS C++ SDK. If you are using ML-IO along with another library or fr
 initialize_aws_sdk()
 ```
 
-#### dispose_aws_sdk
-Disposes the internal data structures used by AWS C++ SDK. It is recommended to call this function when you no longer use an [S3Client](#S3Client).
+#### deallocate_aws_sdk
+Deallocates the internal data structures used by AWS C++ SDK. It is recommended to call this function when you no longer use an [S3Client](#S3Client).
 
 ```python
-dispose_aws_sdk()
+deallocate_aws_sdk()
 ```

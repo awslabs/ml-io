@@ -66,10 +66,12 @@ from mlio._core import\
     StreamError,\
     Tensor,\
     TextLineReader,\
-    dispose_aws_sdk,\
+    deallocate_aws_sdk,\
     initialize_aws_sdk,\
     list_files,\
-    list_s3_objects
+    list_s3_objects,\
+    supports_image_reader,\
+    supports_s3
 
 
 __all__ = [
@@ -122,10 +124,12 @@ __all__ = [
     'StreamError',
     'Tensor',
     'TextLineReader',
-    'dispose_aws_sdk',
+    'deallocate_aws_sdk',
     'initialize_aws_sdk',
     'list_files',
-    'list_s3_objects']
+    'list_s3_objects',
+    'supports_image_reader',
+    'supports_s3']
 
 
 _logger = logging.getLogger("mlio")

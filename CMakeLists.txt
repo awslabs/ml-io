@@ -49,8 +49,8 @@ cmake_dependent_option(
 option(MLIO_INCLUDE_TESTS "If set, generates build target for the tests." ON)
 option(MLIO_INCLUDE_DOC "If set, generates build target for the documentation.")
 
-option(MLIO_BUILD_IMAGE_READER "If set, builds the image reader.")
-option(MLIO_BUILD_S3_SUPPORT "If set, builds with Amazon S3 support.")
+option(MLIO_BUILD_S3 "If set, builds with Amazon S3 support.")
+option(MLIO_BUILD_IMAGE_READER "If set, builds with image reader support.")
 
 option(MLIO_TREAT_WARNINGS_AS_ERRORS "If set, treats compilation warnings as errors.")
 
@@ -290,7 +290,7 @@ if(MLIO_INCLUDE_LIB)
     find_package(Threads REQUIRED)
     find_package(ZLIB REQUIRED)
 
-    if(MLIO_BUILD_S3_SUPPORT)
+    if(MLIO_BUILD_S3)
         find_package(AWSSDK 1.7 REQUIRED CONFIG COMPONENTS s3)
     endif()
 

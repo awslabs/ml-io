@@ -1,6 +1,12 @@
-import os
-
 import mlio
+import os
+import pytest
+
+
+if not mlio.supports_image_reader():
+    pytest.skip("Skipping image reader tests as the library does not have support for it.",
+                allow_module_level=True)
+
 
 resources_dir = os.path.join(
     os.path.dirname(os.path.realpath(__file__)), '../resources/images')

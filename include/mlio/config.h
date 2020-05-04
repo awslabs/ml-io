@@ -30,3 +30,19 @@
 #define MLIO_API __attribute__((visibility("default")))
 #define MLIO_HIDDEN __attribute__((visibility("hidden")))
 #endif
+
+namespace mlio {
+inline namespace v1 {
+
+/// Returns a boolean value indicating whether the library was built
+/// with Amazon S3 support.
+MLIO_API
+bool supports_s3() noexcept;
+
+/// Returns a boolean value indicating whether the library was built
+/// with image reader support.
+MLIO_API
+bool supports_image_reader() noexcept;
+
+}  // namespace v1
+}  // namespace mlio

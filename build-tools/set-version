@@ -7,14 +7,14 @@ function _print_usage
     printf "Usage: %s [VERSION|SEMANTIC_VERSION PEP_VERSION]\n" "$(basename "$0")"
 }
 
-function _exit_usage
+function _exit
 {
     _print_usage
 
     exit 0
 }
 
-function _exit_usage_error
+function _exit_error
 {
     _print_usage >&2
 
@@ -47,12 +47,12 @@ function _replace_versions
 function _main
 {
     if [[ $# -eq 0 || $# -gt 2 ]]; then
-        _exit_usage_error
+        _exit_error
     fi
 
     if [[ $# -eq 1 ]]; then
         if [[ $1 == -h || $1 == --help ]]; then
-            _exit_usage
+            _exit
         fi
 
         _sem_version=$1

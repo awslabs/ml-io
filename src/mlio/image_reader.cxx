@@ -413,7 +413,7 @@ inline namespace v1 {
 image_reader::image_reader(data_reader_params prm, image_reader_params)
     : parallel_data_reader{std::move(prm)}, params_{}, error_bad_batch_{}
 {
-    throw not_supported_error{"ML-IO has not been built with image reader support."};
+    throw not_supported_error{"ML-IO was not built with image reader support."};
 }
 
 image_reader::~image_reader() = default;

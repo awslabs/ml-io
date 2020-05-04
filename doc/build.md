@@ -81,7 +81,8 @@ $ cmake --build .
 | MLIO_INCLUDE_ARROW_INTEGRATION | Generates build target 'mlio-arrow' for the Apache Arrow integration | OFF     |
 | MLIO_INCLUDE_TESTS             | Generates build target 'mlio-test' for the tests                     | ON      |
 | MLIO_INCLUDE_DOC               | Generates build target 'mlio-doc' for the documentation              | OFF     |
-| MLIO_BUILD_S3_SUPPORT          | Builds with Amazon S3 support                                        | OFF     |
+| MLIO_BUILD_S3                  | Builds with Amazon S3 support                                        | OFF     |
+| MLIO_BUILD_IMAGE_READER        | Builds with image reader support                                     | OFF     |
 | MLIO_BUILD_FOR_NATIVE_ARCH     | Builds for the processor type of the compiling machine               | OFF     |
 | MLIO_TREAT_WARNINGS_AS_ERRORS  | Treats compilation warnings as errors                                | OFF     |
 | MLIO_ENABLE_LTO                | Enables link time optimization                                       | ON      |

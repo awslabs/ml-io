@@ -15,7 +15,7 @@
 
 #include "mlio/init.h"
 
-#ifdef MLIO_BUILD_S3_SUPPORT
+#ifdef MLIO_BUILD_S3
 
 #include <aws/core/Aws.h>
 
@@ -44,7 +44,7 @@ void initialize_aws_sdk()
     detail::aws_initialized = true;
 }
 
-void dispose_aws_sdk()
+void deallocate_aws_sdk()
 {
     if (detail::aws_initialized) {
         Aws::ShutdownAPI({});
@@ -68,12 +68,12 @@ inline namespace v1 {
 
 void initialize_aws_sdk()
 {
-    throw not_supported_error{"ML-IO has not been built with S3 support."};
+    throw not_supported_error{"ML-IO was not built with S3 support."};
 }
 
-void dispose_aws_sdk()
+void deallocate_aws_sdk()
 {
-    throw not_supported_error{"ML-IO has not been built with S3 support."};
+    throw not_supported_error{"ML-IO was not built with S3 support."};
 }
 
 #pragma GCC diagnostic pop

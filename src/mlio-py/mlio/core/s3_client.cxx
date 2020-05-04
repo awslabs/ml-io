@@ -57,9 +57,9 @@ void register_s3_client(py::module &m)
              "use_https"_a = true);
 
     m.def("initialize_aws_sdk", initialize_aws_sdk, "Initialize AWS C++ SDK");
-    m.def("dispose_aws_sdk",
-          dispose_aws_sdk,
-          "Dispose the internal data structures used by AWS C++ SDK.");
+    m.def("deallocate_aws_sdk",
+          deallocate_aws_sdk,
+          "Deallocate the internal data structures used by AWS C++ SDK.");
 }
 
 }  // namespace pymlio

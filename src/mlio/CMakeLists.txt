@@ -63,6 +63,7 @@ add_library(mlio
     streams/utf8_input_stream.cxx
     util/number.cxx
     util/string.cxx
+    config.cxx
     coo_tensor_builder.cxx
     cpu_array.cxx
     csv_reader.cxx
@@ -123,10 +124,10 @@ target_link_libraries(mlio
         Iconv::Iconv Threads::Threads ZLIB::ZLIB
 )
 
-if(MLIO_BUILD_S3_SUPPORT)
+if(MLIO_BUILD_S3)
     target_compile_definitions(mlio
         PUBLIC
-            MLIO_BUILD_S3_SUPPORT
+            MLIO_BUILD_S3
     )
 
     target_link_libraries(mlio
