@@ -23,13 +23,15 @@ PYBIND11_MODULE(_core, m)
 
     mlio::initialize();
 
-    m.def("supports_s3",
-          &mlio::supports_s3,
-          "Return a boolean value indicating whether the library was built with Amazon S3 support.");
+    m.def(
+        "supports_s3",
+        &mlio::supports_s3,
+        "Return a boolean value indicating whether the library was built with Amazon S3 support.");
 
-    m.def("supports_image_reader",
-          &mlio::supports_image_reader,
-          "Return a boolean value indicating whether the library was built with image reader support.");
+    m.def(
+        "supports_image_reader",
+        &mlio::supports_image_reader,
+        "Return a boolean value indicating whether the library was built with image reader support.");
 
     register_exceptions(m);
     register_logging(m);
