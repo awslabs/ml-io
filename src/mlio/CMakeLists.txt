@@ -179,7 +179,7 @@ install(
         COMPONENT
             devel
     INCLUDES DESTINATION
-        include
+        ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
 install(

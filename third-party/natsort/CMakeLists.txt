@@ -39,6 +39,8 @@ install(
     ARCHIVE
         DESTINATION
             ${CMAKE_INSTALL_LIBDIR}
+    INCLUDES DESTINATION
+        ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
 install(
