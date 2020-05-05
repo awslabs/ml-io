@@ -295,7 +295,7 @@ if(MLIO_INCLUDE_LIB)
     endif()
 
     if(MLIO_BUILD_IMAGE_READER)
-        find_package(OpenCV 4.0 REQUIRED core imgproc imgcodecs)
+        find_package(OpenCV 4.0 REQUIRED COMPONENTS core imgproc imgcodecs)
     endif()
 
     if(MLIO_INCLUDE_TESTS)

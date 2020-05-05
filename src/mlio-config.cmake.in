@@ -18,6 +18,10 @@ if(@MLIO_STATIC_LIB@)
     if(@MLIO_BUILD_S3@)
         find_dependency(AWSSDK 1.7 COMPONENTS s3)
     endif()
+
+    if(@MLIO_BUILD_IMAGE_READER@)
+        find_dependency(OpenCV 4.0 COMPONENTS core imgproc imgcodecs)
+    endif()
 endif()
 
 include(${CMAKE_CURRENT_LIST_DIR}/mlio-targets.cmake)

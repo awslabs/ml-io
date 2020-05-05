@@ -1,4 +1,4 @@
-# When performing ThinLTO on macOS, mach-o object files are generated
+# When performing ThinLTO on macOS mach-o object files are generated
 # under a temporary directory that gets automatically pruned by the
 # linker at the end of the build process. Thus tools such as dsymutil
 # cannot access the DWARF debug info contained in those files. To make
