@@ -15,8 +15,8 @@
 
 #include "mlio/integ/dlpack.h"
 
+#include <climits>
 #include <cstdint>
-#include <limits>
 #include <memory>
 #include <stdexcept>
 
@@ -53,9 +53,7 @@ inline ::DLDataType as_dl_data_type(::DLDataTypeCode code)
 {
     auto uint_code = static_cast<std::uint8_t>(code);
 
-    std::uint8_t bit_size = std::numeric_limits<std::byte>::digits * sizeof(data_type_t<dt>);
-
-    return ::DLDataType{uint_code, bit_size, 1};
+    return ::DLDataType{uint_code, CHAR_BIT * sizeof(data_type_t<dt>), 1};
 }
 
 // clang-format off
