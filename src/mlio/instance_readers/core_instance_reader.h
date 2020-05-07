@@ -37,7 +37,7 @@ public:
 private:
     std::optional<instance> read_instance_core() final;
 
-    [[noreturn]] void handle_nested_errors();
+    [[noreturn]] void handle_errors();
 
     std::optional<memory_slice> read_record_payload();
 

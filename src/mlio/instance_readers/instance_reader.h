@@ -48,9 +48,6 @@ public:
     virtual std::optional<instance> peek_instance() = 0;
 
     virtual void reset() noexcept = 0;
-
-public:
-    virtual std::size_t num_bytes_read() const noexcept = 0;
 };
 
 using record_reader_factory = std::function<intrusive_ptr<record_reader>(data_store const &ds)>;

@@ -50,17 +50,24 @@ std::optional<instance> core_instance_reader::read_instance_core()
         payload = read_record_payload();
     }
     catch (std::exception const &) {
-        handle_nested_errors();
+        handle_errors();
     }
 
     if (payload == std::nullopt) {
+        // If we have not reached the end of the dataset, but we could
+        // not read a record from the current data store, it means the
+        // data store itself is an instance (e.g. an image file).
+        if (store_ != nullptr) {
+            return instance{*store_};
+        }
+
         return {};
     }
 
     return instance{*store_, instance_idx_++, std::move(*payload)};
 }
 
-void core_instance_reader::handle_nested_errors()
+void core_instance_reader::handle_errors()
 {
     try {
         throw;
@@ -188,13 +195,17 @@ std::optional<record> core_instance_reader::read_record()
 
 bool core_instance_reader::init_next_record_reader()
 {
-    if (store_iter_ == params_->dataset.end()) {
-        return false;
-    }
-
     instance_idx_ = 0;
 
     record_idx_ = 0;
+
+    if (store_iter_ == params_->dataset.end()) {
+        store_ = nullptr;
+
+        record_reader_ = nullptr;
+
+        return false;
+    }
 
     store_ = store_iter_->get();
 
@@ -220,7 +231,7 @@ bool core_instance_reader::init_next_record_reader()
     // throws an exception.
     ++store_iter_;
 
-    return true;
+    return record_reader_ != nullptr;
 }
 
 void core_instance_reader::reset_core() noexcept

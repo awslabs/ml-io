@@ -15,6 +15,7 @@
 
 #pragma once
 
+#include <atomic>
 #include <condition_variable>
 #include <deque>
 #include <exception>
@@ -122,6 +123,7 @@ private:
     std::condition_variable fill_cond_{};
     std::condition_variable read_cond_{};
     std::exception_ptr exception_ptr_{};
+    std::atomic_size_t num_bytes_read_{};
     intrusive_ptr<schema const> schema_{};
 };
 

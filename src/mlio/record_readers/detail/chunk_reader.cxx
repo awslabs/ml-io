@@ -34,6 +34,8 @@ std::unique_ptr<chunk_reader> make_chunk_reader(intrusive_ptr<input_stream> strm
     // memory block right away instead of reading chunk by chunk.
     if (strm->supports_zero_copy()) {
         memory_slice chunk = strm->read(strm->size());
+        // Although this shouldn't happen, make sure we have read all
+        // the data.
         if (chunk.size() == strm->size()) {
             return std::make_unique<in_memory_chunk_reader>(std::move(chunk));
         }

@@ -53,6 +53,8 @@ public:
 
     record(record &&) noexcept = default;
 
+    ~record() = default;
+
 public:
     record &operator=(record const &) noexcept = default;
 

@@ -13,32 +13,21 @@
  * language governing permissions and limitations under the License.
  */
 
-#pragma once
-
-#include <optional>
-
-#include "mlio/config.h"
-#include "mlio/fwd.h"
-#include "mlio/intrusive_ptr.h"
-#include "mlio/record_readers/stream_record_reader.h"
+#include "mlio/instance_batch.h"
 
 namespace mlio {
 inline namespace v1 {
 
-/// @addtogroup records Records
-/// @{
+std::size_t instance_batch::size_bytes() const
+{
+    if (size_bytes_ == 0) {
+        for (instance const &ins : instances_) {
+            size_bytes_ += ins.bits().size();
+        }
+    }
 
-/// A class for reading blobs of memory as complete records.
-class MLIO_API blob_record_reader : public stream_record_reader {
-public:
-    explicit blob_record_reader(intrusive_ptr<input_stream> strm);
-
-private:
-    MLIO_HIDDEN
-    std::optional<record> decode_record(memory_slice &chunk, bool ignore_leftover) final;
-};
-
-/// @}
+    return size_bytes_;
+}
 
 }  // namespace v1
 }  // namespace mlio

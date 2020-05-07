@@ -71,7 +71,11 @@ public:
 public:
     memory_block::pointer data() const noexcept
     {
-        return beg_ != end_ ? std::addressof(*beg_) : nullptr;
+        if (beg_ == memory_block::iterator{}) {
+            return nullptr;
+        }
+
+        return std::addressof(*beg_);
     }
 
     memory_block::size_type size() const noexcept

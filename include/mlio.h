@@ -53,7 +53,6 @@
 #include "mlio/not_supported_error.h"                  // IWYU pragma: export
 #include "mlio/parallel_data_reader.h"                 // IWYU pragma: export
 #include "mlio/parser.h"                               // IWYU pragma: export
-#include "mlio/record_readers/blob_record_reader.h"    // IWYU pragma: export
 #include "mlio/record_readers/record.h"                // IWYU pragma: export
 #include "mlio/record_readers/record_error.h"          // IWYU pragma: export
 #include "mlio/record_readers/record_reader.h"         // IWYU pragma: export

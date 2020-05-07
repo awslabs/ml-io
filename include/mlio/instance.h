@@ -16,6 +16,7 @@
 #pragma once
 
 #include <cstddef>
+#include <optional>
 #include <utility>
 
 #include "mlio/config.h"
@@ -32,19 +33,31 @@ inline namespace v1 {
 class MLIO_API instance {
 public:
     /// @param ds
+    ///     The data store that represents the instance.
+    explicit instance(data_store const &ds) noexcept : store_{&ds}
+    {}
+
+    /// @param ds
     ///     The data store from which the instance was read.
     /// @param index
     ///     The position of the instance in the data store.
     /// @param bits
     ///     The raw data of the instance.
     explicit instance(data_store const &ds, std::size_t index, memory_slice &&bits) noexcept
-        : data_store_{&ds}, index_{index}, bits_{std::move(bits)}
+        : store_{&ds}, index_{index}, bits_{std::move(bits)}
     {}
+
+private:
+    memory_slice load_bits_from_store() const;
+
+    memory_slice read_stream(input_stream &strm) const;
+
+    [[noreturn]] void handle_errors() const;
 
 public:
     data_store const &get_data_store() const noexcept
     {
-        return *data_store_;
+        return *store_;
     }
 
     std::size_t index() const noexcept
@@ -52,15 +65,21 @@ public:
         return index_;
     }
 
-    memory_slice const &bits() const noexcept
+    memory_slice const &bits() const
     {
-        return bits_;
+        // If we do not have instance data, it means that we should
+        // treat the whole data store as a single instance.
+        if (bits_ == std::nullopt) {
+            bits_ = load_bits_from_store();
+        }
+
+        return *bits_;
     }
 
 private:
-    data_store const *data_store_;
-    std::size_t index_;
-    memory_slice bits_;
+    data_store const *store_;
+    std::size_t index_{};
+    mutable std::optional<memory_slice> bits_{};
 };
 
 /// @}

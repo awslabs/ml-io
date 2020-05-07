@@ -38,15 +38,8 @@ private:
 
     virtual void reset_core() noexcept = 0;
 
-public:
-    std::size_t num_bytes_read() const noexcept final
-    {
-        return num_bytes_read_;
-    }
-
 private:
     std::optional<instance> peeked_instance_{};
-    std::size_t num_bytes_read_{};
 };
 
 }  // namespace detail

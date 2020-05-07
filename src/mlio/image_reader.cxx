@@ -32,7 +32,6 @@
 #include "mlio/intrusive_ptr.h"
 #include "mlio/logger.h"
 #include "mlio/parallel_data_reader.h"
-#include "mlio/record_readers/blob_record_reader.h"
 #include "mlio/record_readers/recordio_record_reader.h"
 #include "mlio/schema.h"
 #include "mlio/util/cast.h"
@@ -62,7 +61,7 @@ intrusive_ptr<record_reader> image_reader::make_record_reader(data_store const &
 {
     switch (params_.img_frame) {
     case image_frame::none:
-        return make_intrusive<blob_record_reader>(ds.open_read());
+        return nullptr;
     case image_frame::recordio:
         return make_intrusive<detail::recordio_record_reader>(ds.open_read());
     }
@@ -212,7 +211,7 @@ bool image_reader::decode_core(stdx::span<std::uint8_t> out, instance const &ins
         catch (cv::Exception const &e) {
             if (warn_bad_instances() || error_bad_example_) {
                 auto msg = fmt::format(
-                    "The BGR2RGB operation for the image #{1:n} in the data store '{0}' failed with the following exception: {2}",
+                    "The BGR2RGB operation failed for the image #{1:n} in the data store '{0}' with the following exception: {2}",
                     ins.get_data_store().id(),
                     ins.index(),
                     e.what());

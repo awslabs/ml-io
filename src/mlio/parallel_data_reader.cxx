@@ -203,6 +203,10 @@ void parallel_data_reader::init_graph()
                 // ordering of other batches.
                 example_msg out{msg.batch->index(), this->decode(*msg.batch)};
 
+                if (out.exm != nullptr) {
+                    num_bytes_read_.fetch_add(msg.batch->size_bytes());
+                }
+
                 std::get<0>(ports).try_put(std::move(out));
             });
 
@@ -282,6 +286,8 @@ void parallel_data_reader::reset() noexcept
 
     exception_ptr_ = nullptr;
 
+    num_bytes_read_ = 0;
+
     data_reader_base::reset();
 }
 
@@ -308,7 +314,7 @@ void parallel_data_reader::stop()
 
 std::size_t parallel_data_reader::num_bytes_read() const noexcept
 {
-    return reader_->num_bytes_read();
+    return num_bytes_read_;
 }
 
 }  // namespace v1

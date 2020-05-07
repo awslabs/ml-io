@@ -65,10 +65,13 @@ public:
         return size_;
     }
 
+    std::size_t size_bytes() const;
+
 private:
     std::size_t index_;
     std::vector<instance> instances_;
     std::size_t size_;
+    mutable std::size_t size_bytes_{};
 };
 
 /// @}
