@@ -18,7 +18,7 @@ import mlio._core
 
 from mlio._core import\
     Attribute,\
-    BadBatchHandling,\
+    BadExampleHandling,\
     Compression,\
     CooTensor,\
     CorruptFooterError,\
@@ -44,7 +44,7 @@ from mlio._core import\
     InflateError,\
     InputStream,\
     InvalidInstanceError,\
-    LastBatchHandling,\
+    LastExampleHandling,\
     LogLevel,\
     MLIOError,\
     MaxFieldLengthHandling,\
@@ -76,7 +76,7 @@ from mlio._core import\
 
 __all__ = [
     'Attribute',
-    'BadBatchHandling',
+    'BadExampleHandling',
     'Compression',
     'CooTensor',
     'CorruptFooterError',
@@ -102,7 +102,7 @@ __all__ = [
     'InflateError',
     'InputStream',
     'InvalidInstanceError',
-    'LastBatchHandling',
+    'LastExampleHandling',
     'LogLevel',
     'MLIOError',
     'MaxFieldLengthHandling',

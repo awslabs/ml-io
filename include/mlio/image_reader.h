@@ -101,7 +101,7 @@ private:
 private:
     image_reader_params params_;
     std::array<int, image_dimensions_size_> img_dims_{};
-    bool error_bad_batch_;
+    bool error_bad_example_;
 };
 
 /// @}

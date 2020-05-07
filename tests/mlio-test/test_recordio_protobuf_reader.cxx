@@ -60,7 +60,7 @@ TEST_F(test_recordio_protobuf_reader, test_corrupt_split_records_patH)
     mlio::data_reader_params prm{};
     prm.dataset.emplace_back(mlio::make_intrusive<mlio::file>(corrupt_split_records_path_));
     prm.batch_size = 10;
-    prm.num_prefetched_batches = 1;
+    prm.num_prefetched_examples = 1;
 
     std::string error_substring = "The record #13 in the data store";
 

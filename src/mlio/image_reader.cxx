@@ -50,7 +50,7 @@ image_reader::image_reader(data_reader_params prm, image_reader_params img_prm)
 
     std::copy(params_.image_dimensions.begin(), params_.image_dimensions.end(), img_dims_.begin());
 
-    error_bad_batch_ = params().bad_batch_hnd == bad_batch_handling::error;
+    error_bad_example_ = params().bad_example_hnd == bad_example_handling::error;
 }
 
 image_reader::~image_reader()
@@ -105,25 +105,25 @@ intrusive_ptr<example> image_reader::decode(instance_batch const &batch) const
         else {
             // If the user requested to skip the batch in case of an
             // error, shortcut the loop and return immediately.
-            if (params().bad_batch_hnd == bad_batch_handling::skip) {
+            if (params().bad_example_hnd == bad_example_handling::skip) {
                 return {};
             }
-            if (params().bad_batch_hnd == bad_batch_handling::skip_warn) {
+            if (params().bad_example_hnd == bad_example_handling::skip_warn) {
                 logger::warn(
                     "The example #{0:n} has been skipped as it had at least one bad instance.",
                     batch.index());
 
                 return {};
             }
-            if (params().bad_batch_hnd != bad_batch_handling::pad &&
-                params().bad_batch_hnd != bad_batch_handling::pad_warn) {
+            if (params().bad_example_hnd != bad_example_handling::pad &&
+                params().bad_example_hnd != bad_example_handling::pad_warn) {
                 throw std::invalid_argument{"The specified bad batch handling is invalid."};
             }
         }
     }
 
     if (batch.instances().size() != num_instances_read) {
-        if (params().bad_batch_hnd == bad_batch_handling::pad_warn) {
+        if (params().bad_example_hnd == bad_example_handling::pad_warn) {
             logger::warn("The example #{0:n} has been padded as it had {1:n} bad instance(s).",
                          batch.index(),
                          batch.instances().size() - num_instances_read);
@@ -210,7 +210,7 @@ bool image_reader::decode_core(stdx::span<std::uint8_t> out, instance const &ins
             cv::cvtColor(tmp, tmp, cv::COLOR_BGR2RGB);
         }
         catch (cv::Exception const &e) {
-            if (warn_bad_instances() || error_bad_batch_) {
+            if (warn_bad_instances() || error_bad_example_) {
                 auto msg = fmt::format(
                     "The BGR2RGB operation for the image #{1:n} in the data store '{0}' failed with the following exception: {2}",
                     ins.get_data_store().id(),
@@ -221,7 +221,7 @@ bool image_reader::decode_core(stdx::span<std::uint8_t> out, instance const &ins
                     logger::warn(msg);
                 }
 
-                if (error_bad_batch_) {
+                if (error_bad_example_) {
                     throw std::runtime_error{msg};
                 }
             }
@@ -242,7 +242,7 @@ cv::Mat image_reader::decode_image(cv::Mat const &buf, int mode, instance const 
         decoded_img = cv::imdecode(buf, mode);
     }
     catch (cv::Exception const &e) {
-        if (warn_bad_instances() || error_bad_batch_) {
+        if (warn_bad_instances() || error_bad_example_) {
             auto msg = fmt::format(
                 "The image decode operation failed for the image #{1:n} in the data store '{0}' with the following exception: {2}",
                 ins.get_data_store().id(),
@@ -253,7 +253,7 @@ cv::Mat image_reader::decode_image(cv::Mat const &buf, int mode, instance const 
                 logger::warn(msg);
             }
 
-            if (error_bad_batch_) {
+            if (error_bad_example_) {
                 throw std::runtime_error{msg};
             }
         }
@@ -262,7 +262,7 @@ cv::Mat image_reader::decode_image(cv::Mat const &buf, int mode, instance const 
     }
 
     if (decoded_img.empty()) {
-        if (warn_bad_instances() || error_bad_batch_) {
+        if (warn_bad_instances() || error_bad_example_) {
             auto msg = fmt::format(
                 "The image decode operation failed for the image #{1:n} in the data store '{0}'.",
                 ins.get_data_store().id(),
@@ -272,7 +272,7 @@ cv::Mat image_reader::decode_image(cv::Mat const &buf, int mode, instance const 
                 logger::warn(msg);
             }
 
-            if (error_bad_batch_) {
+            if (error_bad_example_) {
                 throw std::runtime_error{msg};
             }
         }
@@ -311,7 +311,7 @@ bool image_reader::resize(cv::Mat &src, cv::Mat &dst, instance const &ins) const
         cv::resize(src, dst, cv::Size{new_rows, new_cols}, 0, 0);
     }
     catch (cv::Exception const &e) {
-        if (warn_bad_instances() || error_bad_batch_) {
+        if (warn_bad_instances() || error_bad_example_) {
             auto msg = fmt::format(
                 "The image resize operation failed for the image #{2:n} in the data store '{0}' with the following exception: {2}",
                 ins.get_data_store().id(),
@@ -322,7 +322,7 @@ bool image_reader::resize(cv::Mat &src, cv::Mat &dst, instance const &ins) const
                 logger::warn(msg);
             }
 
-            if (error_bad_batch_) {
+            if (error_bad_example_) {
                 throw std::runtime_error{msg};
             }
         }
@@ -336,7 +336,7 @@ bool image_reader::resize(cv::Mat &src, cv::Mat &dst, instance const &ins) const
 bool image_reader::crop(cv::Mat &src, cv::Mat &dst, instance const &ins) const
 {
     if (src.rows < img_dims_[1] || src.cols < img_dims_[2]) {
-        if (warn_bad_instances() || error_bad_batch_) {
+        if (warn_bad_instances() || error_bad_example_) {
             auto msg = fmt::format(
                 "The input image dimensions (rows: {2:n}, cols: {3:n}) are smaller than the output image dimensions (rows: {4:n}, cols: {5:n}) for the image #{1:n} in the data store '{0}'.",
                 ins.get_data_store().id(),
@@ -350,7 +350,7 @@ bool image_reader::crop(cv::Mat &src, cv::Mat &dst, instance const &ins) const
                 logger::warn(msg);
             }
 
-            if (error_bad_batch_) {
+            if (error_bad_example_) {
                 throw std::invalid_argument{msg};
             }
         }
@@ -367,7 +367,7 @@ bool image_reader::crop(cv::Mat &src, cv::Mat &dst, instance const &ins) const
         src(roi).copyTo(dst);
     }
     catch (cv::Exception const &e) {
-        if (warn_bad_instances() || error_bad_batch_) {
+        if (warn_bad_instances() || error_bad_example_) {
             auto msg = fmt::format(
                 "The image crop operation failed for the image #{1:n} in the data store '{0}' with the following exception: {2}",
                 ins.get_data_store().id(),
@@ -378,7 +378,7 @@ bool image_reader::crop(cv::Mat &src, cv::Mat &dst, instance const &ins) const
                 logger::warn(msg);
             }
 
-            if (error_bad_batch_) {
+            if (error_bad_example_) {
                 throw std::runtime_error{msg};
             }
         }
@@ -411,7 +411,7 @@ inline namespace v1 {
 
 // NOLINTNEXTLINE(performance-unnecessary-value-param)
 image_reader::image_reader(data_reader_params prm, image_reader_params)
-    : parallel_data_reader{std::move(prm)}, params_{}, error_bad_batch_{}
+    : parallel_data_reader{std::move(prm)}, params_{}, error_bad_example_{}
 {
     throw not_supported_error{"ML-IO was not built with image reader support."};
 }

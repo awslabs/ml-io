@@ -59,7 +59,7 @@ struct csv_reader::decoder_state {
     csv_reader const *reader;
     std::vector<intrusive_ptr<tensor>> *tensors;
     bool warn_bad_instance;
-    bool error_bad_batch;
+    bool error_bad_example;
 };
 
 template<typename ColIt>
@@ -419,8 +419,8 @@ intrusive_ptr<example> csv_reader::decode(instance_batch const &batch) const
         // If bad batch handling mode is pad, we cannot parallelize
         // decoding as good records must be stacked together without
         // any gap in between.
-        params().bad_batch_hnd == bad_batch_handling::pad ||
-        params().bad_batch_hnd == bad_batch_handling::pad_warn ||
+        params().bad_example_hnd == bad_example_handling::pad ||
+        params().bad_example_hnd == bad_example_handling::pad_warn ||
         // If the number of values (e.g. integers, floating-points) we
         // need to decode is below the cut-off, avoid parallel
         // execution; otherwise the threading overhead will slow down
@@ -438,7 +438,7 @@ intrusive_ptr<example> csv_reader::decode(instance_batch const &batch) const
     // Check if we failed to decode the batch and return a null pointer
     // if that is the case.
     if (num_instances_read == std::nullopt) {
-        if (params().bad_batch_hnd == bad_batch_handling::skip_warn) {
+        if (params().bad_example_hnd == bad_example_handling::skip_warn) {
             logger::warn("The example #{0:n} has been skipped as it had at least one bad instance.",
                          batch.index());
         }
@@ -447,7 +447,7 @@ intrusive_ptr<example> csv_reader::decode(instance_batch const &batch) const
     }
 
     if (num_instances != *num_instances_read) {
-        if (params().bad_batch_hnd == bad_batch_handling::pad_warn) {
+        if (params().bad_example_hnd == bad_example_handling::pad_warn) {
             logger::warn("The example #{0:n} has been padded as it had {1:n} bad instance(s).",
                          batch.index(),
                          num_instances - *num_instances_read);
@@ -535,12 +535,12 @@ std::optional<std::size_t> csv_reader::decode_ser(decoder_state &state,
         else {
             // If the user requested to skip the batch in case of an
             // error, shortcut the loop and return immediately.
-            if (params().bad_batch_hnd == bad_batch_handling::skip ||
-                params().bad_batch_hnd == bad_batch_handling::skip_warn) {
+            if (params().bad_example_hnd == bad_example_handling::skip ||
+                params().bad_example_hnd == bad_example_handling::skip_warn) {
                 return {};
             }
-            if (params().bad_batch_hnd != bad_batch_handling::pad &&
-                params().bad_batch_hnd != bad_batch_handling::pad_warn) {
+            if (params().bad_example_hnd != bad_example_handling::pad &&
+                params().bad_example_hnd != bad_example_handling::pad_warn) {
                 throw std::invalid_argument{"The specified bad batch handling is invalid."};
             }
         }
@@ -552,7 +552,7 @@ std::optional<std::size_t> csv_reader::decode_ser(decoder_state &state,
 std::optional<std::size_t> csv_reader::decode_prl(decoder_state &state,
                                                   instance_batch const &batch) const
 {
-    std::atomic_bool skip_batch{};
+    std::atomic_bool skip_example{};
 
     std::size_t num_instances = batch.instances().size();
 
@@ -567,7 +567,7 @@ std::optional<std::size_t> csv_reader::decode_prl(decoder_state &state,
 
     tbb::blocked_range<decltype(rng_beg)> range{rng_beg, rng_end};
 
-    auto worker = [this, &state, &skip_batch](auto &sub_range) {
+    auto worker = [this, &state, &skip_example](auto &sub_range) {
         csv_record_tokenizer tokenizer{params_};
 
         // Both GCC and clang have trouble handling structured bindings
@@ -583,9 +583,9 @@ std::optional<std::size_t> csv_reader::decode_prl(decoder_state &state,
             if (!dc.decode(std::get<0>(ins_zip), std::get<1>(ins_zip))) {
                 // If we failed to decode the instance, we can
                 // terminate the task and skip this batch.
-                if (params().bad_batch_hnd == bad_batch_handling::skip ||
-                    params().bad_batch_hnd == bad_batch_handling::skip_warn) {
-                    skip_batch = true;
+                if (params().bad_example_hnd == bad_example_handling::skip ||
+                    params().bad_example_hnd == bad_example_handling::skip_warn) {
+                    skip_example = true;
 
                     return;
                 }
@@ -597,7 +597,7 @@ std::optional<std::size_t> csv_reader::decode_prl(decoder_state &state,
 
     tbb::parallel_for(range, worker, tbb::auto_partitioner{});
 
-    if (skip_batch) {
+    if (skip_example) {
         return {};
     }
 
@@ -609,7 +609,7 @@ csv_reader::decoder_state::decoder_state(csv_reader const &rdr,
     : reader{&rdr}
     , tensors{&tsrs}
     , warn_bad_instance{rdr.warn_bad_instances()}
-    , error_bad_batch{rdr.params().bad_batch_hnd == bad_batch_handling::error}
+    , error_bad_example{rdr.params().bad_example_hnd == bad_example_handling::error}
 {}
 
 template<typename ColIt>
@@ -652,12 +652,12 @@ bool csv_reader::decoder<ColIt>::decode(std::size_t row_idx, instance const &ins
                     logger::warn(msg);
                 }
                 else {
-                    if (state_->warn_bad_instance || state_->error_bad_batch) {
+                    if (state_->warn_bad_instance || state_->error_bad_example) {
                         if (state_->warn_bad_instance) {
                             logger::warn(msg);
                         }
 
-                        if (state_->error_bad_batch) {
+                        if (state_->error_bad_example) {
                             throw invalid_instance_error{msg};
                         }
                     }
@@ -683,7 +683,7 @@ bool csv_reader::decoder<ColIt>::decode(std::size_t row_idx, instance const &ins
             continue;
         }
 
-        if (state_->warn_bad_instance || state_->error_bad_batch) {
+        if (state_->warn_bad_instance || state_->error_bad_example) {
             std::string const &name = std::get<1>(*col_pos);
 
             data_type dt = std::get<2>(*col_pos);
@@ -700,7 +700,7 @@ bool csv_reader::decoder<ColIt>::decode(std::size_t row_idx, instance const &ins
                 logger::warn(msg);
             }
 
-            if (state_->error_bad_batch) {
+            if (state_->error_bad_example) {
                 throw invalid_instance_error{msg};
             }
         }
@@ -713,7 +713,7 @@ bool csv_reader::decoder<ColIt>::decode(std::size_t row_idx, instance const &ins
         return true;
     }
 
-    if (state_->warn_bad_instance || state_->error_bad_batch) {
+    if (state_->warn_bad_instance || state_->error_bad_example) {
         std::size_t num_columns = state_->reader->column_names_.size();
 
         std::size_t num_actual_cols = std::get<0>(*col_pos);
@@ -735,7 +735,7 @@ bool csv_reader::decoder<ColIt>::decode(std::size_t row_idx, instance const &ins
             logger::warn(msg);
         }
 
-        if (state_->error_bad_batch) {
+        if (state_->error_bad_example) {
             throw invalid_instance_error{msg};
         }
     }

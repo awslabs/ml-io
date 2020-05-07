@@ -162,16 +162,16 @@ void parallel_data_reader::init_graph()
 {
     namespace flw = tbb::flow;
 
-    std::size_t num_prefetched_batches = params().num_prefetched_batches;
-    if (num_prefetched_batches == 0) {
+    std::size_t num_prefetched_examples = params().num_prefetched_examples;
+    if (num_prefetched_examples == 0) {
         // Defaults to the number of processor cores.
-        num_prefetched_batches =
+        num_prefetched_examples =
             static_cast<std::size_t>(tbb::task_scheduler_init::default_num_threads());
     }
 
     std::size_t num_parallel_reads = params().num_parallel_reads;
-    if (num_parallel_reads == 0 || num_parallel_reads > num_prefetched_batches) {
-        num_parallel_reads = num_prefetched_batches;
+    if (num_parallel_reads == 0 || num_parallel_reads > num_prefetched_examples) {
+        num_parallel_reads = num_prefetched_examples;
     }
 
     flw::graph &g = graph_->obj;
@@ -213,7 +213,7 @@ void parallel_data_reader::init_graph()
 
     // Queue
     auto queue_node = std::make_unique<flw::function_node<example_msg, flw::continue_msg>>(
-        g, flw::serial, [this, num_prefetched_batches](auto const &msg) {
+        g, flw::serial, [this, num_prefetched_examples](auto const &msg) {
             // If the decode() function has failed simply discard the
             // message.
             if (msg.exm == nullptr) {
@@ -223,8 +223,8 @@ void parallel_data_reader::init_graph()
             {
                 std::unique_lock<std::mutex> queue_lock{queue_mutex_};
 
-                fill_cond_.wait(queue_lock, [this, num_prefetched_batches] {
-                    return fill_queue_.size() < num_prefetched_batches;
+                fill_cond_.wait(queue_lock, [this, num_prefetched_examples] {
+                    return fill_queue_.size() < num_prefetched_examples;
                 });
 
                 if (graph_->ctx.is_group_execution_cancelled()) {

@@ -33,10 +33,10 @@ inline namespace v1 {
 /// @addtogroup data_readers Data Readers
 /// @{
 
-/// Specifies how the last batch read from a dataset should to be
+/// Specifies how the last @ref example read from a dataset should to be
 /// handled if the dataset size is not evenly divisible by the batch
 /// size.
-enum class last_batch_handling {
+enum class last_example_handling {
     /// Return an @ref example where the size of the batch dimension is
     /// less than the requested batch size.
     none,
@@ -60,18 +60,19 @@ enum class last_batch_handling {
     pad_warn
 };
 
-/// Specifies how a batch that contains erroneous data should be
+/// Specifies how an example that contains erroneous data should be
 /// handled.
-enum class bad_batch_handling {
+enum class bad_example_handling {
     /// Throw exception.
     error,
-    /// Skip the batch.
+    /// Skip the @ref example.
     skip,
-    /// Skip the batch and warn.
+    /// Skip the @ref example and warn.
     skip_warn,
-    /// Skip bad instances, pad the batch to the batch size.
+    /// Skip bad instances, pad the @ref example to the batch size.
     pad,
-    /// Skip bad instances, pad the batch to the batch size, and warn.
+    /// Skip bad instances, pad the @ref example to the batch size, and
+    /// warn.
     pad_warn
 };
 
@@ -84,18 +85,19 @@ struct MLIO_API data_reader_params {
     /// A number indicating how many @ref instance "data instances"
     /// should be packed into a single @ref example.
     std::size_t batch_size{};
-    /// The number of batches to prefetch in background to accelerate
-    /// reading. If zero, defaults to the number of processor cores.
-    std::size_t num_prefetched_batches{};
-    /// The number of parallel batch reads. If not specified, it equals
-    /// to @ref num_prefetched_batches. In case a large number of
-    /// batches should be prefetched, this parameter can be used to
-    /// avoid thread oversubscription.
+    /// The number of @ref example "examples" to prefetch in background
+    /// to accelerate reading. If zero, defaults to the number of
+    /// processor cores.
+    std::size_t num_prefetched_examples{};
+    /// The number of parallel reads. If not specified, it equals to
+    /// @ref num_prefetched_examples. In case a large number of examples
+    /// should be prefetched, this parameter can be used to avoid
+    /// thread oversubscription.
     std::size_t num_parallel_reads{};
-    /// See @ref last_batch_handling.
-    last_batch_handling last_batch_hnd = last_batch_handling::none;
-    /// See @ref bad_batch_handling.
-    bad_batch_handling bad_batch_hnd = bad_batch_handling::error;
+    /// See @ref last_example_handling.
+    last_example_handling last_example_hnd = last_example_handling::none;
+    /// See @ref bad_example_handling.
+    bad_example_handling bad_example_hnd = bad_example_handling::error;
     /// A boolean value indicating whether a warning will be output for
     /// each bad instance.
     bool warn_bad_instances = true;
@@ -175,11 +177,11 @@ public:
     ///
     /// @remark
     ///     The returned number won't include the size of the discarded
-    ///     parts of the dataset such as comment blocks.
+    ///     parts of the dataset such as record headers.
     ///
     /// @remark
-    ///     The returned number can be greater than expected as ML-IO
-    ///     reads ahead the dataset in background.
+    ///     The returned number can be greater than expected as MLIO
+    ///     can read ahead in background.
     virtual std::size_t num_bytes_read() const noexcept = 0;
 };
 

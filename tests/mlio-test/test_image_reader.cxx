@@ -102,7 +102,7 @@ test_image_reader::~test_image_reader() = default;
 TEST_F(test_image_reader, test_jpg_3_channel_last_batch_dropped)
 {
     size_t batch_size = 2;
-    mlio::data_reader_params prm{jpeg_dataset_, batch_size, {}, {}, last_batch_handling::drop};
+    mlio::data_reader_params prm{jpeg_dataset_, batch_size, {}, {}, last_example_handling::drop};
     mlio::image_reader_params img_prm{image_frame::none, {}, image_dimensions_std_, false};
     auto reader = mlio::make_intrusive<mlio::image_reader>(prm, img_prm);
     for (auto i = 0; i < 2; i++) {
@@ -136,7 +136,7 @@ TEST_F(test_image_reader, test_jpg_3_channel_last_batch_dropped)
 TEST_F(test_image_reader, test_jpg_3_channel_with_resize_last_batch_dropped)
 {
     size_t batch_size = 2;
-    mlio::data_reader_params prm{jpeg_dataset_, batch_size, {}, {}, last_batch_handling::drop};
+    mlio::data_reader_params prm{jpeg_dataset_, batch_size, {}, {}, last_example_handling::drop};
     std::size_t resize = 300;
     mlio::image_reader_params img_prm{image_frame::none, resize, image_dimensions_std_, false};
     auto reader = mlio::make_intrusive<mlio::image_reader>(prm, img_prm);
@@ -367,11 +367,11 @@ TEST_F(test_image_reader, test_recordio_1_channel)
     assert_tensor_shape(lbl, batch_size, ret_img_1channel_);
 }
 
-TEST_F(test_image_reader, test_bad_batch_handling_skip)
+TEST_F(test_image_reader, test_bad_example_handling_skip)
 {
     size_t batch_size = 2;
     mlio::data_reader_params prm{
-        jpeg_dataset_, batch_size, {}, {}, last_batch_handling::none, bad_batch_handling::skip};
+        jpeg_dataset_, batch_size, {}, {}, last_example_handling::none, bad_example_handling::skip};
 
     // passing in a larger width so that crop operation on the second
     // image would fail, as required width would be greater than

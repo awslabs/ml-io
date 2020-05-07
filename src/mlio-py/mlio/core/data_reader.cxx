@@ -105,10 +105,10 @@ std::size_t py_data_reader::num_bytes_read() const noexcept
 
 data_reader_params make_data_reader_params(std::vector<intrusive_ptr<data_store>> dataset,
                                            std::size_t batch_size,
-                                           std::size_t num_prefetched_batches,
+                                           std::size_t num_prefetched_examples,
                                            std::size_t num_parallel_reads,
-                                           last_batch_handling last_batch_hnd,
-                                           bad_batch_handling bad_batch_hnd,
+                                           last_example_handling last_example_hnd,
+                                           bad_example_handling bad_example_hnd,
                                            bool warn_bad_instances,
                                            std::size_t num_instances_to_skip,
                                            std::optional<std::size_t> num_instances_to_read,
@@ -124,10 +124,10 @@ data_reader_params make_data_reader_params(std::vector<intrusive_ptr<data_store>
 
     prm.dataset = std::move(dataset);
     prm.batch_size = batch_size;
-    prm.num_prefetched_batches = num_prefetched_batches;
+    prm.num_prefetched_examples = num_prefetched_examples;
     prm.num_parallel_reads = num_parallel_reads;
-    prm.last_batch_hnd = last_batch_hnd;
-    prm.bad_batch_hnd = bad_batch_hnd;
+    prm.last_example_hnd = last_example_hnd;
+    prm.bad_example_hnd = bad_example_hnd;
     prm.warn_bad_instances = warn_bad_instances;
     prm.num_instances_to_skip = num_instances_to_skip;
     prm.num_instances_to_read = num_instances_to_read;
@@ -244,39 +244,41 @@ intrusive_ptr<text_line_reader> make_text_line_reader(data_reader_params prm)
 
 void register_data_readers(py::module &m)
 {
-    py::enum_<last_batch_handling>(
+    py::enum_<last_example_handling>(
         m,
-        "LastBatchHandling",
-        "Specifies how the last batch read from a dataset should to be "
+        "LastExampleHandling",
+        "Specifies how the last ``example`` read from a dataset should to be "
         "handled if the dataset size is not evenly divisible by the batch "
         "size.")
         .value("NONE",
-               last_batch_handling::none,
+               last_example_handling::none,
                "Return an ``example`` where the size of the batch dimension is "
                "less than the requested batch size.")
-        .value("DROP", last_batch_handling::drop, "Drop the last ``example``.")
-        .value("DROP_WARN", last_batch_handling::drop_warn, "Drop the last ``example`` and warn.")
+        .value("DROP", last_example_handling::drop, "Drop the last ``example``.")
+        .value("DROP_WARN", last_example_handling::drop_warn, "Drop the last ``example`` and warn.")
         .value("PAD",
-               last_batch_handling::pad,
+               last_example_handling::pad,
                "Pad the feature tensors with zero so that the size of the batch "
                "dimension equals the requested batch size.")
         .value("PAD_WARN",
-               last_batch_handling::pad_warn,
+               last_example_handling::pad_warn,
                "Pad the feature tensors with zero so that the size of the batch "
                "dimension equals the requested batch size and warn.");
 
-    py::enum_<bad_batch_handling>(m,
-                                  "BadBatchHandling",
-                                  "Specifies how a batch that contains erroneous data should be"
-                                  "handled.")
-        .value("ERROR", bad_batch_handling::error, "Raise an error.")
-        .value("SKIP", bad_batch_handling::skip, "Skip the batch.")
-        .value("SKIP_WARN", bad_batch_handling::skip_warn, "Skip the batch and warn.")
-        .value(
-            "PAD", bad_batch_handling::pad, "Skip bad instances, pad the batch to the batch size.")
+    py::enum_<bad_example_handling>(
+        m,
+        "BadExampleHandling",
+        "Specifies how an ``example`` that contains erroneous data should be"
+        "handled.")
+        .value("ERROR", bad_example_handling::error, "Raise an error.")
+        .value("SKIP", bad_example_handling::skip, "Skip the ``example``.")
+        .value("SKIP_WARN", bad_example_handling::skip_warn, "Skip the ``example`` and warn.")
+        .value("PAD",
+               bad_example_handling::pad,
+               "Skip bad instances, pad the ``example`` to the batch size.")
         .value("PAD_WARN",
-               bad_batch_handling::pad_warn,
-               "Skip bad instances, pad the batch to the batch size, and warn.");
+               bad_example_handling::pad_warn,
+               "Skip bad instances, pad the ``example`` to the batch size, and warn.");
 
     py::enum_<max_field_length_handling>(
         m,
@@ -306,10 +308,10 @@ void register_data_readers(py::module &m)
         .def(py::init(&make_data_reader_params),
              "dataset"_a,
              "batch_size"_a,
-             "num_prefetched_batches"_a = 0,
+             "num_prefetched_examples"_a = 0,
              "num_parallel_reads"_a = 0,
-             "last_batch_handling"_a = last_batch_handling::none,
-             "bad_batch_handling"_a = bad_batch_handling::error,
+             "last_example_handling"_a = last_example_handling::none,
+             "bad_example_handling"_a = bad_example_handling::error,
              "warn_bad_instances"_a = true,
              "num_instances_to_skip"_a = 0,
              "num_instances_to_read"_a = std::nullopt,
@@ -329,18 +331,18 @@ void register_data_readers(py::module &m)
             batch_size : int
                 A number indicating how many data instances should be packed
                 into a single ``example``.
-            num_prefetched_batches : int, optional
-                The number of batches to prefetch in background to accelerate
+            num_prefetched_examples : int, optional
+                The number of examples to prefetch in background to accelerate
                 reading. If zero, default to the number of processor cores.
             num_parallel_reads : int, optional
-                The number of parallel batch reads. If not specified, it equals
-                to `num_prefetched_batche`. In case a large number of batches
+                The number of parallel reads. If not specified, it equals
+                to `num_prefetched_examples`. In case a large number of examples
                 should be prefetched, this parameter can be used to avoid
                 thread oversubscription.
-            last_batch_handling : LastBatchHandling
-                See ``LastBatchHandling``.
-            bad_batch_handling : BadBatchHandling
-                See ``BadBatchHandling``.
+            last_example_handling : LastExampleHandling
+                See ``LastExampleHandling``.
+            bad_example_handling : BadExampleHandling
+                See ``BadExampleHandling``.
             warn_bad_instances : bool, optional
                 A boolean value indicating whether a warning will be output for
                 each bad instance.
@@ -379,10 +381,10 @@ void register_data_readers(py::module &m)
             )")
         .def_readwrite("dataset", &data_reader_params::dataset)
         .def_readwrite("batch_size", &data_reader_params::batch_size)
-        .def_readwrite("num_prefetched_batches", &data_reader_params::num_prefetched_batches)
+        .def_readwrite("num_prefetched_examples", &data_reader_params::num_prefetched_examples)
         .def_readwrite("num_parallel_reads", &data_reader_params::num_parallel_reads)
-        .def_readwrite("last_batch_handling", &data_reader_params::last_batch_hnd)
-        .def_readwrite("bad_batch_handling", &data_reader_params::bad_batch_hnd)
+        .def_readwrite("last_example_handling", &data_reader_params::last_example_hnd)
+        .def_readwrite("bad_example_handling", &data_reader_params::bad_example_hnd)
         .def_readwrite("num_instances_to_skip", &data_reader_params::num_instances_to_skip)
         .def_readwrite("num_instances_to_read", &data_reader_params::num_instances_to_read)
         .def_readwrite("shard_index", &data_reader_params::shard_index)

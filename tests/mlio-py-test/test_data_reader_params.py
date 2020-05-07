@@ -50,10 +50,10 @@ def test_data_reader_params_members():
 
     assert rdr_prm.dataset == dataset
     assert rdr_prm.batch_size == 1
-    assert rdr_prm.num_prefetched_batches == 0
+    assert rdr_prm.num_prefetched_examples == 0
     assert rdr_prm.num_parallel_reads == 0
-    assert rdr_prm.last_batch_handling == mlio.LastBatchHandling.NONE
-    assert rdr_prm.bad_batch_handling == mlio.BadBatchHandling.ERROR
+    assert rdr_prm.last_example_handling == mlio.LastExampleHandling.NONE
+    assert rdr_prm.bad_example_handling == mlio.BadExampleHandling.ERROR
     assert rdr_prm.num_instances_to_skip == 0
     assert rdr_prm.num_instances_to_read is None
     assert rdr_prm.shard_index == 0

@@ -12,8 +12,8 @@
     * [Schema](#Schema)
     * [Attribute](#Attribute)
 * [Enumerations](#Enumerations)
-    * [LastBatchHandling](#LastBatchHandling)
-    * [BadBatchHandling](#BadBatchHandling)
+    * [LastExampleHandling](#LastExampleHandling)
+    * [BadExampleHandling](#BadExampleHandling)
     * [ImageFrame](#ImageFrame)
     * [MaxFieldLengthHandling](#MaxFieldLengthHandling)
 * [Exceptions](#Exceptions)
@@ -98,10 +98,10 @@ All constructor parameters described below have a same-named read/write accessor
 ```python
 DataReaderParams(dataset : Sequence[DataStore],
                  batch_size : int,
-                 num_prefetched_batches : int = 0,
+                 num_prefetched_examples : int = 0,
                  num_parallel_reads : int = 0,
-                 last_batch_handling : LastBatchHandling = LastBatchHandling.NONE,
-                 bad_batch_handling : BadBatchHandling = BatchBatchHandling.ERROR,
+                 last_example_handling : LastExampleHandling = LastExampleHandling.NONE,
+                 bad_example_handling : BadExampleHandling = BadExampleHandling.ERROR,
                  warn_bad_instances : True,
                  num_instances_to_skip : int = 0,
                  num_instances_to_read : Optional[int] = None,
@@ -116,10 +116,10 @@ DataReaderParams(dataset : Sequence[DataStore],
 
 - `dataset`: A sequence of [`DataStore`](data_store.md#DataStore) instances that together form the dataset to read from.
 - `batch_size`: A number indicating how many data instances should be packed into a single [`Example`](#Example).
-- `num_prefetched_batches`: The number of batches to prefetch in background to accelerate reading. If zero, defaults to the number of processor cores.
-- `num_parallel_reads`: The number of parallel batch reads. If not specified, it equals to `num_prefetched_batches`. In case a large number of batches should be prefetched, this parameter can be used to avoid thread oversubscription.
-- `last_batch_handling`: See [`LastBatchHandling`](#LastBatchHandling).
-- `bad_batch_handling`: See [`BadBatchHandling`](#BadBatchHandling).
+- `num_prefetched_examples`: The number of [``Examples``](#Example) to prefetch in background to accelerate reading. If zero, defaults to the number of processor cores.
+- `num_parallel_reads`: The number of parallel reads. If not specified, it equals to `num_prefetched_examples`. In case a large number of [``Examples``](#Example) should be prefetched, this parameter can be used to avoid thread oversubscription.
+- `last_example_handling`: See [`LastExampleHandling`](#LastExampleHandling).
+- `bad_example_handling`: See [`BadExampleHandling`](#BadExampleHandling).
 - `warn_bad_instances`: A boolean value indicating whether a warning will be output for each bad instance.
 - `num_instances_to_skip`: The number of data instances to skip from the beginning of the dataset.
 - `num_instances_to_read`: The number of data instances to read. The rest of the dataset will be ignored.
@@ -298,8 +298,8 @@ Gets the strides of the attribute.
 Gets a boolean value indicating whether the attribute is sparse or dense.
 
 ## Enumerations
-### LastBatchHandling
-Specifies how the last batch read from a dataset should be handled if the dataset size is not evenly divisible by the batch size.
+### LastExampleHandling
+Specifies how the last batch [``Example``](#Example) from a dataset should be handled if the dataset size is not evenly divisible by the batch size.
 
 | Value      | Description                                                                                                                               |
 |------------|-------------------------------------------------------------------------------------------------------------------------------------------|
@@ -309,16 +309,16 @@ Specifies how the last batch read from a dataset should be handled if the datase
 | `PAD`      | Pad the features of the [`Example`](#Example) with zero so that the size of the batch dimension equals the requested batch size.          |
 | `PAD_WARN` | Pad the features of the [`Example`](#Example) with zero so that the size of the batch dimension equals the requested batch size and warn. |
 
-### BadBatchHandling
-Specifies how a batch that contains erroneous data should be handled.
+### BadExampleHandling
+Specifies how an [``Example``](#Example) that contains erroneous data should be handled.
 
-| Value       | Description                                                    |
-|-------------|----------------------------------------------------------------|
-| `ERROR`     | Raise an error.                                                |
-| `SKIP`      | Skip the batch.                                                |
-| `SKIP_WARN` | Skip the batch and warn.                                       |
-| `PAD`       | Skip bad instances, pad the batch to the batch size.           |
-| `PAD_WARN`  | Skip bad instances, pad the batch to the batch size, and warn. |
+| Value       | Description                                                                      |
+|-------------|----------------------------------------------------------------------------------|
+| `ERROR`     | Raise an error.                                                                  |
+| `SKIP`      | Skip the [``Example``](#Example).                                                |
+| `SKIP_WARN` | Skip the [``Example``](#Example) and warn.                                       |
+| `PAD`       | Skip bad instances, pad the [``Example``](#Example) to the batch size.           |
+| `PAD_WARN`  | Skip bad instances, pad the [``Example``](#Example) to the batch size, and warn. |
 
 ### ImageFrame
 Specifies what image frame to use for reading an image dataset.

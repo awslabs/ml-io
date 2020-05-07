@@ -54,10 +54,10 @@ std::optional<instance_batch> instance_batch_reader::read_instance_batch()
     }
 
     if (instances.size() != params_->batch_size) {
-        if (params_->last_batch_hnd == last_batch_handling::drop) {
+        if (params_->last_example_hnd == last_example_handling::drop) {
             return {};
         }
-        if (params_->last_batch_hnd == last_batch_handling::drop_warn) {
+        if (params_->last_example_hnd == last_example_handling::drop_warn) {
             logger::warn(
                 "The last example has been dropped as it had only {0:n} instance(s) while the batch size is {1:n}.",
                 instances.size(),
@@ -65,7 +65,7 @@ std::optional<instance_batch> instance_batch_reader::read_instance_batch()
 
             return {};
         }
-        if (params_->last_batch_hnd == last_batch_handling::pad_warn) {
+        if (params_->last_example_hnd == last_example_handling::pad_warn) {
             logger::warn(
                 "The last example has been padded as it had only {0:n} instance(s) while the batch size is {1:n}.",
                 instances.size(),
@@ -74,7 +74,7 @@ std::optional<instance_batch> instance_batch_reader::read_instance_batch()
     }
 
     std::size_t size{};
-    if (params_->last_batch_hnd == last_batch_handling::pad) {
+    if (params_->last_example_hnd == last_example_handling::pad) {
         size = params_->batch_size;
     }
     else {

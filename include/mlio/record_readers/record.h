@@ -53,27 +53,21 @@ public:
 
     record(record &&) noexcept = default;
 
-    ~record() = default;
-
 public:
     record &operator=(record const &) noexcept = default;
 
     record &operator=(record &&) noexcept = default;
 
 public:
-    // clang-format off
-
-    memory_slice const & payload() const & noexcept
+    memory_slice const &payload() const &noexcept
     {
         return payload_;
     }
 
-    memory_slice && payload() && noexcept
+    memory_slice &&payload() &&noexcept
     {
         return std::move(payload_);
     }
-
-    // clang-format on
 
     record_kind kind() const noexcept
     {
