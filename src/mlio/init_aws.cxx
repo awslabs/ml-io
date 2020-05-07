@@ -68,12 +68,12 @@ inline namespace v1 {
 
 void initialize_aws_sdk()
 {
-    throw not_supported_error{"ML-IO was not built with S3 support."};
+    throw not_supported_error{"MLIO was not built with S3 support."};
 }
 
 void deallocate_aws_sdk()
 {
-    throw not_supported_error{"ML-IO was not built with S3 support."};
+    throw not_supported_error{"MLIO was not built with S3 support."};
 }
 
 #pragma GCC diagnostic pop

@@ -614,7 +614,7 @@ void register_data_readers(py::module &m)
              The returned number won't include the size of the discarded
              parts of the dataset such as comment blocks.
 
-             The returned number can be greater than expected as ML-IO
+             The returned number can be greater than expected as MLIO
              reads ahead the dataset in background.)");
 
     py::class_<csv_reader, data_reader, intrusive_ptr<csv_reader>>(

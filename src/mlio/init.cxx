@@ -29,7 +29,7 @@ void initialize()
 {
     static bool initialized{};
     if (initialized) {
-        logger::warn("ML-IO is already initialized.");
+        logger::warn("MLIO is already initialized.");
 
         return;
     }

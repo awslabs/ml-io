@@ -1,4 +1,4 @@
-# Building ML-IO
+# Building MLIO
 
 * [Runtime Requirements](#Runtime-Requirements)
 * [Build Requirements](#Build-Requirements)
@@ -30,7 +30,7 @@
 ## Installing System Dependencies
 The build instructions for Linux are based on Ubuntu 18.04. In case you are using a different distribution, please perform the equivalent steps.
 
-Official Ubuntu APT repositories do not contain an up-to-date version of CMake required to build ML-IO. [Follow the instructions](https://apt.kitware.com) on Kitware to add a repository that contains the latest version of CMake.
+Official Ubuntu APT repositories do not contain an up-to-date version of CMake required to build MLIO. [Follow the instructions](https://apt.kitware.com) on Kitware to add a repository that contains the latest version of CMake.
 
 On Ubuntu 18.04 you can install the build dependencies with:
 ```bash
@@ -43,7 +43,7 @@ $ brew update && brew install automake libtool llvm cmake ninja doxygen git
 ```
 
 ## Building the Library
-Run the following commands to pull and build the ML-IO C++ library.
+Run the following commands to pull and build the MLIO C++ library.
 
 ### Linux build commands
 
@@ -58,7 +58,7 @@ $ cmake --build .
 ```
 
 ### Mac build commands
-The Clang fork that is distributed as part of Xcode is not compatible with ML-IO and causes segmentation faults when used with certain C++17 language features. It is recommended to use the vanilla LLVM that is installed via Homebrew; this version is usually found in ```/usr/local/opt/llvm/bin/clang``` after installation.
+The Clang fork that is distributed as part of Xcode is not compatible with MLIO and causes segmentation faults when used with certain C++17 language features. It is recommended to use the vanilla LLVM that is installed via Homebrew; this version is usually found in ```/usr/local/opt/llvm/bin/clang``` after installation.
 
 ```bash
 $ export CC=/usr/local/opt/llvm/bin/clang
@@ -115,7 +115,7 @@ Once you have successfully built the project, you can install it via cmake:
 $ sudo cmake --build . --target install
 ```
 
-By default cmake will install ML-IO system wide. If you want to have it installed under a specific directory (or if you don't have sudo access), you can tell cmake the desired install location:
+By default cmake will install MLIO system wide. If you want to have it installed under a specific directory (or if you don't have sudo access), you can tell cmake the desired install location:
 
 ```bash
 $ cmake -DCMAKE_INSTALL_PREFIX=/custom/path ../..
@@ -123,7 +123,7 @@ $ cmake --build . --target install
 ```
 
 ## Building the Python Package
-ML-IO Python package uses an extension module that needs to be build first. Pass the `MLIO_INCLUDE_PYTHON_EXTENSION` option to cmake:
+MLIO Python package uses an extension module that needs to be build first. Pass the `MLIO_INCLUDE_PYTHON_EXTENSION` option to cmake:
 
 ```bash
 $ cmake -DMLIO_INCLUDE_PYTHON_EXTENSION=ON ../..
@@ -146,7 +146,7 @@ $ cd <repo_root>/src/mlio-py
 $ python setup.py bdist_wheel
 ```
 
-Note that the generated wheel won't contain the ML-IO runtime library or any of its dependencies though.
+Note that the generated wheel won't contain the MLIO runtime library or any of its dependencies though.
 
 If you want to do development in Python, an easy way to avoid repeated installs everytime you edit a Python file is to have an editable (a.k.a. develop mode) install:
 
@@ -158,7 +158,7 @@ $ pip install -e .
 With this mode changes made in Python files will be immediately reflected when the `mlio` package gets imported.
 
 ## Building the Apache Arrow Integration
-Please refer to Arrow's official install instructions [here](https://arrow.apache.org/install/) first. As Arrow does not guarantee API compatibility (yet) you have to make sure that your environment has the right version. As of today ML-IO works with Arrow v0.15.1. Once you have it installed, turn on the `MLIO_INCLUDE_ARROW_INTEGRATION` flag as follows:
+Please refer to Arrow's official install instructions [here](https://arrow.apache.org/install/) first. As Arrow does not guarantee API compatibility (yet) you have to make sure that your environment has the right version. As of today MLIO works with Arrow v0.15.1. Once you have it installed, turn on the `MLIO_INCLUDE_ARROW_INTEGRATION` flag as follows:
 
 ```bash
 $ conda install pyarrow=0.16.0
@@ -184,4 +184,4 @@ All your unit and/or integration tests must pass successfully when you build you
 Before submitting a PR you must analyze your code with `clang-tidy`. Any false positives reported by clang-tidy (which is rare) must be suppressed with a `NOLINT` inline comment and must include an explanation why it is suppressed.
 
 ### Code Style and Formatting
-ML-IO has its own style guidelines formally defined in the .clang-format file at the root of the project. Before submitting a PR you must format your code using `clang-format`.
+MLIO has its own style guidelines formally defined in the .clang-format file at the root of the project. Before submitting a PR you must format your code using `clang-format`.

@@ -236,7 +236,7 @@ inline namespace v1 {
 
 s3_client::s3_client() : core_{}
 {
-    throw not_supported_error{"ML-IO was not built with S3 support."};
+    throw not_supported_error{"MLIO was not built with S3 support."};
 }
 
 s3_client::s3_client(std::unique_ptr<Aws::S3::S3Client>) noexcept : core_{}
@@ -269,7 +269,7 @@ std::size_t s3_client::read_object_size(std::string_view, std::string_view, std:
 // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 intrusive_ptr<s3_client> s3_client_builder::build()
 {
-    throw not_supported_error{"ML-IO was not built with S3 support."};
+    throw not_supported_error{"MLIO was not built with S3 support."};
 }
 
 #pragma GCC diagnostic pop

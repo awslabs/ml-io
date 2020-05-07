@@ -9,9 +9,9 @@
 * [Enumerations](#Enumerations)
     * [DataType](#DataType)
 
-A tensor is an in-memory representation of an n-dimensional array. It is the primary data structure used by ML-IO to expose datasets in its API. Besides the conventional dense tensors, where the whole tensor data is allocated as a single contiguous memory block, ML-IO also supports multi-dimensional sparse [COO tensors](https://en.wikipedia.org/wiki/Sparse_matrix#Coordinate_list_(COO)).
+A tensor is an in-memory representation of an n-dimensional array. It is the primary data structure used by MLIO to expose datasets in its API. Besides the conventional dense tensors, where the whole tensor data is allocated as a single contiguous memory block, MLIO also supports multi-dimensional sparse [COO tensors](https://en.wikipedia.org/wiki/Sparse_matrix#Coordinate_list_(COO)).
 
-The tensor types in ML-IO are deliberately designed to be lightweight. Their primary purpose is to expose their data in most efficient way to mainstream numerical libraries and frameworks such as NumPy or PyTorch.
+The tensor types in MLIO are deliberately designed to be lightweight. Their primary purpose is to expose their data in most efficient way to mainstream numerical libraries and frameworks such as NumPy or PyTorch.
 
 ## Tensor
 Represents an abstract base class that only defines the data type and the shape of a tensor. Derived types specify how the tensor data is laid out in memory.
@@ -36,8 +36,8 @@ DenseTensor(shape : Sequence[int], data : buffer, strides : Sequence[int] = None
 ```
 - `shape`: A sequence of `int`s that describes the shape of the tensor.
 - `data`: A Python object that contains the data of the tensor and that supports the Python Buffer protocol.
-- `strides`: A sequence of `int`s that describes the strides of the tensor. ML-IO can handle negative strides, but note that not all libraries have full support for strided tensors.
-- `copy`: A boolean value indicating whether ML-IO should use a copy of the data contained in `data` or use `data` directly.
+- `strides`: A sequence of `int`s that describes the strides of the tensor. MLIO can handle negative strides, but note that not all libraries have full support for strided tensors.
+- `copy`: A boolean value indicating whether MLIO should use a copy of the data contained in `data` or use `data` directly.
 
 ### Properties
 #### data
@@ -53,7 +53,7 @@ CooTensor(shape : Sequence[int], data : buffer, coords : Sequence[buffer], copy 
 - `shape`: A sequence of `int`s that describes the shape of the tensor.
 - `data`: A Python object that contains the data of the tensor and that supports the Python Buffer protocol.
 - `coords`: A sequence that has the same length as the rank of the tensor (`len(shape)`) and that contains Python objects supporting the Python Buffer protocol. Each element should be a contiguous buffer of integers representing the data indices. See [here](https://en.wikipedia.org/wiki/Sparse_matrix#Coordinate_list_(COO)) for a detailed description of how `data` and `coords` together define a tensor.
-- `copy`: A boolean value indicating whether ML-IO should use a copy of the data contained in `data` and `coords` or use them directly.
+- `copy`: A boolean value indicating whether MLIO should use a copy of the data contained in `data` and `coords` or use them directly.
 
 ### Functions
 #### indices
@@ -102,7 +102,7 @@ Gets the id of the device.
 ## DeviceKind
 Represents a device kind that has data processing capabilities such as CPU or CUDA-capable GPU. Note that instances of `DeviceKind` can only be constructed in C++.
 
-> As of today ML-IO does not have GPU support and the only available device kind is CPU.
+> As of today MLIO does not have GPU support and the only available device kind is CPU.
 
 ### Properties
 #### cpu (static)

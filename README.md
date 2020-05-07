@@ -1,10 +1,10 @@
 [![Download](https://img.shields.io/conda/pn/mlio/mlio-py)](https://anaconda.org/mlio/mlio-py)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
 
-# ML-IO
-ML-IO is a high performance data access library for machine learning tasks with support for multiple data formats. It makes it easy for scientists to train models on their data without worrying about the format or where it's stored. Algorithm developers can also use ML-IO to build production-quality algorithms that support a rich variety of data formats and provide helpful parsing and validation messages to their customers without compromising on performance.
+# MLIO
+MLIO is a high performance data access library for machine learning tasks with support for multiple data formats. It makes it easy for scientists to train models on their data without worrying about the format or where it's stored. Algorithm developers can also use MLIO to build production-quality algorithms that support a rich variety of data formats and provide helpful parsing and validation messages to their customers without compromising on performance.
 
-ML-IO is already being leveraged by various components of the [Amazon SageMaker](https://aws.amazon.com/sagemaker/) platform such as its first-party algorithms and the [Autopilot](https://aws.amazon.com/sagemaker/autopilot/) feature. The open-source Amazon SageMaker [XGBoost](https://github.com/aws/sagemaker-xgboost-container) and [Scikit-learn](https://github.com/aws/sagemaker-scikit-learn-container) container images also use ML-IO for consuming datasets.
+MLIO is already being leveraged by various components of the [Amazon SageMaker](https://aws.amazon.com/sagemaker/) platform such as its first-party algorithms and the [Autopilot](https://aws.amazon.com/sagemaker/autopilot/) feature. The open-source Amazon SageMaker [XGBoost](https://github.com/aws/sagemaker-xgboost-container) and [Scikit-learn](https://github.com/aws/sagemaker-scikit-learn-container) container images also use MLIO for consuming datasets.
 
 * [Installation](#Installation)
     * [Binaries](#Binaries)
@@ -17,11 +17,11 @@ ML-IO is already being leveraged by various components of the [Amazon SageMaker]
 * [How to Contribute](#How-to-Contribute)
 
 ## Installation
-> ML-IO is only available for Linux and macOS operating systems.
+> MLIO is only available for Linux and macOS operating systems.
 
 ### Binaries
 #### Conda
-The easiest way to get started with ML-IO is installing it via [Conda](https://conda.io). The latest version is available in the *mlio* channel and can be installed into a Conda environment using the following commands:
+The easiest way to get started with MLIO is installing it via [Conda](https://conda.io). The latest version is available in the *mlio* channel and can be installed into a Conda environment using the following commands:
 
 ```bash
 $ conda create -name <env_name> python=3.7
@@ -40,17 +40,17 @@ The *mlio* channel provides the following packages:
 
 #### PyPI
 
-ML-IO is not available in PyPI due to technical challenges involved in supporting non-Python dependencies in pip environments. [See the blog post](https://uwekorn.com/2019/09/15/how-we-build-apache-arrows-manylinux-wheels.html) of Uwe L. Korn from the Apache Arrow project to learn more about the issues they faced with pip and why they dropped their official support for it. These are the very same issues our team has faced and the reason why do not support pip/wheel at the moment.
+MLIO is not available in PyPI due to technical challenges involved in supporting non-Python dependencies in pip environments. [See the blog post](https://uwekorn.com/2019/09/15/how-we-build-apache-arrows-manylinux-wheels.html) of Uwe L. Korn from the Apache Arrow project to learn more about the issues they faced with pip and why they dropped their official support for it. These are the very same issues our team has faced and the reason why do not support pip/wheel at the moment.
 
 ### From Source
-> Unless you want to contribute to ML-IO we strongly recommend installing it in binary form as described above. Building ML-IO from scratch involves setting up a specific development environment and can be a tedious task if you are not comfortable with various tools and technologies (e.g. toolchains, CMake, C++).
+> Unless you want to contribute to MLIO we strongly recommend installing it in binary form as described above. Building MLIO from scratch involves setting up a specific development environment and can be a tedious task if you are not comfortable with various tools and technologies (e.g. toolchains, CMake, C++).
 
-Instructions on how to build ML-IO locally can be found [here](doc/build.md).
+Instructions on how to build MLIO locally can be found [here](doc/build.md).
 
 ## Getting Started
-ML-IO currently supports reading three data formats: CSV, Parquet, and RecordIO-Protobuf.
+MLIO currently supports reading three data formats: CSV, Parquet, and RecordIO-Protobuf.
 
-Datasets read with ML-IO can be converted into NumPy arrays, SciPy COO matrices, pandas DataFrames, TensorFlow tensors, PyTorch tensors, and MXNet arrays. Below we show some examples on how to read and convert data with ML-IO.
+Datasets read with MLIO can be converted into NumPy arrays, SciPy COO matrices, pandas DataFrames, TensorFlow tensors, PyTorch tensors, and MXNet arrays. Below we show some examples on how to read and convert data with MLIO.
 
 ### Reading CSV Files as NumPy Arrays
 
@@ -74,9 +74,9 @@ num_epochs = 5 # Number of times to read the full dataset.
 for epoch in range(num_epochs):
     # CsvReader is simply an iterator over mini-batches of data.
     for example in reader:
-        # An ``Example`` instance acts like a dictionary of ML-IO tensors
+        # An ``Example`` instance acts like a dictionary of MLIO tensors
         # mapped by column name according to the CSV header.
-        lbl = example['label'] # Get the ML-IO ``Tensor`` of the column called 'label'.
+        lbl = example['label'] # Get the MLIO ``Tensor`` of the column called 'label'.
         lbl = as_numpy(lbl) # Zero-copy convert the tensor into a NumPy array.
 
         # Alternatively, transform the mini-batch into a NumPy array.
@@ -86,7 +86,7 @@ for epoch in range(num_epochs):
  ```
 
 ### Reading CSV Files over Amazon SageMaker Pipe Mode as pandas DataFrames
-ML-IO can read datasets from various sources including local file system, in-memory buffers, and Amazon SageMaker Pipe mode. Below we show how you can read a CSV dataset over Amazon SageMaker Pipe mode.
+MLIO can read datasets from various sources including local file system, in-memory buffers, and Amazon SageMaker Pipe mode. Below we show how you can read a CSV dataset over Amazon SageMaker Pipe mode.
 
 ```python
 import numpy as np
@@ -150,7 +150,7 @@ for epoch in range(num_epochs):
  ```
 
 ### Reading RecordIO-protobuf Files over Amazon S3 as PyTorch Tensors
-[RecordIO-protobuf](https://docs.aws.amazon.com/sagemaker/latest/dg/cdf-training.html) is the native data format of first-party Amazon SageMaker algorithms. It is a binary format that is specifically tuned for high-throughput. With ML-IO third-party algorithms can now leverage the same performance benefit as first-party Amazon SageMaker algorithms.
+[RecordIO-protobuf](https://docs.aws.amazon.com/sagemaker/latest/dg/cdf-training.html) is the native data format of first-party Amazon SageMaker algorithms. It is a binary format that is specifically tuned for high-throughput. With MLIO third-party algorithms can now leverage the same performance benefit as first-party Amazon SageMaker algorithms.
 
 ```python
 import numpy as np
@@ -192,7 +192,7 @@ for epoch in range(num_epochs):
  ```
 
 ### Reading Parquet Files over Amazon SageMaker Pipe Mode with Apache Arrow
-ML-IO offers native integration with Apache Arrow and can represent dataset records as Arrow files. In the example below we read a Parquet dataset from an Amazon SageMaker Pipe channel and pass it to Arrow for actual parsing.
+MLIO offers native integration with Apache Arrow and can represent dataset records as Arrow files. In the example below we read a Parquet dataset from an Amazon SageMaker Pipe channel and pass it to Arrow for actual parsing.
 
 ```python
 import pyarrow.parquet as pq
@@ -217,7 +217,7 @@ with pipe.open_read() as strm:
 ```
 
 ### Reading in C++
-The C++ API of ML-IO has full feature parity with its Python API. In fact ML-IO is mostly written in modern C++ and exposes its functionality to Python using a thin language binding layer. This makes it possible to perform quick experimentations and fast iterations in Python that can later be productionized in C++ with very little effort.
+The C++ API of MLIO has full feature parity with its Python API. In fact MLIO is mostly written in modern C++ and exposes its functionality to Python using a thin language binding layer. This makes it possible to perform quick experimentations and fast iterations in Python that can later be productionized in C++ with very little effort.
 
 Below we show the same [`CsvReader`](doc/python/data_reader.md#CsvReader) sample code; this time exporting columns as DLPack tensors instead of NumPy arrays.
 
@@ -236,13 +236,13 @@ int main(int argc, char *argv[])
 
     // Read the dataset five times (five epochs).
     for (auto i = 0; i < /*num_epochs*/ 5; i++) {
-        // An example instance acts like a dictionary of ML-IO tensors
+        // An example instance acts like a dictionary of MLIO tensors
         // mapped by column name according to the CSV header.
         mlio::intrusive_ptr<mlio::example> exm;
 
         // csv_reader is simply an iterator over mini-batches of data.
         while ((exm = reader->read_example()) != nullptr) {
-            // Get the ML-IO tensor of the column called 'label'.
+            // Get the MLIO tensor of the column called 'label'.
             auto lbl = exm->find_feature("label");
 
             // Zero-copy convert it to DLPack.
@@ -259,9 +259,9 @@ int main(int argc, char *argv[])
 
 ## Reference
 
-ML-IO uses a layered architecture as shown in the following figure. Check out the Python and C++ reference links below to learn more about ML-IO's API.
+MLIO uses a layered architecture as shown in the following figure. Check out the Python and C++ reference links below to learn more about MLIO's API.
 
-<p align="center"><image src="doc/architecture.svg"></p>
+<p align="center"><image src="doc/architecture.png"></p>
 
 ### Python
 * [Data Stores](doc/python/data_store.md)
@@ -281,7 +281,7 @@ ML-IO uses a layered architecture as shown in the following figure. Check out th
 Please submit your questions, feature requests, and bug reports on [GitHub issues](https://github.com/awslabs/ml-io/issues) page.
 
 ## How to Contribute
-We welcome community contributions to ML-IO. Please read our [Contributing Guidelines](CONTRIBUTING.md) to learn more.
+We welcome community contributions to MLIO. Please read our [Contributing Guidelines](CONTRIBUTING.md) to learn more.
 
 ## License
 This project is licensed under the Apache-2.0 License.

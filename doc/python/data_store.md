@@ -11,7 +11,7 @@
     * [list_files](#list_files)
     * [list_s3_objects](#list_s3_objects)
 
-A data store, as its name suggests, represents an entity that is used for storing binary or textual data. As of today ML-IO supports local files, in-memory buffers, Amazon S3 objects, and Amazon SageMaker pipe channels as data stores. 
+A data store, as its name suggests, represents an entity that is used for storing binary or textual data. As of today MLIO supports local files, in-memory buffers, Amazon S3 objects, and Amazon SageMaker pipe channels as data stores. 
 
 ## DataStore
 Represents an abstract base class for all data store types.

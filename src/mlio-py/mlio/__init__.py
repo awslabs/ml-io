@@ -161,7 +161,7 @@ atexit.register(mlio._core.clear_log_message_handler)
 
 def set_log_level(lvl):
     """
-    Sets the log level for the ML-IO library.
+    Sets the log level for the MLIO library.
 
     Parameters
     ----------

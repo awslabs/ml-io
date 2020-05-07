@@ -28,7 +28,7 @@ S3Client(access_key_id : str = None,
 
 ## Functions
 #### initialize_aws_sdk
-Initializes AWS C++ SDK. If you are using ML-IO along with another library or framework that initializes AWS C++ SDK, you might/should skip calling this function; otherwise, this function has to be called before instantiating an [S3Client](#S3Client).
+Initializes AWS C++ SDK. If you are using MLIO along with another library or framework that initializes AWS C++ SDK, you might/should skip calling this function; otherwise, this function has to be called before instantiating an [S3Client](#S3Client).
 
 ```python
 initialize_aws_sdk()

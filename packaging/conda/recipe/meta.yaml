@@ -46,7 +46,7 @@ outputs:
         - test -f "$PREFIX/lib/libmlio.so"     # [linux]
         - test -f "$PREFIX/lib/libmlio.dylib"  # [osx]
     about:
-      summary: ML-IO C++ Runtime Library
+      summary: MLIO C++ Runtime Library
 
   - name: libmlio-devel
     script: build-mlio-devel.sh
@@ -66,7 +66,7 @@ outputs:
       commands:
         - test -f "$PREFIX/include/mlio.h"  # [unix]
     about:
-      summary: ML-IO C++ Header Files and Development Artifacts
+      summary: MLIO C++ Header Files and Development Artifacts
 
   - name: libmlio-dbg
     script: build-mlio-dbg.sh
@@ -81,7 +81,7 @@ outputs:
         # of libmlio.
         - {{ pin_subpackage('libmlio', exact=True) }}
     about:
-      summary: ML-IO Debug Symbols
+      summary: MLIO Debug Symbols
 
   - name: mlio-py
     script: build-mlio-py.sh
@@ -118,7 +118,7 @@ outputs:
       requires:
         - {{ pin_compatible('arrow-cpp', exact=True) }}
     about:
-      summary: ML-IO Python Package
+      summary: MLIO Python Package
 
 about:
   home: http://github.com/awslabs/ml-io

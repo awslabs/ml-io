@@ -18,7 +18,7 @@
     * [MaxFieldLengthHandling](#MaxFieldLengthHandling)
 * [Exceptions](#Exceptions)
 
-A data reader is the main interface of ML-IO for reading datasets. A dataset is a collection of one or more [data stores](data_store.md) all of which contain data in the same format (e.g. CSV or RecordIO-protobuf). By instantiating a subclass of [`DataReader`](#DataReader) such as a [`CsvReader`](#CsvReader) or a [`RecordIOProtobufReader`](#RecordIOProtobufReader) a dataset can be read in batches.
+A data reader is the main interface of MLIO for reading datasets. A dataset is a collection of one or more [data stores](data_store.md) all of which contain data in the same format (e.g. CSV or RecordIO-protobuf). By instantiating a subclass of [`DataReader`](#DataReader) such as a [`CsvReader`](#CsvReader) or a [`RecordIOProtobufReader`](#RecordIOProtobufReader) a dataset can be read in batches.
 
 ## DataReader
 Represents an abstract base class for all data reader types.
@@ -59,7 +59,7 @@ All data readers are iterable and can be used in contexts such as `for` loops, l
 #### num_bytes_read
 Gets the number of bytes read from the dataset. The returned number won't include the size of the discarded parts of the dataset such as comment blocks.
 
-> The returned number can be greater than expected as ML-IO reads ahead the dataset in background.
+> The returned number can be greater than expected as MLIO reads ahead the dataset in background.
 
 ## CsvReader
 Represents a data reader for reading CSV datasets.  Inherits from [DataReader](#DataReader).

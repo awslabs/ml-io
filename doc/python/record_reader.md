@@ -7,7 +7,7 @@
     * [RecordKind](#RecordKind)
 * [Exceptions](#Exceptions)
 
-Record readers are relatively low-level constructs in the ML-IO API. They allow reading raw binary records from an [`InputStream`](stream.md#InputStream) instance.
+Record readers are relatively low-level constructs in the MLIO API. They allow reading raw binary records from an [`InputStream`](stream.md#InputStream) instance.
 
 As of today the only publicly available record reader type is [`ParquetRecordReader`](#ParquetRecordReader) which reads Parquet files as memory blobs that can be passed to Apache Arrow.
 

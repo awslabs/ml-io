@@ -1,11 +1,11 @@
-# ML-IO Insights
+# MLIO Insights
 
-The insights contrib package provides tools to analyze large tabular datasets using ML-IO.
-In particular, it is well suited to be combined with ML-IO's support for large CSV datasets.
+The insights contrib package provides tools to analyze large tabular datasets using MLIO.
+In particular, it is well suited to be combined with MLIO's support for large CSV datasets.
 
-All functionality in the ML-IO insights package uses streaming and approximate algorithms to
+All functionality in the MLIO insights package uses streaming and approximate algorithms to
 ensure that memory usage is bound. Similarly, as a CPU bound task it uses the same 
-multithreading primitives as ML-IO to achieve better performance.
+multithreading primitives as MLIO to achieve better performance.
 
 ## Usage
 
