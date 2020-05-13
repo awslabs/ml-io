@@ -45,9 +45,17 @@ void *py_device_array::make_or_get_string_buffer()
 {
     if (string_buf_.empty()) {
         string_buf_.reserve(span_.size());
-
-        for (py::str obj : span_.as<std::string>()) {
-            string_buf_.push_back(obj.release().ptr());
+        try {
+            for (py::str obj : span_.as<std::string>()) {
+                string_buf_.push_back(obj.release().ptr());
+            }
+        } catch (std::runtime_error &) {
+            PyErr_SetString(
+                PyExc_ValueError,
+                "The string tensor contains an invalid UTF-8 sequence. Please make sure that you "
+                "specify an explicit text encoding if the text is supposed to be in a different "
+                "encoding.");
+            return nullptr;
         }
     }
 

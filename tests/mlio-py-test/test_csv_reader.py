@@ -1,11 +1,14 @@
 from typing import List
 
 import numpy as np
+import os
 import pytest
 
 import mlio
 from mlio.integ.numpy import as_numpy
 
+resources_dir = os.path.join(
+    os.path.dirname(os.path.realpath(__file__)), '../resources')
 
 def _test_dedupe_column_names(
         tmpdir,
@@ -122,3 +125,37 @@ def test_dedupe_column_names_duplicates_use_columns_by_index(tmpdir):
         expected_data=[1, 2, 4],
         use_columns_by_index={0, 1, 3}
     )
+
+
+def test_csv_nonutf_encoding_without_encoding_param():
+    filename = os.path.join(resources_dir, 'test_iso8859_5.csv')
+    dataset = [mlio.File(filename)]
+    rdr_prm = mlio.DataReaderParams(dataset=dataset,
+                                    batch_size=2)
+
+    reader = mlio.CsvReader(rdr_prm)
+    example = reader.read_example()
+    nonutf_feature = example['col_3']
+
+    try:
+        feature_np = as_numpy(nonutf_feature)
+        pytest.fail("exception expected")
+    except SystemError as err:
+        pass
+
+
+def test_csv_nonutf_encoding_with_encoding_param():
+    filename = os.path.join(resources_dir, 'test_iso8859_5.csv')
+    dataset = [mlio.File(filename)]
+    rdr_prm = mlio.DataReaderParams(dataset=dataset,
+                                    batch_size=2)
+    csv_params = mlio.CsvParams(encoding='ISO-8859-5')
+
+    reader = mlio.CsvReader(rdr_prm, csv_params)
+    example = reader.read_example()
+    nonutf_feature = example['col_3']
+
+    try:
+        feature_np = as_numpy(nonutf_feature)
+    except SystemError as err:
+        pytest.fail("Unexpected exception thrown")
