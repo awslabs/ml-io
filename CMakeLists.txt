@@ -306,9 +306,11 @@ else()
 endif()
 
 if(MLIO_INCLUDE_PYTHON_EXTENSION)
-    # The minimum required Python version to compile the C extensions.
-    set(PYBIND11_PYTHON_VERSION 3.6)
     find_package(pybind11 2.4.2 REQUIRED CONFIG)
+
+    if(${PYTHON_VERSION_STRING} VERSION_LESS "3.6")
+        message(FATAL_ERROR "Only CPython 3.6 or later is supported.")
+    endif()
 
     if(MLIO_INCLUDE_ARROW_INTEGRATION)
         find_package(Arrow 0.16.0 REQUIRED CONFIG)
