@@ -2,25 +2,24 @@
 
 set -o errexit
 
-declare -r _valid_dependencies=(absl
-                                awssdk
-                                dlpack
-                                fmt
-                                gtest
-                                natsort
-                                protobuf
-                                pybind11
-                                tbb)
+declare -r _static_dependencies=(absl dlpack fmt gtest natsort pybind11)
+declare -r _shared_dependencies=(awssdk protobuf tbb)
 
 function _print_usage
 {
     local dep
 
-    printf "Usage: %s DIRECTORY [all|DEPENDENCY...]\n\nDependencies:\n" "$(basename "$0")"
+    printf "Usage: %s DIRECTORY [statics|all|DEPENDENCY...]\n\nDependencies:\n" "$(basename "$0")"
 
-    for dep in "${_valid_dependencies[@]}"; do
-        printf "  %s\n" "$dep"
-    done
+    {
+        for dep in "${_static_dependencies[@]}"; do
+            printf "  %-10s (static)\n" "$dep"
+        done
+
+        for dep in "${_shared_dependencies[@]}"; do
+            printf "  %-10s (shared)\n" "$dep"
+        done
+    } | sort
 }
 
 function _exit
@@ -41,7 +40,7 @@ function _check_dependency
 {
     local dep
 
-    for dep in "${_valid_dependencies[@]}"; do
+    for dep in "${_static_dependencies[@]}" "${_shared_dependencies[@]}"; do
         if [[ $1 == "$dep" ]]; then
             return
         fi
@@ -92,9 +91,19 @@ function _main
 
     shift
 
-    if [[ $# -eq 1 && $1 == all ]]; then
-        deps=("${_valid_dependencies[@]}")
-    else
+    if [[ $# -eq 0 ]]; then
+        _exit_error
+    fi
+
+    if [[ $# -eq 1 ]]; then
+       if [[ $1 == all ]]; then
+            deps=("${_static_dependencies[@]}" "${_shared_dependencies[@]}")
+        elif [[ $1 == statics ]]; then
+            deps=("${_static_dependencies[@]}")
+        fi
+    fi
+
+    if [[ ${#deps[@]} == 0 ]]; then
         deps=("$@")
     fi
 
