@@ -31,24 +31,24 @@ public:
     using value_type = std::byte;
     using size_type = std::size_t;
     using difference_type = std::ptrdiff_t;
-    using reference = std::byte const &;
-    using const_reference = std::byte const &;
-    using pointer = std::byte const *;
-    using const_pointer = std::byte const *;
-    using iterator = std::byte const *;
-    using const_iterator = std::byte const *;
+    using reference = const std::byte &;
+    using const_reference = const std::byte &;
+    using pointer = const std::byte *;
+    using const_pointer = const std::byte *;
+    using iterator = const std::byte *;
+    using const_iterator = const std::byte *;
 
 public:
     memory_block() noexcept = default;
 
-    memory_block(memory_block const &) = delete;
+    memory_block(const memory_block &) = delete;
 
     memory_block(memory_block &&) = delete;
 
     virtual ~memory_block();
 
 public:
-    memory_block &operator=(memory_block const &) = delete;
+    memory_block &operator=(const memory_block &) = delete;
 
     memory_block &operator=(memory_block &&) = delete;
 
@@ -88,14 +88,14 @@ public:
 public:
     mutable_memory_block() noexcept = default;
 
-    mutable_memory_block(mutable_memory_block const &) = delete;
+    mutable_memory_block(const mutable_memory_block &) = delete;
 
     mutable_memory_block(mutable_memory_block &&) = delete;
 
     ~mutable_memory_block() override;
 
 public:
-    mutable_memory_block &operator=(mutable_memory_block const &) = delete;
+    mutable_memory_block &operator=(const mutable_memory_block &) = delete;
 
     mutable_memory_block &operator=(mutable_memory_block &&) = delete;
 

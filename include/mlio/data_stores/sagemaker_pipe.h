@@ -47,7 +47,7 @@ public:
     std::string repr() const final;
 
 public:
-    std::string const &id() const noexcept final
+    const std::string &id() const noexcept final
     {
         return pathname_;
     }

@@ -34,7 +34,7 @@ class MLIO_API instance {
 public:
     /// @param ds
     ///     The data store that represents the instance.
-    explicit instance(data_store const &ds) noexcept : store_{&ds}
+    explicit instance(const data_store &ds) noexcept : store_{&ds}
     {}
 
     /// @param ds
@@ -43,7 +43,7 @@ public:
     ///     The position of the instance in the data store.
     /// @param bits
     ///     The raw data of the instance.
-    explicit instance(data_store const &ds, std::size_t index, memory_slice &&bits) noexcept
+    explicit instance(const data_store &ds, std::size_t index, memory_slice &&bits) noexcept
         : store_{&ds}, index_{index}, bits_{std::move(bits)}
     {}
 
@@ -55,7 +55,7 @@ private:
     [[noreturn]] void handle_errors() const;
 
 public:
-    data_store const &get_data_store() const noexcept
+    const data_store &get_data_store() const noexcept
     {
         return *store_;
     }
@@ -65,7 +65,7 @@ public:
         return index_;
     }
 
-    memory_slice const &bits() const
+    const memory_slice &bits() const
     {
         // If we do not have instance data, it means that we should
         // treat the whole data store as a single instance.
@@ -77,7 +77,7 @@ public:
     }
 
 private:
-    data_store const *store_;
+    const data_store *store_;
     std::size_t index_{};
     mutable std::optional<memory_slice> bits_{};
 };

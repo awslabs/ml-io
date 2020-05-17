@@ -34,7 +34,7 @@ decltype(auto) at(device_array_span arr, std::size_t index) noexcept
 }
 
 template<data_type dt>
-return_if<dt == data_type::size> make_parser_core(parser_params const &)
+return_if<dt == data_type::size> make_parser_core(const parser_params &)
 {
     return [](std::string_view s, device_array_span arr, std::size_t index) {
         return try_parse_size_t(s, at<dt>(arr, index));
@@ -42,7 +42,7 @@ return_if<dt == data_type::size> make_parser_core(parser_params const &)
 }
 
 template<data_type dt>
-return_if<dt == data_type::float16> make_parser_core(parser_params const &)
+return_if<dt == data_type::float16> make_parser_core(const parser_params &)
 {
     return [](std::string_view, device_array_span, std::size_t) {
         return parse_result::failed;
@@ -51,7 +51,7 @@ return_if<dt == data_type::float16> make_parser_core(parser_params const &)
 
 template<data_type dt>
 return_if<dt == data_type::float32 || dt == data_type::float64>
-make_parser_core(parser_params const &prm)
+make_parser_core(const parser_params &prm)
 {
     return [&prm](std::string_view s, device_array_span arr, std::size_t index) {
         return try_parse_float({s, &prm.nan_values}, at<dt>(arr, index));
@@ -62,7 +62,7 @@ template<data_type dt>
 return_if<dt == data_type::sint8 || dt == data_type::sint16 || dt == data_type::sint32 ||
           dt == data_type::sint64 || dt == data_type::uint8 || dt == data_type::uint16 ||
           dt == data_type::uint32 || dt == data_type::uint64>
-make_parser_core(parser_params const &prm)
+make_parser_core(const parser_params &prm)
 {
     return [&prm](std::string_view s, device_array_span arr, std::size_t index) {
         return try_parse_int({s, prm.base}, at<dt>(arr, index));
@@ -70,7 +70,7 @@ make_parser_core(parser_params const &prm)
 }
 
 template<data_type dt>
-return_if<dt == data_type::string> make_parser_core(parser_params const &)
+return_if<dt == data_type::string> make_parser_core(const parser_params &)
 {
     return [](std::string_view s, device_array_span arr, std::size_t index) {
         at<dt>(arr, index) = static_cast<std::string>(s);
@@ -81,7 +81,7 @@ return_if<dt == data_type::string> make_parser_core(parser_params const &)
 
 template<data_type dt>
 struct make_parser_op {
-    parser operator()(parser_params const &prm)
+    parser operator()(const parser_params &prm)
     {
         return make_parser_core<dt>(prm);
     }
@@ -90,7 +90,7 @@ struct make_parser_op {
 }  // namespace
 }  // namespace detail
 
-parser make_parser(data_type dt, parser_params const &prm)
+parser make_parser(data_type dt, const parser_params &prm)
 {
     return dispatch<detail::make_parser_op>(dt, prm);
 }

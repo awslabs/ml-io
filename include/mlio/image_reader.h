@@ -62,41 +62,41 @@ private:
 public:
     explicit image_reader(data_reader_params prm, image_reader_params img_prm);
 
-    image_reader(image_reader const &) = delete;
+    image_reader(const image_reader &) = delete;
 
     image_reader(image_reader &&) = delete;
 
     ~image_reader() final;
 
 public:
-    image_reader &operator=(image_reader const &) = delete;
+    image_reader &operator=(const image_reader &) = delete;
 
     image_reader &operator=(image_reader &&) = delete;
 
 private:
     MLIO_HIDDEN
-    intrusive_ptr<record_reader> make_record_reader(data_store const &ds) final;
+    intrusive_ptr<record_reader> make_record_reader(const data_store &ds) final;
 
     MLIO_HIDDEN
     intrusive_ptr<schema const> infer_schema(std::optional<instance> const &ins) final;
 
     MLIO_HIDDEN
-    intrusive_ptr<example> decode(instance_batch const &batch) const final;
+    intrusive_ptr<example> decode(const instance_batch &batch) const final;
 
     MLIO_HIDDEN
     intrusive_ptr<dense_tensor> make_tensor(std::size_t batch_size, std::size_t batch_stride) const;
 
     MLIO_HIDDEN
-    bool decode_core(stdx::span<std::uint8_t> out, instance const &ins) const;
+    bool decode_core(stdx::span<std::uint8_t> out, const instance &ins) const;
 
     MLIO_HIDDEN
-    cv::Mat decode_image(cv::Mat const &buf, int mode, instance const &ins) const;
+    cv::Mat decode_image(const cv::Mat &buf, int mode, const instance &ins) const;
 
     MLIO_HIDDEN
-    bool resize(cv::Mat &src, cv::Mat &dst, instance const &ins) const;
+    bool resize(cv::Mat &src, cv::Mat &dst, const instance &ins) const;
 
     MLIO_HIDDEN
-    bool crop(cv::Mat &src, cv::Mat &dst, instance const &ins) const;
+    bool crop(cv::Mat &src, cv::Mat &dst, const instance &ins) const;
 
 private:
     image_reader_params params_;

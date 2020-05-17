@@ -59,17 +59,17 @@ thread_local Record proto_msg_{};  // NOLINT(cert-err58-cpp)
 
 class recordio_protobuf_reader::decoder_state {
 public:
-    explicit decoder_state(recordio_protobuf_reader const &rdr, std::size_t batch_size);
+    explicit decoder_state(const recordio_protobuf_reader &rdr, std::size_t batch_size);
 
 private:
-    void init_state(schema const &shm, std::size_t batch_size);
+    void init_state(const schema &shm, std::size_t batch_size);
 
-    void init_tensor(attribute const &attr, std::size_t batch_size);
+    void init_tensor(const attribute &attr, std::size_t batch_size);
 
-    void init_coo_tensor_builder(attribute const &attr, std::size_t batch_size);
+    void init_coo_tensor_builder(const attribute &attr, std::size_t batch_size);
 
 public:
-    recordio_protobuf_reader const *reader;
+    const recordio_protobuf_reader *reader;
     bool warn_bad_instance;
     bool error_bad_example;
     std::vector<intrusive_ptr<tensor>> tensors{};
@@ -82,34 +82,34 @@ public:
     {}
 
 public:
-    bool decode(std::size_t row_idx, instance const &ins);
+    bool decode(std::size_t row_idx, const instance &ins);
 
 private:
-    Record const *parse_proto(instance const &ins) const;
+    const Record *parse_proto(const instance &ins) const;
 
-    bool decode_feature(std::string const &name, Value const &value);
+    bool decode_feature(const std::string &name, const Value &value);
 
     template<data_type dt, typename ProtobufTensor>
-    bool decode_feature(ProtobufTensor const &tsr);
+    bool decode_feature(const ProtobufTensor &tsr);
 
     template<typename ProtobufTensor>
-    bool is_sparse(ProtobufTensor const &tsr) const;
+    bool is_sparse(const ProtobufTensor &tsr) const;
 
     template<typename ProtobufTensor>
-    bool shape_equals(ProtobufTensor const &tsr) const;
+    bool shape_equals(const ProtobufTensor &tsr) const;
 
     template<data_type dt, typename ProtobufTensor>
-    bool copy_to_tensor(ProtobufTensor const &tsr) const;
+    bool copy_to_tensor(const ProtobufTensor &tsr) const;
 
     template<data_type dt, typename ProtobufTensor>
-    bool append_to_builder(ProtobufTensor const &tsr) const;
+    bool append_to_builder(const ProtobufTensor &tsr) const;
 
 private:
     decoder_state *state_;
-    instance const *instance_{};
+    const instance *instance_{};
     std::size_t row_idx_{};
     std::size_t attr_idx_{};
-    attribute const *attr_{};
+    const attribute *attr_{};
 };
 
 recordio_protobuf_reader::recordio_protobuf_reader(data_reader_params prm)
@@ -124,7 +124,7 @@ recordio_protobuf_reader::~recordio_protobuf_reader()
     stop();
 }
 
-intrusive_ptr<record_reader> recordio_protobuf_reader::make_record_reader(data_store const &ds)
+intrusive_ptr<record_reader> recordio_protobuf_reader::make_record_reader(const data_store &ds)
 {
     return make_intrusive<detail::recordio_record_reader>(ds.open_read());
 }
@@ -136,7 +136,7 @@ recordio_protobuf_reader::infer_schema(std::optional<instance> const &ins)
         return {};
     }
 
-    Record const *proto_msg = parse_proto(*ins);
+    const Record *proto_msg = parse_proto(*ins);
     if (proto_msg == nullptr) {
         throw schema_error{fmt::format(
             "The instance #{1:n} in the data store '{0}' contains a corrupt RecordIO-protobuf message.",
@@ -160,7 +160,7 @@ recordio_protobuf_reader::infer_schema(std::optional<instance> const &ins)
 
     // We use this value in the decode() function to decide whether the
     // amount of data we need to process is worth to parallelize.
-    for (attribute const &attr : shm->attributes()) {
+    for (const attribute &attr : shm->attributes()) {
         if (!attr.sparse()) {
             // Add the stride of the batch dimension.
             num_values_per_instance_ += as_size(attr.strides()[0]);
@@ -170,9 +170,9 @@ recordio_protobuf_reader::infer_schema(std::optional<instance> const &ins)
     return std::move(shm);
 }
 
-attribute recordio_protobuf_reader::make_attribute(instance const &ins,
-                                                   std::string const &name,
-                                                   Value const &value)
+attribute recordio_protobuf_reader::make_attribute(const instance &ins,
+                                                   const std::string &name,
+                                                   const Value &value)
 {
     switch (value.value_case()) {
     case Value::ValueCase::kFloat32Tensor:
@@ -199,9 +199,9 @@ attribute recordio_protobuf_reader::make_attribute(instance const &ins,
 }
 
 template<data_type dt, typename ProtobufTensor>
-attribute recordio_protobuf_reader::make_attribute(instance const &ins,
-                                                   std::string const &name,
-                                                   ProtobufTensor const &tsr)
+attribute recordio_protobuf_reader::make_attribute(const instance &ins,
+                                                   const std::string &name,
+                                                   const ProtobufTensor &tsr)
 {
     bool is_sparse{};
 
@@ -247,10 +247,10 @@ attribute recordio_protobuf_reader::make_attribute(instance const &ins,
 }
 
 template<typename ProtobufTensor>
-void recordio_protobuf_reader::copy_shape(instance const &ins,
-                                          std::string const &name,
+void recordio_protobuf_reader::copy_shape(const instance &ins,
+                                          const std::string &name,
                                           size_vector &shp,
-                                          ProtobufTensor const &tsr)
+                                          const ProtobufTensor &tsr)
 {
     for (std::uint64_t dim : tsr.shape()) {
         std::size_t d{};
@@ -269,7 +269,7 @@ void recordio_protobuf_reader::copy_shape(instance const &ins,
     }
 }
 
-intrusive_ptr<example> recordio_protobuf_reader::decode(instance_batch const &batch) const
+intrusive_ptr<example> recordio_protobuf_reader::decode(const instance_batch &batch) const
 {
     decoder_state state{*this, batch.size()};
 
@@ -346,12 +346,12 @@ intrusive_ptr<example> recordio_protobuf_reader::decode(instance_batch const &ba
     return exm;
 }
 
-std::optional<std::size_t> recordio_protobuf_reader::decode_ser(decoder_state &state,
-                                                                instance_batch const &batch) const
+std::optional<std::size_t>
+recordio_protobuf_reader::decode_ser(decoder_state &state, const instance_batch &batch) const
 {
     std::size_t row_idx = 0;
 
-    for (instance const &ins : batch.instances()) {
+    for (const instance &ins : batch.instances()) {
         decoder dc{state};
         if (dc.decode(row_idx, ins)) {
             row_idx++;
@@ -373,8 +373,8 @@ std::optional<std::size_t> recordio_protobuf_reader::decode_ser(decoder_state &s
     return row_idx;
 }
 
-std::optional<std::size_t> recordio_protobuf_reader::decode_prl(decoder_state &state,
-                                                                instance_batch const &batch) const
+std::optional<std::size_t>
+recordio_protobuf_reader::decode_prl(decoder_state &state, const instance_batch &batch) const
 {
     std::atomic_bool skip_example{};
 
@@ -418,7 +418,7 @@ std::optional<std::size_t> recordio_protobuf_reader::decode_prl(decoder_state &s
     return num_instances;
 }
 
-Record const *recordio_protobuf_reader::parse_proto(instance const &ins)
+const Record *recordio_protobuf_reader::parse_proto(const instance &ins)
 {
     bool parsed =
         detail::proto_msg_.ParseFromArray(ins.bits().data(), static_cast<int>(ins.bits().size()));
@@ -426,7 +426,7 @@ Record const *recordio_protobuf_reader::parse_proto(instance const &ins)
     return parsed ? &detail::proto_msg_ : nullptr;
 }
 
-recordio_protobuf_reader::decoder_state::decoder_state(recordio_protobuf_reader const &rdr,
+recordio_protobuf_reader::decoder_state::decoder_state(const recordio_protobuf_reader &rdr,
                                                        std::size_t batch_size)
     : reader{&rdr}
     , warn_bad_instance{rdr.warn_bad_instances()}
@@ -435,13 +435,13 @@ recordio_protobuf_reader::decoder_state::decoder_state(recordio_protobuf_reader 
     init_state(*rdr.get_schema(), batch_size);
 }
 
-void recordio_protobuf_reader::decoder_state::init_state(schema const &shm, std::size_t batch_size)
+void recordio_protobuf_reader::decoder_state::init_state(const schema &shm, std::size_t batch_size)
 {
     tensors.reserve(shm.attributes().size());
 
     coo_tensor_builders.reserve(shm.attributes().size());
 
-    for (attribute const &attr : shm.attributes()) {
+    for (const attribute &attr : shm.attributes()) {
         if (attr.sparse()) {
             init_coo_tensor_builder(attr, batch_size);
         }
@@ -451,7 +451,7 @@ void recordio_protobuf_reader::decoder_state::init_state(schema const &shm, std:
     }
 }
 
-void recordio_protobuf_reader::decoder_state::init_tensor(attribute const &attr,
+void recordio_protobuf_reader::decoder_state::init_tensor(const attribute &attr,
                                                           std::size_t batch_size)
 {
     std::size_t data_size = batch_size * as_size(attr.strides()[0]);
@@ -471,7 +471,7 @@ void recordio_protobuf_reader::decoder_state::init_tensor(attribute const &attr,
     coo_tensor_builders.emplace_back(nullptr);
 }
 
-void recordio_protobuf_reader::decoder_state::init_coo_tensor_builder(attribute const &attr,
+void recordio_protobuf_reader::decoder_state::init_coo_tensor_builder(const attribute &attr,
                                                                       std::size_t batch_size)
 {
     auto bld = make_coo_tensor_builder(attr, batch_size);
@@ -481,13 +481,13 @@ void recordio_protobuf_reader::decoder_state::init_coo_tensor_builder(attribute 
     tensors.emplace_back(nullptr);
 }
 
-bool recordio_protobuf_reader::decoder::decode(std::size_t row_idx, instance const &ins)
+bool recordio_protobuf_reader::decoder::decode(std::size_t row_idx, const instance &ins)
 {
     row_idx_ = row_idx;
 
     instance_ = &ins;
 
-    Record const *proto_msg = parse_proto(ins);
+    const Record *proto_msg = parse_proto(ins);
     if (proto_msg == nullptr) {
         return false;
     }
@@ -509,7 +509,7 @@ bool recordio_protobuf_reader::decoder::decode(std::size_t row_idx, instance con
         num_features_read++;
     }
 
-    auto const &shm = state_->reader->get_schema();
+    const auto &shm = state_->reader->get_schema();
 
     // Make sure that we read all the features for which we have an
     // attribute in the schema.
@@ -537,9 +537,9 @@ bool recordio_protobuf_reader::decoder::decode(std::size_t row_idx, instance con
     return false;
 }
 
-Record const *recordio_protobuf_reader::decoder::parse_proto(instance const &ins) const
+const Record *recordio_protobuf_reader::decoder::parse_proto(const instance &ins) const
 {
-    Record const *proto_msg = recordio_protobuf_reader::parse_proto(ins);
+    const Record *proto_msg = recordio_protobuf_reader::parse_proto(ins);
     if (proto_msg != nullptr) {
         return proto_msg;
     }
@@ -562,9 +562,9 @@ Record const *recordio_protobuf_reader::decoder::parse_proto(instance const &ins
     return nullptr;
 }
 
-bool recordio_protobuf_reader::decoder::decode_feature(std::string const &name, Value const &value)
+bool recordio_protobuf_reader::decoder::decode_feature(const std::string &name, const Value &value)
 {
-    auto const &shm = state_->reader->get_schema();
+    const auto &shm = state_->reader->get_schema();
 
     std::optional<std::size_t> attr_idx = shm->get_index(name);
     if (attr_idx == std::nullopt) {
@@ -626,7 +626,7 @@ bool recordio_protobuf_reader::decoder::decode_feature(std::string const &name, 
 }
 
 template<data_type dt, typename ProtobufTensor>
-bool recordio_protobuf_reader::decoder::decode_feature(ProtobufTensor const &tsr)
+bool recordio_protobuf_reader::decoder::decode_feature(const ProtobufTensor &tsr)
 {
     if (attr_->dtype() != dt) {
         if (state_->warn_bad_instance || state_->error_bad_example) {
@@ -652,7 +652,7 @@ bool recordio_protobuf_reader::decoder::decode_feature(ProtobufTensor const &tsr
 
     if (is_sparse(tsr) != attr_->sparse()) {
         if (state_->warn_bad_instance || state_->error_bad_example) {
-            char const *ft{};
+            const char *ft{};
             if (attr_->sparse()) {
                 ft =
                     "The feature '{2}' of the instance #{1:n} in the data store '{0}' is sparse while the expected storage type is dense.";
@@ -686,7 +686,7 @@ bool recordio_protobuf_reader::decoder::decode_feature(ProtobufTensor const &tsr
                 pshp = fmt::format("{0}", fmt::join(tsr.shape(), ", "));
             }
 
-            size_vector const &shape = attr_->shape();
+            const size_vector &shape = attr_->shape();
 
             auto msg = fmt::format(
                 "The feature '{2}' of the instance #{1:n} in the data store '{0}' has the shape ({3}) while the expected shape is ({4}).",
@@ -716,7 +716,7 @@ bool recordio_protobuf_reader::decoder::decode_feature(ProtobufTensor const &tsr
 }
 
 template<typename ProtobufTensor>
-bool recordio_protobuf_reader::decoder::is_sparse(ProtobufTensor const &tsr) const
+bool recordio_protobuf_reader::decoder::is_sparse(const ProtobufTensor &tsr) const
 {
     if (tsr.keys().empty()) {
         return tsr.values().empty() && !tsr.shape().empty();
@@ -725,9 +725,9 @@ bool recordio_protobuf_reader::decoder::is_sparse(ProtobufTensor const &tsr) con
 }
 
 template<typename ProtobufTensor>
-bool recordio_protobuf_reader::decoder::shape_equals(ProtobufTensor const &tsr) const
+bool recordio_protobuf_reader::decoder::shape_equals(const ProtobufTensor &tsr) const
 {
-    size_vector const &shape = attr_->shape();
+    const size_vector &shape = attr_->shape();
 
     // A dense feature might have no shape specified.
     if (tsr.shape().empty()) {
@@ -761,14 +761,14 @@ bool recordio_protobuf_reader::decoder::shape_equals(ProtobufTensor const &tsr) 
 }
 
 template<data_type dt, typename ProtobufTensor>
-bool recordio_protobuf_reader::decoder::copy_to_tensor(ProtobufTensor const &tsr) const
+bool recordio_protobuf_reader::decoder::copy_to_tensor(const ProtobufTensor &tsr) const
 {
     // The stride of the batch dimension.
     std::ptrdiff_t num_values = attr_->strides()[0];
 
     if (num_values != tsr.values_size()) {
         if (state_->warn_bad_instance || state_->error_bad_example) {
-            size_vector const &shape = attr_->shape();
+            const size_vector &shape = attr_->shape();
 
             auto msg = fmt::format(
                 "The feature '{2}' of the instance #{1:n} in the data store '{0}' has {3:n} values(s) but a shape of ({4:n}).",
@@ -801,7 +801,7 @@ bool recordio_protobuf_reader::decoder::copy_to_tensor(ProtobufTensor const &tsr
 }
 
 template<data_type dt, typename ProtobufTensor>
-bool recordio_protobuf_reader::decoder::append_to_builder(ProtobufTensor const &tsr) const
+bool recordio_protobuf_reader::decoder::append_to_builder(const ProtobufTensor &tsr) const
 {
     if (tsr.keys_size() != tsr.values_size()) {
         if (state_->warn_bad_instance || state_->error_bad_example) {

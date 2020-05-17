@@ -47,51 +47,51 @@ class MLIO_API recordio_protobuf_reader final : public parallel_data_reader {
 public:
     explicit recordio_protobuf_reader(data_reader_params prm);
 
-    recordio_protobuf_reader(recordio_protobuf_reader const &) = delete;
+    recordio_protobuf_reader(const recordio_protobuf_reader &) = delete;
 
     recordio_protobuf_reader(recordio_protobuf_reader &&) = delete;
 
     ~recordio_protobuf_reader() final;
 
 public:
-    recordio_protobuf_reader &operator=(recordio_protobuf_reader const &) = delete;
+    recordio_protobuf_reader &operator=(const recordio_protobuf_reader &) = delete;
 
     recordio_protobuf_reader &operator=(recordio_protobuf_reader &&) = delete;
 
 private:
     MLIO_HIDDEN
-    intrusive_ptr<record_reader> make_record_reader(data_store const &ds) final;
+    intrusive_ptr<record_reader> make_record_reader(const data_store &ds) final;
 
     MLIO_HIDDEN
     intrusive_ptr<schema const> infer_schema(std::optional<instance> const &ins) final;
 
     MLIO_HIDDEN
     attribute
-    make_attribute(instance const &ins, std::string const &name, aialgs::data::Value const &value);
+    make_attribute(const instance &ins, const std::string &name, const aialgs::data::Value &value);
 
     template<data_type dt, typename ProtobufTensor>
     MLIO_HIDDEN
     attribute
-    make_attribute(instance const &ins, std::string const &name, ProtobufTensor const &tsr);
+    make_attribute(const instance &ins, const std::string &name, const ProtobufTensor &tsr);
 
     template<typename ProtobufTensor>
     MLIO_HIDDEN
-    void copy_shape(instance const &ins,
-                    std::string const &name,
+    void copy_shape(const instance &ins,
+                    const std::string &name,
                     size_vector &shp,
-                    ProtobufTensor const &tsr);
+                    const ProtobufTensor &tsr);
 
     MLIO_HIDDEN
-    intrusive_ptr<example> decode(instance_batch const &batch) const final;
+    intrusive_ptr<example> decode(const instance_batch &batch) const final;
 
     MLIO_HIDDEN
-    std::optional<std::size_t> decode_ser(decoder_state &state, instance_batch const &batch) const;
+    std::optional<std::size_t> decode_ser(decoder_state &state, const instance_batch &batch) const;
 
     MLIO_HIDDEN
-    std::optional<std::size_t> decode_prl(decoder_state &state, instance_batch const &batch) const;
+    std::optional<std::size_t> decode_prl(decoder_state &state, const instance_batch &batch) const;
 
     MLIO_HIDDEN
-    static aialgs::data::Record const *parse_proto(instance const &ins);
+    static const aialgs::data::Record *parse_proto(const instance &ins);
 
 private:
     bool has_sparse_feature_{};

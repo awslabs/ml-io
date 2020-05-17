@@ -40,7 +40,7 @@ memory_slice instance::load_bits_from_store() const
     try {
         strm = store_->open_read();
     }
-    catch (std::system_error const &e) {
+    catch (const std::system_error &e) {
         if (e.code() == std::errc::no_such_file_or_directory) {
             throw data_reader_error{
                 fmt::format("The data store '{0}' does not exist.", store_->id())};
@@ -59,7 +59,7 @@ memory_slice instance::load_bits_from_store() const
         try {
             bits = strm->read(strm->size());
         }
-        catch (std::exception const &) {
+        catch (const std::exception &) {
             handle_errors();
         }
 
@@ -107,7 +107,7 @@ memory_slice instance::read_stream(input_stream &strm) const
             try {
                 num_bytes_read = strm.read(remaining_bits);
             }
-            catch (std::exception const &) {
+            catch (const std::exception &) {
                 handle_errors();
             }
 
@@ -129,17 +129,17 @@ void instance::handle_errors() const
     try {
         throw;
     }
-    catch (stream_error const &) {
+    catch (const stream_error &) {
         std::throw_with_nested(data_reader_error{fmt::format(
             "The data store '{0}' contains corrupt data. See nested exception for details.",
             store_->id())});
     }
-    catch (not_supported_error const &) {
+    catch (const not_supported_error &) {
         std::throw_with_nested(data_reader_error{
             fmt::format("The data store '{0}' cannot be read. See nested exception for details.",
                         store_->id())});
     }
-    catch (std::system_error const &) {
+    catch (const std::system_error &) {
         std::throw_with_nested(data_reader_error{fmt::format(
             "A system error occurred while trying to read from the data store '{0}'. See nested exception for details.",
             store_->id())});

@@ -27,7 +27,7 @@ namespace mlio {
 inline namespace v1 {
 namespace detail {
 
-instance_batch_reader::instance_batch_reader(data_reader_params const &prm, instance_reader &rdr)
+instance_batch_reader::instance_batch_reader(const data_reader_params &prm, instance_reader &rdr)
     : params_{&prm}, reader_{&rdr}
 {
     if (params_->batch_size == 0) {

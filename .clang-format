@@ -64,6 +64,7 @@ KeepEmptyLinesAtTheStartOfBlocks: true
 Language: Cpp
 MaxEmptyLinesToKeep: 1
 NamespaceIndentation: None
+PenaltyReturnTypeOnItsOwnLine: 5  # Prefer over breaking function parameters.
 PointerAlignment: Right
 ReflowComments: true
 SortIncludes: true

@@ -29,14 +29,14 @@ public:
     using mlio_error::mlio_error;
 
 public:
-    data_reader_error(data_reader_error const &) = default;
+    data_reader_error(const data_reader_error &) = default;
 
     data_reader_error(data_reader_error &&) = default;
 
     ~data_reader_error() override;
 
 public:
-    data_reader_error &operator=(data_reader_error const &) = default;
+    data_reader_error &operator=(const data_reader_error &) = default;
 
     data_reader_error &operator=(data_reader_error &&) = default;
 };
@@ -46,14 +46,14 @@ public:
     using data_reader_error::data_reader_error;
 
 public:
-    schema_error(schema_error const &) = default;
+    schema_error(const schema_error &) = default;
 
     schema_error(schema_error &&) = default;
 
     ~schema_error() override;
 
 public:
-    schema_error &operator=(schema_error const &) = default;
+    schema_error &operator=(const schema_error &) = default;
 
     schema_error &operator=(schema_error &&) = default;
 };
@@ -63,14 +63,14 @@ public:
     using data_reader_error::data_reader_error;
 
 public:
-    invalid_instance_error(invalid_instance_error const &) = default;
+    invalid_instance_error(const invalid_instance_error &) = default;
 
     invalid_instance_error(invalid_instance_error &&) = default;
 
     ~invalid_instance_error() override;
 
 public:
-    invalid_instance_error &operator=(invalid_instance_error const &) = default;
+    invalid_instance_error &operator=(const invalid_instance_error &) = default;
 
     invalid_instance_error &operator=(invalid_instance_error &&) = default;
 };

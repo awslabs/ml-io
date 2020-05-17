@@ -31,10 +31,10 @@ private:
     enum class parser_state { new_field, in_field, in_quoted_field, quote_in_quoted_field };
 
 public:
-    explicit csv_record_tokenizer(csv_params const &prm) noexcept : csv_record_tokenizer{prm, {}}
+    explicit csv_record_tokenizer(const csv_params &prm) noexcept : csv_record_tokenizer{prm, {}}
     {}
 
-    explicit csv_record_tokenizer(csv_params const &prm, memory_span blob) noexcept
+    explicit csv_record_tokenizer(const csv_params &prm, memory_span blob) noexcept
         : text_{as_span<char const>(blob)}
         , delimiter_{prm.delimiter}
         , quote_char_{prm.quote_char}
@@ -52,7 +52,7 @@ private:
     void push_char(char chr) noexcept;
 
 public:
-    std::string const &value() const noexcept
+    const std::string &value() const noexcept
     {
         return value_;
     }

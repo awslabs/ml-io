@@ -57,7 +57,7 @@ std::string attribute::repr() const
         sparse_);
 }
 
-bool operator==(attribute const &lhs, attribute const &rhs) noexcept
+bool operator==(const attribute &lhs, const attribute &rhs) noexcept
 {
     return lhs.name() == rhs.name() && lhs.dtype() == rhs.dtype() && lhs.sparse() == rhs.sparse() &&
            lhs.shape() == rhs.shape() && lhs.strides() == rhs.strides();
@@ -77,7 +77,7 @@ schema::schema(std::vector<attribute> attrs) : attributes_{std::move(attrs)}
     }
 }
 
-std::optional<std::size_t> schema::get_index(std::string const &name) const noexcept
+std::optional<std::size_t> schema::get_index(const std::string &name) const noexcept
 {
     auto pos = name_index_map_.find(name);
     if (pos == name_index_map_.end()) {
@@ -91,7 +91,7 @@ std::string schema::repr() const
     return fmt::format("<schema attributes={{{0}}}>", fmt::join(attributes_, ", "));
 }
 
-bool operator==(schema const &lhs, schema const &rhs) noexcept
+bool operator==(const schema &lhs, const schema &rhs) noexcept
 {
     return lhs.attributes() == rhs.attributes();
 }
@@ -101,7 +101,7 @@ bool operator==(schema const &lhs, schema const &rhs) noexcept
 
 namespace std {  // NOLINT(cert-dcl58-cpp)
 
-size_t hash<mlio::attribute>::operator()(mlio::attribute const &attr) const noexcept
+size_t hash<mlio::attribute>::operator()(const mlio::attribute &attr) const noexcept
 {
     size_t seed = 0;
 

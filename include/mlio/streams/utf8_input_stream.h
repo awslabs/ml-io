@@ -48,14 +48,14 @@ private:
     explicit utf8_input_stream(intrusive_ptr<input_stream> inner, text_encoding &&enc);
 
 public:
-    utf8_input_stream(utf8_input_stream const &) = delete;
+    utf8_input_stream(const utf8_input_stream &) = delete;
 
     utf8_input_stream(utf8_input_stream &&) = delete;
 
     ~utf8_input_stream() final;
 
 public:
-    utf8_input_stream &operator=(utf8_input_stream const &) = delete;
+    utf8_input_stream &operator=(const utf8_input_stream &) = delete;
 
     utf8_input_stream &operator=(utf8_input_stream &&) = delete;
 
@@ -102,8 +102,8 @@ private:
 /// from the preamble of the underlying stream. If no preamble is found,
 /// falls back to UTF-8.
 MLIO_API
-intrusive_ptr<input_stream> make_utf8_stream(intrusive_ptr<input_stream> strm,
-                                             std::optional<text_encoding> enc = {});
+intrusive_ptr<input_stream>
+make_utf8_stream(intrusive_ptr<input_stream> strm, std::optional<text_encoding> enc = {});
 
 /// @}
 

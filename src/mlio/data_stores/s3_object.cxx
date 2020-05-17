@@ -64,7 +64,7 @@ intrusive_ptr<input_stream> s3_object::open_read() const
     return make_inflate_stream(std::move(strm), compression_);
 }
 
-std::string const &s3_object::id() const
+const std::string &s3_object::id() const
 {
     if (id_.empty()) {
         if (version_id_.empty()) {
@@ -86,15 +86,15 @@ std::string s3_object::repr() const
 namespace detail {
 namespace {
 
-void list_s3_objects(list_s3_objects_params const &prm,
-                     std::string const &uri,
+void list_s3_objects(const list_s3_objects_params &prm,
+                     const std::string &uri,
                      std::vector<std::string> &object_uris)
 {
     auto [bucket, prefix] = detail::split_s3_uri_to_bucket_and_key(uri);
 
     prm.client->list_objects(bucket, prefix, [&](std::string object_uri) {
         // Pattern match.
-        std::string const *pattern = prm.pattern;
+        const std::string *pattern = prm.pattern;
         if (pattern != nullptr && !pattern->empty()) {
             int r = ::fnmatch(pattern->c_str(), object_uri.c_str(), 0);
             if (r == FNM_NOMATCH) {
@@ -106,7 +106,7 @@ void list_s3_objects(list_s3_objects_params const &prm,
         }
 
         // Predicate match.
-        auto const *predicate = prm.predicate;
+        const auto *predicate = prm.predicate;
         if (predicate != nullptr && *predicate != nullptr) {
             if (!(*predicate)(object_uri)) {
                 return;
@@ -120,15 +120,15 @@ void list_s3_objects(list_s3_objects_params const &prm,
 }  // namespace
 }  // namespace detail
 
-std::vector<intrusive_ptr<data_store>> list_s3_objects(list_s3_objects_params const &prm)
+std::vector<intrusive_ptr<data_store>> list_s3_objects(const list_s3_objects_params &prm)
 {
     std::vector<std::string> object_uris{};
 
-    for (std::string const &uri : prm.uris) {
+    for (const std::string &uri : prm.uris) {
         detail::list_s3_objects(prm, uri, object_uris);
     }
 
-    std::sort(object_uris.begin(), object_uris.end(), [](auto const &a, auto const &b) {
+    std::sort(object_uris.begin(), object_uris.end(), [](const auto &a, const auto &b) {
         return ::strnatcmp(a.c_str(), b.c_str()) < 0;
     });
 
@@ -137,7 +137,7 @@ std::vector<intrusive_ptr<data_store>> list_s3_objects(list_s3_objects_params co
     std::vector<intrusive_ptr<data_store>> stores{};
     stores.reserve(object_uris.size());
 
-    for (std::string const &uri : object_uris) {
+    for (const std::string &uri : object_uris) {
         stores.emplace_back(make_intrusive<s3_object>(clt, uri, std::string{}, prm.cmp));
     }
 
@@ -145,7 +145,7 @@ std::vector<intrusive_ptr<data_store>> list_s3_objects(list_s3_objects_params co
 }
 
 std::vector<intrusive_ptr<data_store>>
-list_s3_objects(s3_client const &client, std::string const &uri, std::string const &pattern)
+list_s3_objects(const s3_client &client, const std::string &uri, const std::string &pattern)
 {
     stdx::span<std::string const> uris{&uri, 1};
 

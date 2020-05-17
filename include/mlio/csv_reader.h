@@ -127,23 +127,23 @@ class MLIO_API csv_reader final : public parallel_data_reader {
 public:
     explicit csv_reader(data_reader_params prm, csv_params csv_prm = {});
 
-    csv_reader(csv_reader const &) = delete;
+    csv_reader(const csv_reader &) = delete;
 
     csv_reader(csv_reader &&) = delete;
 
     ~csv_reader() final;
 
 public:
-    csv_reader &operator=(csv_reader const &) = delete;
+    csv_reader &operator=(const csv_reader &) = delete;
 
     csv_reader &operator=(csv_reader &&) = delete;
 
 private:
     MLIO_HIDDEN
-    intrusive_ptr<record_reader> make_record_reader(data_store const &ds) final;
+    intrusive_ptr<record_reader> make_record_reader(const data_store &ds) final;
 
     MLIO_HIDDEN
-    void read_names_from_header(data_store const &ds, record_reader &rdr);
+    void read_names_from_header(const data_store &ds, record_reader &rdr);
 
     MLIO_HIDDEN
     void skip_to_header_row(record_reader &rdr);
@@ -164,19 +164,19 @@ private:
     intrusive_ptr<schema const> init_parsers_and_make_schema();
 
     MLIO_HIDDEN
-    bool should_skip(std::size_t index, std::string const &name) const noexcept;
+    bool should_skip(std::size_t index, const std::string &name) const noexcept;
 
     MLIO_HIDDEN
-    intrusive_ptr<example> decode(instance_batch const &batch) const final;
+    intrusive_ptr<example> decode(const instance_batch &batch) const final;
 
     MLIO_HIDDEN
     std::vector<intrusive_ptr<tensor>> make_tensors(std::size_t batch_size) const;
 
     MLIO_HIDDEN
-    std::optional<std::size_t> decode_ser(decoder_state &state, instance_batch const &batch) const;
+    std::optional<std::size_t> decode_ser(decoder_state &state, const instance_batch &batch) const;
 
     MLIO_HIDDEN
-    std::optional<std::size_t> decode_prl(decoder_state &state, instance_batch const &batch) const;
+    std::optional<std::size_t> decode_prl(decoder_state &state, const instance_batch &batch) const;
 
     MLIO_HIDDEN
     auto make_column_iterators() const noexcept;

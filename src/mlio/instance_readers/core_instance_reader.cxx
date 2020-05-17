@@ -36,7 +36,7 @@ namespace mlio {
 inline namespace v1 {
 namespace detail {
 
-core_instance_reader::core_instance_reader(data_reader_params const &prm,
+core_instance_reader::core_instance_reader(const data_reader_params &prm,
                                            record_reader_factory &&fct)
     : params_{&prm}, record_reader_factory_{std::move(fct)}
 {
@@ -49,7 +49,7 @@ std::optional<instance> core_instance_reader::read_instance_core()
     try {
         payload = read_record_payload();
     }
-    catch (std::exception const &) {
+    catch (const std::exception &) {
         handle_errors();
     }
 
@@ -72,29 +72,29 @@ void core_instance_reader::handle_errors()
     try {
         throw;
     }
-    catch (record_too_large_error const &) {
+    catch (const record_too_large_error &) {
         std::throw_with_nested(data_reader_error{fmt::format(
             "The record #{1:n} in the data store '{0}' is too large. See nested exception for details.",
             store_->id(),
             record_idx_)});
     }
-    catch (corrupt_record_error const &) {
+    catch (const corrupt_record_error &) {
         std::throw_with_nested(data_reader_error{fmt::format(
             "The record #{1:n} in the data store '{0}' is corrupt. See nested exception for details.",
             store_->id(),
             record_idx_)});
     }
-    catch (stream_error const &) {
+    catch (const stream_error &) {
         std::throw_with_nested(data_reader_error{fmt::format(
             "The data store '{0}' contains corrupt data. See nested exception for details.",
             store_->id())});
     }
-    catch (not_supported_error const &) {
+    catch (const not_supported_error &) {
         std::throw_with_nested(data_reader_error{
             fmt::format("The data store '{0}' cannot be read. See nested exception for details.",
                         store_->id())});
     }
-    catch (std::system_error const &) {
+    catch (const std::system_error &) {
         std::throw_with_nested(data_reader_error{fmt::format(
             "A system error occurred while trying to read from the data store '{0}'. See nested exception for details.",
             store_->id())});
@@ -158,7 +158,7 @@ core_instance_reader::read_split_record_payload(std::optional<record> rec)
     auto payload = get_memory_allocator().allocate(payload_size);
 
     auto pos = payload->begin();
-    for (record const &r : records) {
+    for (const record &r : records) {
         pos = std::copy(r.payload().begin(), r.payload().end(), pos);
     }
 
@@ -212,7 +212,7 @@ bool core_instance_reader::init_next_record_reader()
     try {
         record_reader_ = record_reader_factory_(*store_);
     }
-    catch (std::system_error const &e) {
+    catch (const std::system_error &e) {
         if (e.code() == std::errc::no_such_file_or_directory) {
             throw data_reader_error{
                 fmt::format("The data store '{0}' does not exist.", store_->id())};

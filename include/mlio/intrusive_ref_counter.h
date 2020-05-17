@@ -27,7 +27,7 @@ class MLIO_API intrusive_ref_counter {
 public:
     intrusive_ref_counter() noexcept = default;
 
-    intrusive_ref_counter(intrusive_ref_counter const &) noexcept
+    intrusive_ref_counter(const intrusive_ref_counter &) noexcept
     {}
 
     intrusive_ref_counter(intrusive_ref_counter &&) noexcept
@@ -39,7 +39,7 @@ protected:
 public:
     intrusive_ref_counter &
     // NOLINTNEXTLINE(cert-oop54-cpp)
-    operator=(intrusive_ref_counter const &) noexcept
+    operator=(const intrusive_ref_counter &) noexcept
     {
         return *this;
     }
@@ -57,16 +57,16 @@ public:
 
 public:
     MLIO_API
-    friend inline void intrusive_ptr_inc_ref(intrusive_ref_counter const *ptr) noexcept
+    friend inline void intrusive_ptr_inc_ref(const intrusive_ref_counter *ptr) noexcept
     {
         ptr->ref_count_.fetch_add(1, std::memory_order_acq_rel);
     }
 
     MLIO_API
-    friend inline void intrusive_ptr_dec_ref(intrusive_ref_counter const *ptr) noexcept
+    friend inline void intrusive_ptr_dec_ref(const intrusive_ref_counter *ptr) noexcept
     {
         if (ptr->ref_count_.fetch_sub(1, std::memory_order_acq_rel) == 1) {
-            delete static_cast<T const *>(ptr);
+            delete static_cast<const T *>(ptr);
         }
     }
 

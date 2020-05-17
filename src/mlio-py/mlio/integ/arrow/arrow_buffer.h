@@ -24,14 +24,14 @@ class arrow_buffer final : public arrow::Buffer {
 public:
     explicit arrow_buffer(mlio::memory_slice s) noexcept;
 
-    arrow_buffer(arrow_buffer const &) = delete;
+    arrow_buffer(const arrow_buffer &) = delete;
 
     arrow_buffer(arrow_buffer &&) = delete;
 
     ~arrow_buffer() final;
 
 public:
-    arrow_buffer &operator=(arrow_buffer const &) = delete;
+    arrow_buffer &operator=(const arrow_buffer &) = delete;
 
     arrow_buffer &operator=(arrow_buffer &&) = delete;
 

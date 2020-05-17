@@ -103,8 +103,8 @@ std::optional<text_encoding> infer_bom_encoding(memory_span preamble) noexcept
 }  // namespace
 }  // namespace detail
 
-intrusive_ptr<input_stream> make_utf8_stream(intrusive_ptr<input_stream> strm,
-                                             std::optional<text_encoding> enc)
+intrusive_ptr<input_stream>
+make_utf8_stream(intrusive_ptr<input_stream> strm, std::optional<text_encoding> enc)
 {
     if (enc != std::nullopt) {
         if (*enc == text_encoding::utf8 || *enc == text_encoding::ascii_latin1) {

@@ -37,14 +37,14 @@ class csv_record_reader final : public text_record_reader {
     };
 
 public:
-    explicit csv_record_reader(intrusive_ptr<input_stream> strm, csv_params const &prm)
+    explicit csv_record_reader(intrusive_ptr<input_stream> strm, const csv_params &prm)
         : text_record_reader{std::move(strm)}, params_{&prm}
     {}
 
 private:
     std::optional<record> decode_text_record(memory_slice &chunk, bool ignore_leftover) final;
 
-    bool is_comment_line(memory_slice const &chunk);
+    bool is_comment_line(const memory_slice &chunk);
 
     std::optional<record> read_line(memory_slice &chunk, bool ignore_leftover);
 
@@ -57,7 +57,7 @@ private:
                                   std::size_t max_line_length);
 
 private:
-    csv_params const *params_;
+    const csv_params *params_;
 };
 
 }  // namespace detail

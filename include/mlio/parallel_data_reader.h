@@ -47,21 +47,21 @@ protected:
     explicit parallel_data_reader(data_reader_params &&prm);
 
 public:
-    parallel_data_reader(parallel_data_reader const &) = delete;
+    parallel_data_reader(const parallel_data_reader &) = delete;
 
     parallel_data_reader(parallel_data_reader &&) = delete;
 
     ~parallel_data_reader() override;
 
 public:
-    parallel_data_reader &operator=(parallel_data_reader const &) = delete;
+    parallel_data_reader &operator=(const parallel_data_reader &) = delete;
 
     parallel_data_reader &operator=(parallel_data_reader &&) = delete;
 
 private:
     /// When implemented in a derived class, constructs a @ref
     /// record_reader from the specified data store.
-    virtual intrusive_ptr<record_reader> make_record_reader(data_store const &ds) = 0;
+    virtual intrusive_ptr<record_reader> make_record_reader(const data_store &ds) = 0;
 
     MLIO_HIDDEN
     intrusive_ptr<example> read_example_core() final;
@@ -89,7 +89,7 @@ private:
 
     /// When implemented in a derived class, converts the specified
     /// @ref instance_batch into an @ref example.
-    virtual intrusive_ptr<example> decode(instance_batch const &batch) const = 0;
+    virtual intrusive_ptr<example> decode(const instance_batch &batch) const = 0;
 
 public:
     intrusive_ptr<schema const> read_schema() final;

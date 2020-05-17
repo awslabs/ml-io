@@ -33,7 +33,7 @@ class sampled_instance_reader final : public instance_reader_base {
     static constexpr std::size_t num_instances_to_read_ = 100;
 
 public:
-    explicit sampled_instance_reader(data_reader_params const &prm,
+    explicit sampled_instance_reader(const data_reader_params &prm,
                                      std::unique_ptr<instance_reader> &&inner);
 
 private:
@@ -44,7 +44,7 @@ private:
     void reset_core() noexcept final;
 
 private:
-    data_reader_params const *params_;
+    const data_reader_params *params_;
     std::unique_ptr<instance_reader> inner_;
     std::vector<std::optional<instance>> buffer_{};
     std::vector<std::optional<instance>>::iterator buffer_pos_{};

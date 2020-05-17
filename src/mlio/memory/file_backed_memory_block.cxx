@@ -99,7 +99,7 @@ void file_backed_memory_block::resize(size_type size)
         try {
             data = init_memory_map(size);
         }
-        catch (std::system_error const &) {
+        catch (const std::system_error &) {
             // We already truncated the backing file, but cannot map it
             // to memory. If the new size is less than the original size
             // this means we lost the data in the truncated region. In

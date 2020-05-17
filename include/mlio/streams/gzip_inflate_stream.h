@@ -38,14 +38,14 @@ class MLIO_API gzip_inflate_stream final : public input_stream_base {
 public:
     explicit gzip_inflate_stream(intrusive_ptr<input_stream> inner);
 
-    gzip_inflate_stream(gzip_inflate_stream const &) = delete;
+    gzip_inflate_stream(const gzip_inflate_stream &) = delete;
 
     gzip_inflate_stream(gzip_inflate_stream &&) = delete;
 
     ~gzip_inflate_stream() final;
 
 public:
-    gzip_inflate_stream &operator=(gzip_inflate_stream const &) = delete;
+    gzip_inflate_stream &operator=(const gzip_inflate_stream &) = delete;
 
     gzip_inflate_stream &operator=(gzip_inflate_stream &&) = delete;
 

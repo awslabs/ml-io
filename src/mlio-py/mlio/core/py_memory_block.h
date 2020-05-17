@@ -23,21 +23,21 @@ namespace pymlio {
 
 class py_memory_block final : public mlio::memory_block {
 public:
-    explicit py_memory_block(pybind11::buffer const &buf)
+    explicit py_memory_block(const pybind11::buffer &buf)
     {
         if (::PyObject_GetBuffer(buf.ptr(), &buffer_, PyBUF_SIMPLE) != 0) {
             throw pybind11::error_already_set();
         }
     }
 
-    py_memory_block(py_memory_block const &) = delete;
+    py_memory_block(const py_memory_block &) = delete;
 
     py_memory_block(py_memory_block &&) = delete;
 
     ~py_memory_block() final;
 
 public:
-    py_memory_block &operator=(py_memory_block const &) = delete;
+    py_memory_block &operator=(const py_memory_block &) = delete;
 
     py_memory_block &operator=(py_memory_block &&) = delete;
 
@@ -52,7 +52,7 @@ public:
         return static_cast<size_type>(buffer_.len);
     }
 
-    Py_buffer const &buffer() const noexcept
+    const Py_buffer &buffer() const noexcept
     {
         return buffer_;
     }
@@ -63,21 +63,21 @@ private:
 
 class py_mutable_memory_block final : public mlio::mutable_memory_block {
 public:
-    explicit py_mutable_memory_block(pybind11::buffer const &buf)
+    explicit py_mutable_memory_block(const pybind11::buffer &buf)
     {
         if (::PyObject_GetBuffer(buf.ptr(), &buffer_, PyBUF_WRITABLE) != 0) {
             throw pybind11::error_already_set();
         }
     }
 
-    py_mutable_memory_block(py_mutable_memory_block const &) = delete;
+    py_mutable_memory_block(const py_mutable_memory_block &) = delete;
 
     py_mutable_memory_block(py_mutable_memory_block &&) = delete;
 
     ~py_mutable_memory_block() final;
 
 public:
-    py_mutable_memory_block &operator=(py_mutable_memory_block const &) = delete;
+    py_mutable_memory_block &operator=(const py_mutable_memory_block &) = delete;
 
     py_mutable_memory_block &operator=(py_mutable_memory_block &&) = delete;
 

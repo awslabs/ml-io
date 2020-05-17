@@ -53,10 +53,10 @@ namespace mlio {
 inline namespace v1 {
 
 struct csv_reader::decoder_state {
-    explicit decoder_state(csv_reader const &rdr,
+    explicit decoder_state(const csv_reader &rdr,
                            std::vector<intrusive_ptr<tensor>> &tsrs) noexcept;
 
-    csv_reader const *reader;
+    const csv_reader *reader;
     std::vector<intrusive_ptr<tensor>> *tensors;
     bool warn_bad_instance;
     bool error_bad_example;
@@ -70,7 +70,7 @@ public:
     {}
 
 public:
-    bool decode(std::size_t row_idx, instance const &ins);
+    bool decode(std::size_t row_idx, const instance &ins);
 
 private:
     decoder_state *state_;
@@ -90,7 +90,7 @@ csv_reader::~csv_reader()
     stop();
 }
 
-intrusive_ptr<record_reader> csv_reader::make_record_reader(data_store const &ds)
+intrusive_ptr<record_reader> csv_reader::make_record_reader(const data_store &ds)
 {
     auto strm = make_utf8_stream(ds.open_read(), params_.encoding);
 
@@ -115,7 +115,7 @@ intrusive_ptr<record_reader> csv_reader::make_record_reader(data_store const &ds
     return std::move(rdr);
 }
 
-void csv_reader::read_names_from_header(data_store const &ds, record_reader &rdr)
+void csv_reader::read_names_from_header(const data_store &ds, record_reader &rdr)
 {
     skip_to_header_row(rdr);
 
@@ -137,7 +137,7 @@ void csv_reader::read_names_from_header(data_store const &ds, record_reader &rdr
             column_names_.emplace_back(std::move(name));
         }
     }
-    catch (corrupt_record_error const &) {
+    catch (const corrupt_record_error &) {
         std::throw_with_nested(schema_error{fmt::format(
             "The header row of the data store '{0}' cannot be read. See nested exception for details.",
             ds.id())});
@@ -210,7 +210,7 @@ void csv_reader::infer_column_types(std::optional<instance> const &ins)
                 column_types_.emplace_back(dt);
             }
         }
-        catch (corrupt_record_error const &) {
+        catch (const corrupt_record_error &) {
             std::throw_with_nested(schema_error{fmt::format(
                 "The schema of the data store '{0}' cannot be inferred. See nested exception for details.",
                 ins->get_data_store().id())});
@@ -373,7 +373,7 @@ intrusive_ptr<schema const> csv_reader::init_parsers_and_make_schema()
     try {
         return make_intrusive<schema>(attrs);
     }
-    catch (std::invalid_argument const &) {
+    catch (const std::invalid_argument &) {
         std::unordered_set<std::string_view> tmp{};
         for (auto &attr : attrs) {
             if (auto pr = tmp.emplace(attr.name()); !pr.second) {
@@ -386,7 +386,7 @@ intrusive_ptr<schema const> csv_reader::init_parsers_and_make_schema()
     }
 }
 
-bool csv_reader::should_skip(std::size_t index, std::string const &name) const noexcept
+bool csv_reader::should_skip(std::size_t index, const std::string &name) const noexcept
 {
     auto uci = params_.use_columns_by_index;
     if (!uci.empty()) {
@@ -405,7 +405,7 @@ bool csv_reader::should_skip(std::size_t index, std::string const &name) const n
     return false;
 }
 
-intrusive_ptr<example> csv_reader::decode(instance_batch const &batch) const
+intrusive_ptr<example> csv_reader::decode(const instance_batch &batch) const
 {
     auto tensors = make_tensors(batch.size());
 
@@ -518,8 +518,8 @@ auto csv_reader::make_column_iterators() const noexcept
     return std::make_pair(col_beg, col_end);
 }
 
-std::optional<std::size_t> csv_reader::decode_ser(decoder_state &state,
-                                                  instance_batch const &batch) const
+std::optional<std::size_t>
+csv_reader::decode_ser(decoder_state &state, const instance_batch &batch) const
 {
     std::size_t row_idx = 0;
 
@@ -527,7 +527,7 @@ std::optional<std::size_t> csv_reader::decode_ser(decoder_state &state,
 
     auto [col_beg, col_end] = make_column_iterators();
 
-    for (instance const &ins : batch.instances()) {
+    for (const instance &ins : batch.instances()) {
         decoder<decltype(col_beg)> dc{state, tokenizer, col_beg, col_end};
         if (dc.decode(row_idx, ins)) {
             row_idx++;
@@ -549,8 +549,8 @@ std::optional<std::size_t> csv_reader::decode_ser(decoder_state &state,
     return row_idx;
 }
 
-std::optional<std::size_t> csv_reader::decode_prl(decoder_state &state,
-                                                  instance_batch const &batch) const
+std::optional<std::size_t>
+csv_reader::decode_prl(decoder_state &state, const instance_batch &batch) const
 {
     std::atomic_bool skip_example{};
 
@@ -604,7 +604,7 @@ std::optional<std::size_t> csv_reader::decode_prl(decoder_state &state,
     return num_instances;
 }
 
-csv_reader::decoder_state::decoder_state(csv_reader const &rdr,
+csv_reader::decoder_state::decoder_state(const csv_reader &rdr,
                                          std::vector<intrusive_ptr<tensor>> &tsrs) noexcept
     : reader{&rdr}
     , tensors{&tsrs}
@@ -613,7 +613,7 @@ csv_reader::decoder_state::decoder_state(csv_reader const &rdr,
 {}
 
 template<typename ColIt>
-bool csv_reader::decoder<ColIt>::decode(std::size_t row_idx, instance const &ins)
+bool csv_reader::decoder<ColIt>::decode(std::size_t row_idx, const instance &ins)
 {
     auto col_pos = col_beg_;
 
@@ -639,7 +639,7 @@ bool csv_reader::decoder<ColIt>::decode(std::size_t row_idx, instance const &ins
 
             if (mflh == max_field_length_handling::treat_as_bad ||
                 mflh == max_field_length_handling::truncate_warn) {
-                std::string const &name = std::get<1>(*col_pos);
+                const std::string &name = std::get<1>(*col_pos);
 
                 auto msg = fmt::format(
                     "The column '{2}' of the row #{1:n} in the data store '{0}' is too long. Its truncated value is '{3:.64}'.",
@@ -671,7 +671,7 @@ bool csv_reader::decoder<ColIt>::decode(std::size_t row_idx, instance const &ins
             }
         }
 
-        parser const &prsr = std::get<4>(*col_pos);
+        const parser &prsr = std::get<4>(*col_pos);
 
         auto &dense_tsr = static_cast<dense_tensor &>(**tsr_pos);
 
@@ -684,7 +684,7 @@ bool csv_reader::decoder<ColIt>::decode(std::size_t row_idx, instance const &ins
         }
 
         if (state_->warn_bad_instance || state_->error_bad_example) {
-            std::string const &name = std::get<1>(*col_pos);
+            const std::string &name = std::get<1>(*col_pos);
 
             data_type dt = std::get<2>(*col_pos);
 

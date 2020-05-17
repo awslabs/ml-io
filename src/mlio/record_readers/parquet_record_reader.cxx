@@ -24,8 +24,8 @@ namespace mlio {
 inline namespace v1 {
 namespace detail {
 
-std::optional<record> parquet_record_reader::decode_record(memory_slice &chunk,
-                                                           bool ignore_leftover)
+std::optional<record>
+parquet_record_reader::decode_record(memory_slice &chunk, bool ignore_leftover)
 {
     if (chunk.empty()) {
         return {};
@@ -94,7 +94,7 @@ inline bool parquet_record_reader::is_magic_number(memory_block::iterator pos) n
     return as<std::uint32_t>(pos) == 0x3152'4150;  // PAR1
 }
 
-bool parquet_record_reader::is_footer(memory_slice const &chunk,
+bool parquet_record_reader::is_footer(const memory_slice &chunk,
                                       memory_block::iterator pos) noexcept
 {
     auto metadata_end = pos - as_ssize(sizeof(std::uint32_t));
@@ -155,7 +155,7 @@ inline bool parquet_record_reader::is_file_metadata_begin(memory_block::iterator
 template<typename T>
 inline T parquet_record_reader::as(memory_block::iterator pos) noexcept
 {
-    return *reinterpret_cast<T const *>(&*pos);
+    return *reinterpret_cast<const T *>(&*pos);
 }
 
 }  // namespace detail

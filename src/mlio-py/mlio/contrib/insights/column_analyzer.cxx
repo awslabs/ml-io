@@ -32,13 +32,13 @@ column_analyzer::column_analyzer(std::vector<column_analysis> &columns,
     , max_capture_count_{max_capture_count}
 {}
 
-void column_analyzer::analyze(mlio::example const &exm) const
+void column_analyzer::analyze(const mlio::example &exm) const
 {
     std::size_t feature_idx = 0;
 
     for (auto pos = exm.features().begin(); pos < exm.features().end(); ++pos, feature_idx++) {
-        auto const &tsr = exm.features()[feature_idx];
-        auto const &dense_tsr = static_cast<mlio::dense_tensor const &>(*tsr);
+        const auto &tsr = exm.features()[feature_idx];
+        const auto &dense_tsr = static_cast<const mlio::dense_tensor &>(*tsr);
         auto cells = dense_tsr.data().as<std::string>();
 
         column_analysis &stats = (*columns_)[feature_idx];
@@ -50,7 +50,7 @@ void column_analyzer::analyze(mlio::example const &exm) const
         double numeric_column_sum = 0.0;
         std::size_t numeric_column_count = 0.0;
 
-        for (std::string const &cell : cells) {
+        for (const std::string &cell : cells) {
             // Capture the first example.
             if (stats.rows_seen == 0) {
                 stats.example_value = cell;

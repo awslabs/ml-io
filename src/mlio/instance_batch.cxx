@@ -21,7 +21,7 @@ inline namespace v1 {
 std::size_t instance_batch::size_bytes() const
 {
     if (size_bytes_ == 0) {
-        for (instance const &ins : instances_) {
+        for (const instance &ins : instances_) {
             size_bytes_ += ins.bits().size();
         }
     }

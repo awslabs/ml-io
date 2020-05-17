@@ -46,7 +46,7 @@ public:
         }
     }
 
-    intrusive_ptr(intrusive_ptr const &other) noexcept : ptr_{other.ptr_}
+    intrusive_ptr(const intrusive_ptr &other) noexcept : ptr_{other.ptr_}
     {
         inc_ref_count();
     }
@@ -91,7 +91,7 @@ public:
 
     intrusive_ptr &
     // NOLINTNEXTLINE(bugprone-unhandled-self-assignment, cert-oop54-cpp)
-    operator=(intrusive_ptr const &other) noexcept
+    operator=(const intrusive_ptr &other) noexcept
     {
         copy_assign(other.ptr_);
 

@@ -33,14 +33,14 @@ class MLIO_API file_backed_memory_block final : public mutable_memory_block {
 public:
     explicit file_backed_memory_block(size_type size);
 
-    file_backed_memory_block(file_backed_memory_block const &) = delete;
+    file_backed_memory_block(const file_backed_memory_block &) = delete;
 
     file_backed_memory_block(file_backed_memory_block &&) = delete;
 
     ~file_backed_memory_block() final;
 
 public:
-    file_backed_memory_block &operator=(file_backed_memory_block const &) = delete;
+    file_backed_memory_block &operator=(const file_backed_memory_block &) = delete;
 
     file_backed_memory_block &operator=(file_backed_memory_block &&) = delete;
 

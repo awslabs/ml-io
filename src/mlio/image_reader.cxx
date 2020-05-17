@@ -57,7 +57,7 @@ image_reader::~image_reader()
     stop();
 }
 
-intrusive_ptr<record_reader> image_reader::make_record_reader(data_store const &ds)
+intrusive_ptr<record_reader> image_reader::make_record_reader(const data_store &ds)
 {
     switch (params_.img_frame) {
     case image_frame::none:
@@ -83,7 +83,7 @@ intrusive_ptr<schema const> image_reader::infer_schema(std::optional<instance> c
     return make_intrusive<schema>(std::move(attrs));
 }
 
-intrusive_ptr<example> image_reader::decode(instance_batch const &batch) const
+intrusive_ptr<example> image_reader::decode(const instance_batch &batch) const
 {
     // The stride of the batch dimension corresponds to the byte size
     // of the images.
@@ -95,7 +95,7 @@ intrusive_ptr<example> image_reader::decode(instance_batch const &batch) const
 
     std::size_t num_instances_read = 0;
 
-    for (instance const &ins : batch.instances()) {
+    for (const instance &ins : batch.instances()) {
         if (decode_core(bits, ins)) {
             bits = bits.subspan(batch_stride);
 
@@ -139,8 +139,8 @@ intrusive_ptr<example> image_reader::decode(instance_batch const &batch) const
     return exm;
 }
 
-intrusive_ptr<dense_tensor> image_reader::make_tensor(std::size_t batch_size,
-                                                      std::size_t batch_stride) const
+intrusive_ptr<dense_tensor>
+image_reader::make_tensor(std::size_t batch_size, std::size_t batch_stride) const
 {
     size_vector shp{batch_size,
                     params_.image_dimensions[1],
@@ -152,7 +152,7 @@ intrusive_ptr<dense_tensor> image_reader::make_tensor(std::size_t batch_size,
     return make_intrusive<dense_tensor>(std::move(shp), std::move(arr));
 }
 
-bool image_reader::decode_core(stdx::span<std::uint8_t> out, instance const &ins) const
+bool image_reader::decode_core(stdx::span<std::uint8_t> out, const instance &ins) const
 {
     memory_slice img_buf{};
     if (params_.img_frame == image_frame::recordio) {
@@ -208,7 +208,7 @@ bool image_reader::decode_core(stdx::span<std::uint8_t> out, instance const &ins
         try {
             cv::cvtColor(tmp, tmp, cv::COLOR_BGR2RGB);
         }
-        catch (cv::Exception const &e) {
+        catch (const cv::Exception &e) {
             if (warn_bad_instances() || error_bad_example_) {
                 auto msg = fmt::format(
                     "The BGR2RGB operation failed for the image #{1:n} in the data store '{0}' with the following exception: {2}",
@@ -234,13 +234,13 @@ bool image_reader::decode_core(stdx::span<std::uint8_t> out, instance const &ins
     return crop(tmp, dst, ins);
 }
 
-cv::Mat image_reader::decode_image(cv::Mat const &buf, int mode, instance const &ins) const
+cv::Mat image_reader::decode_image(const cv::Mat &buf, int mode, const instance &ins) const
 {
     cv::Mat decoded_img{};
     try {
         decoded_img = cv::imdecode(buf, mode);
     }
-    catch (cv::Exception const &e) {
+    catch (const cv::Exception &e) {
         if (warn_bad_instances() || error_bad_example_) {
             auto msg = fmt::format(
                 "The image decode operation failed for the image #{1:n} in the data store '{0}' with the following exception: {2}",
@@ -290,7 +290,7 @@ cv::Mat image_reader::decode_image(cv::Mat const &buf, int mode, instance const 
     return decoded_img;
 }
 
-bool image_reader::resize(cv::Mat &src, cv::Mat &dst, instance const &ins) const
+bool image_reader::resize(cv::Mat &src, cv::Mat &dst, const instance &ins) const
 {
     int new_cols{};
     int new_rows{};
@@ -309,7 +309,7 @@ bool image_reader::resize(cv::Mat &src, cv::Mat &dst, instance const &ins) const
     try {
         cv::resize(src, dst, cv::Size{new_rows, new_cols}, 0, 0);
     }
-    catch (cv::Exception const &e) {
+    catch (const cv::Exception &e) {
         if (warn_bad_instances() || error_bad_example_) {
             auto msg = fmt::format(
                 "The image resize operation failed for the image #{2:n} in the data store '{0}' with the following exception: {2}",
@@ -332,7 +332,7 @@ bool image_reader::resize(cv::Mat &src, cv::Mat &dst, instance const &ins) const
     return true;
 }
 
-bool image_reader::crop(cv::Mat &src, cv::Mat &dst, instance const &ins) const
+bool image_reader::crop(cv::Mat &src, cv::Mat &dst, const instance &ins) const
 {
     if (src.rows < img_dims_[1] || src.cols < img_dims_[2]) {
         if (warn_bad_instances() || error_bad_example_) {
@@ -365,7 +365,7 @@ bool image_reader::crop(cv::Mat &src, cv::Mat &dst, instance const &ins) const
         cv::Rect roi{x, y, img_dims_[2], img_dims_[1]};
         src(roi).copyTo(dst);
     }
-    catch (cv::Exception const &e) {
+    catch (const cv::Exception &e) {
         if (warn_bad_instances() || error_bad_example_) {
             auto msg = fmt::format(
                 "The image crop operation failed for the image #{1:n} in the data store '{0}' with the following exception: {2}",
@@ -417,7 +417,7 @@ image_reader::image_reader(data_reader_params prm, image_reader_params)
 
 image_reader::~image_reader() = default;
 
-intrusive_ptr<record_reader> image_reader::make_record_reader(data_store const &)
+intrusive_ptr<record_reader> image_reader::make_record_reader(const data_store &)
 {
     return nullptr;
 }
@@ -427,7 +427,7 @@ intrusive_ptr<schema const> image_reader::infer_schema(std::optional<instance> c
     return nullptr;
 }
 
-intrusive_ptr<example> image_reader::decode(instance_batch const &) const
+intrusive_ptr<example> image_reader::decode(const instance_batch &) const
 {
     return nullptr;
 }

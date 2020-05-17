@@ -26,7 +26,7 @@ bool match_nan_values(std::string_view s, std::vector<std::string> const &match_
 {
     s = mlio::trim(s);
 
-    for (auto const &needle : match_values) {
+    for (const auto &needle : match_values) {
         bool matches =
             std::equal(needle.begin(), needle.end(), s.begin(), s.end(), [](int c1, int c2) {
                 return c1 == c2 || std::tolower(c1) == std::tolower(c2);

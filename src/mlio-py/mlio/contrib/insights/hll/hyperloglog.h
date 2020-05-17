@@ -80,7 +80,7 @@ public:
     HyperLogLog(uint8_t b = 4);
 
     /// Adds a string-value to the estimator.
-    void add(std::string_view const &str);
+    void add(const std::string_view &str);
 
     /// Estimates the cardinality.
     double estimate() const;

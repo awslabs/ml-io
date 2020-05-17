@@ -27,7 +27,7 @@ namespace {
 
 py::capsule to_dlpack_capsule(tensor &tsr, std::size_t version)
 {
-    void const *managed_tensor = as_dlpack(tsr, version);
+    const void *managed_tensor = as_dlpack(tsr, version);
 
     return py::capsule(managed_tensor, "dltensor", [](::PyObject *obj) {
         auto *ptr = ::PyCapsule_GetPointer(obj, "dltensor");

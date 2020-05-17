@@ -53,7 +53,7 @@ public:
     std::string repr() const;
 
 public:
-    std::string const &name() const noexcept
+    const std::string &name() const noexcept
     {
         return name_;
     }
@@ -63,12 +63,12 @@ public:
         return data_type_;
     }
 
-    size_vector const &shape() const noexcept
+    const size_vector &shape() const noexcept
     {
         return shape_;
     }
 
-    ssize_vector const &strides() const noexcept
+    const ssize_vector &strides() const noexcept
     {
         return strides_;
     }
@@ -87,16 +87,16 @@ private:
 };
 
 MLIO_API
-bool operator==(attribute const &lhs, attribute const &rhs) noexcept;
+bool operator==(const attribute &lhs, const attribute &rhs) noexcept;
 
 MLIO_API
-inline bool operator!=(attribute const &lhs, attribute const &rhs) noexcept
+inline bool operator!=(const attribute &lhs, const attribute &rhs) noexcept
 {
     return !(lhs == rhs);
 }
 
 MLIO_API
-inline std::ostream &operator<<(std::ostream &strm, attribute const &attr)
+inline std::ostream &operator<<(std::ostream &strm, const attribute &attr)
 {
     return strm << attr.repr();
 }
@@ -151,7 +151,7 @@ public:
 
 public:
     /// Returns the index of the attribute with the specified name.
-    std::optional<std::size_t> get_index(std::string const &name) const noexcept;
+    std::optional<std::size_t> get_index(const std::string &name) const noexcept;
 
     std::string repr() const;
 
@@ -167,16 +167,16 @@ private:
 };
 
 MLIO_API
-bool operator==(schema const &lhs, schema const &rhs) noexcept;
+bool operator==(const schema &lhs, const schema &rhs) noexcept;
 
 MLIO_API
-inline bool operator!=(schema const &lhs, schema const &rhs) noexcept
+inline bool operator!=(const schema &lhs, const schema &rhs) noexcept
 {
     return !(lhs == rhs);
 }
 
 MLIO_API
-inline std::ostream &operator<<(std::ostream &strm, schema const &shm)
+inline std::ostream &operator<<(std::ostream &strm, const schema &shm)
 {
     return strm << shm.repr();
 }
@@ -190,12 +190,12 @@ namespace std {
 
 template<>
 struct MLIO_API hash<mlio::attribute> {
-    size_t operator()(mlio::attribute const &attr) const noexcept;
+    size_t operator()(const mlio::attribute &attr) const noexcept;
 };
 
 template<>
 struct MLIO_API hash<mlio::schema> {
-    inline size_t operator()(mlio::schema const &shm) const noexcept
+    inline size_t operator()(const mlio::schema &shm) const noexcept
     {
         return mlio::detail::hash_range(shm.attributes());
     }

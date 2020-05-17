@@ -37,7 +37,7 @@ public:
     file_descriptor(int fd) noexcept : fd_{fd}
     {}
 
-    file_descriptor(file_descriptor const &other) = delete;
+    file_descriptor(const file_descriptor &other) = delete;
 
     file_descriptor(file_descriptor &&other) noexcept : fd_{other.fd_}
     {
@@ -50,7 +50,7 @@ public:
     }
 
 public:
-    file_descriptor &operator=(file_descriptor const &other) = delete;
+    file_descriptor &operator=(const file_descriptor &other) = delete;
 
     file_descriptor &operator=(file_descriptor &&other) noexcept
     {
@@ -89,13 +89,13 @@ private:
 };
 
 MLIO_API
-inline bool operator==(file_descriptor const &lhs, file_descriptor const &rhs) noexcept
+inline bool operator==(const file_descriptor &lhs, const file_descriptor &rhs) noexcept
 {
     return lhs.get() == rhs.get();
 }
 
 MLIO_API
-inline bool operator!=(file_descriptor const &lhs, file_descriptor const &rhs) noexcept
+inline bool operator!=(const file_descriptor &lhs, const file_descriptor &rhs) noexcept
 {
     return lhs.get() != rhs.get();
 }
@@ -108,7 +108,7 @@ namespace std {
 
 template<>
 struct MLIO_API hash<mlio::detail::file_descriptor> {
-    inline size_t operator()(mlio::detail::file_descriptor const &desc) const noexcept
+    inline size_t operator()(const mlio::detail::file_descriptor &desc) const noexcept
     {
         return hash<int>{}(desc.get());
     }

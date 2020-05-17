@@ -28,8 +28,8 @@ namespace detail {
 
 instance_reader::~instance_reader() = default;
 
-std::unique_ptr<instance_reader> make_instance_reader(data_reader_params const &prm,
-                                                      record_reader_factory &&fct)
+std::unique_ptr<instance_reader>
+make_instance_reader(const data_reader_params &prm, record_reader_factory &&fct)
 {
     std::unique_ptr<instance_reader> rdr{};
 

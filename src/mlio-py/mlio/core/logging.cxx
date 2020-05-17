@@ -28,7 +28,7 @@ public:
     explicit py_log_message_handler(py::function hdl) noexcept : hdl_{std::move(hdl)}
     {}
 
-    py_log_message_handler(py_log_message_handler const &) = default;
+    py_log_message_handler(const py_log_message_handler &) = default;
 
     py_log_message_handler(py_log_message_handler &&) = delete;
 
@@ -40,7 +40,7 @@ public:
     }
 
 public:
-    py_log_message_handler &operator=(py_log_message_handler const &) = default;
+    py_log_message_handler &operator=(const py_log_message_handler &) = default;
 
     py_log_message_handler &operator=(py_log_message_handler &&) = delete;
 

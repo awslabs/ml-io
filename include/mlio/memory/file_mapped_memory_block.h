@@ -32,14 +32,14 @@ class MLIO_API file_mapped_memory_block final : public memory_block {
 public:
     explicit file_mapped_memory_block(std::string pathname);
 
-    file_mapped_memory_block(file_mapped_memory_block const &) = delete;
+    file_mapped_memory_block(const file_mapped_memory_block &) = delete;
 
     file_mapped_memory_block(file_mapped_memory_block &&) = delete;
 
     ~file_mapped_memory_block() final;
 
 public:
-    file_mapped_memory_block &operator=(file_mapped_memory_block const &) = delete;
+    file_mapped_memory_block &operator=(const file_mapped_memory_block &) = delete;
 
     file_mapped_memory_block &operator=(file_mapped_memory_block &&) = delete;
 

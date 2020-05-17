@@ -34,7 +34,7 @@ struct MLIO_API float_parse_params {
 
 template<typename T>
 MLIO_API
-parse_result try_parse_float(float_parse_params const &prm, T &result);
+parse_result try_parse_float(const float_parse_params &prm, T &result);
 
 template<typename T>
 MLIO_API
@@ -43,9 +43,9 @@ inline parse_result try_parse_float(std::string_view s, T &result)
     return try_parse_float(float_parse_params{s}, result);
 }
 
-extern template parse_result try_parse_float<float>(float_parse_params const &prm, float &result);
+extern template parse_result try_parse_float<float>(const float_parse_params &prm, float &result);
 
-extern template parse_result try_parse_float<double>(float_parse_params const &prm, double &result);
+extern template parse_result try_parse_float<double>(const float_parse_params &prm, double &result);
 
 struct MLIO_API int_parse_params {
     std::string_view s{};
@@ -54,33 +54,33 @@ struct MLIO_API int_parse_params {
 
 template<typename T>
 MLIO_API
-parse_result try_parse_int(int_parse_params const &prm, T &result) noexcept;
+parse_result try_parse_int(const int_parse_params &prm, T &result) noexcept;
 
 // clang-format off
 
 extern template parse_result
-try_parse_int<std::int8_t>  (int_parse_params const &prm, std::int8_t   &result) noexcept;
+try_parse_int<std::int8_t>  (const int_parse_params &prm, std::int8_t   &result) noexcept;
 
 extern template parse_result
-try_parse_int<std::int16_t> (int_parse_params const &prm, std::int16_t  &result) noexcept;
+try_parse_int<std::int16_t> (const int_parse_params &prm, std::int16_t  &result) noexcept;
 
 extern template parse_result
-try_parse_int<std::int32_t> (int_parse_params const &prm, std::int32_t  &result) noexcept;
+try_parse_int<std::int32_t> (const int_parse_params &prm, std::int32_t  &result) noexcept;
 
 extern template parse_result
-try_parse_int<std::int64_t> (int_parse_params const &prm, std::int64_t  &result) noexcept;
+try_parse_int<std::int64_t> (const int_parse_params &prm, std::int64_t  &result) noexcept;
 
 extern template parse_result
-try_parse_int<std::uint8_t> (int_parse_params const &prm, std::uint8_t  &result) noexcept;
+try_parse_int<std::uint8_t> (const int_parse_params &prm, std::uint8_t  &result) noexcept;
 
 extern template parse_result
-try_parse_int<std::uint16_t>(int_parse_params const &prm, std::uint16_t &result) noexcept;
+try_parse_int<std::uint16_t>(const int_parse_params &prm, std::uint16_t &result) noexcept;
 
 extern template parse_result
-try_parse_int<std::uint32_t>(int_parse_params const &prm, std::uint32_t &result) noexcept;
+try_parse_int<std::uint32_t>(const int_parse_params &prm, std::uint32_t &result) noexcept;
 
 extern template parse_result
-try_parse_int<std::uint64_t>(int_parse_params const &prm, std::uint64_t &result) noexcept;
+try_parse_int<std::uint64_t>(const int_parse_params &prm, std::uint64_t &result) noexcept;
 
 // clang-format on
 

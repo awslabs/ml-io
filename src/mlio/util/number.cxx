@@ -49,7 +49,7 @@ struct parser_traits<T, std::enable_if_t<std::is_integral_v<T>>> {
 };
 
 template<typename T>
-parse_result try_parse_float_core(float_parse_params const &prm, T &result)
+parse_result try_parse_float_core(const float_parse_params &prm, T &result)
 {
     T v = 0.0;
 
@@ -76,8 +76,8 @@ parse_result try_parse_float_core(float_parse_params const &prm, T &result)
 }
 
 template<typename T>
-std::enable_if_t<sizeof(T) >= 4, parse_result> try_parse_int_core(int_parse_params const &prm,
-                                                                  T &result) noexcept
+std::enable_if_t<sizeof(T) >= 4, parse_result>
+try_parse_int_core(const int_parse_params &prm, T &result) noexcept
 {
     // Do not use 0; otherwise we cannot distinguish between a failure
     // and an overflow for unsigned types.
@@ -96,8 +96,8 @@ std::enable_if_t<sizeof(T) >= 4, parse_result> try_parse_int_core(int_parse_para
 }
 
 template<typename T>
-std::enable_if_t<sizeof(T) <= 2, parse_result> try_parse_int_core(int_parse_params const &prm,
-                                                                  T &result) noexcept
+std::enable_if_t<sizeof(T) <= 2, parse_result>
+try_parse_int_core(const int_parse_params &prm, T &result) noexcept
 {
     using U = std::conditional_t<std::is_signed_v<T>, std::int32_t, std::uint32_t>;
 
@@ -121,17 +121,17 @@ std::enable_if_t<sizeof(T) <= 2, parse_result> try_parse_int_core(int_parse_para
 }  // namespace detail
 
 template<typename T>
-inline parse_result try_parse_float(float_parse_params const &prm, T &result)
+inline parse_result try_parse_float(const float_parse_params &prm, T &result)
 {
     return detail::try_parse_float_core(prm, result);
 }
 
-template parse_result try_parse_float<float>(float_parse_params const &prm, float &result);
+template parse_result try_parse_float<float>(const float_parse_params &prm, float &result);
 
-template parse_result try_parse_float<double>(float_parse_params const &prm, double &result);
+template parse_result try_parse_float<double>(const float_parse_params &prm, double &result);
 
 template<typename T>
-inline parse_result try_parse_int(int_parse_params const &prm, T &result) noexcept
+inline parse_result try_parse_int(const int_parse_params &prm, T &result) noexcept
 {
     return detail::try_parse_int_core(prm, result);
 }
@@ -139,28 +139,28 @@ inline parse_result try_parse_int(int_parse_params const &prm, T &result) noexce
 // clang-format off
 
 template parse_result
-try_parse_int<std::int8_t>  (int_parse_params const &prm, std::int8_t   &result) noexcept;
+try_parse_int<std::int8_t>  (const int_parse_params &prm, std::int8_t   &result) noexcept;
 
 template parse_result
-try_parse_int<std::int16_t> (int_parse_params const &prm, std::int16_t  &result) noexcept;
+try_parse_int<std::int16_t> (const int_parse_params &prm, std::int16_t  &result) noexcept;
 
 template parse_result
-try_parse_int<std::int32_t> (int_parse_params const &prm, std::int32_t  &result) noexcept;
+try_parse_int<std::int32_t> (const int_parse_params &prm, std::int32_t  &result) noexcept;
 
 template parse_result
-try_parse_int<std::int64_t> (int_parse_params const &prm, std::int64_t  &result) noexcept;
+try_parse_int<std::int64_t> (const int_parse_params &prm, std::int64_t  &result) noexcept;
 
 template parse_result
-try_parse_int<std::uint8_t> (int_parse_params const &prm, std::uint8_t  &result) noexcept;
+try_parse_int<std::uint8_t> (const int_parse_params &prm, std::uint8_t  &result) noexcept;
 
 template parse_result
-try_parse_int<std::uint16_t>(int_parse_params const &prm, std::uint16_t &result) noexcept;
+try_parse_int<std::uint16_t>(const int_parse_params &prm, std::uint16_t &result) noexcept;
 
 template parse_result
-try_parse_int<std::uint32_t>(int_parse_params const &prm, std::uint32_t &result) noexcept;
+try_parse_int<std::uint32_t>(const int_parse_params &prm, std::uint32_t &result) noexcept;
 
 template parse_result
-try_parse_int<std::uint64_t>(int_parse_params const &prm, std::uint64_t &result) noexcept;
+try_parse_int<std::uint64_t>(const int_parse_params &prm, std::uint64_t &result) noexcept;
 
 // clang-format on
 

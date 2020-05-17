@@ -33,8 +33,8 @@ enum class compression { none, infer, gzip, bzip2, zip };
 /// Constructs a new inflate stream by wrapping the specified input
 /// stream.
 MLIO_API
-intrusive_ptr<input_stream> make_inflate_stream(intrusive_ptr<input_stream> &&strm,
-                                                compression cmp);
+intrusive_ptr<input_stream>
+make_inflate_stream(intrusive_ptr<input_stream> &&strm, compression cmp);
 
 MLIO_API
 inline std::ostream &operator<<(std::ostream &strm, compression cmp)

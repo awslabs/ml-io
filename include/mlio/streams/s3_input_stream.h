@@ -93,7 +93,7 @@ private:
 
 MLIO_API
 intrusive_ptr<s3_input_stream> make_s3_input_stream(intrusive_ptr<s3_client const> client,
-                                                    std::string const &uri,
+                                                    const std::string &uri,
                                                     std::string version_id = {});
 
 /// @}

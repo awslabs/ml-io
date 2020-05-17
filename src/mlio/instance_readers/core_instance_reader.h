@@ -32,7 +32,7 @@ namespace detail {
 
 class core_instance_reader final : public instance_reader_base {
 public:
-    explicit core_instance_reader(data_reader_params const &prm, record_reader_factory &&fct);
+    explicit core_instance_reader(const data_reader_params &prm, record_reader_factory &&fct);
 
 private:
     std::optional<instance> read_instance_core() final;
@@ -52,7 +52,7 @@ private:
     void reset_core() noexcept final;
 
 private:
-    data_reader_params const *params_;
+    const data_reader_params *params_;
     record_reader_factory record_reader_factory_;
     std::vector<intrusive_ptr<data_store>>::const_iterator store_iter_{};
     data_store *store_{};

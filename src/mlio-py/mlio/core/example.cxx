@@ -25,7 +25,7 @@ using namespace pybind11::literals;
 namespace pymlio {
 namespace {
 
-intrusive_ptr<tensor> get_feature(example &exm, std::string const &name)
+intrusive_ptr<tensor> get_feature(example &exm, const std::string &name)
 {
     intrusive_ptr<tensor> tsr = exm.find_feature(name);
     if (tsr == nullptr) {
@@ -66,10 +66,10 @@ void register_example(py::module &m)
              [](example &self) {
                  return self.features().size();
              })
-        .def("__getitem__", py::overload_cast<example &, std::string const &>(&get_feature))
+        .def("__getitem__", py::overload_cast<example &, const std::string &>(&get_feature))
         .def("__getitem__", py::overload_cast<example &, std::size_t>(&get_feature))
         .def("__contains__",
-             [](example &self, std::string const &name) {
+             [](example &self, const std::string &name) {
                  return self.get_schema().get_index(name) != std::nullopt;
              })
         .def("__contains__",

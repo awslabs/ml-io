@@ -33,14 +33,14 @@ class MLIO_API input_stream : public intrusive_ref_counter<input_stream> {
 public:
     input_stream() noexcept = default;
 
-    input_stream(input_stream const &) = delete;
+    input_stream(const input_stream &) = delete;
 
     input_stream(input_stream &&) = delete;
 
     virtual ~input_stream();
 
 public:
-    input_stream &operator=(input_stream const &) = delete;
+    input_stream &operator=(const input_stream &) = delete;
 
     input_stream &operator=(input_stream &&) = delete;
 

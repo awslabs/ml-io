@@ -141,14 +141,14 @@ class MLIO_API data_reader : public intrusive_ref_counter<data_reader> {
 public:
     data_reader() noexcept = default;
 
-    data_reader(data_reader const &) = delete;
+    data_reader(const data_reader &) = delete;
 
     data_reader(data_reader &&) = delete;
 
     virtual ~data_reader();
 
 public:
-    data_reader &operator=(data_reader const &) = delete;
+    data_reader &operator=(const data_reader &) = delete;
 
     data_reader &operator=(data_reader &&) = delete;
 

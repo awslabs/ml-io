@@ -29,14 +29,14 @@ class MLIO_API heap_memory_block final : public mutable_memory_block {
 public:
     explicit heap_memory_block(size_type size);
 
-    heap_memory_block(heap_memory_block const &) = delete;
+    heap_memory_block(const heap_memory_block &) = delete;
 
     heap_memory_block(heap_memory_block &&) = delete;
 
     ~heap_memory_block() override;
 
 public:
-    heap_memory_block &operator=(heap_memory_block const &) = delete;
+    heap_memory_block &operator=(const heap_memory_block &) = delete;
 
     heap_memory_block &operator=(heap_memory_block &&) = delete;
 

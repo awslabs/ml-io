@@ -55,12 +55,12 @@ public:
     /// @return
     ///     The @ref tensor instance if the feature is found in the
     ///     example; otherwise an @c std::nullptr.
-    intrusive_ptr<tensor> find_feature(std::string const &name) const noexcept;
+    intrusive_ptr<tensor> find_feature(const std::string &name) const noexcept;
 
     std::string repr() const;
 
 public:
-    schema const &get_schema() const noexcept
+    const schema &get_schema() const noexcept
     {
         return *schema_;
     }
@@ -84,7 +84,7 @@ private:
 };
 
 MLIO_API
-inline std::ostream &operator<<(std::ostream &strm, example const &exm)
+inline std::ostream &operator<<(std::ostream &strm, const example &exm)
 {
     return strm << exm.repr();
 }

@@ -29,8 +29,8 @@ namespace mlio {
 inline namespace v1 {
 namespace detail {
 
-std::optional<record> recordio_record_reader::decode_record(memory_slice &chunk,
-                                                            bool ignore_leftover)
+std::optional<record>
+recordio_record_reader::decode_record(memory_slice &chunk, bool ignore_leftover)
 {
     if (chunk.empty()) {
         return {};

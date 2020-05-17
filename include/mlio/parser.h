@@ -58,7 +58,7 @@ using parser =
 /// @param dt
 ///     The data type for which to construct a parser.
 MLIO_API
-parser make_parser(data_type dt, parser_params const &prm);
+parser make_parser(data_type dt, const parser_params &prm);
 
 }  // namespace v1
 }  // namespace mlio

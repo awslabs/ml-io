@@ -28,7 +28,7 @@ namespace detail {
 
 struct s3_input_stream_access {
     static inline intrusive_ptr<s3_input_stream>
-    make(intrusive_ptr<s3_client const> client, std::string const &uri, std::string version_id)
+    make(intrusive_ptr<s3_client const> client, const std::string &uri, std::string version_id)
     {
         auto [bucket, key] = split_s3_uri_to_bucket_and_key(uri);
 
@@ -46,7 +46,7 @@ struct s3_input_stream_access {
 }  // namespace detail
 
 intrusive_ptr<s3_input_stream> make_s3_input_stream(intrusive_ptr<s3_client const> client,
-                                                    std::string const &uri,
+                                                    const std::string &uri,
                                                     std::string version_id)
 {
     return detail::s3_input_stream_access::make(std::move(client), uri, std::move(version_id));

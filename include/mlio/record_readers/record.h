@@ -49,19 +49,19 @@ public:
         : payload_{std::move(payload)}, kind_{knd}
     {}
 
-    record(record const &) noexcept = default;
+    record(const record &) noexcept = default;
 
     record(record &&) noexcept = default;
 
     ~record() = default;
 
 public:
-    record &operator=(record const &) noexcept = default;
+    record &operator=(const record &) noexcept = default;
 
     record &operator=(record &&) noexcept = default;
 
 public:
-    memory_slice const &payload() const &noexcept
+    const memory_slice &payload() const &noexcept
     {
         return payload_;
     }

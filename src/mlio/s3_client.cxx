@@ -88,7 +88,7 @@ Aws::Auth::AWSCredentials get_default_aws_credentials()
 #pragma GCC diagnostic pop
 
 template<typename Outcome>
-inline void check_s3_error(Outcome const &outcome)
+inline void check_s3_error(const Outcome &outcome)
 {
     if (!outcome.IsSuccess()) {
         throw_s3_error(outcome.GetError());
@@ -128,9 +128,9 @@ void s3_client::list_objects(std::string_view bucket,
         auto outcome = core_->ListObjectsV2(req);
         detail::check_s3_error(outcome);
 
-        auto const &result = outcome.GetResult();
+        const auto &result = outcome.GetResult();
 
-        for (auto const &obj : result.GetContents()) {
+        for (const auto &obj : result.GetContents()) {
             callback(base_uri + std::string{obj.GetKey()});
         }
 

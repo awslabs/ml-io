@@ -49,16 +49,16 @@ public:
     using index_type = std::size_t;
     using difference_type = std::ptrdiff_t;
     using pointer = T *;
-    using const_pointer = T const *;
+    using const_pointer = const T *;
     using reference = T &;
-    using const_reference = T const &;
+    using const_reference = const T &;
     using iterator = T *;
-    using const_iterator = T const *;
+    using const_iterator = const T *;
 
 public:
     constexpr span() noexcept = default;
 
-    constexpr span(span const &other) noexcept = default;
+    constexpr span(const span &other) noexcept = default;
 
     // NOLINTNEXTLINE(google-explicit-constructor)
     constexpr span(pointer data, index_type size) noexcept : data_{data}, size_{size}
@@ -83,7 +83,7 @@ public:
 
     template<typename Container>
     // NOLINTNEXTLINE(google-explicit-constructor)
-    constexpr span(Container const &cont)
+    constexpr span(const Container &cont)
         : data_{cont.data()}, size_{static_cast<index_type>(cont.size())}
     {
         static_assert(detail::is_container<Container>::value,
@@ -105,7 +105,7 @@ public:
     ~span() = default;
 
 public:
-    constexpr span &operator=(span const &) noexcept = default;
+    constexpr span &operator=(const span &) noexcept = default;
 
 public:
     constexpr span<element_type> subspan(index_type offset) const
@@ -185,7 +185,7 @@ template<class T>
 MLIO_API
 inline constexpr span<std::byte const> as_bytes(span<T> s) noexcept
 {
-    return {reinterpret_cast<std::byte const *>(s.data()), s.size_bytes()};
+    return {reinterpret_cast<const std::byte *>(s.data()), s.size_bytes()};
 }
 
 template<class T>

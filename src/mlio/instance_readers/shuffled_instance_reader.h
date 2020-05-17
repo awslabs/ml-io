@@ -32,7 +32,7 @@ namespace detail {
 
 class shuffled_instance_reader final : public instance_reader_base {
 public:
-    explicit shuffled_instance_reader(data_reader_params const &prm,
+    explicit shuffled_instance_reader(const data_reader_params &prm,
                                       std::unique_ptr<instance_reader> &&inner);
 
 private:
@@ -45,7 +45,7 @@ private:
     void reset_core() noexcept final;
 
 private:
-    data_reader_params const *params_;
+    const data_reader_params *params_;
     std::unique_ptr<instance_reader> inner_;
     std::size_t shuffle_window_;
     std::vector<instance> buffer_{};

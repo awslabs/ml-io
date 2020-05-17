@@ -53,7 +53,7 @@ data_analysis analyze_dataset(mlio::data_reader &reader,
     std::vector<column_analysis> column_stats;
     column_stats.reserve(exm->features().size());
 
-    for (mlio::attribute const &attr : exm->get_schema().attributes()) {
+    for (const mlio::attribute &attr : exm->get_schema().attributes()) {
         if (attr.sparse() || attr.dtype() != mlio::data_type::string) {
             throw std::runtime_error("Data insights only works with dense string tensors.");
         }
@@ -132,7 +132,7 @@ PYBIND11_MODULE(insights, m)
 
     ca_class.def("estimate_string_cardinality", &column_analysis::estimate_string_cardinality);
 
-    ca_class.def("to_dict", [=](column_analysis const &self) {
+    ca_class.def("to_dict", [=](const column_analysis &self) {
         py::dict result{};
 
         for (auto &[name, method] : long_stat_names) {
@@ -155,7 +155,7 @@ PYBIND11_MODULE(insights, m)
         return result;
     });
 
-    ca_class.def("__repr__", [](column_analysis const &self) {
+    ca_class.def("__repr__", [](const column_analysis &self) {
         return "ColumnAnalysis(" + self.column_name + ")";
     });
 

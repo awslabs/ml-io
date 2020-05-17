@@ -25,7 +25,7 @@ namespace pymlio {
 arrow_buffer::arrow_buffer(memory_slice s) noexcept
     : arrow::Buffer{nullptr, 0}, slice_{std::move(s)}
 {
-    data_ = reinterpret_cast<std::uint8_t const *>(slice_.data());
+    data_ = reinterpret_cast<const std::uint8_t *>(slice_.data());
 
     size_ = static_cast<std::int64_t>(slice_.size());
 

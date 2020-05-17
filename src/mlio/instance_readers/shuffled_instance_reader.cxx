@@ -25,7 +25,7 @@ namespace mlio {
 inline namespace v1 {
 namespace detail {
 
-shuffled_instance_reader::shuffled_instance_reader(data_reader_params const &prm,
+shuffled_instance_reader::shuffled_instance_reader(const data_reader_params &prm,
                                                    std::unique_ptr<instance_reader> &&inner)
     : params_{&prm}
     , inner_{std::move(inner)}

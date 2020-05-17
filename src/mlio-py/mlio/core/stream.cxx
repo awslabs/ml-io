@@ -132,7 +132,7 @@ bool py_input_stream::closed() const noexcept
     }
 }
 
-std::size_t read_input_stream(input_stream &strm, py::buffer const &buf)
+std::size_t read_input_stream(input_stream &strm, const py::buffer &buf)
 {
     py_mutable_memory_block blk{buf};
 
@@ -163,7 +163,7 @@ void register_streams(py::module &m)
                  return self;
              })
         .def("__exit__",
-             [](input_stream &self, py::args const &) {
+             [](input_stream &self, const py::args &) {
                  self.close();
              })
         .def_property_readonly("size", &input_stream::size, "Gets the size of the stream.")

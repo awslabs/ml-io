@@ -41,7 +41,7 @@ public:
     std::string repr() const final;
 
 public:
-    std::string const &id() const final;
+    const std::string &id() const final;
 
 private:
     memory_slice chunk_;

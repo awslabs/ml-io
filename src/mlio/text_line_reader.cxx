@@ -40,7 +40,7 @@ text_line_reader::~text_line_reader()
     stop();
 }
 
-intrusive_ptr<record_reader> text_line_reader::make_record_reader(data_store const &ds)
+intrusive_ptr<record_reader> text_line_reader::make_record_reader(const data_store &ds)
 {
     auto strm = make_utf8_stream(ds.open_read());
     return make_intrusive<text_line_record_reader>(std::move(strm), false);
@@ -54,12 +54,12 @@ intrusive_ptr<schema const> text_line_reader::infer_schema(std::optional<instanc
     return make_intrusive<schema>(std::move(attrs));
 }
 
-intrusive_ptr<example> text_line_reader::decode(instance_batch const &batch) const
+intrusive_ptr<example> text_line_reader::decode(const instance_batch &batch) const
 {
     intrusive_ptr<dense_tensor> tsr = make_tensor(batch.size());
 
     auto row_pos = tsr->data().as<std::string>().begin();
-    for (instance const &ins : batch.instances()) {
+    for (const instance &ins : batch.instances()) {
         *row_pos++ = as_string_view(ins.bits());
     }
 

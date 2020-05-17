@@ -222,7 +222,7 @@ namespace std {
 
 template<>
 struct MLIO_API hash<mlio::data_type> {
-    inline size_t operator()(mlio::data_type const &dt) const noexcept
+    inline size_t operator()(const mlio::data_type &dt) const noexcept
     {
         using T = underlying_type_t<mlio::data_type>;
 

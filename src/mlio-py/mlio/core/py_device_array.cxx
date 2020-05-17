@@ -49,7 +49,8 @@ void *py_device_array::make_or_get_string_buffer()
             for (py::str obj : span_.as<std::string>()) {
                 string_buf_.push_back(obj.release().ptr());
             }
-        } catch (std::runtime_error &) {
+        }
+        catch (std::runtime_error &) {
             PyErr_SetString(
                 PyExc_ValueError,
                 "The string tensor contains an invalid UTF-8 sequence. Please make sure that you "
@@ -146,11 +147,11 @@ void register_device_array(py::module &m)
                             "Represents a device kind that has data processing capabilities such "
                             "as CPU or CUDA.")
         .def("__eq__",
-             [](device_kind const &self, device_kind const &other) {
+             [](const device_kind &self, const device_kind &other) {
                  return self == other;
              })
         .def("__hash__",
-             [](device_kind const &self) {
+             [](const device_kind &self) {
                  return std::hash<device_kind>{}(self);
              })
         .def("__repr__", &device_kind::repr)
@@ -166,11 +167,11 @@ void register_device_array(py::module &m)
         m, "Device", "Represents a particular data processing unit on the host system.")
         .def(py::init<device_kind, std::size_t>(), "kind"_a, "id"_a)
         .def("__eq__",
-             [](device const &self, device const &other) {
+             [](const device &self, const device &other) {
                  return self == other;
              })
         .def("__hash__",
-             [](device const &self) {
+             [](const device &self) {
                  return std::hash<device>{}(self);
              })
         .def("__repr__", &device::repr)

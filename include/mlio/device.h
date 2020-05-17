@@ -57,19 +57,19 @@ private:
 };
 
 MLIO_API
-inline bool operator==(device_kind const &lhs, device_kind const &rhs) noexcept
+inline bool operator==(const device_kind &lhs, const device_kind &rhs) noexcept
 {
     return lhs.name() == rhs.name();
 }
 
 MLIO_API
-inline bool operator!=(device_kind const &lhs, device_kind const &rhs) noexcept
+inline bool operator!=(const device_kind &lhs, const device_kind &rhs) noexcept
 {
     return lhs.name() != rhs.name();
 }
 
 MLIO_API
-inline std::ostream &operator<<(std::ostream &strm, device_kind const &kind)
+inline std::ostream &operator<<(std::ostream &strm, const device_kind &kind)
 {
     return strm << kind.repr();
 }
@@ -100,19 +100,19 @@ private:
 };
 
 MLIO_API
-inline bool operator==(device const &lhs, device const &rhs) noexcept
+inline bool operator==(const device &lhs, const device &rhs) noexcept
 {
     return lhs.kind() == rhs.kind() && lhs.id() == rhs.id();
 }
 
 MLIO_API
-inline bool operator!=(device const &lhs, device const &rhs) noexcept
+inline bool operator!=(const device &lhs, const device &rhs) noexcept
 {
     return lhs.kind() != rhs.kind() || lhs.id() != rhs.id();
 }
 
 MLIO_API
-inline std::ostream &operator<<(std::ostream &strm, device const &dev)
+inline std::ostream &operator<<(std::ostream &strm, const device &dev)
 {
     return strm << dev.repr();
 }
@@ -126,7 +126,7 @@ namespace std {
 
 template<>
 struct MLIO_API hash<mlio::device_kind> {
-    inline size_t operator()(mlio::device_kind const &kind) const noexcept
+    inline size_t operator()(const mlio::device_kind &kind) const noexcept
     {
         return hash<string_view>{}(kind.name());
     }
@@ -134,7 +134,7 @@ struct MLIO_API hash<mlio::device_kind> {
 
 template<>
 struct MLIO_API hash<mlio::device> {
-    inline size_t operator()(mlio::device const &dev) const noexcept
+    inline size_t operator()(const mlio::device &dev) const noexcept
     {
         size_t seed = 0;
 

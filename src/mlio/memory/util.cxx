@@ -24,8 +24,8 @@
 namespace mlio {
 inline namespace v1 {
 
-intrusive_ptr<mutable_memory_block> resize_memory_block(intrusive_ptr<mutable_memory_block> &blk,
-                                                        std::size_t size)
+intrusive_ptr<mutable_memory_block>
+resize_memory_block(intrusive_ptr<mutable_memory_block> &blk, std::size_t size)
 {
     if (blk->resizable()) {
         blk->resize(size);

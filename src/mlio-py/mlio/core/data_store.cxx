@@ -35,7 +35,7 @@ public:
     std::string repr() const override;
 
 public:
-    std::string const &id() const noexcept override;
+    const std::string &id() const noexcept override;
 };
 
 intrusive_ptr<input_stream> py_data_store::open_read() const
@@ -53,25 +53,25 @@ std::string py_data_store::repr() const
     return repr_func(this).cast<std::string>();
 }
 
-std::string const &py_data_store::id() const noexcept
+const std::string &py_data_store::id() const noexcept
 {
     try {
         // NOLINTNEXTLINE
-        PYBIND11_OVERLOAD_PURE(std::string const &, data_store, id, )
+        PYBIND11_OVERLOAD_PURE(const std::string &, data_store, id, )
     }
     catch (...) {
         std::terminate();
     }
 }
 
-intrusive_ptr<in_memory_store> make_in_memory_store(py::buffer const &buf, compression cmp)
+intrusive_ptr<in_memory_store> make_in_memory_store(const py::buffer &buf, compression cmp)
 {
     return make_intrusive<in_memory_store>(make_intrusive<py_memory_block>(buf), cmp);
 }
 
 std::vector<intrusive_ptr<data_store>>
 py_list_files(std::vector<std::string> const &pathnames,
-              std::string const &pattern,
+              const std::string &pattern,
               list_files_params::predicate_callback &predicate,
               bool mmap,
               compression cmp)
@@ -80,9 +80,9 @@ py_list_files(std::vector<std::string> const &pathnames,
 }
 
 std::vector<intrusive_ptr<data_store>>
-py_list_s3_objects(s3_client const &client,
+py_list_s3_objects(const s3_client &client,
                    std::vector<std::string> const &uris,
-                   std::string const &pattern,
+                   const std::string &pattern,
                    list_files_params::predicate_callback &predicate,
                    compression cmp)
 {
@@ -108,11 +108,11 @@ void register_data_stores(py::module &m)
              py::call_guard<py::gil_scoped_release>(),
              "Return an ``input_stream`` for reading from the data store.")
         .def("__eq__",
-             [](data_store const &self, data_store const &other) {
+             [](const data_store &self, const data_store &other) {
                  return self == other;
              })
         .def("__hash__",
-             [](data_store const &self) {
+             [](const data_store &self) {
                  return std::hash<data_store>{}(self);
              })
         .def("__repr__", &data_store::repr)
@@ -221,7 +221,7 @@ void register_data_stores(py::module &m)
         )");
 
     m.def("list_files",
-          py::overload_cast<std::string const &, std::string const &>(&list_files),
+          py::overload_cast<const std::string &, const std::string &>(&list_files),
           "pathname"_a,
           "pattern"_a = "",
           R"(
@@ -261,7 +261,7 @@ void register_data_stores(py::module &m)
         )");
 
     m.def("list_s3_objects",
-          py::overload_cast<s3_client const &, std::string const &, std::string const &>(
+          py::overload_cast<const s3_client &, const std::string &, const std::string &>(
               &list_s3_objects),
           "client"_a,
           "uri"_a,

@@ -27,14 +27,14 @@ class zlib_inflater {
 public:
     explicit zlib_inflater();
 
-    zlib_inflater(zlib_inflater const &) = delete;
+    zlib_inflater(const zlib_inflater &) = delete;
 
     zlib_inflater(zlib_inflater &&) = delete;
 
     ~zlib_inflater();
 
 public:
-    zlib_inflater &operator=(zlib_inflater const &) = delete;
+    zlib_inflater &operator=(const zlib_inflater &) = delete;
 
     zlib_inflater &operator=(zlib_inflater &&) = delete;
 

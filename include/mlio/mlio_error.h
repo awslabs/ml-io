@@ -27,14 +27,14 @@ public:
     using std::runtime_error::runtime_error;
 
 public:
-    mlio_error(mlio_error const &) = default;
+    mlio_error(const mlio_error &) = default;
 
     mlio_error(mlio_error &&) = default;
 
     ~mlio_error() override;
 
 public:
-    mlio_error &operator=(mlio_error const &) = default;
+    mlio_error &operator=(const mlio_error &) = default;
 
     mlio_error &operator=(mlio_error &&) = default;
 };

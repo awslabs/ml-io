@@ -51,12 +51,12 @@ struct FTS_deleter {
     }
 };
 
-std::vector<char const *> get_pathname_c_strs(stdx::span<std::string const> pathnames)
+std::vector<const char *> get_pathname_c_strs(stdx::span<std::string const> pathnames)
 {
-    std::vector<char const *> c_strs{};
+    std::vector<const char *> c_strs{};
 
     std::transform(
-        pathnames.begin(), pathnames.end(), std::back_inserter(c_strs), [](std::string const &pth) {
+        pathnames.begin(), pathnames.end(), std::back_inserter(c_strs), [](const std::string &pth) {
             return pth.c_str();
         });
 
@@ -65,14 +65,14 @@ std::vector<char const *> get_pathname_c_strs(stdx::span<std::string const> path
     return c_strs;
 }
 
-inline int ver_sort(::FTSENT const **a, ::FTSENT const **b)
+inline int ver_sort(const ::FTSENT **a, const ::FTSENT **b)
 {
     return ::strnatcmp((*a)->fts_name, (*b)->fts_name);
 }
 
 auto make_fts(stdx::span<std::string const> pathnames)
 {
-    std::vector<char const *> c_strs = get_pathname_c_strs(pathnames);
+    std::vector<const char *> c_strs = get_pathname_c_strs(pathnames);
 
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
     auto path_argv = const_cast<char *const *>(c_strs.data());
@@ -89,7 +89,7 @@ auto make_fts(stdx::span<std::string const> pathnames)
 }  // namespace
 }  // namespace detail
 
-std::vector<intrusive_ptr<data_store>> list_files(list_files_params const &prm)
+std::vector<intrusive_ptr<data_store>> list_files(const list_files_params &prm)
 {
     auto fts = detail::make_fts(prm.pathnames);
 
@@ -113,7 +113,7 @@ std::vector<intrusive_ptr<data_store>> list_files(list_files_params const &prm)
         }
 
         // Pattern match.
-        std::string const *pattern = prm.pattern;
+        const std::string *pattern = prm.pattern;
         if (pattern != nullptr && !pattern->empty()) {
             int r = ::fnmatch(pattern->c_str(), e->fts_accpath, 0);
             if (r == FNM_NOMATCH) {
@@ -125,7 +125,7 @@ std::vector<intrusive_ptr<data_store>> list_files(list_files_params const &prm)
         }
 
         // Predicate match.
-        auto const *predicate = prm.predicate;
+        const auto *predicate = prm.predicate;
         if (predicate != nullptr && *predicate != nullptr) {
             if (!(*predicate)(e->fts_accpath)) {
                 continue;
@@ -143,8 +143,8 @@ std::vector<intrusive_ptr<data_store>> list_files(list_files_params const &prm)
     return lst;
 }
 
-std::vector<intrusive_ptr<data_store>> list_files(std::string const &pathname,
-                                                  std::string const &pattern)
+std::vector<intrusive_ptr<data_store>>
+list_files(const std::string &pathname, const std::string &pattern)
 {
     stdx::span<std::string const> pathnames{&pathname, 1};
 

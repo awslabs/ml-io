@@ -31,14 +31,14 @@ class MLIO_API record_reader : public intrusive_ref_counter<record_reader> {
 public:
     record_reader() noexcept = default;
 
-    record_reader(record_reader const &) = delete;
+    record_reader(const record_reader &) = delete;
 
     record_reader(record_reader &&) = delete;
 
     virtual ~record_reader();
 
 public:
-    record_reader &operator=(record_reader const &) = delete;
+    record_reader &operator=(const record_reader &) = delete;
 
     record_reader &operator=(record_reader &&) = delete;
 

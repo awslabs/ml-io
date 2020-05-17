@@ -33,8 +33,8 @@ namespace mlio {
 inline namespace v1 {
 namespace detail {
 
-std::optional<record> csv_record_reader::decode_text_record(memory_slice &chunk,
-                                                            bool ignore_leftover)
+std::optional<record>
+csv_record_reader::decode_text_record(memory_slice &chunk, bool ignore_leftover)
 {
     while (!chunk.empty()) {
         if (is_comment_line(chunk)) {
@@ -64,7 +64,7 @@ std::optional<record> csv_record_reader::decode_text_record(memory_slice &chunk,
     return {};
 }
 
-inline bool csv_record_reader::is_comment_line(memory_slice const &chunk)
+inline bool csv_record_reader::is_comment_line(const memory_slice &chunk)
 {
     if (params_->comment_char == std::nullopt) {
         return false;

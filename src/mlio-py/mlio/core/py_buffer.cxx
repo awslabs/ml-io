@@ -35,11 +35,11 @@ public:
     using size_type = std::size_t;
     using difference_type = std::ptrdiff_t;
     using reference = T &;
-    using const_reference = T const &;
+    using const_reference = const T &;
     using pointer = T *;
-    using const_pointer = T const *;
+    using const_pointer = const T *;
     using iterator = T *;
-    using const_iterator = T const *;
+    using const_iterator = const T *;
 
 public:
     explicit py_buffer_container(T *data, size_type size, py::buffer_info &&info) noexcept
@@ -109,9 +109,9 @@ private:
     py::buffer_info info_;
 };
 
-std::optional<data_type> get_data_type(py::buffer_info const &info)
+std::optional<data_type> get_data_type(const py::buffer_info &info)
 {
-    std::string const &fmt_str = info.format;
+    const std::string &fmt_str = info.format;
 
     if (fmt_str.empty() || fmt_str.size() > 2) {
         return {};
@@ -245,7 +245,7 @@ struct make_cpu_array_op {
 
 template<>
 struct make_cpu_array_op<data_type::string> {
-    static std::vector<std::string> make_string_list(py::buffer_info const &info)
+    static std::vector<std::string> make_string_list(const py::buffer_info &info)
     {
         auto size = static_cast<std::size_t>(info.size);
 

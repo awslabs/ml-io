@@ -31,14 +31,14 @@ class chunk_reader {
 public:
     chunk_reader() noexcept = default;
 
-    chunk_reader(chunk_reader const &) = delete;
+    chunk_reader(const chunk_reader &) = delete;
 
     chunk_reader(chunk_reader &&) = delete;
 
     virtual ~chunk_reader();
 
 public:
-    chunk_reader &operator=(chunk_reader const &) = delete;
+    chunk_reader &operator=(const chunk_reader &) = delete;
 
     chunk_reader &operator=(chunk_reader &&) = delete;
 

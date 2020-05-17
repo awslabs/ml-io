@@ -57,7 +57,7 @@ struct parallel_data_reader::graph_data {
 parallel_data_reader::parallel_data_reader(data_reader_params &&prm)
     : data_reader_base{std::move(prm)}, graph_{std::make_unique<graph_data>()}
 {
-    reader_ = detail::make_instance_reader(params(), [this](data_store const &ds) {
+    reader_ = detail::make_instance_reader(params(), [this](const data_store &ds) {
         return make_record_reader(ds);
     });
 
@@ -140,7 +140,7 @@ void parallel_data_reader::run_pipeline()
     try {
         graph_->obj.wait_for_all();
     }
-    catch (std::exception const &) {
+    catch (const std::exception &) {
         exception_ptr_ = std::current_exception();
     }
 
@@ -197,7 +197,7 @@ void parallel_data_reader::init_graph()
     // Decode
     auto decode_node =
         std::make_unique<flw::multifunction_node<batch_msg, std::tuple<example_msg>>>(
-            g, flw::unlimited, [this](auto const &msg, auto &ports) {
+            g, flw::unlimited, [this](const auto &msg, auto &ports) {
                 // We send a message to the next node even if the decode()
                 // function fails. This is needed to have correct sequential
                 // ordering of other batches.
@@ -211,13 +211,13 @@ void parallel_data_reader::init_graph()
             });
 
     // Order
-    auto order_node = std::make_unique<flw::sequencer_node<example_msg>>(g, [](auto const &msg) {
+    auto order_node = std::make_unique<flw::sequencer_node<example_msg>>(g, [](const auto &msg) {
         return msg.idx;
     });
 
     // Queue
     auto queue_node = std::make_unique<flw::function_node<example_msg, flw::continue_msg>>(
-        g, flw::serial, [this, num_prefetched_examples](auto const &msg) {
+        g, flw::serial, [this, num_prefetched_examples](const auto &msg) {
             // If the decode() function has failed simply discard the
             // message.
             if (msg.exm == nullptr) {

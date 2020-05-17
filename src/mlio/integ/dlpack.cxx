@@ -95,17 +95,17 @@ as_dl_data_type(data_type dt)
 
 // clang-format on
 
-std::int64_t *cast_shape(size_vector const &shape) noexcept
+std::int64_t *cast_shape(const size_vector &shape) noexcept
 {
     if (shape.empty()) {
         return nullptr;
     }
 
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
-    return const_cast<std::int64_t *>(reinterpret_cast<std::int64_t const *>(shape.data()));
+    return const_cast<std::int64_t *>(reinterpret_cast<const std::int64_t *>(shape.data()));
 }
 
-std::int64_t *cast_strides(ssize_vector const &strides) noexcept
+std::int64_t *cast_strides(const ssize_vector &strides) noexcept
 {
     if (strides.empty()) {
         return nullptr;
@@ -117,7 +117,7 @@ std::int64_t *cast_strides(ssize_vector const &strides) noexcept
 #endif
 
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
-    return const_cast<std::int64_t *>(reinterpret_cast<std::int64_t const *>(strides.data()));
+    return const_cast<std::int64_t *>(reinterpret_cast<const std::int64_t *>(strides.data()));
 
 #if defined(__GNUC__) && !defined(__clang__)
 #pragma GCC diagnostic pop

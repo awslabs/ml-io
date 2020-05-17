@@ -26,14 +26,14 @@ public:
     using mlio_error::mlio_error;
 
 public:
-    not_supported_error(not_supported_error const &) = default;
+    not_supported_error(const not_supported_error &) = default;
 
     not_supported_error(not_supported_error &&) = default;
 
     ~not_supported_error() override;
 
 public:
-    not_supported_error &operator=(not_supported_error const &) = default;
+    not_supported_error &operator=(const not_supported_error &) = default;
 
     not_supported_error &operator=(not_supported_error &&) = default;
 };

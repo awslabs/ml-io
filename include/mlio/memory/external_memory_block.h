@@ -31,14 +31,14 @@ public:
         : data_{data}, size_{size}
     {}
 
-    external_memory_block(external_memory_block const &) = delete;
+    external_memory_block(const external_memory_block &) = delete;
 
     external_memory_block(external_memory_block &&) = delete;
 
     ~external_memory_block() override;
 
 public:
-    external_memory_block &operator=(external_memory_block const &) = delete;
+    external_memory_block &operator=(const external_memory_block &) = delete;
 
     external_memory_block &operator=(external_memory_block &&) = delete;
 

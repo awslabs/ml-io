@@ -600,8 +600,8 @@ XXH_FORCE_INLINE void XXH3_accumulate_512(void *XXH_RESTRICT acc,
         XXH_ALIGN(16) uint64x2_t *const xacc = (uint64x2_t *) acc;
         /* We don't use a uint32x4_t pointer because it causes bus errors on
          * ARMv7. */
-        uint8_t const *const xinput = (const uint8_t *) input;
-        uint8_t const *const xsecret = (const uint8_t *) secret;
+        const uint8_t *const xinput = (const uint8_t *) input;
+        const uint8_t *const xsecret = (const uint8_t *) secret;
 
         size_t i;
         for (i = 0; i < STRIPE_LEN / sizeof(uint64x2_t); i++) {
@@ -684,8 +684,8 @@ XXH_FORCE_INLINE void XXH3_accumulate_512(void *XXH_RESTRICT acc,
 
 #elif (XXH_VECTOR == XXH_VSX)
     U64x2 *const xacc = (U64x2 *) acc;                   /* presumed aligned */
-    U64x2 const *const xinput = (U64x2 const *) input;   /* no alignment restriction */
-    U64x2 const *const xsecret = (U64x2 const *) secret; /* no alignment restriction */
+    const U64x2 *const xinput = (const U64x2 *) input;   /* no alignment restriction */
+    const U64x2 *const xsecret = (const U64x2 *) secret; /* no alignment restriction */
     U64x2 const v32 = {32, 32};
 #if XXH_VSX_BE
     U8x16 const vXorSwap = {0x07,
@@ -825,7 +825,7 @@ XXH_FORCE_INLINE void XXH3_scrambleAcc(void *XXH_RESTRICT acc, const void *XXH_R
 
     {
         uint64x2_t *const xacc = (uint64x2_t *) acc;
-        uint8_t const *const xsecret = (uint8_t const *) secret;
+        const uint8_t *const xsecret = (const uint8_t *) secret;
         uint32x2_t const prime = vdup_n_u32(PRIME32_1);
 
         size_t i;

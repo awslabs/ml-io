@@ -27,8 +27,8 @@ namespace mlio {
 inline namespace v1 {
 namespace detail {
 
-std::optional<record> text_line_record_reader::decode_text_record(memory_slice &chunk,
-                                                                  bool ignore_leftover)
+std::optional<record>
+text_line_record_reader::decode_text_record(memory_slice &chunk, bool ignore_leftover)
 {
     if (chunk.empty()) {
         return {};

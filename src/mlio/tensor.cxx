@@ -29,7 +29,7 @@ inline namespace v1 {
 namespace detail {
 namespace {
 
-std::string repr(tensor const &tsr, std::string_view type_name)
+std::string repr(const tensor &tsr, std::string_view type_name)
 {
     return fmt::format("<{0} data_type='{1}' shape=({2}) strides=({3})>",
                        type_name,
@@ -55,7 +55,7 @@ tensor::tensor(data_type dt, size_vector &&shape, ssize_vector &&strides)
 
 tensor::~tensor() = default;
 
-ssize_vector tensor::default_strides(size_vector const &shape)
+ssize_vector tensor::default_strides(const size_vector &shape)
 {
     if (shape.empty()) {
         return {};
@@ -160,7 +160,7 @@ csr_tensor::csr_tensor(size_vector shape,
     , indices_{std::move(indices)}
     , indptr_{std::move(indptr)}
 {
-    size_vector const &shp = this->shape();
+    const size_vector &shp = this->shape();
 
     if (shp.size() > 2) {
         throw std::invalid_argument{"A CSR tensor cannot have a rank greater than 2."};

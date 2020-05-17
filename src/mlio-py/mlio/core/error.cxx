@@ -29,18 +29,18 @@ namespace {
 std::unordered_map<std::string, py::object> py_exc_types{};
 
 template<typename T>
-inline PyObject *register_exception(py::module &m, char const *name, PyObject *base)
+inline PyObject *register_exception(py::module &m, const char *name, PyObject *base)
 {
     auto r = py_exc_types.emplace(name, py::exception<T>{m, name, base});
 
     return r.first->second.ptr();
 }
 
-void throw_nested_error(std::exception const &exc, py::object const &py_exc);
+void throw_nested_error(const std::exception &exc, const py::object &py_exc);
 
-void set_nested_error(py::object const &outer_py_exc,
-                      std::exception const &nested_exc,
-                      char const *name)
+void set_nested_error(const py::object &outer_py_exc,
+                      const std::exception &nested_exc,
+                      const char *name)
 {
     py::object nested_py_exc = py_exc_types[name](nested_exc.what());
 
@@ -49,7 +49,7 @@ void set_nested_error(py::object const &outer_py_exc,
     ::PyException_SetCause(outer_py_exc.ptr(), nested_py_exc.release().ptr());
 }
 
-void set_nested_system_error(py::object const &outer_py_exc, std::system_error const &nested_exc)
+void set_nested_system_error(const py::object &outer_py_exc, const std::system_error &nested_exc)
 {
     py::object nested_py_exc =
         py::handle{::PyExc_OSError}(nested_exc.code().value(), nested_exc.what());
@@ -59,53 +59,53 @@ void set_nested_system_error(py::object const &outer_py_exc, std::system_error c
     ::PyException_SetCause(outer_py_exc.ptr(), nested_py_exc.release().ptr());
 }
 
-void throw_nested_error(std::exception const &exc, py::object const &py_exc)
+void throw_nested_error(const std::exception &exc, const py::object &py_exc)
 {
     try {
         std::rethrow_if_nested(exc);
     }
-    catch (not_supported_error const &e) {
+    catch (const not_supported_error &e) {
         set_nested_error(py_exc, e, "NotSupportedError");
     }
-    catch (invalid_instance_error const &e) {
+    catch (const invalid_instance_error &e) {
         set_nested_error(py_exc, e, "InvalidInstanceError");
     }
-    catch (schema_error const &e) {
+    catch (const schema_error &e) {
         set_nested_error(py_exc, e, "SchemaError");
     }
-    catch (data_reader_error const &e) {
+    catch (const data_reader_error &e) {
         set_nested_error(py_exc, e, "DataReaderError");
     }
-    catch (record_too_large_error const &e) {
+    catch (const record_too_large_error &e) {
         set_nested_error(py_exc, e, "RecordTooLargeError");
     }
-    catch (corrupt_footer_error const &e) {
+    catch (const corrupt_footer_error &e) {
         set_nested_error(py_exc, e, "CorruptFooterError");
     }
-    catch (corrupt_header_error const &e) {
+    catch (const corrupt_header_error &e) {
         set_nested_error(py_exc, e, "CorruptHeaderError");
     }
-    catch (corrupt_record_error const &e) {
+    catch (const corrupt_record_error &e) {
         set_nested_error(py_exc, e, "CorruptRecordError");
     }
-    catch (record_error const &e) {
+    catch (const record_error &e) {
         set_nested_error(py_exc, e, "RecordError");
     }
-    catch (inflate_error const &e) {
+    catch (const inflate_error &e) {
         set_nested_error(py_exc, e, "InflateError");
     }
-    catch (stream_error const &e) {
+    catch (const stream_error &e) {
         set_nested_error(py_exc, e, "StreamError");
     }
-    catch (mlio_error const &e) {
+    catch (const mlio_error &e) {
         set_nested_error(py_exc, e, "MLIOError");
     }
-    catch (std::system_error const &e) {
+    catch (const std::system_error &e) {
         set_nested_system_error(py_exc, e);
     }
 }
 
-void set_error(std::exception const &exc, char const *name)
+void set_error(const std::exception &exc, const char *name)
 {
     py::handle &py_exc_type = py_exc_types[name];
 
@@ -116,7 +116,7 @@ void set_error(std::exception const &exc, char const *name)
     ::PyErr_SetObject(py_exc_type.ptr(), py_exc.ptr());
 }
 
-void set_system_error(std::system_error const &exc)
+void set_system_error(const std::system_error &exc)
 {
     py::object py_exc = py::handle{::PyExc_OSError}(exc.code().value(), exc.what());
 
@@ -172,43 +172,43 @@ void register_exceptions(py::module &m)
         try {
             std::rethrow_exception(ptr);
         }
-        catch (not_supported_error const &e) {
+        catch (const not_supported_error &e) {
             set_error(e, "NotSupportedError");
         }
-        catch (invalid_instance_error const &e) {
+        catch (const invalid_instance_error &e) {
             set_error(e, "InvalidInstanceError");
         }
-        catch (schema_error const &e) {
+        catch (const schema_error &e) {
             set_error(e, "SchemaError");
         }
-        catch (data_reader_error const &e) {
+        catch (const data_reader_error &e) {
             set_error(e, "DataReaderError");
         }
-        catch (record_too_large_error const &e) {
+        catch (const record_too_large_error &e) {
             set_error(e, "RecordTooLargeError");
         }
-        catch (corrupt_footer_error const &e) {
+        catch (const corrupt_footer_error &e) {
             set_error(e, "CorruptFooterError");
         }
-        catch (corrupt_header_error const &e) {
+        catch (const corrupt_header_error &e) {
             set_error(e, "CorruptHeaderError");
         }
-        catch (corrupt_record_error const &e) {
+        catch (const corrupt_record_error &e) {
             set_error(e, "CorruptRecordError");
         }
-        catch (record_error const &e) {
+        catch (const record_error &e) {
             set_error(e, "RecordError");
         }
-        catch (inflate_error const &e) {
+        catch (const inflate_error &e) {
             set_error(e, "InflateError");
         }
-        catch (stream_error const &e) {
+        catch (const stream_error &e) {
             set_error(e, "StreamError");
         }
-        catch (mlio_error const &e) {
+        catch (const mlio_error &e) {
             set_error(e, "MLIOError");
         }
-        catch (std::system_error const &e) {
+        catch (const std::system_error &e) {
             set_system_error(e);
         }
     });

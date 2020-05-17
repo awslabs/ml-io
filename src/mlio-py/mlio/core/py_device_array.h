@@ -31,14 +31,14 @@ public:
         : tensor_{std::move(tsr)}, span_{s}
     {}
 
-    py_device_array(py_device_array const &) = delete;
+    py_device_array(const py_device_array &) = delete;
 
     py_device_array(py_device_array &&) noexcept = default;
 
     ~py_device_array();
 
 public:
-    py_device_array &operator=(py_device_array const &) = delete;
+    py_device_array &operator=(const py_device_array &) = delete;
 
     py_device_array &operator=(py_device_array &&) noexcept = default;
 

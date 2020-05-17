@@ -42,14 +42,14 @@ public:
 
     explicit s3_client(std::unique_ptr<Aws::S3::S3Client> clt) noexcept;
 
-    s3_client(s3_client const &) = delete;
+    s3_client(const s3_client &) = delete;
 
     s3_client(s3_client &&) = delete;
 
     ~s3_client();
 
 public:
-    s3_client &operator=(s3_client const &) = delete;
+    s3_client &operator=(const s3_client &) = delete;
 
     s3_client &operator=(s3_client &&) = delete;
 

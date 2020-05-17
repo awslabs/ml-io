@@ -56,7 +56,7 @@ HyperLogLog::HyperLogLog(uint8_t b) : b_(b), m_(1 << b), M_(m_, 0)
     alpha_mm_ = alpha * m_ * m_;
 }
 
-void HyperLogLog::add(std::string_view const &str)
+void HyperLogLog::add(const std::string_view &str)
 {
     // Hash the value to add.
     uint32_t hash;

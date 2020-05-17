@@ -30,8 +30,8 @@ inline namespace v1 {
 /// @{
 
 MLIO_API
-intrusive_ptr<mutable_memory_block> resize_memory_block(intrusive_ptr<mutable_memory_block> &blk,
-                                                        std::size_t size);
+intrusive_ptr<mutable_memory_block>
+resize_memory_block(intrusive_ptr<mutable_memory_block> &blk, std::size_t size);
 
 template<typename T>
 MLIO_API

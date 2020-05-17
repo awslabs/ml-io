@@ -45,7 +45,7 @@ public:
     void reset() noexcept override;
 
 public:
-    data_reader_params const &params() const noexcept
+    const data_reader_params &params() const noexcept
     {
         return params_;
     }

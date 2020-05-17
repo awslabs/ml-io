@@ -28,14 +28,14 @@ class arrow_file final : public arrow::io::RandomAccessFile {
 public:
     explicit arrow_file(mlio::intrusive_ptr<mlio::input_stream> strm);
 
-    arrow_file(arrow_file const &) = delete;
+    arrow_file(const arrow_file &) = delete;
 
     arrow_file(arrow_file &&) = delete;
 
     ~arrow_file() final;
 
 public:
-    arrow_file &operator=(arrow_file const &) = delete;
+    arrow_file &operator=(const arrow_file &) = delete;
 
     arrow_file &operator=(arrow_file &&) = delete;
 

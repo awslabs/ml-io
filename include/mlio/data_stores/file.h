@@ -50,7 +50,7 @@ public:
     std::string repr() const final;
 
 public:
-    std::string const &id() const noexcept final
+    const std::string &id() const noexcept final
     {
         return pathname_;
     }
@@ -62,14 +62,14 @@ private:
 };
 
 struct MLIO_API list_files_params {
-    using predicate_callback = std::function<bool(std::string const &)>;
+    using predicate_callback = std::function<bool(const std::string &)>;
 
     /// The list of pathnames to traverse.
     stdx::span<std::string const> pathnames{};
     /// The pattern to match the filenames against.
-    std::string const *pattern{};
+    const std::string *pattern{};
     /// The callback function for user-specific filtering.
-    predicate_callback const *predicate{};
+    const predicate_callback *predicate{};
     /// A boolean value indicating whether the files should be
     /// memory-mapped.
     bool mmap = true;
@@ -80,11 +80,11 @@ struct MLIO_API list_files_params {
 
 /// Recursively lists all files residing under the specified pathnames.
 MLIO_API
-std::vector<intrusive_ptr<data_store>> list_files(list_files_params const &prm);
+std::vector<intrusive_ptr<data_store>> list_files(const list_files_params &prm);
 
 MLIO_API
-std::vector<intrusive_ptr<data_store>> list_files(std::string const &pathname,
-                                                  std::string const &pattern = {});
+std::vector<intrusive_ptr<data_store>>
+list_files(const std::string &pathname, const std::string &pattern = {});
 
 /// @}
 

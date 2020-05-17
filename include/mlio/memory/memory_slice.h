@@ -192,7 +192,7 @@ private:
 
 template<typename T>
 MLIO_API
-inline stdx::span<T> as_span(memory_slice const &ms) noexcept
+inline stdx::span<T> as_span(const memory_slice &ms) noexcept
 {
     return as_span<T>(memory_span{ms});
 }

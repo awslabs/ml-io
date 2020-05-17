@@ -34,23 +34,23 @@ class MLIO_API text_line_reader final : public parallel_data_reader {
 public:
     explicit text_line_reader(data_reader_params prm);
 
-    text_line_reader(text_line_reader const &) = delete;
+    text_line_reader(const text_line_reader &) = delete;
 
     text_line_reader(text_line_reader &&) = delete;
 
     ~text_line_reader() final;
 
 public:
-    text_line_reader &operator=(text_line_reader const &) = delete;
+    text_line_reader &operator=(const text_line_reader &) = delete;
 
     text_line_reader &operator=(text_line_reader &&) = delete;
 
 private:
-    intrusive_ptr<record_reader> make_record_reader(data_store const &ds) final;
+    intrusive_ptr<record_reader> make_record_reader(const data_store &ds) final;
 
     intrusive_ptr<schema const> infer_schema(std::optional<instance> const &ins) final;
 
-    intrusive_ptr<example> decode(instance_batch const &batch) const final;
+    intrusive_ptr<example> decode(const instance_batch &batch) const final;
 
     static intrusive_ptr<dense_tensor> make_tensor(std::size_t batch_size);
 };

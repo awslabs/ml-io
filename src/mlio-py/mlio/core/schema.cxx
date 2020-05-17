@@ -55,11 +55,11 @@ void register_schema(py::module &m)
              "strides"_a = std::nullopt,
              "sparse"_a = false)
         .def("__eq__",
-             [](attribute const &self, attribute const &other) {
+             [](const attribute &self, const attribute &other) {
                  return self == other;
              })
         .def("__hash__",
-             [](attribute const &self) {
+             [](const attribute &self) {
                  return std::hash<attribute>{}(self);
              })
         .def("__repr__", &attribute::repr)
@@ -87,11 +87,11 @@ void register_schema(py::module &m)
              "name"_a,
              "Returns the index of the attribute with the specified name.")
         .def("__eq__",
-             [](schema const &self, schema const &other) {
+             [](const schema &self, const schema &other) {
                  return self == other;
              })
         .def("__hash__",
-             [](schema const &self) {
+             [](const schema &self) {
                  return std::hash<schema>{}(self);
              })
         .def("__repr__", &schema::repr)

@@ -50,10 +50,10 @@ intrusive_ptr<input_stream> in_memory_store::open_read() const
     return make_inflate_stream(std::move(strm), compression_);
 }
 
-std::string const &in_memory_store::id() const
+const std::string &in_memory_store::id() const
 {
     if (id_.empty()) {
-        auto *ptr = static_cast<void const *>(chunk_.data());
+        auto *ptr = static_cast<const void *>(chunk_.data());
         id_ = fmt::format("{0:p}+{1:#04x}", ptr, chunk_.size());
     }
 
@@ -62,7 +62,7 @@ std::string const &in_memory_store::id() const
 
 std::string in_memory_store::repr() const
 {
-    auto *ptr = static_cast<void const *>(chunk_.data());
+    auto *ptr = static_cast<const void *>(chunk_.data());
 
     return fmt::format("<in_memory_store address={0:p} size={1:#04x} compression='{2}'>",
                        ptr,

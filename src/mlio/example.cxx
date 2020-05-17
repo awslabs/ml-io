@@ -40,7 +40,7 @@ example::example(intrusive_ptr<schema const> shm, std::vector<intrusive_ptr<tens
     }
 }
 
-intrusive_ptr<tensor> example::find_feature(std::string const &name) const noexcept
+intrusive_ptr<tensor> example::find_feature(const std::string &name) const noexcept
 {
     std::optional<std::size_t> idx = schema_->get_index(name);
     if (idx == std::nullopt) {

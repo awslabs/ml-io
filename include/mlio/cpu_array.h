@@ -50,7 +50,7 @@ class MLIO_API cpu_array final : public device_array {
     friend struct detail::cpu_array_access;
 
 private:
-    explicit cpu_array(data_type dt, Container const &cont) : data_type_{dt}, container_{cont}
+    explicit cpu_array(data_type dt, const Container &cont) : data_type_{dt}, container_{cont}
     {}
 
     explicit cpu_array(data_type dt, Container &&cont) : data_type_{dt}, container_{std::move(cont)}
@@ -65,7 +65,7 @@ public:
         return container_.data();
     }
 
-    void const *data() const noexcept final
+    const void *data() const noexcept final
     {
         return container_.data();
     }

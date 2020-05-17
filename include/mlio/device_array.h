@@ -36,14 +36,14 @@ class MLIO_API device_array {
 public:
     device_array() noexcept = default;
 
-    device_array(device_array const &) = delete;
+    device_array(const device_array &) = delete;
 
     device_array(device_array &&) = delete;
 
     virtual ~device_array();
 
 public:
-    device_array &operator=(device_array const &) = delete;
+    device_array &operator=(const device_array &) = delete;
 
     device_array &operator=(device_array &&) = delete;
 
@@ -56,7 +56,7 @@ public:
     ///     be accessible in all contexts.
     virtual void *data() noexcept = 0;
 
-    virtual void const *data() const noexcept = 0;
+    virtual const void *data() const noexcept = 0;
 
     virtual std::size_t size() const noexcept = 0;
 
@@ -80,9 +80,9 @@ stdx::span<T> as_span(device_array &arr) noexcept
 
 template<typename T>
 MLIO_API
-stdx::span<T const> as_span(device_array const &arr) noexcept
+stdx::span<T const> as_span(const device_array &arr) noexcept
 {
-    return {static_cast<T const *>(arr.data()), arr.size()};
+    return {static_cast<const T *>(arr.data()), arr.size()};
 }
 
 /// Represents a span that wraps a device array.

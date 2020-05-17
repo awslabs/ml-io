@@ -32,14 +32,14 @@ class MLIO_API memory_allocator {
 public:
     memory_allocator() noexcept = default;
 
-    memory_allocator(memory_allocator const &) = delete;
+    memory_allocator(const memory_allocator &) = delete;
 
     memory_allocator(memory_allocator &&) = delete;
 
     virtual ~memory_allocator();
 
 public:
-    memory_allocator &operator=(memory_allocator const &) = delete;
+    memory_allocator &operator=(const memory_allocator &) = delete;
 
     memory_allocator &operator=(memory_allocator &&) = delete;
 

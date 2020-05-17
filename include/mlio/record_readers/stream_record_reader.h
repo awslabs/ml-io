@@ -38,14 +38,14 @@ protected:
     explicit stream_record_reader(intrusive_ptr<input_stream> strm);
 
 public:
-    stream_record_reader(stream_record_reader const &) = delete;
+    stream_record_reader(const stream_record_reader &) = delete;
 
     stream_record_reader(stream_record_reader &&) = delete;
 
     ~stream_record_reader() override;
 
 public:
-    stream_record_reader &operator=(stream_record_reader const &) = delete;
+    stream_record_reader &operator=(const stream_record_reader &) = delete;
 
     stream_record_reader &operator=(stream_record_reader &&) = delete;
 

@@ -29,14 +29,14 @@ public:
     using mlio_error::mlio_error;
 
 public:
-    stream_error(stream_error const &) = default;
+    stream_error(const stream_error &) = default;
 
     stream_error(stream_error &&) = default;
 
     ~stream_error() override;
 
 public:
-    stream_error &operator=(stream_error const &) = default;
+    stream_error &operator=(const stream_error &) = default;
 
     stream_error &operator=(stream_error &&) = default;
 };
@@ -46,14 +46,14 @@ public:
     using stream_error::stream_error;
 
 public:
-    inflate_error(inflate_error const &) = default;
+    inflate_error(const inflate_error &) = default;
 
     inflate_error(inflate_error &&) = default;
 
     ~inflate_error() override;
 
 public:
-    inflate_error &operator=(inflate_error const &) = default;
+    inflate_error &operator=(const inflate_error &) = default;
 
     inflate_error &operator=(inflate_error &&) = default;
 };

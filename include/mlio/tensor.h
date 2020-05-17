@@ -53,19 +53,19 @@ protected:
     explicit tensor(data_type dt, size_vector &&shape, ssize_vector &&strides);
 
 public:
-    tensor(tensor const &) = delete;
+    tensor(const tensor &) = delete;
 
     tensor(tensor &&) = delete;
 
     virtual ~tensor();
 
 public:
-    tensor &operator=(tensor const &) = delete;
+    tensor &operator=(const tensor &) = delete;
 
     tensor &operator=(tensor &&) = delete;
 
 private:
-    static ssize_vector default_strides(size_vector const &shape);
+    static ssize_vector default_strides(const size_vector &shape);
 
 public:
     virtual std::string repr() const = 0;
@@ -76,12 +76,12 @@ public:
         return data_type_;
     }
 
-    size_vector const &shape() const noexcept
+    const size_vector &shape() const noexcept
     {
         return shape_;
     }
 
-    ssize_vector const &strides() const noexcept
+    const ssize_vector &strides() const noexcept
     {
         return strides_;
     }
@@ -99,7 +99,7 @@ private:
 };
 
 MLIO_API
-inline std::ostream &operator<<(std::ostream &strm, tensor const &tsr)
+inline std::ostream &operator<<(std::ostream &strm, const tensor &tsr)
 {
     return strm << tsr.repr();
 }

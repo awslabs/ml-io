@@ -29,14 +29,14 @@ public:
     using mlio_error::mlio_error;
 
 public:
-    record_error(record_error const &) = default;
+    record_error(const record_error &) = default;
 
     record_error(record_error &&) = default;
 
     ~record_error() override;
 
 public:
-    record_error &operator=(record_error const &) = default;
+    record_error &operator=(const record_error &) = default;
 
     record_error &operator=(record_error &&) = default;
 };
@@ -46,14 +46,14 @@ public:
     using record_error::record_error;
 
 public:
-    corrupt_record_error(corrupt_record_error const &) = default;
+    corrupt_record_error(const corrupt_record_error &) = default;
 
     corrupt_record_error(corrupt_record_error &&) = default;
 
     ~corrupt_record_error() override;
 
 public:
-    corrupt_record_error &operator=(corrupt_record_error const &) = default;
+    corrupt_record_error &operator=(const corrupt_record_error &) = default;
 
     corrupt_record_error &operator=(corrupt_record_error &&) = default;
 };
@@ -63,14 +63,14 @@ public:
     using corrupt_record_error::corrupt_record_error;
 
 public:
-    corrupt_header_error(corrupt_header_error const &) = default;
+    corrupt_header_error(const corrupt_header_error &) = default;
 
     corrupt_header_error(corrupt_header_error &&) = default;
 
     ~corrupt_header_error() override;
 
 public:
-    corrupt_header_error &operator=(corrupt_header_error const &) = default;
+    corrupt_header_error &operator=(const corrupt_header_error &) = default;
 
     corrupt_header_error &operator=(corrupt_header_error &&) = default;
 };
@@ -80,14 +80,14 @@ public:
     using corrupt_record_error::corrupt_record_error;
 
 public:
-    corrupt_footer_error(corrupt_footer_error const &) = default;
+    corrupt_footer_error(const corrupt_footer_error &) = default;
 
     corrupt_footer_error(corrupt_footer_error &&) = default;
 
     ~corrupt_footer_error() override;
 
 public:
-    corrupt_footer_error &operator=(corrupt_footer_error const &) = default;
+    corrupt_footer_error &operator=(const corrupt_footer_error &) = default;
 
     corrupt_footer_error &operator=(corrupt_footer_error &&) = default;
 };
@@ -97,14 +97,14 @@ public:
     using record_error::record_error;
 
 public:
-    record_too_large_error(record_too_large_error const &) = default;
+    record_too_large_error(const record_too_large_error &) = default;
 
     record_too_large_error(record_too_large_error &&) = default;
 
     ~record_too_large_error() override;
 
 public:
-    record_too_large_error &operator=(record_too_large_error const &) = default;
+    record_too_large_error &operator=(const record_too_large_error &) = default;
 
     record_too_large_error &operator=(record_too_large_error &&) = default;
 };

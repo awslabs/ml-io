@@ -33,19 +33,19 @@ inline arrow::Status convert_exception()
     try {
         throw;
     }
-    catch (std::bad_alloc const &e) {
+    catch (const std::bad_alloc &e) {
         return arrow::Status::OutOfMemory(e.what());
     }
-    catch (std::invalid_argument const &e) {
+    catch (const std::invalid_argument &e) {
         return arrow::Status::Invalid(e.what());
     }
-    catch (mlio::stream_error const &e) {
+    catch (const mlio::stream_error &e) {
         return arrow::Status::IOError(e.what());
     }
-    catch (mlio::not_supported_error const &e) {
+    catch (const mlio::not_supported_error &e) {
         return arrow::Status::NotImplemented(e.what());
     }
-    catch (std::exception const &e) {
+    catch (const std::exception &e) {
         return arrow::Status::UnknownError(e.what());
     }
     catch (...) {

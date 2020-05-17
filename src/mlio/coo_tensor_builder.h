@@ -33,18 +33,18 @@ namespace detail {
 
 class coo_tensor_builder {
 public:
-    explicit coo_tensor_builder(attribute const &attr, std::size_t batch_size)
+    explicit coo_tensor_builder(const attribute &attr, std::size_t batch_size)
         : attr_{&attr}, batch_size_{batch_size}, coords_(attr.shape().size())
     {}
 
-    coo_tensor_builder(coo_tensor_builder const &) = delete;
+    coo_tensor_builder(const coo_tensor_builder &) = delete;
 
     coo_tensor_builder(coo_tensor_builder &&) = delete;
 
     virtual ~coo_tensor_builder();
 
 public:
-    coo_tensor_builder &operator=(coo_tensor_builder const &) = delete;
+    coo_tensor_builder &operator=(const coo_tensor_builder &) = delete;
 
     coo_tensor_builder &operator=(coo_tensor_builder &&) = delete;
 
@@ -57,7 +57,7 @@ protected:
     intrusive_ptr<tensor> build_core(std::unique_ptr<device_array> &&data);
 
 private:
-    attribute const *attr_;
+    const attribute *attr_;
     std::size_t batch_size_;
     std::size_t row_idx_{};
     std::vector<std::vector<std::size_t>> coords_{};
@@ -99,14 +99,14 @@ intrusive_ptr<tensor> coo_tensor_builder_impl<dt>::build()
 
 template<data_type dt>
 struct make_coo_tensor_builder_op {
-    std::unique_ptr<coo_tensor_builder> operator()(attribute const &attr, std::size_t batch_size)
+    std::unique_ptr<coo_tensor_builder> operator()(const attribute &attr, std::size_t batch_size)
     {
         return std::make_unique<coo_tensor_builder_impl<dt>>(attr, batch_size);
     }
 };
 
-inline std::unique_ptr<coo_tensor_builder> make_coo_tensor_builder(attribute const &attr,
-                                                                   std::size_t batch_size)
+inline std::unique_ptr<coo_tensor_builder>
+make_coo_tensor_builder(const attribute &attr, std::size_t batch_size)
 {
     return dispatch<make_coo_tensor_builder_op>(attr.dtype(), attr, batch_size);
 }

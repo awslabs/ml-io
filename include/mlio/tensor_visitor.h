@@ -30,33 +30,33 @@ class MLIO_API tensor_visitor {
 public:
     tensor_visitor() noexcept = default;
 
-    tensor_visitor(tensor_visitor const &) = delete;
+    tensor_visitor(const tensor_visitor &) = delete;
 
     tensor_visitor(tensor_visitor &&) = delete;
 
     virtual ~tensor_visitor();
 
 public:
-    tensor_visitor &operator=(tensor_visitor const &) = delete;
+    tensor_visitor &operator=(const tensor_visitor &) = delete;
 
     tensor_visitor &operator=(tensor_visitor &&) = delete;
 
 public:
     virtual void visit(tensor &tsr);
 
-    virtual void visit(tensor const &tsr);
+    virtual void visit(const tensor &tsr);
 
     virtual void visit(dense_tensor &tsr);
 
-    virtual void visit(dense_tensor const &tsr);
+    virtual void visit(const dense_tensor &tsr);
 
     virtual void visit(coo_tensor &tsr);
 
-    virtual void visit(coo_tensor const &tsr);
+    virtual void visit(const coo_tensor &tsr);
 
     virtual void visit(csr_tensor &tsr);
 
-    virtual void visit(csr_tensor const &tsr);
+    virtual void visit(const csr_tensor &tsr);
 };
 
 // @}

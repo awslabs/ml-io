@@ -12,7 +12,7 @@ inline namespace v1 {
 namespace stdx {
 
 template<typename Cont>
-inline constexpr std::ptrdiff_t ssize(Cont const &cont) noexcept
+inline constexpr std::ptrdiff_t ssize(const Cont &cont) noexcept
 {
     return static_cast<std::ptrdiff_t>(cont.size());
 }

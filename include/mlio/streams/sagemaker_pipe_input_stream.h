@@ -46,14 +46,14 @@ private:
                                          std::optional<std::size_t> fifo_id);
 
 public:
-    sagemaker_pipe_input_stream(sagemaker_pipe_input_stream const &) = delete;
+    sagemaker_pipe_input_stream(const sagemaker_pipe_input_stream &) = delete;
 
     sagemaker_pipe_input_stream(sagemaker_pipe_input_stream &&) = delete;
 
     ~sagemaker_pipe_input_stream() final;
 
 public:
-    sagemaker_pipe_input_stream &operator=(sagemaker_pipe_input_stream const &) = delete;
+    sagemaker_pipe_input_stream &operator=(const sagemaker_pipe_input_stream &) = delete;
 
     sagemaker_pipe_input_stream &operator=(sagemaker_pipe_input_stream &&) = delete;
 

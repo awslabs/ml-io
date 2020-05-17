@@ -30,14 +30,14 @@ class iconv_desc {
 public:
     explicit iconv_desc(text_encoding &&enc);
 
-    iconv_desc(iconv_desc const &) = delete;
+    iconv_desc(const iconv_desc &) = delete;
 
     iconv_desc(iconv_desc &&) = delete;
 
     ~iconv_desc();
 
 public:
-    iconv_desc &operator=(iconv_desc const &) = delete;
+    iconv_desc &operator=(const iconv_desc &) = delete;
 
     iconv_desc &operator=(iconv_desc &&) = delete;
 
@@ -45,7 +45,7 @@ public:
     iconv_status convert(memory_span &inp, mutable_memory_span &out);
 
 public:
-    text_encoding const &encoding() const noexcept
+    const text_encoding &encoding() const noexcept
     {
         return encoding_;
     }
