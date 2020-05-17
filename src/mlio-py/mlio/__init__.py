@@ -13,6 +13,7 @@
 
 import atexit
 import logging
+import pkg_resources
 
 import mlio._core
 
@@ -72,6 +73,9 @@ from mlio._core import\
     list_s3_objects,\
     supports_image_reader,\
     supports_s3
+
+
+__version__ = pkg_resources.get_distribution("mlio").version
 
 
 __all__ = [
