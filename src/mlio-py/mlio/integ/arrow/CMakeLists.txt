@@ -3,9 +3,9 @@
 # ------------------------------------------------------------
 
 add_python_extension(mlio-arrow arrow
-    arrow_buffer.cxx
-    arrow_file.cxx
-    module.cxx
+    arrow_buffer.cc
+    arrow_file.cc
+    module.cc
 )
 
 target_link_libraries(mlio-arrow

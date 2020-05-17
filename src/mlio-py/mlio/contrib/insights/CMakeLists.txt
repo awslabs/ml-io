@@ -3,7 +3,7 @@
 # ------------------------------------------------------------
 
 add_library(hyperloglog OBJECT
-    hll/hyperloglog.cxx
+    hll/hyperloglog.cc
     hll/xxhash.c
 )
 
@@ -25,9 +25,9 @@ target_compile_options(hyperloglog
 
 add_python_extension(mlio-contrib insights
     $<TARGET_OBJECTS:hyperloglog>
-    column_analyzer.cxx
-    utils.cxx
-    module.cxx
+    column_analyzer.cc
+    utils.cc
+    module.cc
 )
 
 target_link_libraries(mlio-contrib

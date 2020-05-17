@@ -3,8 +3,8 @@
 # ------------------------------------------------------------
 
 add_executable(mlio-test
-    test_text_line_reader.cxx
-    test_recordio_protobuf_reader.cxx)
+    test_text_line_reader.cc
+    test_recordio_protobuf_reader.cc)
 
 target_include_directories(mlio-test
     PRIVATE
@@ -27,7 +27,7 @@ target_link_libraries(mlio-test
 if(MLIO_BUILD_IMAGE_READER)
     target_sources(mlio-test
         PRIVATE
-            test_image_reader.cxx
+            test_image_reader.cc
     )
 
     target_link_libraries(mlio-test

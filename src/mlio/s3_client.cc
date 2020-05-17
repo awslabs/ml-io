@@ -41,15 +41,13 @@ std::once_flag chain_initialized;
 
 Aws::Auth::AWSCredentials get_default_aws_credentials()
 {
-    using ProvChain = Aws::Auth::DefaultAWSCredentialsProviderChain;
-
-    std::unique_ptr<ProvChain> chain{};
+    std::unique_ptr<Aws::Auth::DefaultAWSCredentialsProviderChain> chain{};
 
     // Compilers are allowed to initialize local static variables before
     // entering the main function. As the credentials provider chain has
     // to be constructed after Aws::InitAPI() we initialize lazily.
     std::call_once(chain_initialized, [&chain]() {
-        chain = std::make_unique<ProvChain>();
+        chain = std::make_unique<Aws::Auth::DefaultAWSCredentialsProviderChain>();
     });
 
     return chain->GetAWSCredentials();
