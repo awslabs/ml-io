@@ -25,7 +25,7 @@
 #include "mlio/streams/input_stream_base.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 
 struct s3_input_stream_access;
@@ -98,5 +98,5 @@ intrusive_ptr<s3_input_stream> make_s3_input_stream(intrusive_ptr<s3_client cons
 
 /// @}
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

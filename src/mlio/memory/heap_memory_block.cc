@@ -20,7 +20,7 @@
 #include <new>
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 namespace {
 
@@ -70,5 +70,5 @@ void heap_memory_block::resize(size_type size)
     }
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

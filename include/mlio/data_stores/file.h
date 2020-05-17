@@ -27,7 +27,7 @@
 #include "mlio/span.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 /// @addtogroup data_stores Data Stores
 /// @{
@@ -88,5 +88,5 @@ list_files(const std::string &pathname, const std::string &pattern = {});
 
 /// @}
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

@@ -22,7 +22,7 @@
 #include "mlio/logging.h"  // IWYU pragma: export
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace logger {
 namespace detail {
 
@@ -83,5 +83,5 @@ inline void debug(std::string_view fmt, const Args &... args) noexcept
 }
 
 }  // namespace logger
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

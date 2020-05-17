@@ -20,7 +20,7 @@
 #include <cerrno>
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 
 inline std::error_code current_error_code() noexcept
@@ -29,5 +29,5 @@ inline std::error_code current_error_code() noexcept
 }
 
 }  // namespace detail
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

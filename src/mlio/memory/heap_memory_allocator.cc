@@ -19,12 +19,12 @@
 #include "mlio/memory/memory_block.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 intrusive_ptr<mutable_memory_block> heap_memory_allocator::allocate(std::size_t size)
 {
     return make_intrusive<heap_memory_block>(size);
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

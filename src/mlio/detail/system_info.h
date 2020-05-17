@@ -18,11 +18,11 @@
 #include <cstddef>
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 
 std::size_t get_total_ram() noexcept;
 
 }  // namespace detail
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

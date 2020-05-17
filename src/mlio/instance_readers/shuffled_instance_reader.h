@@ -27,7 +27,7 @@
 #include "mlio/instance_readers/instance_reader_base.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 
 class shuffled_instance_reader final : public instance_reader_base {
@@ -57,5 +57,5 @@ private:
 };
 
 }  // namespace detail
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

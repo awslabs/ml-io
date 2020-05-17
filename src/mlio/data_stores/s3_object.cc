@@ -32,7 +32,7 @@
 #include "mlio/streams/s3_input_stream.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 s3_object::s3_object(intrusive_ptr<s3_client const> client,
                      std::string uri,
@@ -152,5 +152,5 @@ list_s3_objects(const s3_client &client, const std::string &uri, const std::stri
     return list_s3_objects({&client, uris, &pattern});
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

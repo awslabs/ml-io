@@ -28,7 +28,7 @@
 using mlio::detail::current_error_code;
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 file_backed_memory_block::file_backed_memory_block(size_type size) : size_{size}
 {
@@ -147,5 +147,5 @@ void file_backed_memory_block::validate_mapped_address(void *addr)
     throw std::system_error{current_error_code(), "The file-backed memory block cannot be mapped."};
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

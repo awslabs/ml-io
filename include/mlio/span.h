@@ -22,7 +22,7 @@
 #include "mlio/type_traits.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace stdx {
 namespace detail {
 
@@ -224,5 +224,5 @@ using memory_span = stdx::span<std::byte const>;
 
 using mutable_memory_span = stdx::span<std::byte>;
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

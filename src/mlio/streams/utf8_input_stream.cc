@@ -32,7 +32,7 @@ using mlio::detail::iconv_status;
 using mlio::detail::utf8_input_stream_access;
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 
 struct utf8_input_stream_access {
@@ -328,5 +328,5 @@ bool utf8_input_stream::closed() const noexcept
     return inner_->closed();
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

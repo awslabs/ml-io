@@ -16,7 +16,7 @@
 #include "mlio/config.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 bool supports_s3() noexcept
 {
@@ -36,5 +36,5 @@ bool supports_image_reader() noexcept
 #endif
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

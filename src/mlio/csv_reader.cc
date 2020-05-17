@@ -50,7 +50,7 @@ using mlio::detail::csv_record_reader;
 using mlio::detail::csv_record_tokenizer;
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 struct csv_reader::decoder_state {
     explicit decoder_state(const csv_reader &rdr,
@@ -750,5 +750,5 @@ void csv_reader::reset() noexcept
     should_read_header = true;
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

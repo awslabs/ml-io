@@ -16,9 +16,9 @@
 #include "mlio/device_array.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 device_array::~device_array() = default;
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

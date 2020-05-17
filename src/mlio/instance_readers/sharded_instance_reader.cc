@@ -21,7 +21,7 @@
 #include "mlio/instance.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 
 sharded_instance_reader::sharded_instance_reader(const data_reader_params &prm,
@@ -64,5 +64,5 @@ void sharded_instance_reader::reset_core() noexcept
 }
 
 }  // namespace detail
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

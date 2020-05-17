@@ -22,7 +22,7 @@
 #include "mlio/streams/stream_error.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 
 zlib_inflater::zlib_inflater()
@@ -94,5 +94,5 @@ void zlib_inflater::validate_state() const
 }
 
 }  // namespace detail
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

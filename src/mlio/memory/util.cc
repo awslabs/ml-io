@@ -22,7 +22,7 @@
 #include "mlio/memory/memory_block.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 intrusive_ptr<mutable_memory_block>
 resize_memory_block(intrusive_ptr<mutable_memory_block> &blk, std::size_t size)
@@ -44,5 +44,5 @@ resize_memory_block(intrusive_ptr<mutable_memory_block> &blk, std::size_t size)
     return new_blk;
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

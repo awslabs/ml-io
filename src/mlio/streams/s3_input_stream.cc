@@ -23,7 +23,7 @@
 #include "mlio/streams/stream_error.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 
 struct s3_input_stream_access {
@@ -107,5 +107,5 @@ void s3_input_stream::check_if_closed() const
     }
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

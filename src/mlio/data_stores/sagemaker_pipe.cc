@@ -27,7 +27,7 @@
 #include "mlio/streams/sagemaker_pipe_input_stream.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 sagemaker_pipe::sagemaker_pipe(std::string pathname,
                                std::chrono::seconds timeout,
@@ -62,5 +62,5 @@ std::string sagemaker_pipe::repr() const
         "<sagemaker_pipe pathname='{0}' compression='{1}'>", pathname_, compression_);
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

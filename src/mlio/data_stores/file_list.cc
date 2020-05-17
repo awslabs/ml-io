@@ -38,7 +38,7 @@
 using mlio::detail::current_error_code;
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 namespace {
 
@@ -151,5 +151,5 @@ list_files(const std::string &pathname, const std::string &pattern)
     return list_files({pathnames, &pattern});
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

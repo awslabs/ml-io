@@ -19,7 +19,7 @@
 #include "mlio/tensor.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 tensor_visitor::~tensor_visitor() = default;
 
@@ -63,5 +63,5 @@ void tensor_visitor::visit(const csr_tensor &tsr)
     visit(static_cast<const tensor &>(tsr));
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

@@ -24,7 +24,7 @@
 #include "mlio/span.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 
 class chunk_reader {
@@ -56,5 +56,5 @@ public:
 std::unique_ptr<chunk_reader> make_chunk_reader(intrusive_ptr<input_stream> strm);
 
 }  // namespace detail
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

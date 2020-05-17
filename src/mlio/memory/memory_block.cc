@@ -16,11 +16,11 @@
 #include "mlio/memory/memory_block.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 memory_block::~memory_block() = default;
 
 mutable_memory_block::~mutable_memory_block() = default;
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

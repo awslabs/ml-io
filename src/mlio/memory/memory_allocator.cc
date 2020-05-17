@@ -18,7 +18,7 @@
 #include <utility>
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 namespace {
 
@@ -39,5 +39,5 @@ void set_memory_allocator(std::unique_ptr<memory_allocator> &&alloc) noexcept
     detail::memory_allocator_ = std::move(alloc);
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

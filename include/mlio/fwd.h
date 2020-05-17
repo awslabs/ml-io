@@ -16,7 +16,7 @@
 #pragma once
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 
 class chunk_reader;
@@ -55,5 +55,5 @@ class text_encoding;
 struct csv_params;
 struct data_reader_params;
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

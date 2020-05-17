@@ -29,7 +29,7 @@
 #include "mlio/text_encoding.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 
 struct utf8_input_stream_access;
@@ -107,5 +107,5 @@ make_utf8_stream(intrusive_ptr<input_stream> strm, std::optional<text_encoding> 
 
 /// @}
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

@@ -16,7 +16,7 @@
 #include "mlio/data_reader_error.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 data_reader_error::~data_reader_error() = default;
 
@@ -24,5 +24,5 @@ schema_error::~schema_error() = default;
 
 invalid_instance_error::~invalid_instance_error() = default;
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

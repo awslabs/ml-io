@@ -25,7 +25,7 @@
 #include "mlio/intrusive_ref_counter.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 /// @addtogroup data_stores Data Stores
 /// @{
@@ -77,7 +77,7 @@ inline std::ostream &operator<<(std::ostream &strm, const data_store &ds)
 
 /// @}
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio
 
 namespace std {

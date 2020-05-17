@@ -26,7 +26,7 @@
 #include "mlio/util/string.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 namespace {
 
@@ -169,5 +169,5 @@ parse_result try_parse_size_t(std::string_view s, std::size_t &result) noexcept
     return try_parse_int(s, result);
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

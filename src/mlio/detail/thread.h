@@ -25,7 +25,7 @@
 #include "mlio/config.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 
 template<typename Func, typename... Args>
@@ -53,5 +53,5 @@ std::thread start_thread(Func &&f, Args &&... args)
 }
 
 }  // namespace detail
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

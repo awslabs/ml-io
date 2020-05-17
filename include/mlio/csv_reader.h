@@ -32,7 +32,7 @@
 #include "mlio/text_encoding.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 /// Specifies how field limits should be enforced.
 enum class max_field_length_handling {
@@ -195,5 +195,5 @@ private:
 
 /// @}
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

@@ -26,7 +26,7 @@
 #include "mlio/streams/input_stream.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 
 class default_chunk_reader : public chunk_reader {
@@ -59,5 +59,5 @@ private:
 };
 
 }  // namespace detail
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

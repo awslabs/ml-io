@@ -23,7 +23,7 @@
 #include "mlio/streams/input_stream.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 text_record_reader::text_record_reader(intrusive_ptr<input_stream> strm)
     : stream_record_reader{std::move(strm)}
@@ -58,5 +58,5 @@ bool text_record_reader::skip_utf8_bom(memory_slice &chunk, bool ignore_leftover
     return true;
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

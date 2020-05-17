@@ -30,7 +30,7 @@
 #include "mlio/util/cast.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 
 std::optional<record>
@@ -266,5 +266,5 @@ inline void csv_record_reader::check_line_length(stdx::span<char const> const &c
 }
 
 }  // namespace detail
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

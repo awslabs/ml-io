@@ -33,7 +33,7 @@
 using mlio::detail::instance_batch_reader;
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 // Used as a message in the TBB flow graph.
 struct batch_msg {
@@ -317,5 +317,5 @@ std::size_t parallel_data_reader::num_bytes_read() const noexcept
     return num_bytes_read_;
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

@@ -24,7 +24,7 @@
 #define MLIO_BYTE_ORDER_HOST __BYTE_ORDER__
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 
 MLIO_API
@@ -95,5 +95,5 @@ enum class byte_order {
     host = MLIO_BYTE_ORDER_HOST
 };
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

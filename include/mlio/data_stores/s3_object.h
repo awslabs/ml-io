@@ -27,7 +27,7 @@
 #include "mlio/span.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 /// @addtogroup data_stores Data Stores
 /// @{
@@ -85,5 +85,5 @@ list_s3_objects(const s3_client &client, const std::string &uri, const std::stri
 
 /// @}
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

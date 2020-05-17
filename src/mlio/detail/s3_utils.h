@@ -19,7 +19,7 @@
 #include <utility>
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 
 std::pair<std::string_view, std::string_view> split_s3_uri_to_bucket_and_key(std::string_view uri);
@@ -27,5 +27,5 @@ std::pair<std::string_view, std::string_view> split_s3_uri_to_bucket_and_key(std
 void validate_s3_uri(std::string_view uri);
 
 }  // namespace detail
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

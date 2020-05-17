@@ -22,7 +22,7 @@
 #include "mlio/util/cast.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 std::size_t memory_input_stream::read(mutable_memory_span dest)
 {
@@ -98,5 +98,5 @@ std::size_t memory_input_stream::position() const
     return as_size(pos_ - source_.begin());
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

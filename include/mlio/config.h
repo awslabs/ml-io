@@ -32,7 +32,7 @@
 #endif
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 /// Returns a boolean value indicating whether the library was built
 /// with Amazon S3 support.
@@ -44,5 +44,5 @@ bool supports_s3() noexcept;
 MLIO_API
 bool supports_image_reader() noexcept;
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

@@ -21,7 +21,7 @@
 #include "mlio/config.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 enum class log_level { off, warning, info, debug };
 
@@ -39,5 +39,5 @@ log_message_handler set_log_message_handler(log_message_handler hdl) noexcept;
 MLIO_API
 void set_log_level(log_level lvl) noexcept;
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

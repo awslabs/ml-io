@@ -23,7 +23,7 @@
 #include "mlio/not_supported_error.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 void initialize()
 {
@@ -39,5 +39,5 @@ void initialize()
     initialized = true;
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

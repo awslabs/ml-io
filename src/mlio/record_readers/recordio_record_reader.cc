@@ -26,7 +26,7 @@
 #include "mlio/record_readers/record_error.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 
 std::optional<record>
@@ -75,5 +75,5 @@ recordio_record_reader::decode_record(memory_slice &chunk, bool ignore_leftover)
 }
 
 }  // namespace detail
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

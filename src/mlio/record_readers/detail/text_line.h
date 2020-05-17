@@ -21,7 +21,7 @@
 #include "mlio/fwd.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 
 std::optional<record> read_line(memory_slice &chunk,
@@ -29,5 +29,5 @@ std::optional<record> read_line(memory_slice &chunk,
                                 std::optional<std::size_t> max_line_length = {});
 
 }  // namespace detail
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

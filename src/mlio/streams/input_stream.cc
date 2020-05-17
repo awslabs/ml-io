@@ -16,9 +16,9 @@
 #include "mlio/streams/input_stream.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 input_stream::~input_stream() = default;
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

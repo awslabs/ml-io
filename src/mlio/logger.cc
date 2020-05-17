@@ -22,7 +22,7 @@
 #include <fmt/format.h>
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace logger {
 namespace {
 
@@ -77,5 +77,5 @@ void set_log_level(log_level lvl) noexcept
     logger::level_ = lvl;
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

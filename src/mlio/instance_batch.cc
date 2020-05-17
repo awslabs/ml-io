@@ -16,7 +16,7 @@
 #include "mlio/instance_batch.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 std::size_t instance_batch::size_bytes() const
 {
@@ -29,5 +29,5 @@ std::size_t instance_batch::size_bytes() const
     return size_bytes_;
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

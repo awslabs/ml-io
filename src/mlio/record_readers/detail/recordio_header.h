@@ -23,7 +23,7 @@
 #include "mlio/span.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 
 class recordio_header {
@@ -59,5 +59,5 @@ private:
 std::optional<recordio_header> decode_recordio_header(memory_span bits);
 
 }  // namespace detail
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

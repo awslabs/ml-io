@@ -29,7 +29,7 @@
 #include "mlio/streams/memory_input_stream.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 file::file(std::string pathname, bool mmap, compression cmp)
     : pathname_{std::move(pathname)}, mmap_{mmap}, compression_{cmp}
@@ -68,5 +68,5 @@ std::string file::repr() const
                        compression_);
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

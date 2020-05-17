@@ -16,9 +16,9 @@
 #include "mlio/data_stores/data_store.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 data_store::~data_store() = default;
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

@@ -24,7 +24,7 @@
 using mlio::detail::read_line;
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 
 std::optional<record>
@@ -49,5 +49,5 @@ text_line_record_reader::decode_text_record(memory_slice &chunk, bool ignore_lef
 }
 
 }  // namespace detail
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

@@ -20,7 +20,7 @@
 #include "mlio/logger.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 data_reader_base::data_reader_base(data_reader_params &&prm) noexcept : params_{std::move(prm)}
 {
@@ -50,5 +50,5 @@ void data_reader_base::reset() noexcept
     peeked_example_ = nullptr;
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

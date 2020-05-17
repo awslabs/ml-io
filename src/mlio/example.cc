@@ -29,7 +29,7 @@
 #include "mlio/util/cast.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 example::example(intrusive_ptr<schema const> shm, std::vector<intrusive_ptr<tensor>> &&features)
     : schema_{std::move(shm)}, features_{std::move(features)}
@@ -78,5 +78,5 @@ std::string example::repr() const
     return fmt::format("<example features={{{0}}} padding={1}>", s, padding);
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

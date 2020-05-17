@@ -33,7 +33,7 @@ class S3Client;
 }  // namespace Aws::S3
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 /// Represents a client to access Amazon S3.
 class MLIO_API s3_client : public intrusive_ref_counter<s3_client> {
@@ -127,5 +127,5 @@ private:
     bool https_{true};
 };
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

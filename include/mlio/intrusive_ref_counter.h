@@ -20,7 +20,7 @@
 #include "mlio/config.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 template<typename T>
 class MLIO_API intrusive_ref_counter {
@@ -74,5 +74,5 @@ private:
     mutable std::atomic_size_t ref_count_{0};
 };
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

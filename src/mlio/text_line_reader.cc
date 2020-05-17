@@ -30,7 +30,7 @@
 using mlio::detail::text_line_record_reader;
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 text_line_reader::text_line_reader(data_reader_params prm) : parallel_data_reader{std::move(prm)}
 {}
@@ -82,5 +82,5 @@ intrusive_ptr<dense_tensor> text_line_reader::make_tensor(std::size_t batch_size
     return make_intrusive<dense_tensor>(std::move(shp), std::move(arr));
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

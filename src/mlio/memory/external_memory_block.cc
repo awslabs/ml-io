@@ -16,9 +16,9 @@
 #include "mlio/memory/external_memory_block.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 external_memory_block::~external_memory_block() = default;
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

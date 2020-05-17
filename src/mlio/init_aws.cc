@@ -22,7 +22,7 @@
 #include "mlio/logger.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 namespace {
 
@@ -53,7 +53,7 @@ void deallocate_aws_sdk()
     detail::aws_initialized = false;
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio
 
 #else
@@ -61,7 +61,7 @@ void deallocate_aws_sdk()
 #include "mlio/not_supported_error.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmissing-noreturn"
@@ -78,7 +78,7 @@ void deallocate_aws_sdk()
 
 #pragma GCC diagnostic pop
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio
 
 #endif

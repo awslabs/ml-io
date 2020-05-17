@@ -37,7 +37,7 @@
 #include "mlio/util/cast.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 image_reader::image_reader(data_reader_params prm, image_reader_params img_prm)
     : parallel_data_reader{std::move(prm)}, params_{std::move(img_prm)}
@@ -388,7 +388,7 @@ bool image_reader::crop(cv::Mat &src, cv::Mat &dst, const instance &ins) const
     return true;
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio
 
 #else
@@ -403,7 +403,7 @@ class Mat {};
 }  // namespace cv
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmissing-noreturn"
@@ -434,7 +434,7 @@ intrusive_ptr<example> image_reader::decode(const instance_batch &) const
 
 #pragma GCC diagnostic pop
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio
 
 #endif

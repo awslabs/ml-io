@@ -25,7 +25,7 @@
 #include "mlio/parser.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 struct MLIO_API float_parse_params {
     std::string_view s{};
@@ -94,5 +94,5 @@ inline parse_result try_parse_int(std::string_view s, T &result) noexcept
 MLIO_API
 parse_result try_parse_size_t(std::string_view s, std::size_t &result) noexcept;
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

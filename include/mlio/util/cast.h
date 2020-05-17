@@ -8,7 +8,7 @@
 #include "mlio/type_traits.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace stdx {
 
 template<typename Cont>
@@ -61,5 +61,5 @@ inline constexpr bool try_narrow(U u, T &t) noexcept
     return true;
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

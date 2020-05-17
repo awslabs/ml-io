@@ -16,7 +16,7 @@
 #include "mlio/text_encoding.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 // clang-format off
 
@@ -31,5 +31,5 @@ text_encoding const text_encoding::utf32_be    {"UTF-32BE"};  // NOLINT(cert-err
 
 // clang-format on
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

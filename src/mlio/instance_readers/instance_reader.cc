@@ -23,7 +23,7 @@
 #include "mlio/instance_readers/shuffled_instance_reader.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 
 instance_reader::~instance_reader() = default;
@@ -55,5 +55,5 @@ make_instance_reader(const data_reader_params &prm, record_reader_factory &&fct)
 }
 
 }  // namespace detail
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

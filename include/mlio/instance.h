@@ -24,7 +24,7 @@
 #include "mlio/memory/memory_slice.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 /// @addtogroup data_readers Data Readers
 /// @{
@@ -84,5 +84,5 @@ private:
 
 /// @}
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

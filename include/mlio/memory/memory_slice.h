@@ -25,7 +25,7 @@
 #include "mlio/util/cast.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 /// @addtogroup memory Memory
 /// @{
@@ -199,5 +199,5 @@ inline stdx::span<T> as_span(const memory_slice &ms) noexcept
 
 /// @}
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

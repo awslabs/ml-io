@@ -27,7 +27,7 @@
 #include "mlio/streams/stream_error.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 
 iconv_desc::iconv_desc(text_encoding &&enc) : encoding_{std::move(enc)}
@@ -98,5 +98,5 @@ iconv_status iconv_desc::convert(memory_span &inp, mutable_memory_span &out)
 }
 
 }  // namespace detail
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

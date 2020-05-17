@@ -23,7 +23,7 @@
 #include "mlio/config.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 class MLIO_API text_encoding {
 public:
@@ -65,7 +65,7 @@ inline bool operator!=(const text_encoding &lhs, const text_encoding &rhs) noexc
     return lhs.name() != rhs.name();
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio
 
 namespace std {

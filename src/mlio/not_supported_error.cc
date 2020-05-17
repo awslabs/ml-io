@@ -16,9 +16,9 @@
 #include "mlio/not_supported_error.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 not_supported_error::~not_supported_error() = default;
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

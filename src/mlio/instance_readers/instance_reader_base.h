@@ -22,7 +22,7 @@
 #include "mlio/instance_readers/instance_reader.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 
 class instance_reader_base : public instance_reader {
@@ -43,5 +43,5 @@ private:
 };
 
 }  // namespace detail
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

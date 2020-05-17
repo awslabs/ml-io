@@ -25,7 +25,7 @@
 #include "mlio/streams/input_stream.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 /// @addtogroup streams Streams
 /// @{
@@ -80,5 +80,5 @@ private:
 
 /// @}
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

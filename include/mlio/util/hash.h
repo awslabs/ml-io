@@ -20,7 +20,7 @@
 #include "mlio/config.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 
 template<typename T>
@@ -52,5 +52,5 @@ inline std::size_t hash_range(const Cont &cont)
 }
 
 }  // namespace detail
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

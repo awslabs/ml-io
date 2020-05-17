@@ -16,9 +16,9 @@
 #include "mlio/mlio_error.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 mlio_error::~mlio_error() = default;
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

@@ -20,7 +20,7 @@
 #include "mlio/util/number.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 namespace {
 
@@ -95,5 +95,5 @@ parser make_parser(data_type dt, const parser_params &prm)
     return dispatch<detail::make_parser_op>(dt, prm);
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

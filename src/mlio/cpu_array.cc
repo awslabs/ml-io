@@ -16,7 +16,7 @@
 #include "mlio/cpu_array.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 namespace {
 
@@ -36,5 +36,5 @@ std::unique_ptr<device_array> make_cpu_array(data_type dt, std::size_t size)
     return dispatch<detail::make_cpu_array_op>(dt, size);
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

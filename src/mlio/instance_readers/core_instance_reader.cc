@@ -33,7 +33,7 @@
 #include "mlio/streams/stream_error.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 
 core_instance_reader::core_instance_reader(const data_reader_params &prm,
@@ -250,5 +250,5 @@ void core_instance_reader::reset_core() noexcept
 }
 
 }  // namespace detail
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

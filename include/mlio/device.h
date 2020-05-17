@@ -24,7 +24,7 @@
 #include "mlio/util/hash.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 /// @addtogroup tensors Tensors
 /// @{
@@ -119,7 +119,7 @@ inline std::ostream &operator<<(std::ostream &strm, const device &dev)
 
 /// @}
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio
 
 namespace std {

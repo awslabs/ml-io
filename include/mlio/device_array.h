@@ -25,7 +25,7 @@
 #include "mlio/span.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 /// @addtogroup tensors Tensors
 /// @{
@@ -146,5 +146,5 @@ using device_array_view = basic_device_array_span<device_array const>;
 
 /// @}
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

@@ -18,7 +18,7 @@
 #include "mlio/config.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 /// Initializes the internal data structures needed for the proper
 /// operation of the library.
@@ -33,5 +33,5 @@ void initialize_aws_sdk();
 MLIO_API
 void deallocate_aws_sdk();
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

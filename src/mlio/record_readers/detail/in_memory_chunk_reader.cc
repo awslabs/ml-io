@@ -18,7 +18,7 @@
 #include "mlio/memory/memory_slice.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 
 memory_slice in_memory_chunk_reader::read_chunk(memory_span)
@@ -27,5 +27,5 @@ memory_slice in_memory_chunk_reader::read_chunk(memory_span)
 }
 
 }  // namespace detail
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

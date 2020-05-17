@@ -16,9 +16,9 @@
 #include "mlio/data_reader.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 data_reader::~data_reader() = default;
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

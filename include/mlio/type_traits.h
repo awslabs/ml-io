@@ -18,7 +18,7 @@
 #include <type_traits>
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 
 template<typename T, typename = void>
@@ -35,5 +35,5 @@ template<typename T>
 struct is_container : detail::is_container_helper<T> {};
 
 }  // namespace detail
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

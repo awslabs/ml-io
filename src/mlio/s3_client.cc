@@ -33,7 +33,7 @@
 #include "mlio/util/cast.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 namespace {
 
@@ -213,7 +213,7 @@ intrusive_ptr<s3_client> s3_client_builder::build()
     return make_intrusive<s3_client>(std::move(clt));
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio
 
 #else
@@ -227,7 +227,7 @@ class S3Client {};
 }  // namespace Aws::S3
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmissing-noreturn"
@@ -272,7 +272,7 @@ intrusive_ptr<s3_client> s3_client_builder::build()
 
 #pragma GCC diagnostic pop
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio
 
 #endif

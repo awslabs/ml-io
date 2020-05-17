@@ -24,7 +24,7 @@
 #include "mlio/logger.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 
 instance_batch_reader::instance_batch_reader(const data_reader_params &prm, instance_reader &rdr)
@@ -92,5 +92,5 @@ void instance_batch_reader::reset() noexcept
 }
 
 }  // namespace detail
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

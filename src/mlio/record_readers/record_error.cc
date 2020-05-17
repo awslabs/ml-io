@@ -16,7 +16,7 @@
 #include "mlio/record_readers/record_error.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 record_error::~record_error() = default;
 
@@ -28,5 +28,5 @@ corrupt_footer_error::~corrupt_footer_error() = default;
 
 record_too_large_error::~record_too_large_error() = default;
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

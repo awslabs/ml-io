@@ -32,7 +32,7 @@
 #include "mlio/streams/stream_error.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 memory_slice instance::load_bits_from_store() const
 {
@@ -146,5 +146,5 @@ void instance::handle_errors() const
     }
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

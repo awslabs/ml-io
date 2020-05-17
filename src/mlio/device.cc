@@ -21,7 +21,7 @@
 #include <fmt/ostream.h>
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 device_kind device_kind::cpu() noexcept
 {
@@ -40,5 +40,5 @@ std::string device::repr() const
     return fmt::format("<device kind={0} id={1}>", kind_, id_);
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

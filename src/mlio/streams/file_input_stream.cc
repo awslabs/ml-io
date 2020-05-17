@@ -31,7 +31,7 @@
 using mlio::detail::current_error_code;
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 file_input_stream::file_input_stream(std::string pathname) : pathname_{std::move(pathname)}
 {
@@ -138,5 +138,5 @@ std::size_t file_input_stream::position() const
     return static_cast<std::size_t>(o);
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

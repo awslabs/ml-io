@@ -25,7 +25,7 @@
 using mlio::detail::zlib_inflater;
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 gzip_inflate_stream::gzip_inflate_stream(intrusive_ptr<input_stream> inner)
     : inner_{std::move(inner)}
@@ -92,5 +92,5 @@ bool gzip_inflate_stream::closed() const noexcept
     return inner_->closed();
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

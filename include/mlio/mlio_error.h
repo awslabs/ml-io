@@ -20,7 +20,7 @@
 #include "mlio/config.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 class MLIO_API mlio_error : public std::runtime_error {
 public:
@@ -39,5 +39,5 @@ public:
     mlio_error &operator=(mlio_error &&) = default;
 };
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

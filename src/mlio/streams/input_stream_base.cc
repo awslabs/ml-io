@@ -23,7 +23,7 @@
 #include "mlio/not_supported_error.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 memory_slice input_stream_base::read(std::size_t size)
 {
@@ -49,5 +49,5 @@ std::size_t input_stream_base::position() const
     throw not_supported_error{"The input stream is not seekable."};
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

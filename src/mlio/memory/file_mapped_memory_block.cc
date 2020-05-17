@@ -33,7 +33,7 @@ using mlio::detail::current_error_code;
 using mlio::detail::file_descriptor;
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 file_mapped_memory_block::file_mapped_memory_block(std::string pathname)
     : pathname_{std::move(pathname)}
@@ -76,5 +76,5 @@ void file_mapped_memory_block::init_memory_map()
     data_ = static_cast<std::byte *>(address);
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

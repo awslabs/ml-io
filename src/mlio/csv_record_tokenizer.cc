@@ -19,7 +19,7 @@
 #include "mlio/record_readers/record_error.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 
 bool csv_record_tokenizer::next()
@@ -154,5 +154,5 @@ void csv_record_tokenizer::reset(memory_span blob)
 }
 
 }  // namespace detail
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

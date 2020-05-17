@@ -23,7 +23,7 @@
 #include "mlio/util/cast.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 
 memory_slice default_chunk_reader::read_chunk(memory_span leftover)
@@ -102,5 +102,5 @@ void default_chunk_reader::set_chunk_size_hint(std::size_t value) noexcept
 }
 
 }  // namespace detail
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

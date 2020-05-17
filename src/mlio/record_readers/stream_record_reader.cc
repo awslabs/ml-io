@@ -23,7 +23,7 @@
 #include "mlio/streams/input_stream.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 stream_record_reader::stream_record_reader(intrusive_ptr<input_stream> strm)
 {
@@ -61,5 +61,5 @@ void stream_record_reader::set_record_size_hint(std::size_t value) noexcept
     chunk_reader_->set_chunk_size_hint(value);
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

@@ -28,7 +28,7 @@
 #include "mlio/tensor.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 
 class coo_tensor_builder {
@@ -112,5 +112,5 @@ make_coo_tensor_builder(const attribute &attr, std::size_t batch_size)
 }
 
 }  // namespace detail
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

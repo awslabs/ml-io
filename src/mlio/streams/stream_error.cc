@@ -16,11 +16,11 @@
 #include "mlio/streams/stream_error.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 stream_error::~stream_error() = default;
 
 inflate_error::~inflate_error() = default;
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

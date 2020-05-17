@@ -23,7 +23,7 @@
 #include "mlio/streams/input_stream.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 intrusive_ptr<input_stream> make_inflate_stream(intrusive_ptr<input_stream> &&strm, compression cmp)
 {
@@ -43,5 +43,5 @@ intrusive_ptr<input_stream> make_inflate_stream(intrusive_ptr<input_stream> &&st
     throw std::invalid_argument{"The specified compression is not supported."};
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

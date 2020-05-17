@@ -7,7 +7,7 @@
 #include "mlio/span.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 MLIO_API
 std::string_view trim(std::string_view s) noexcept;
@@ -23,5 +23,5 @@ inline std::string_view as_string_view(stdx::span<std::byte const> bits) noexcep
     return std::string_view{chrs.data(), chrs.size()};
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

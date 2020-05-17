@@ -22,7 +22,7 @@
 #include "mlio/streams/input_stream.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 
 chunk_reader::~chunk_reader() = default;
@@ -46,5 +46,5 @@ std::unique_ptr<chunk_reader> make_chunk_reader(intrusive_ptr<input_stream> strm
 }
 
 }  // namespace detail
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

@@ -26,7 +26,7 @@
 #include "mlio/streams/memory_input_stream.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 in_memory_store::in_memory_store(memory_slice chunk, compression cmp)
     : chunk_{std::move(chunk)}, compression_{cmp}
@@ -70,5 +70,5 @@ std::string in_memory_store::repr() const
                        compression_);
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

@@ -16,7 +16,7 @@
 #include "mlio/instance_readers/instance_reader_base.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 
 std::optional<instance> instance_reader_base::read_instance()
@@ -44,5 +44,5 @@ void instance_reader_base::reset() noexcept
 }
 
 }  // namespace detail
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

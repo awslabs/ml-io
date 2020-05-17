@@ -40,7 +40,7 @@ using mlio::detail::current_error_code;
 using mlio::detail::sagemaker_pipe_input_stream_access;
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 
 struct sagemaker_pipe_input_stream_access {
@@ -264,5 +264,5 @@ void sagemaker_pipe_input_stream::check_if_closed() const
     throw stream_error{"The input stream is closed."};
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

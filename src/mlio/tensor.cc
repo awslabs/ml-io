@@ -25,7 +25,7 @@
 #include "mlio/util/cast.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 namespace {
 
@@ -203,5 +203,5 @@ void csr_tensor::accept(tensor_visitor &vst) const
     vst.visit(*this);
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

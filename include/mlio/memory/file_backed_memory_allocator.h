@@ -23,7 +23,7 @@
 #include "mlio/memory/memory_allocator.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 /// @addtogroup memory Memory
 /// @{
@@ -49,5 +49,5 @@ private:
 
 /// @}
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

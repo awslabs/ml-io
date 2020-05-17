@@ -27,7 +27,7 @@
 #include "mlio/streams/input_stream_base.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 
 struct sagemaker_pipe_input_stream_access;
@@ -100,5 +100,5 @@ make_sagemaker_pipe_input_stream(std::string pathname,
 
 /// @}
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

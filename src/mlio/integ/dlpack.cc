@@ -30,7 +30,7 @@
 #include "mlio/tensor_visitor.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 namespace {
 
@@ -190,5 +190,5 @@ void as_dlpack_op::visit(dense_tensor &tsr)
 #endif
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

@@ -23,7 +23,7 @@
 #include "mlio/config.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 
 class MLIO_API file_descriptor {
@@ -101,7 +101,7 @@ inline bool operator!=(const file_descriptor &lhs, const file_descriptor &rhs) n
 }
 
 }  // namespace detail
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio
 
 namespace std {

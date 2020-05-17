@@ -18,7 +18,7 @@
 #include <utility>
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 std::optional<record> record_reader_base::read_record()
 {
@@ -36,5 +36,5 @@ std::optional<record> record_reader_base::peek_record()
     return peeked_record_;
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

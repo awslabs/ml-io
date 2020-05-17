@@ -18,7 +18,7 @@
 #include "mlio/util/cast.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 
 coo_tensor_builder::~coo_tensor_builder() = default;
@@ -96,5 +96,5 @@ intrusive_ptr<tensor> coo_tensor_builder::build_core(std::unique_ptr<device_arra
 }
 
 }  // namespace detail
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

@@ -21,7 +21,7 @@
 #include "mlio/util/cast.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 
 std::optional<record>
@@ -159,5 +159,5 @@ inline T parquet_record_reader::as(memory_block::iterator pos) noexcept
 }
 
 }  // namespace detail
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

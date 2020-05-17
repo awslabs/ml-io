@@ -22,7 +22,7 @@
 #include "mlio/config.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 template<typename T>
 class MLIO_API intrusive_ptr {
@@ -251,7 +251,7 @@ inline intrusive_ptr<T> wrap_intrusive(T *t, bool inc_ref = true)
     return intrusive_ptr<T>{t, inc_ref};
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio
 
 namespace std {

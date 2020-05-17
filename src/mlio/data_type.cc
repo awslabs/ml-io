@@ -19,7 +19,7 @@
 #include "mlio/util/number.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 data_type infer_data_type(std::string_view s) noexcept
 {
@@ -50,5 +50,5 @@ data_type infer_data_type(std::string_view s) noexcept
     return data_type::string;
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

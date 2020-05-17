@@ -18,7 +18,7 @@
 #include <utility>
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 
 // C++ equivalent of the TEMP_FAILURE_RETRY macro.
@@ -35,5 +35,5 @@ inline int temp_failure_retry(Func syscall, Args &&... args) noexcept
 }
 
 }  // namespace detail
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

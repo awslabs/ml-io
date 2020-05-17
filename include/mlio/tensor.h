@@ -29,7 +29,7 @@
 #include "mlio/intrusive_ref_counter.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 /// @addtogroup tensors Tensors
 /// @{
@@ -240,5 +240,5 @@ private:
 
 /// @}
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

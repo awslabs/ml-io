@@ -46,7 +46,7 @@ using mlio::detail::coo_tensor_builder_impl;
 using mlio::detail::make_coo_tensor_builder;
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 namespace {
 
@@ -850,5 +850,5 @@ bool recordio_protobuf_reader::decoder::append_to_builder(const ProtobufTensor &
     return false;
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

@@ -27,7 +27,7 @@ struct fmt::formatter<mlio::attribute, Char>
     : fmt::v6::internal::fallback_formatter<mlio::attribute, Char> {};
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 attribute::attribute(std::string &&name, data_type dt, size_vector &&shape)
     : name_{std::move(name)}, data_type_{dt}, shape_{std::move(shape)}
@@ -96,7 +96,7 @@ bool operator==(const schema &lhs, const schema &rhs) noexcept
     return lhs.attributes() == rhs.attributes();
 }
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio
 
 namespace std {  // NOLINT(cert-dcl58-cpp)

@@ -18,7 +18,7 @@
 #include <cstddef>
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 
 inline constexpr std::size_t align(std::size_t s, std::size_t alignment)
@@ -27,5 +27,5 @@ inline constexpr std::size_t align(std::size_t s, std::size_t alignment)
 }
 
 }  // namespace detail
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

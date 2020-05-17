@@ -24,7 +24,7 @@
 #include <sys/sysinfo.h>
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 
 std::size_t get_total_ram() noexcept
@@ -37,7 +37,7 @@ std::size_t get_total_ram() noexcept
 }
 
 }  // namespace detail
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio
 
 #elif defined(MLIO_PLATFORM_MACOS)
@@ -48,7 +48,7 @@ std::size_t get_total_ram() noexcept
 #include <sys/types.h>
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 
 std::size_t get_total_ram() noexcept
@@ -66,7 +66,7 @@ std::size_t get_total_ram() noexcept
 }
 
 }  // namespace detail
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio
 
 #endif

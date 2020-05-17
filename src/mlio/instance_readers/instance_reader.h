@@ -23,7 +23,7 @@
 #include "mlio/intrusive_ptr.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 
 // Reads data instances from a dataset.
@@ -56,5 +56,5 @@ std::unique_ptr<instance_reader>
 make_instance_reader(const data_reader_params &prm, record_reader_factory &&fct);
 
 }  // namespace detail
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

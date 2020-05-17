@@ -26,7 +26,7 @@
 #include "mlio/device_array.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 
 enum class parse_result { ok, failed, overflowed };
 
@@ -60,5 +60,5 @@ using parser =
 MLIO_API
 parser make_parser(data_type dt, const parser_params &prm);
 
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio

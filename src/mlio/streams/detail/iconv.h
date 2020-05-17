@@ -21,7 +21,7 @@
 #include "mlio/text_encoding.h"
 
 namespace mlio {
-inline namespace v1 {
+inline namespace abi_v1 {
 namespace detail {
 
 enum class iconv_status { ok, incomplete_char, leftover };
@@ -56,5 +56,5 @@ private:
 };
 
 }  // namespace detail
-}  // namespace v1
+}  // namespace abi_v1
 }  // namespace mlio
