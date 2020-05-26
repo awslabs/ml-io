@@ -58,7 +58,7 @@ void deallocate_aws_sdk()
 
 #else
 
-#include "mlio/not_supported_error.h"
+#include "mlio/Not_supported_error.h"
 
 namespace mlio {
 inline namespace abi_v1 {
@@ -68,12 +68,12 @@ inline namespace abi_v1 {
 
 void initialize_aws_sdk()
 {
-    throw not_supported_error{"MLIO was not built with S3 support."};
+    throw Not_supported_error{"MLIO was not built with S3 support."};
 }
 
 void deallocate_aws_sdk()
 {
-    throw not_supported_error{"MLIO was not built with S3 support."};
+    throw Not_supported_error{"MLIO was not built with S3 support."};
 }
 
 #pragma GCC diagnostic pop

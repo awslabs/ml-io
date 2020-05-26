@@ -24,7 +24,6 @@
 #include <utility>
 
 #include <fmt/format.h>
-#include <fmt/ostream.h>
 #include <tbb/tbb.h>
 
 #include "mlio/cpu_array.h"
@@ -46,86 +45,94 @@
 #include "mlio/streams/utf8_input_stream.h"
 #include "mlio/tensor.h"
 
-using mlio::detail::csv_record_reader;
-using mlio::detail::csv_record_tokenizer;
+using mlio::detail::Csv_record_reader;
+using mlio::detail::Csv_record_tokenizer;
 
 namespace mlio {
 inline namespace abi_v1 {
 
-struct csv_reader::decoder_state {
-    explicit decoder_state(const csv_reader &rdr,
-                           std::vector<intrusive_ptr<tensor>> &tsrs) noexcept;
+struct Csv_reader::Decoder_state {
+    explicit Decoder_state(const Csv_reader &r, std::vector<Intrusive_ptr<Tensor>> &t) noexcept;
 
-    const csv_reader *reader;
-    std::vector<intrusive_ptr<tensor>> *tensors;
+    const Csv_reader *reader;
+    std::vector<Intrusive_ptr<Tensor>> *tensors;
     bool warn_bad_instance;
     bool error_bad_example;
 };
 
-template<typename ColIt>
-class csv_reader::decoder {
+template<typename Col_iter>
+class Csv_reader::Decoder {
 public:
-    explicit decoder(decoder_state &state, csv_record_tokenizer &tk, ColIt col_beg, ColIt col_end)
-        : state_{&state}, tokenizer_{&tk}, col_beg_{col_beg}, col_end_{col_end}
+    explicit Decoder(Decoder_state &state,
+                     Csv_record_tokenizer &tokenizer,
+                     Col_iter col_beg,
+                     Col_iter col_end)
+        : state_{&state}, tokenizer_{&tokenizer}, col_beg_{col_beg}, col_end_{col_end}
     {}
 
-public:
-    bool decode(std::size_t row_idx, const instance &ins);
+    bool decode(std::size_t row_idx, const Instance &instance);
 
 private:
-    decoder_state *state_;
-    csv_record_tokenizer *tokenizer_;
-    ColIt col_beg_;
-    ColIt col_end_;
+    Decoder_state *state_;
+    Csv_record_tokenizer *tokenizer_;
+    Col_iter col_beg_;
+    Col_iter col_end_;
 };
 
-csv_reader::csv_reader(data_reader_params prm, csv_params csv_prm)
-    : parallel_data_reader{std::move(prm)}, params_{std::move(csv_prm)}
+Csv_reader::Csv_reader(Data_reader_params params, Csv_params csv_params)
+    : Parallel_data_reader{std::move(params)}, params_{std::move(csv_params)}
 {
     column_names_ = params_.column_names;
 }
 
-csv_reader::~csv_reader()
+Csv_reader::~Csv_reader()
 {
     stop();
 }
 
-intrusive_ptr<record_reader> csv_reader::make_record_reader(const data_store &ds)
+void Csv_reader::reset() noexcept
 {
-    auto strm = make_utf8_stream(ds.open_read(), params_.encoding);
+    Parallel_data_reader::reset();
 
-    auto rdr = make_intrusive<csv_record_reader>(std::move(strm), params_);
+    should_read_header = true;
+}
+
+Intrusive_ptr<Record_reader> Csv_reader::make_record_reader(const Data_store &store)
+{
+    auto stream = make_utf8_stream(store.open_read(), params_.encoding);
+
+    auto reader = make_intrusive<Csv_record_reader>(std::move(stream), params_);
 
     if (params_.header_row_index) {
         // Check if the caller did not explicitly specified the column
         // names and requested us to infer them from the header.
         if (column_names_.empty()) {
-            read_names_from_header(ds, *rdr);
+            read_names_from_header(store, *reader);
         }
         else if (should_read_header || !params_.has_single_header) {
-            skip_to_header_row(*rdr);
+            skip_to_header_row(*reader);
 
             // Discard the header row.
-            rdr->read_record();
+            reader->read_record();
         }
 
         should_read_header = false;
     }
 
-    return std::move(rdr);
+    return std::move(reader);
 }
 
-void csv_reader::read_names_from_header(const data_store &ds, record_reader &rdr)
+void Csv_reader::read_names_from_header(const Data_store &store, Record_reader &reader)
 {
-    skip_to_header_row(rdr);
+    skip_to_header_row(reader);
 
     try {
-        std::optional<record> hdr = rdr.read_record();
+        std::optional<Record> hdr = reader.read_record();
         if (hdr == std::nullopt) {
             return;
         }
 
-        csv_record_tokenizer tokenizer{params_, hdr->payload()};
+        Csv_record_tokenizer tokenizer{params_, hdr->payload()};
         while (tokenizer.next()) {
             std::string name;
             if (params_.name_prefix.empty()) {
@@ -137,58 +144,58 @@ void csv_reader::read_names_from_header(const data_store &ds, record_reader &rdr
             column_names_.emplace_back(std::move(name));
         }
     }
-    catch (const corrupt_record_error &) {
-        std::throw_with_nested(schema_error{fmt::format(
+    catch (const Corrupt_record_error &) {
+        std::throw_with_nested(Schema_error{fmt::format(
             "The header row of the data store '{0}' cannot be read. See nested exception for details.",
-            ds.id())});
+            store.id())});
     }
 
     // If the header row was blank, we treat it as a single column with
-    // an empty name.
+    // an blank name.
     if (column_names_.empty()) {
         column_names_.emplace_back(params_.name_prefix);
     }
 }
 
-void csv_reader::skip_to_header_row(record_reader &rdr)
+void Csv_reader::skip_to_header_row(Record_reader &reader)
 {
     std::size_t header_idx = *params_.header_row_index;
     for (std::size_t i = 0; i < header_idx; i++) {
-        std::optional<record> rec = rdr.read_record();
-        if (rec == std::nullopt) {
+        std::optional<Record> record = reader.read_record();
+        if (record == std::nullopt) {
             return;
         }
     }
 }
 
-intrusive_ptr<schema const> csv_reader::infer_schema(std::optional<instance> const &ins)
+Intrusive_ptr<const Schema> Csv_reader::infer_schema(const std::optional<Instance> &instance)
 {
     // If we don't have any data rows and if the store has no header or
-    // no explicit column names, we have no way of inferring a schema.
-    if (ins == std::nullopt && column_names_.empty()) {
+    // explicit column names, we have no way to infer the schema.
+    if (instance == std::nullopt && column_names_.empty()) {
         return {};
     }
 
-    infer_column_types(ins);
+    infer_column_types(instance);
 
-    set_or_validate_column_names(ins);
+    set_or_validate_column_names(instance);
 
     apply_column_type_overrides();
 
     return init_parsers_and_make_schema();
 }
 
-void csv_reader::infer_column_types(std::optional<instance> const &ins)
+void Csv_reader::infer_column_types(const std::optional<Instance> &instance)
 {
-    // If we don't have any data rows, assume that all fields are of
-    // the default data type or of type string.
-    if (ins == std::nullopt) {
+    // If we don't have any data rows, assume that all fields are of the
+    // default data type or of type string.
+    if (instance == std::nullopt) {
         column_types_.reserve(column_names_.size());
 
         for (std::size_t i = 0; i < column_names_.size(); i++) {
-            data_type dt{};
+            Data_type dt{};
             if (params_.default_data_type == std::nullopt) {
-                dt = data_type::string;
+                dt = Data_type::string;
             }
             else {
                 dt = *params_.default_data_type;
@@ -198,9 +205,9 @@ void csv_reader::infer_column_types(std::optional<instance> const &ins)
     }
     else {
         try {
-            csv_record_tokenizer tokenizer{params_, ins->bits()};
+            Csv_record_tokenizer tokenizer{params_, instance->bits()};
             while (tokenizer.next()) {
-                data_type dt{};
+                Data_type dt{};
                 if (params_.default_data_type == std::nullopt) {
                     dt = infer_data_type(tokenizer.value());
                 }
@@ -210,15 +217,15 @@ void csv_reader::infer_column_types(std::optional<instance> const &ins)
                 column_types_.emplace_back(dt);
             }
         }
-        catch (const corrupt_record_error &) {
-            std::throw_with_nested(schema_error{fmt::format(
+        catch (const Corrupt_record_error &) {
+            std::throw_with_nested(Schema_error{fmt::format(
                 "The schema of the data store '{0}' cannot be inferred. See nested exception for details.",
-                ins->get_data_store().id())});
+                instance->data_store().id())});
         }
     }
 }
 
-void csv_reader::set_or_validate_column_names(std::optional<instance> const &ins)
+void Csv_reader::set_or_validate_column_names(const std::optional<Instance> &instance)
 {
     if (column_names_.empty()) {
         column_names_.reserve(column_types_.size());
@@ -236,17 +243,17 @@ void csv_reader::set_or_validate_column_names(std::optional<instance> const &ins
     }
     else {
         if (column_names_.size() != column_types_.size()) {
-            throw schema_error{fmt::format(
+            throw Schema_error{fmt::format(
                 "The number of columns ({3:n}) read from the row #{1:n} in the data store '{0}' does not match the number of headers ({2:n}).",
-                ins->get_data_store().id(),
-                ins->index(),
+                instance->data_store().id(),
+                instance->index(),
                 column_names_.size(),
                 column_types_.size())};
         }
     }
 }
 
-void csv_reader::apply_column_type_overrides()
+void Csv_reader::apply_column_type_overrides()
 {
     std::size_t num_columns = column_names_.size();
 
@@ -276,16 +283,16 @@ void csv_reader::apply_column_type_overrides()
 
     // Throw an error if there are leftover indices.
     if (!idx_overrides.empty()) {
-        std::vector<std::size_t> leftover_inds{};
-        leftover_inds.reserve(idx_overrides.size());
+        std::vector<std::size_t> leftover_indices{};
+        leftover_indices.reserve(idx_overrides.size());
 
         for (auto &pr : idx_overrides) {
-            leftover_inds.emplace_back(pr.first);
+            leftover_indices.emplace_back(pr.first);
         }
 
         throw std::invalid_argument{fmt::format(
-            "The column types cannot bet set. The following column indices are out of range: {0}",
-            fmt::join(leftover_inds, ", "))};
+            "The column types cannot be set. The following column indices are out of range: {0}",
+            fmt::join(leftover_indices, ", "))};
     }
 
     // Override column types by name.
@@ -315,11 +322,11 @@ void csv_reader::apply_column_type_overrides()
     }
 }
 
-intrusive_ptr<schema const> csv_reader::init_parsers_and_make_schema()
+Intrusive_ptr<const Schema> Csv_reader::init_parsers_and_make_schema()
 {
     std::size_t batch_size = params().batch_size;
 
-    std::vector<attribute> attrs{};
+    std::vector<Attribute> attrs{};
 
     std::size_t num_columns = column_names_.size();
 
@@ -350,15 +357,16 @@ intrusive_ptr<schema const> csv_reader::init_parsers_and_make_schema()
             continue;
         }
 
-        data_type dt = std::get<2>(*col_pos);
+        Data_type dt = std::get<2>(*col_pos);
 
         column_ignores_.emplace_back(0);
-        column_parsers_.emplace_back(make_parser(dt, params_.parser_prm));
+        column_parsers_.emplace_back(make_parser(dt, params_.parser_params));
 
         if (params_.dedupe_column_names) {
-            // Keep count of column names. If the key already exists, create a
-            // new name by appending underscore + count. Since this new name
-            // might also exist, iterate until we can insert the new name.
+            // Keep count of column names. If the key already exists,
+            // create a new name by appending an underscore plus count.
+            // Since this new name might also exist, iterate until we
+            // can insert the new name.
             auto [pos, inserted] = name_counts.try_emplace(name, 0);
             while (!inserted) {
                 name.append("_").append(fmt::to_string(pos->second++));
@@ -367,17 +375,17 @@ intrusive_ptr<schema const> csv_reader::init_parsers_and_make_schema()
             pos->second++;
         }
 
-        attrs.emplace_back(std::move(name), dt, size_vector{batch_size, 1});
+        attrs.emplace_back(std::move(name), dt, Size_vector{batch_size, 1});
     }
 
     try {
-        return make_intrusive<schema>(attrs);
+        return make_intrusive<Schema>(attrs);
     }
     catch (const std::invalid_argument &) {
         std::unordered_set<std::string_view> tmp{};
         for (auto &attr : attrs) {
             if (auto pr = tmp.emplace(attr.name()); !pr.second) {
-                throw schema_error{fmt::format(
+                throw Schema_error{fmt::format(
                     "The dataset contains more than one column with the name '{0}'.", *pr.first)};
             }
         }
@@ -386,7 +394,7 @@ intrusive_ptr<schema const> csv_reader::init_parsers_and_make_schema()
     }
 }
 
-bool csv_reader::should_skip(std::size_t index, const std::string &name) const noexcept
+bool Csv_reader::should_skip(std::size_t index, const std::string &name) const noexcept
 {
     auto uci = params_.use_columns_by_index;
     if (!uci.empty()) {
@@ -405,40 +413,40 @@ bool csv_reader::should_skip(std::size_t index, const std::string &name) const n
     return false;
 }
 
-intrusive_ptr<example> csv_reader::decode(const instance_batch &batch) const
+Intrusive_ptr<Example> Csv_reader::decode(const Instance_batch &batch) const
 {
     auto tensors = make_tensors(batch.size());
 
-    decoder_state state{*this, tensors};
+    Decoder_state state{*this, tensors};
 
     std::size_t num_instances = batch.instances().size();
 
     constexpr std::size_t cut_off = 10'000'000;
 
-    bool serial =
-        // If bad batch handling mode is pad, we cannot parallelize
+    bool should_run_serial =
+        // If bad example handling mode is pad, we cannot parallelize
         // decoding as good records must be stacked together without
         // any gap in between.
-        params().bad_example_hnd == bad_example_handling::pad ||
-        params().bad_example_hnd == bad_example_handling::pad_warn ||
+        params().bad_example_handling == Bad_example_handling::pad ||
+        params().bad_example_handling == Bad_example_handling::pad_warn ||
         // If the number of values (e.g. integers, floating-points) we
-        // need to decode is below the cut-off, avoid parallel
-        // execution; otherwise the threading overhead will slow down
-        // the performance.
+        // need to decode is below the cut-off threshold, avoid parallel
+        // execution; otherwise the threading overhead will potentially
+        // slow down the performance.
         column_names_.size() * num_instances < cut_off;
 
     std::optional<std::size_t> num_instances_read{};
-    if (serial) {
+    if (should_run_serial) {
         num_instances_read = decode_ser(state, batch);
     }
     else {
         num_instances_read = decode_prl(state, batch);
     }
 
-    // Check if we failed to decode the batch and return a null pointer
-    // if that is the case.
+    // Check if we failed to decode the example and return a null
+    // pointer if that is the case.
     if (num_instances_read == std::nullopt) {
-        if (params().bad_example_hnd == bad_example_handling::skip_warn) {
+        if (params().bad_example_handling == Bad_example_handling::skip_warn) {
             logger::warn("The example #{0:n} has been skipped as it had at least one bad instance.",
                          batch.index());
         }
@@ -447,33 +455,33 @@ intrusive_ptr<example> csv_reader::decode(const instance_batch &batch) const
     }
 
     if (num_instances != *num_instances_read) {
-        if (params().bad_example_hnd == bad_example_handling::pad_warn) {
+        if (params().bad_example_handling == Bad_example_handling::pad_warn) {
             logger::warn("The example #{0:n} has been padded as it had {1:n} bad instance(s).",
                          batch.index(),
                          num_instances - *num_instances_read);
         }
     }
 
-    auto exm = make_intrusive<example>(get_schema(), std::move(tensors));
+    auto example = make_intrusive<Example>(schema(), std::move(tensors));
 
-    exm->padding = batch.size() - *num_instances_read;
+    example->padding = batch.size() - *num_instances_read;
 
-    return exm;
+    return example;
 }
 
-std::vector<intrusive_ptr<tensor>> csv_reader::make_tensors(std::size_t batch_size) const
+std::vector<Intrusive_ptr<Tensor>> Csv_reader::make_tensors(std::size_t batch_size) const
 {
-    std::vector<intrusive_ptr<tensor>> tensors{};
+    std::vector<Intrusive_ptr<Tensor>> tensors{};
     tensors.reserve(column_types_.size() - column_ignores_.size());
 
     auto type_beg = column_types_.begin();
     auto type_end = column_types_.end();
 
-    auto skip_beg = column_ignores_.begin();
-    auto skip_end = column_ignores_.end();
+    auto ignore_beg = column_ignores_.begin();
+    auto ignore_end = column_ignores_.end();
 
-    auto col_beg = tbb::make_zip_iterator(type_beg, skip_beg);
-    auto col_end = tbb::make_zip_iterator(type_end, skip_end);
+    auto col_beg = tbb::make_zip_iterator(type_beg, ignore_beg);
+    auto col_end = tbb::make_zip_iterator(type_end, ignore_end);
 
     for (auto col_pos = col_beg; col_pos < col_end; ++col_pos) {
         // Check if we should skip this column.
@@ -481,19 +489,19 @@ std::vector<intrusive_ptr<tensor>> csv_reader::make_tensors(std::size_t batch_si
             continue;
         }
 
-        size_vector shp{batch_size, 1};
+        Size_vector shape{batch_size, 1};
 
-        data_type dt = std::get<0>(*col_pos);
+        Data_type dt = std::get<0>(*col_pos);
 
-        std::unique_ptr<device_array> arr = make_cpu_array(dt, batch_size);
+        std::unique_ptr<Device_array> arr = make_cpu_array(dt, batch_size);
 
-        tensors.emplace_back(make_intrusive<dense_tensor>(std::move(shp), std::move(arr)));
+        tensors.emplace_back(make_intrusive<Dense_tensor>(std::move(shape), std::move(arr)));
     }
 
     return tensors;
 }
 
-auto csv_reader::make_column_iterators() const noexcept
+auto Csv_reader::make_column_iterators() const noexcept
 {
     std::size_t num_columns = column_names_.size();
 
@@ -506,42 +514,42 @@ auto csv_reader::make_column_iterators() const noexcept
     auto type_beg = column_types_.begin();
     auto type_end = column_types_.end();
 
-    auto skip_beg = column_ignores_.begin();
-    auto skip_end = column_ignores_.end();
+    auto ignore_beg = column_ignores_.begin();
+    auto ignore_end = column_ignores_.end();
 
-    auto prs_beg = column_parsers_.begin();
-    auto prs_end = column_parsers_.end();
+    auto parser_beg = column_parsers_.begin();
+    auto parser_end = column_parsers_.end();
 
-    auto col_beg = tbb::make_zip_iterator(col_idx_beg, name_beg, type_beg, skip_beg, prs_beg);
-    auto col_end = tbb::make_zip_iterator(col_idx_end, name_end, type_end, skip_end, prs_end);
+    auto col_beg = tbb::make_zip_iterator(col_idx_beg, name_beg, type_beg, ignore_beg, parser_beg);
+    auto col_end = tbb::make_zip_iterator(col_idx_end, name_end, type_end, ignore_end, parser_end);
 
     return std::make_pair(col_beg, col_end);
 }
 
 std::optional<std::size_t>
-csv_reader::decode_ser(decoder_state &state, const instance_batch &batch) const
+Csv_reader::decode_ser(Decoder_state &state, const Instance_batch &batch) const
 {
     std::size_t row_idx = 0;
 
-    csv_record_tokenizer tokenizer{params_};
+    Csv_record_tokenizer tokenizer{params_};
 
     auto [col_beg, col_end] = make_column_iterators();
 
-    for (const instance &ins : batch.instances()) {
-        decoder<decltype(col_beg)> dc{state, tokenizer, col_beg, col_end};
-        if (dc.decode(row_idx, ins)) {
+    for (const Instance &instance : batch.instances()) {
+        Decoder<decltype(col_beg)> decoder{state, tokenizer, col_beg, col_end};
+        if (decoder.decode(row_idx, instance)) {
             row_idx++;
         }
         else {
-            // If the user requested to skip the batch in case of an
+            // If the user requested to skip the example in case of an
             // error, shortcut the loop and return immediately.
-            if (params().bad_example_hnd == bad_example_handling::skip ||
-                params().bad_example_hnd == bad_example_handling::skip_warn) {
+            if (params().bad_example_handling == Bad_example_handling::skip ||
+                params().bad_example_handling == Bad_example_handling::skip_warn) {
                 return {};
             }
-            if (params().bad_example_hnd != bad_example_handling::pad &&
-                params().bad_example_hnd != bad_example_handling::pad_warn) {
-                throw std::invalid_argument{"The specified bad batch handling is invalid."};
+            if (params().bad_example_handling != Bad_example_handling::pad &&
+                params().bad_example_handling != Bad_example_handling::pad_warn) {
+                throw std::invalid_argument{"The specified bad example handling is invalid."};
             }
         }
     }
@@ -550,7 +558,7 @@ csv_reader::decode_ser(decoder_state &state, const instance_batch &batch) const
 }
 
 std::optional<std::size_t>
-csv_reader::decode_prl(decoder_state &state, const instance_batch &batch) const
+Csv_reader::decode_prl(Decoder_state &state, const Instance_batch &batch) const
 {
     std::atomic_bool skip_example{};
 
@@ -559,38 +567,41 @@ csv_reader::decode_prl(decoder_state &state, const instance_batch &batch) const
     auto row_idx_beg = tbb::counting_iterator<std::size_t>(0);
     auto row_idx_end = tbb::counting_iterator<std::size_t>(num_instances);
 
-    auto ins_beg = batch.instances().begin();
-    auto ins_end = batch.instances().end();
+    auto instance_beg = batch.instances().begin();
+    auto instance_end = batch.instances().end();
 
-    auto rng_beg = tbb::make_zip_iterator(row_idx_beg, ins_beg);
-    auto rng_end = tbb::make_zip_iterator(row_idx_end, ins_end);
+    auto range_beg = tbb::make_zip_iterator(row_idx_beg, instance_beg);
+    auto range_end = tbb::make_zip_iterator(row_idx_end, instance_end);
 
-    tbb::blocked_range<decltype(rng_beg)> range{rng_beg, rng_end};
+    tbb::blocked_range<decltype(range_beg)> range{range_beg, range_end};
 
     auto worker = [this, &state, &skip_example](auto &sub_range) {
-        csv_record_tokenizer tokenizer{params_};
+        Csv_record_tokenizer tokenizer{params_};
 
         // Both GCC and clang have trouble handling structured bindings
         // in lambdas.
         auto iter_pair = make_column_iterators();
 
-        using ColIt = std::remove_reference_t<decltype(std::get<0>(iter_pair))>;
+        using Col_iter = std::remove_reference_t<decltype(std::get<0>(iter_pair))>;
 
-        for (auto ins_zip : sub_range) {
+        Col_iter col_beg = std::get<0>(iter_pair);
+        Col_iter col_end = std::get<1>(iter_pair);
+
+        for (auto instance_zip : sub_range) {
             // Both GCC and clang have a bug that prevents using class
             // template argument deduction (CTAD) with nested types.
-            decoder<ColIt> dc{state, tokenizer, std::get<0>(iter_pair), std::get<1>(iter_pair)};
-            if (!dc.decode(std::get<0>(ins_zip), std::get<1>(ins_zip))) {
-                // If we failed to decode the instance, we can
-                // terminate the task and skip this batch.
-                if (params().bad_example_hnd == bad_example_handling::skip ||
-                    params().bad_example_hnd == bad_example_handling::skip_warn) {
+            Decoder<Col_iter> decoder{state, tokenizer, col_beg, col_end};
+            if (!decoder.decode(std::get<0>(instance_zip), std::get<1>(instance_zip))) {
+                // If we failed to decode the instance, we can terminate
+                // the task right away and skip this example.
+                if (params().bad_example_handling == Bad_example_handling::skip ||
+                    params().bad_example_handling == Bad_example_handling::skip_warn) {
                     skip_example = true;
 
                     return;
                 }
 
-                throw std::invalid_argument{"The specified bad batch handling is invalid."};
+                throw std::invalid_argument{"The specified bad example handling is invalid."};
             }
         }
     };
@@ -604,22 +615,22 @@ csv_reader::decode_prl(decoder_state &state, const instance_batch &batch) const
     return num_instances;
 }
 
-csv_reader::decoder_state::decoder_state(const csv_reader &rdr,
-                                         std::vector<intrusive_ptr<tensor>> &tsrs) noexcept
-    : reader{&rdr}
-    , tensors{&tsrs}
-    , warn_bad_instance{rdr.warn_bad_instances()}
-    , error_bad_example{rdr.params().bad_example_hnd == bad_example_handling::error}
+Csv_reader::Decoder_state::Decoder_state(const Csv_reader &r,
+                                         std::vector<Intrusive_ptr<Tensor>> &t) noexcept
+    : reader{&r}
+    , tensors{&t}
+    , warn_bad_instance{r.warn_bad_instances()}
+    , error_bad_example{r.params().bad_example_handling == Bad_example_handling::error}
 {}
 
-template<typename ColIt>
-bool csv_reader::decoder<ColIt>::decode(std::size_t row_idx, const instance &ins)
+template<typename Col_iter>
+bool Csv_reader::Decoder<Col_iter>::decode(std::size_t row_idx, const Instance &instance)
 {
     auto col_pos = col_beg_;
 
     auto tsr_pos = state_->tensors->begin();
 
-    tokenizer_->reset(ins.bits());
+    tokenizer_->reset(instance.bits());
 
     while (tokenizer_->next()) {
         if (col_pos == col_end_) {
@@ -634,21 +645,21 @@ bool csv_reader::decoder<ColIt>::decode(std::size_t row_idx, const instance &ins
         }
 
         // Check if we truncated the field.
-        if (tokenizer_->is_truncated()) {
-            auto mflh = state_->reader->params_.max_field_length_hnd;
+        if (tokenizer_->truncated()) {
+            auto h = state_->reader->params_.max_field_length_handling;
 
-            if (mflh == max_field_length_handling::treat_as_bad ||
-                mflh == max_field_length_handling::truncate_warn) {
+            if (h == Max_field_length_handling::treat_as_bad ||
+                h == Max_field_length_handling::truncate_warn) {
                 const std::string &name = std::get<1>(*col_pos);
 
                 auto msg = fmt::format(
                     "The column '{2}' of the row #{1:n} in the data store '{0}' is too long. Its truncated value is '{3:.64}'.",
-                    ins.get_data_store().id(),
-                    ins.index(),
+                    instance.data_store().id(),
+                    instance.index(),
                     name,
                     tokenizer_->value());
 
-                if (mflh == max_field_length_handling::truncate_warn) {
+                if (h == Max_field_length_handling::truncate_warn) {
                     logger::warn(msg);
                 }
                 else {
@@ -658,25 +669,25 @@ bool csv_reader::decoder<ColIt>::decode(std::size_t row_idx, const instance &ins
                         }
 
                         if (state_->error_bad_example) {
-                            throw invalid_instance_error{msg};
+                            throw Invalid_instance_error{msg};
                         }
                     }
 
                     return false;
                 }
             }
-            else if (mflh != max_field_length_handling::truncate) {
+            else if (h != Max_field_length_handling::truncate) {
                 throw std::invalid_argument{
                     "The specified maximum field length handling is invalid."};
             }
         }
 
-        const parser &prsr = std::get<4>(*col_pos);
+        const Parser &parser = std::get<4>(*col_pos);
 
-        auto &dense_tsr = static_cast<dense_tensor &>(**tsr_pos);
+        auto &dense_tensor = static_cast<Dense_tensor &>(**tsr_pos);
 
-        parse_result r = prsr(tokenizer_->value(), dense_tsr.data(), row_idx);
-        if (r == parse_result::ok) {
+        Parse_result r = parser(tokenizer_->value(), dense_tensor.data(), row_idx);
+        if (r == Parse_result::ok) {
             ++col_pos;
             ++tsr_pos;
 
@@ -686,12 +697,12 @@ bool csv_reader::decoder<ColIt>::decode(std::size_t row_idx, const instance &ins
         if (state_->warn_bad_instance || state_->error_bad_example) {
             const std::string &name = std::get<1>(*col_pos);
 
-            data_type dt = std::get<2>(*col_pos);
+            Data_type dt = std::get<2>(*col_pos);
 
             auto msg = fmt::format(
                 "The column '{2}' of the row #{1:n} in the data store '{0}' cannot be parsed as {3}. Its string value is '{4:.64}'.",
-                ins.get_data_store().id(),
-                ins.index(),
+                instance.data_store().id(),
+                instance.index(),
                 name,
                 dt,
                 tokenizer_->value());
@@ -701,7 +712,7 @@ bool csv_reader::decoder<ColIt>::decode(std::size_t row_idx, const instance &ins
             }
 
             if (state_->error_bad_example) {
-                throw invalid_instance_error{msg};
+                throw Invalid_instance_error{msg};
             }
         }
 
@@ -725,9 +736,9 @@ bool csv_reader::decoder<ColIt>::decode(std::size_t row_idx, const instance &ins
         }
 
         auto msg = fmt::format(
-            "The row #{1:n} in the data store '{0}' has {2:n} column(s) while the expected number of column(s) is {3:n}.",
-            ins.get_data_store().id(),
-            ins.index(),
+            "The row #{1:n} in the data store '{0}' has {2:n} column(s) while it is expected to have {3:n} column(s).",
+            instance.data_store().id(),
+            instance.index(),
             num_actual_cols,
             num_columns);
 
@@ -736,18 +747,11 @@ bool csv_reader::decoder<ColIt>::decode(std::size_t row_idx, const instance &ins
         }
 
         if (state_->error_bad_example) {
-            throw invalid_instance_error{msg};
+            throw Invalid_instance_error{msg};
         }
     }
 
     return false;
-}
-
-void csv_reader::reset() noexcept
-{
-    parallel_data_reader::reset();
-
-    should_read_header = true;
 }
 
 }  // namespace abi_v1

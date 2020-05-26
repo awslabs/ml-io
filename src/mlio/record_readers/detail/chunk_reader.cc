@@ -25,24 +25,25 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-chunk_reader::~chunk_reader() = default;
+Chunk_reader::~Chunk_reader() = default;
 
-std::unique_ptr<chunk_reader> make_chunk_reader(intrusive_ptr<input_stream> strm)
+std::unique_ptr<Chunk_reader> make_chunk_reader(Intrusive_ptr<Input_stream> stream)
 {
     // See if we can zero-copy read the whole stream (e.g. a
     // memory-mapped file). In such case we can simply return a single
-    // memory block right away instead of reading chunk by chunk.
-    if (strm->supports_zero_copy()) {
-        memory_slice chunk = strm->read(strm->size());
+    // memory block right away instead of reading the stream chunk by
+    // chunk.
+    if (stream->supports_zero_copy()) {
+        Memory_slice chunk = stream->read(stream->size());
         // Although this shouldn't happen, make sure we have read all
         // the data.
-        if (chunk.size() == strm->size()) {
-            return std::make_unique<in_memory_chunk_reader>(std::move(chunk));
+        if (chunk.size() == stream->size()) {
+            return std::make_unique<In_memory_chunk_reader>(std::move(chunk));
         }
 
-        strm->seek(0);
+        stream->seek(0);
     }
-    return std::make_unique<default_chunk_reader>(std::move(strm));
+    return std::make_unique<Default_chunk_reader>(std::move(stream));
 }
 
 }  // namespace detail

@@ -34,10 +34,10 @@ def to_tf(tensor):
 
 def make_tf_dataset(data_reader, features, dtypes):
     def generator():
-        for exm in data_reader:
+        for example in data_reader:
             feature_tensor_dict = {}
             for feature in features:
-                feature_tensor_dict[feature] = exm[feature]
+                feature_tensor_dict[feature] = example[feature]
             yield feature_tensor_dict
 
     output_types = {k: l for (k, l) in zip(features, dtypes)}

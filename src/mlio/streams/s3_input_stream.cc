@@ -24,62 +24,25 @@
 
 namespace mlio {
 inline namespace abi_v1 {
-namespace detail {
 
-struct s3_input_stream_access {
-    static inline intrusive_ptr<s3_input_stream>
-    make(intrusive_ptr<s3_client const> client, const std::string &uri, std::string version_id)
-    {
-        auto [bucket, key] = split_s3_uri_to_bucket_and_key(uri);
-
-        auto *ptr = new s3_input_stream{
-            std::move(client), std::string{bucket}, std::string{key}, std::move(version_id)};
-
-        auto strm = wrap_intrusive(ptr);
-
-        strm->fetch_size();
-
-        return strm;
-    }
-};
-
-}  // namespace detail
-
-intrusive_ptr<s3_input_stream> make_s3_input_stream(intrusive_ptr<s3_client const> client,
-                                                    const std::string &uri,
-                                                    std::string version_id)
-{
-    return detail::s3_input_stream_access::make(std::move(client), uri, std::move(version_id));
-}
-
-s3_input_stream::s3_input_stream(intrusive_ptr<s3_client const> client,
-                                 std::string bucket,
-                                 std::string key,
-                                 std::string version_id)
-    : client_{std::move(client)}
-    , bucket_{std::move(bucket)}
-    , key_{std::move(key)}
-    , version_id_{std::move(version_id)}
-{}
-
-std::size_t s3_input_stream::read(mutable_memory_span dest)
+std::size_t S3_input_stream::read(Mutable_memory_span destination)
 {
     check_if_closed();
 
-    if (dest.empty() || position_ == size_) {
+    if (destination.empty() || position_ == size_) {
         return 0;
     }
 
-    dest = dest.first(std::min(size_ - position_, dest.size()));
+    destination = destination.first(std::min(size_ - position_, destination.size()));
 
-    auto num_bytes_read = client_->read_object(bucket_, key_, version_id_, position_, dest);
+    auto num_bytes_read = client_->read_object(bucket_, key_, version_id_, position_, destination);
 
     position_ += num_bytes_read;
 
     return num_bytes_read;
 }
 
-void s3_input_stream::seek(std::size_t position)
+void S3_input_stream::seek(std::size_t position)
 {
     check_if_closed();
 
@@ -90,21 +53,59 @@ void s3_input_stream::seek(std::size_t position)
     position_ = position;
 }
 
-void s3_input_stream::close() noexcept
+void S3_input_stream::close() noexcept
 {
     closed_ = true;
 }
 
-void s3_input_stream::fetch_size()
+S3_input_stream::S3_input_stream(Intrusive_ptr<const S3_client> client,
+                                 std::string bucket,
+                                 std::string key,
+                                 std::string version_id)
+    : client_{std::move(client)}
+    , bucket_{std::move(bucket)}
+    , key_{std::move(key)}
+    , version_id_{std::move(version_id)}
+{}
+
+void S3_input_stream::fetch_size()
 {
     size_ = client_->read_object_size(bucket_, key_, version_id_);
 }
 
-void s3_input_stream::check_if_closed() const
+void S3_input_stream::check_if_closed() const
 {
     if (closed_) {
-        throw stream_error{"The input stream is closed."};
+        throw Stream_error{"The input stream is closed."};
     }
+}
+
+namespace detail {
+
+struct S3_input_stream_access {
+    static inline Intrusive_ptr<S3_input_stream>
+    make(Intrusive_ptr<const S3_client> client, const std::string &uri, std::string version_id)
+    {
+        auto [bucket, key] = split_s3_uri_to_bucket_and_key(uri);
+
+        auto *ptr = new S3_input_stream{
+            std::move(client), std::string{bucket}, std::string{key}, std::move(version_id)};
+
+        auto stream = wrap_intrusive(ptr);
+
+        stream->fetch_size();
+
+        return stream;
+    }
+};
+
+}  // namespace detail
+
+Intrusive_ptr<S3_input_stream> make_s3_input_stream(Intrusive_ptr<const S3_client> client,
+                                                    const std::string &uri,
+                                                    std::string version_id)
+{
+    return detail::S3_input_stream_access::make(std::move(client), uri, std::move(version_id));
 }
 
 }  // namespace abi_v1

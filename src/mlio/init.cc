@@ -20,7 +20,6 @@
 #include "mlio/logger.h"
 #include "mlio/memory/file_backed_memory_allocator.h"
 #include "mlio/memory/memory_allocator.h"
-#include "mlio/not_supported_error.h"
 
 namespace mlio {
 inline namespace abi_v1 {
@@ -34,7 +33,7 @@ void initialize()
         return;
     }
 
-    set_memory_allocator(std::make_unique<file_backed_memory_allocator>());
+    set_memory_allocator(std::make_unique<File_backed_memory_allocator>());
 
     initialized = true;
 }

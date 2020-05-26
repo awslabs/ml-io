@@ -25,21 +25,17 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-class instance_batch_reader {
+class Instance_batch_reader {
 public:
-    explicit instance_batch_reader(const data_reader_params &prm, instance_reader &rdr);
+    explicit Instance_batch_reader(const Data_reader_params &params, Instance_reader &reader);
 
-public:
-    std::optional<instance_batch> read_instance_batch();
+    std::optional<Instance_batch> read_instance_batch();
 
     void reset() noexcept;
 
 private:
-    void init_num_instances_to_skip();
-
-private:
-    const data_reader_params *params_;
-    instance_reader *reader_;
+    const Data_reader_params *params_;
+    Instance_reader *reader_;
     std::size_t batch_idx_{};
 };
 

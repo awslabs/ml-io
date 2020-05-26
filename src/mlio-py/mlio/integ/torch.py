@@ -18,6 +18,6 @@ from mlio.integ.dlpack import as_dlpack
 
 def as_torch(tensor):
     """
-    Wraps the specified tensor as a PyTorch tensor.
+    Wraps the specified Tensor as a PyTorch Tensor.
     """
     return torch.utils.dlpack.from_dlpack(as_dlpack(tensor))

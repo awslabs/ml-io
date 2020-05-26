@@ -186,13 +186,13 @@ Contains the parameters used by [`ImageReader`](#ImageReader).
 All constructor parameters described below have a same-named read/write accessor property. Not though that, due to a shortcoming in pybind11-based language bindings, values cannot be added to container types via properties and updates must instead be made via assignment.
 
 ```python
-ImageReaderParams(img_frame : ImageFrame = ImageFrame.NONE,
+ImageReaderParams(image_frame : ImageFrame = ImageFrame.NONE,
                   resize : Optional[int] = None,
                   image_dimensions : Sequence[int] = None,
                   to_rgb : bool = False)
 ```
 
-- `img_frame`: See [`ImageFrame`](#ImageFrame)
+- `image_frame`: See [`ImageFrame`](#ImageFrame)
 - `resize`: Scales the shorter edge of the image to this value before applying other augmentations.
 - `image_dimensions`: The dimensions of output image in `channels, height, width` format.
 - `to_rgb`: A boolean value for converting from BGR (OpenCV default) to RGB color scheme.
@@ -272,14 +272,14 @@ Describes an attribute which defines a measurable property of a dataset.
 
 ```python
 Attribute(name : str,
-          dtype : DataType,
+          data_type : DataType,
           shape : Sequence[int],
           strides : Sequence[int] = None,
           sparse : bool = False)
 ```
 
 - `name`: The name of the attribute.
-- `dtype`: The [data type](tensor.md#DataType) of the attribute.
+- `data_type`: The [data type](tensor.md#DataType) of the attribute.
 - `shape`: The shape of the attribute.
 - `strides`: The strides, if any, of the attribute.
 - `sparse`: A boolean value indicating whether the attribute is sparse or dense.
@@ -288,7 +288,7 @@ Attribute(name : str,
 #### name
 Gets the name of the attribute.
 
-#### dtype
+#### data_type
 Gets the [data type](tensor.md#DataType) of the attribute.
 
 #### shape

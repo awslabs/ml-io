@@ -22,9 +22,9 @@
 
 namespace pymlio {
 
-column_analyzer::column_analyzer(std::vector<column_analysis> &columns,
-                                 std::vector<std::string> const &null_like_values,
-                                 std::unordered_set<std::size_t> const &capture_columns,
+Column_analyzer::Column_analyzer(std::vector<Column_analysis> &columns,
+                                 const std::vector<std::string> &null_like_values,
+                                 const std::unordered_set<std::size_t> &capture_columns,
                                  std::size_t max_capture_count) noexcept
     : columns_{&columns}
     , null_like_values_{&null_like_values}
@@ -32,16 +32,17 @@ column_analyzer::column_analyzer(std::vector<column_analysis> &columns,
     , max_capture_count_{max_capture_count}
 {}
 
-void column_analyzer::analyze(const mlio::example &exm) const
+void Column_analyzer::analyze(const mlio::Example &example) const
 {
     std::size_t feature_idx = 0;
 
-    for (auto pos = exm.features().begin(); pos < exm.features().end(); ++pos, feature_idx++) {
-        const auto &tsr = exm.features()[feature_idx];
-        const auto &dense_tsr = static_cast<const mlio::dense_tensor &>(*tsr);
+    for (auto pos = example.features().begin(); pos < example.features().end();
+         ++pos, feature_idx++) {
+        const auto &tensor = example.features()[feature_idx];
+        const auto &dense_tsr = static_cast<const mlio::Dense_tensor &>(*tensor);
         auto cells = dense_tsr.data().as<std::string>();
 
-        column_analysis &stats = (*columns_)[feature_idx];
+        Column_analysis &stats = (*columns_)[feature_idx];
 
         // Used to update the mean.
         // We do this here to aggregate several entries together and avoid
@@ -51,7 +52,7 @@ void column_analyzer::analyze(const mlio::example &exm) const
         std::size_t numeric_column_count = 0.0;
 
         for (const std::string &cell : cells) {
-            // Capture the first example.
+            // Capture the first Example.
             if (stats.rows_seen == 0) {
                 stats.example_value = cell;
             }
@@ -86,7 +87,7 @@ void column_analyzer::analyze(const mlio::example &exm) const
 
             // Numeric analyzers
             double as_float{};
-            if (mlio::try_parse_float(cell, as_float) != mlio::parse_result::ok) {
+            if (mlio::try_parse_float(cell, as_float) != mlio::Parse_result::ok) {
                 stats.numeric_nan_count++;
             }
             else {

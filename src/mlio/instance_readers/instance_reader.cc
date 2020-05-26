@@ -26,32 +26,32 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-instance_reader::~instance_reader() = default;
+Instance_reader::~Instance_reader() = default;
 
-std::unique_ptr<instance_reader>
-make_instance_reader(const data_reader_params &prm, record_reader_factory &&fct)
+std::unique_ptr<Instance_reader>
+make_instance_reader(const Data_reader_params &params, Record_reader_factory &&factory)
 {
-    std::unique_ptr<instance_reader> rdr{};
+    std::unique_ptr<Instance_reader> reader{};
 
-    rdr = std::make_unique<core_instance_reader>(prm, std::move(fct));
+    reader = std::make_unique<Core_instance_reader>(params, std::move(factory));
 
-    if (prm.num_instances_to_skip > 0 || prm.num_instances_to_read) {
-        rdr = std::make_unique<ranged_instance_reader>(prm, std::move(rdr));
+    if (params.num_instances_to_skip > 0 || params.num_instances_to_read) {
+        reader = std::make_unique<Ranged_instance_reader>(params, std::move(reader));
     }
 
-    if (prm.num_shards > 1) {
-        rdr = std::make_unique<sharded_instance_reader>(prm, std::move(rdr));
+    if (params.num_shards > 1) {
+        reader = std::make_unique<Sharded_instance_reader>(params, std::move(reader));
     }
 
-    if (prm.sample_ratio) {
-        rdr = std::make_unique<sampled_instance_reader>(prm, std::move(rdr));
+    if (params.sample_ratio) {
+        reader = std::make_unique<Sampled_instance_reader>(params, std::move(reader));
     }
 
-    if (prm.shuffle_instances) {
-        rdr = std::make_unique<shuffled_instance_reader>(prm, std::move(rdr));
+    if (params.shuffle_instances) {
+        reader = std::make_unique<Shuffled_instance_reader>(params, std::move(reader));
     }
 
-    return rdr;
+    return reader;
 }
 
 }  // namespace detail

@@ -35,32 +35,31 @@ inline namespace abi_v1 {
 
 namespace detail {
 
-/// Represents a @ref record_reader for reading Parquet records.
-class MLIO_API parquet_record_reader final : public stream_record_reader {
-private:
-    static constexpr std::size_t magic_number_size_ = sizeof(std::uint32_t);
-
+/// Represents a @ref Record_reader for reading Parquet records.
+class MLIO_API Parquet_record_reader final : public Stream_record_reader {
 public:
-    explicit parquet_record_reader(intrusive_ptr<input_stream> strm)
-        : stream_record_reader{std::move(strm)}
+    explicit Parquet_record_reader(Intrusive_ptr<Input_stream> stream)
+        : Stream_record_reader{std::move(stream)}
     {}
 
 private:
-    MLIO_HIDDEN
-    std::optional<record> decode_record(memory_slice &chunk, bool ignore_leftover) final;
+    static constexpr std::size_t magic_number_size_ = sizeof(std::uint32_t);
 
     MLIO_HIDDEN
-    static bool is_magic_number(memory_block::iterator pos) noexcept;
+    std::optional<Record> decode_record(Memory_slice &chunk, bool ignore_leftover) final;
 
     MLIO_HIDDEN
-    static bool is_footer(const memory_slice &chunk, memory_block::iterator pos) noexcept;
+    static bool is_magic_number(Memory_block::iterator pos) noexcept;
 
     MLIO_HIDDEN
-    static bool is_file_metadata_begin(memory_block::iterator pos) noexcept;
+    static bool is_footer(const Memory_slice &chunk, Memory_block::iterator pos) noexcept;
+
+    MLIO_HIDDEN
+    static bool is_file_metadata_begin(Memory_block::iterator pos) noexcept;
 
     template<typename T>
     MLIO_HIDDEN
-    static T as(memory_block::iterator pos) noexcept;
+    static T as(Memory_block::iterator pos) noexcept;
 };
 
 }  // namespace detail

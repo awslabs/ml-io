@@ -26,9 +26,9 @@ struct DLManagedTensor;
 namespace mlio {
 inline namespace abi_v1 {
 
-/// Wraps the specified @ref tensor as a DLManagedTensor.
+/// Wraps the specified @ref Tensor as a DLManagedTensor.
 MLIO_API
-::DLManagedTensor *as_dlpack(tensor &tsr, std::size_t version = 020);
+::DLManagedTensor *as_dlpack(Tensor &tensor, std::size_t version = 020);
 
 }  // namespace abi_v1
 }  // namespace mlio

@@ -25,6 +25,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 
 #include "mlio/cpu_array.h"
+#include "mlio/data_reader_error.h"
 #include "mlio/data_stores/data_store.h"
 #include "mlio/data_type.h"
 #include "mlio/instance.h"
@@ -39,8 +40,8 @@
 namespace mlio {
 inline namespace abi_v1 {
 
-image_reader::image_reader(data_reader_params prm, image_reader_params img_prm)
-    : parallel_data_reader{std::move(prm)}, params_{std::move(img_prm)}
+Image_reader::Image_reader(Data_reader_params params, Image_reader_params img_params)
+    : Parallel_data_reader{std::move(params)}, params_{std::move(img_params)}
 {
     if (params_.image_dimensions.size() != image_dimensions_size_) {
         throw std::invalid_argument{
@@ -49,120 +50,120 @@ image_reader::image_reader(data_reader_params prm, image_reader_params img_prm)
 
     std::copy(params_.image_dimensions.begin(), params_.image_dimensions.end(), img_dims_.begin());
 
-    error_bad_example_ = params().bad_example_hnd == bad_example_handling::error;
+    error_bad_example_ = this->params().bad_example_handling == Bad_example_handling::error;
 }
 
-image_reader::~image_reader()
+Image_reader::~Image_reader()
 {
     stop();
 }
 
-intrusive_ptr<record_reader> image_reader::make_record_reader(const data_store &ds)
+Intrusive_ptr<Record_reader> Image_reader::make_record_reader(const Data_store &store)
 {
-    switch (params_.img_frame) {
-    case image_frame::none:
+    switch (params_.image_frame) {
+    case Image_frame::none:
         return nullptr;
-    case image_frame::recordio:
-        return make_intrusive<detail::recordio_record_reader>(ds.open_read());
+    case Image_frame::recordio:
+        return make_intrusive<detail::Recordio_record_reader>(store.open_read());
     }
 
     throw std::invalid_argument{"The specified image frame is invalid."};
 }
 
-intrusive_ptr<schema const> image_reader::infer_schema(std::optional<instance> const &)
+Intrusive_ptr<const Schema> Image_reader::infer_schema(const std::optional<Instance> &)
 {
-    std::vector<attribute> attrs{};
+    std::vector<Attribute> attrs{};
     // The schema follows the NHWC convention.
     attrs.emplace_back("value",
-                       data_type::uint8,
-                       size_vector{params().batch_size,
+                       Data_type::uint8,
+                       Size_vector{params().batch_size,
                                    params_.image_dimensions[1],
                                    params_.image_dimensions[2],
                                    params_.image_dimensions[0]});
 
-    return make_intrusive<schema>(std::move(attrs));
+    return make_intrusive<Schema>(std::move(attrs));
 }
 
-intrusive_ptr<example> image_reader::decode(const instance_batch &batch) const
+Intrusive_ptr<Example> Image_reader::decode(const Instance_batch &batch) const
 {
     // The stride of the batch dimension corresponds to the byte size
-    // of the images.
-    auto batch_stride = as_size(get_schema()->attributes()[0].strides()[0]);
+    // of the images contained in the example.
+    auto batch_stride = as_size(schema()->attributes()[0].strides()[0]);
 
-    auto tsr = make_tensor(batch.size(), batch_stride);
+    auto tensor = make_tensor(batch.size(), batch_stride);
 
-    auto bits = tsr->data().as<std::uint8_t>();
+    auto bits = tensor->data().as<std::uint8_t>();
 
     std::size_t num_instances_read = 0;
 
-    for (const instance &ins : batch.instances()) {
-        if (decode_core(bits, ins)) {
+    for (const Instance &instance : batch.instances()) {
+        if (decode_core(bits, instance)) {
             bits = bits.subspan(batch_stride);
 
             num_instances_read++;
         }
         else {
-            // If the user requested to skip the batch in case of an
+            // If the user requested to skip the example in case of an
             // error, shortcut the loop and return immediately.
-            if (params().bad_example_hnd == bad_example_handling::skip) {
+            if (params().bad_example_handling == Bad_example_handling::skip) {
                 return {};
             }
-            if (params().bad_example_hnd == bad_example_handling::skip_warn) {
+            if (params().bad_example_handling == Bad_example_handling::skip_warn) {
                 logger::warn(
                     "The example #{0:n} has been skipped as it had at least one bad instance.",
                     batch.index());
 
                 return {};
             }
-            if (params().bad_example_hnd != bad_example_handling::pad &&
-                params().bad_example_hnd != bad_example_handling::pad_warn) {
-                throw std::invalid_argument{"The specified bad batch handling is invalid."};
+            if (params().bad_example_handling != Bad_example_handling::pad &&
+                params().bad_example_handling != Bad_example_handling::pad_warn) {
+                throw std::invalid_argument{"The specified bad example handling is invalid."};
             }
         }
     }
 
     if (batch.instances().size() != num_instances_read) {
-        if (params().bad_example_hnd == bad_example_handling::pad_warn) {
+        if (params().bad_example_handling == Bad_example_handling::pad_warn) {
             logger::warn("The example #{0:n} has been padded as it had {1:n} bad instance(s).",
                          batch.index(),
                          batch.instances().size() - num_instances_read);
         }
     }
 
-    std::vector<intrusive_ptr<tensor>> tensors{};
-    tensors.emplace_back(std::move(tsr));
+    std::vector<Intrusive_ptr<Tensor>> tensors{};
+    tensors.emplace_back(std::move(tensor));
 
-    auto exm = make_intrusive<example>(get_schema(), std::move(tensors));
+    auto example = make_intrusive<Example>(schema(), std::move(tensors));
 
-    exm->padding = batch.size() - num_instances_read;
+    example->padding = batch.size() - num_instances_read;
 
-    return exm;
+    return example;
 }
 
-intrusive_ptr<dense_tensor>
-image_reader::make_tensor(std::size_t batch_size, std::size_t batch_stride) const
+Intrusive_ptr<Dense_tensor>
+Image_reader::make_tensor(std::size_t batch_size, std::size_t batch_stride) const
 {
-    size_vector shp{batch_size,
-                    params_.image_dimensions[1],
-                    params_.image_dimensions[2],
-                    params_.image_dimensions[0]};
+    Size_vector shape{batch_size,
+                      params_.image_dimensions[1],
+                      params_.image_dimensions[2],
+                      params_.image_dimensions[0]};
 
-    auto arr = make_cpu_array(data_type::uint8, batch_size * batch_stride);
+    auto arr = make_cpu_array(Data_type::uint8, batch_size * batch_stride);
 
-    return make_intrusive<dense_tensor>(std::move(shp), std::move(arr));
+    return make_intrusive<Dense_tensor>(std::move(shape), std::move(arr));
 }
 
-bool image_reader::decode_core(stdx::span<std::uint8_t> out, const instance &ins) const
+bool Image_reader::decode_core(stdx::span<std::uint8_t> out, const Instance &instance) const
 {
-    memory_slice img_buf{};
-    if (params_.img_frame == image_frame::recordio) {
+    Memory_slice img_buf{};
+    if (params_.image_frame == Image_frame::recordio) {
         // Skip the 24-byte header defined in image_recordio.h in the
         // MXNet GitHub repository. This header contains metadata and
-        // is not relevant.
-        img_buf = ins.bits().subslice(recordio_image_header_offset_);
+        // is not relevant in our implementation.
+        img_buf = instance.bits().subslice(recordio_image_header_offset_);
     }
     else {
-        img_buf = ins.bits();
+        img_buf = instance.bits();
     }
 
     cv::Mat mat{1,
@@ -193,13 +194,13 @@ bool image_reader::decode_core(stdx::span<std::uint8_t> out, const instance &ins
             img_dims_[0])};
     }
 
-    cv::Mat tmp = decode_image(mat, mode, ins);
+    cv::Mat tmp = decode_image(mat, mode, instance);
     if (tmp.empty()) {
         return false;
     }
 
     if (params_.resize) {
-        if (!resize(tmp, tmp, ins)) {
+        if (!resize(tmp, tmp, instance)) {
             return false;
         }
     }
@@ -212,8 +213,8 @@ bool image_reader::decode_core(stdx::span<std::uint8_t> out, const instance &ins
             if (warn_bad_instances() || error_bad_example_) {
                 auto msg = fmt::format(
                     "The BGR2RGB operation failed for the image #{1:n} in the data store '{0}' with the following exception: {2}",
-                    ins.get_data_store().id(),
-                    ins.index(),
+                    instance.data_store().id(),
+                    instance.index(),
                     e.what());
 
                 if (warn_bad_instances()) {
@@ -221,7 +222,7 @@ bool image_reader::decode_core(stdx::span<std::uint8_t> out, const instance &ins
                 }
 
                 if (error_bad_example_) {
-                    throw std::runtime_error{msg};
+                    throw Invalid_instance_error{msg};
                 }
             }
 
@@ -231,10 +232,10 @@ bool image_reader::decode_core(stdx::span<std::uint8_t> out, const instance &ins
 
     cv::Mat dst{img_dims_[1], img_dims_[2], type, out.data()};
 
-    return crop(tmp, dst, ins);
+    return crop(tmp, dst, instance);
 }
 
-cv::Mat image_reader::decode_image(const cv::Mat &buf, int mode, const instance &ins) const
+cv::Mat Image_reader::decode_image(const cv::Mat &buf, int mode, const Instance &instance) const
 {
     cv::Mat decoded_img{};
     try {
@@ -244,8 +245,8 @@ cv::Mat image_reader::decode_image(const cv::Mat &buf, int mode, const instance 
         if (warn_bad_instances() || error_bad_example_) {
             auto msg = fmt::format(
                 "The image decode operation failed for the image #{1:n} in the data store '{0}' with the following exception: {2}",
-                ins.get_data_store().id(),
-                ins.index(),
+                instance.data_store().id(),
+                instance.index(),
                 e.what());
 
             if (warn_bad_instances()) {
@@ -253,7 +254,7 @@ cv::Mat image_reader::decode_image(const cv::Mat &buf, int mode, const instance 
             }
 
             if (error_bad_example_) {
-                throw std::runtime_error{msg};
+                throw Invalid_instance_error{msg};
             }
         }
 
@@ -264,15 +265,15 @@ cv::Mat image_reader::decode_image(const cv::Mat &buf, int mode, const instance 
         if (warn_bad_instances() || error_bad_example_) {
             auto msg = fmt::format(
                 "The image decode operation failed for the image #{1:n} in the data store '{0}'.",
-                ins.get_data_store().id(),
-                ins.index());
+                instance.data_store().id(),
+                instance.index());
 
             if (warn_bad_instances()) {
                 logger::warn(msg);
             }
 
             if (error_bad_example_) {
-                throw std::runtime_error{msg};
+                throw Invalid_instance_error{msg};
             }
         }
 
@@ -281,16 +282,16 @@ cv::Mat image_reader::decode_image(const cv::Mat &buf, int mode, const instance 
 
     if (mode == cv::ImreadModes::IMREAD_UNCHANGED && decoded_img.channels() != 4) {
         throw std::invalid_argument{fmt::format(
-            "The image #{1:n} in the data store '{0}' is expected to have 4 channels. However it contains {2:n} channels.",
-            ins.get_data_store().id(),
-            ins.index(),
+            "The image #{1:n} in the data store '{0}' contains {2:n} channels while it is expected to contain 4 channels.",
+            instance.data_store().id(),
+            instance.index(),
             decoded_img.channels())};
     }
 
     return decoded_img;
 }
 
-bool image_reader::resize(cv::Mat &src, cv::Mat &dst, const instance &ins) const
+bool Image_reader::resize(cv::Mat &src, cv::Mat &dst, const Instance &instance) const
 {
     int new_cols{};
     int new_rows{};
@@ -313,8 +314,8 @@ bool image_reader::resize(cv::Mat &src, cv::Mat &dst, const instance &ins) const
         if (warn_bad_instances() || error_bad_example_) {
             auto msg = fmt::format(
                 "The image resize operation failed for the image #{2:n} in the data store '{0}' with the following exception: {2}",
-                ins.get_data_store().id(),
-                ins.index(),
+                instance.data_store().id(),
+                instance.index(),
                 e.what());
 
             if (warn_bad_instances()) {
@@ -322,7 +323,7 @@ bool image_reader::resize(cv::Mat &src, cv::Mat &dst, const instance &ins) const
             }
 
             if (error_bad_example_) {
-                throw std::runtime_error{msg};
+                throw Invalid_instance_error{msg};
             }
         }
 
@@ -332,14 +333,14 @@ bool image_reader::resize(cv::Mat &src, cv::Mat &dst, const instance &ins) const
     return true;
 }
 
-bool image_reader::crop(cv::Mat &src, cv::Mat &dst, const instance &ins) const
+bool Image_reader::crop(cv::Mat &src, cv::Mat &dst, const Instance &instance) const
 {
     if (src.rows < img_dims_[1] || src.cols < img_dims_[2]) {
         if (warn_bad_instances() || error_bad_example_) {
             auto msg = fmt::format(
                 "The input image dimensions (rows: {2:n}, cols: {3:n}) are smaller than the output image dimensions (rows: {4:n}, cols: {5:n}) for the image #{1:n} in the data store '{0}'.",
-                ins.get_data_store().id(),
-                ins.index(),
+                instance.data_store().id(),
+                instance.index(),
                 src.rows,
                 src.cols,
                 img_dims_[1],
@@ -369,8 +370,8 @@ bool image_reader::crop(cv::Mat &src, cv::Mat &dst, const instance &ins) const
         if (warn_bad_instances() || error_bad_example_) {
             auto msg = fmt::format(
                 "The image crop operation failed for the image #{1:n} in the data store '{0}' with the following exception: {2}",
-                ins.get_data_store().id(),
-                ins.index(),
+                instance.data_store().id(),
+                instance.index(),
                 e.what());
 
             if (warn_bad_instances()) {
@@ -378,7 +379,7 @@ bool image_reader::crop(cv::Mat &src, cv::Mat &dst, const instance &ins) const
             }
 
             if (error_bad_example_) {
-                throw std::runtime_error{msg};
+                throw Invalid_instance_error{msg};
             }
         }
 
@@ -393,8 +394,8 @@ bool image_reader::crop(cv::Mat &src, cv::Mat &dst, const instance &ins) const
 
 #else
 
-#include "mlio/not_supported_error.h"
-#include "mlio/record_readers/record_reader.h"
+#include "mlio/Not_supported_error.h"
+#include "mlio/record_readers/Record_reader.h"
 
 namespace cv {
 
@@ -409,25 +410,25 @@ inline namespace abi_v1 {
 #pragma GCC diagnostic ignored "-Wmissing-noreturn"
 
 // NOLINTNEXTLINE(performance-unnecessary-value-param)
-image_reader::image_reader(data_reader_params prm, image_reader_params)
-    : parallel_data_reader{std::move(prm)}, params_{}, error_bad_example_{}
+Image_reader::Image_reader(Data_reader_params params, Image_reader_params)
+    : Parallel_data_reader{std::move(params)}, params_{}, error_bad_example_{}
 {
-    throw not_supported_error{"MLIO was not built with image reader support."};
+    throw Not_supported_error{"MLIO was not built with image reader support."};
 }
 
-image_reader::~image_reader() = default;
+Image_reader::~Image_reader() = default;
 
-intrusive_ptr<record_reader> image_reader::make_record_reader(const data_store &)
-{
-    return nullptr;
-}
-
-intrusive_ptr<schema const> image_reader::infer_schema(std::optional<instance> const &)
+Intrusive_ptr<Record_reader> Image_reader::make_record_reader(const Data_store &)
 {
     return nullptr;
 }
 
-intrusive_ptr<example> image_reader::decode(const instance_batch &) const
+Intrusive_ptr<const Schema> Image_reader::infer_schema(const std::optional<Instance> &)
+{
+    return nullptr;
+}
+
+Intrusive_ptr<Example> Image_reader::decode(const Instance_batch &) const
 {
     return nullptr;
 }

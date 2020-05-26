@@ -1,6 +1,6 @@
 /*
    xxHash - Extremely Fast Hash algorithm
-   Development source file for `xxh3`
+   Development source File for `xxh3`
    Copyright (C) 2019-present, Yann Collet.
 
    BSD 2-Clause License (http://www.opensource.org/licenses/bsd-license.php)
@@ -303,7 +303,7 @@ static const xxh_u8 kSecret[XXH_SECRET_DEFAULT_SIZE] = {
  * slows it down because instead of free register swap shifts, it
  * must use pshufd and punpckl/hd.
  *
- * To prevent this, we use this attribute to shut off SSE.
+ * To prevent this, we use this Attribute to shut off SSE.
  */
 #if defined(__GNUC__) && !defined(__clang__) && defined(__i386__)
 __attribute__((__target__("no-sse")))
@@ -411,7 +411,7 @@ XXH_mult64to128(xxh_u64 lhs, xxh_u64 rhs)
 }
 
 /*
- * We want to keep the attribute here because a target switch
+ * We want to keep the Attribute here because a target switch
  * disables inlining.
  *
  * Does a 64-bit to 128-bit multiply, then XOR folds it.

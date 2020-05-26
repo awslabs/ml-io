@@ -129,7 +129,7 @@ dataset = mlio.list_files(file_dir, pattern='*.jpg')
 data_reader_params = mlio.DataReaderParams(dataset=dataset, batch_size=200)
 
 # Setting ImageReader parameters.
-image_reader_prm = mlio.ImageReaderParams(img_frame=mlio.ImageFrame.NONE,
+image_reader_prm = mlio.ImageReaderParams(image_frame=mlio.ImageFrame.NONE,
                                           resize=500,
                                           image_dimensions=[3,166,190],
                                           to_rgb=1)

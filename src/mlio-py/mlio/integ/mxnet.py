@@ -18,6 +18,6 @@ from mlio.integ.dlpack import as_dlpack
 
 def as_mxnet(tensor):
     """
-    Wraps the specified tensor as an MXNet ``ndarray``.
+    Wraps the specified Tensor as an MXNet ``ndarray``.
     """
     return mx.ndarray.from_dlpack(as_dlpack(tensor))

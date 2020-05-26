@@ -26,18 +26,16 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-class recordio_header {
+class Recordio_header {
 public:
     static constexpr std::size_t alignment = sizeof(std::uint32_t);
 
-public:
-    explicit recordio_header(std::uint32_t data) noexcept : data_{data}
+    explicit Recordio_header(std::uint32_t data) noexcept : data_{data}
     {}
 
-public:
-    record_kind get_record_kind() const noexcept
+    Record_kind record_kind() const noexcept
     {
-        return static_cast<record_kind>((data_ >> 29U) & 7U);
+        return static_cast<Record_kind>((data_ >> 29U) & 7U);
     }
 
     std::size_t payload_size() const noexcept
@@ -56,7 +54,7 @@ private:
     std::uint32_t data_;
 };
 
-std::optional<recordio_header> decode_recordio_header(memory_span bits);
+std::optional<Recordio_header> decode_recordio_header(Memory_span bits);
 
 }  // namespace detail
 }  // namespace abi_v1

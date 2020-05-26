@@ -26,33 +26,24 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-class MLIO_API file_descriptor {
-private:
-    static constexpr int invalid_fd_ = -1;
-
+class MLIO_API File_descriptor {
 public:
-    file_descriptor() noexcept = default;
+    File_descriptor() noexcept = default;
 
     // NOLINTNEXTLINE(google-explicit-constructor)
-    file_descriptor(int fd) noexcept : fd_{fd}
+    File_descriptor(int fd) noexcept : fd_{fd}
     {}
 
-    file_descriptor(const file_descriptor &other) = delete;
+    File_descriptor(const File_descriptor &other) = delete;
 
-    file_descriptor(file_descriptor &&other) noexcept : fd_{other.fd_}
+    File_descriptor &operator=(const File_descriptor &other) = delete;
+
+    File_descriptor(File_descriptor &&other) noexcept : fd_{other.fd_}
     {
         other.fd_ = invalid_fd_;
     }
 
-    ~file_descriptor()
-    {
-        close_fd();
-    }
-
-public:
-    file_descriptor &operator=(const file_descriptor &other) = delete;
-
-    file_descriptor &operator=(file_descriptor &&other) noexcept
+    File_descriptor &operator=(File_descriptor &&other) noexcept
     {
         close_fd();
 
@@ -61,7 +52,11 @@ public:
         return *this;
     }
 
-public:
+    ~File_descriptor()
+    {
+        close_fd();
+    }
+
     int get() const noexcept
     {
         return fd_;
@@ -84,18 +79,19 @@ private:
         fd_ = invalid_fd_;
     }
 
-private:
+    static constexpr int invalid_fd_ = -1;
+
     int fd_ = invalid_fd_;
 };
 
 MLIO_API
-inline bool operator==(const file_descriptor &lhs, const file_descriptor &rhs) noexcept
+inline bool operator==(const File_descriptor &lhs, const File_descriptor &rhs) noexcept
 {
     return lhs.get() == rhs.get();
 }
 
 MLIO_API
-inline bool operator!=(const file_descriptor &lhs, const file_descriptor &rhs) noexcept
+inline bool operator!=(const File_descriptor &lhs, const File_descriptor &rhs) noexcept
 {
     return lhs.get() != rhs.get();
 }
@@ -107,8 +103,8 @@ inline bool operator!=(const file_descriptor &lhs, const file_descriptor &rhs) n
 namespace std {
 
 template<>
-struct MLIO_API hash<mlio::detail::file_descriptor> {
-    inline size_t operator()(const mlio::detail::file_descriptor &desc) const noexcept
+struct MLIO_API hash<mlio::detail::File_descriptor> {
+    inline size_t operator()(const mlio::detail::File_descriptor &desc) const noexcept
     {
         return hash<int>{}(desc.get());
     }

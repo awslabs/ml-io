@@ -33,59 +33,59 @@ inline namespace abi_v1 {
 /// @addtogroup data_readers Data Readers
 /// @{
 
-/// Specifies how the last @ref example read from a dataset should to be
+/// Specifies how the last @ref Example read from a dataset should to be
 /// handled if the dataset size is not evenly divisible by the batch
 /// size.
-enum class last_example_handling {
-    /// Return an @ref example where the size of the batch dimension is
+enum class Last_example_handling {
+    /// Return an @ref Example where the size of the batch dimension is
     /// less than the requested batch size.
     none,
-    /// Drop the last @ref example.
+    /// Drop the last @ref Example.
     drop,
-    /// Drop the last @ref example and warn.
+    /// Drop the last @ref Example and warn.
     drop_warn,
     /// Pad the feature tensors with zero so that the size of the batch
     /// dimension equals the requested batch size.
     ///
     /// @remark
-    ///     The @ref example::padding field will indicate how much
-    ///     padding was applied to the @ref example.
+    ///     The @ref Example::padding field will indicate how much
+    ///     padding was applied to the @ref Example.
     pad,
     /// Pad the feature tensors with zero so that the size of the batch
     /// dimension equals the requested batch size and warn.
     ///
     /// @remark
-    ///     The @ref example::padding field will indicate how much
-    ///     padding was applied to the @ref example.
+    ///     The @ref Example::padding field will indicate how much
+    ///     padding was applied to the @ref Example.
     pad_warn
 };
 
-/// Specifies how an example that contains erroneous data should be
+/// Specifies how an Example that contains erroneous data should be
 /// handled.
-enum class bad_example_handling {
+enum class Bad_example_handling {
     /// Throw exception.
     error,
-    /// Skip the @ref example.
+    /// Skip the @ref Example.
     skip,
-    /// Skip the @ref example and warn.
+    /// Skip the @ref Example and warn.
     skip_warn,
-    /// Skip bad instances, pad the @ref example to the batch size.
+    /// Skip bad instances, pad the @ref Example to the batch size.
     pad,
-    /// Skip bad instances, pad the @ref example to the batch size, and
+    /// Skip bad instances, pad the @ref Example to the batch size, and
     /// warn.
     pad_warn
 };
 
-/// Contains the parameters that are common to all @ref data_reader
+/// Contains the parameters that are common to all @ref Data_reader
 /// "data readers".
-struct MLIO_API data_reader_params {
-    /// A list of @ref data_store instances that together form the
+struct MLIO_API Data_reader_params {
+    /// A list of @ref Data_store instances that together form the
     /// dataset to read from.
-    std::vector<intrusive_ptr<data_store>> dataset{};
-    /// A number indicating how many @ref instance "data instances"
-    /// should be packed into a single @ref example.
+    std::vector<Intrusive_ptr<Data_store>> dataset{};
+    /// A number indicating how many @ref Instance "data instances"
+    /// should be packed into a single @ref Example.
     std::size_t batch_size{};
-    /// The number of @ref example "examples" to prefetch in background
+    /// The number of @ref Example "examples" to prefetch in background
     /// to accelerate reading. If zero, defaults to the number of
     /// processor cores.
     std::size_t num_prefetched_examples{};
@@ -94,17 +94,17 @@ struct MLIO_API data_reader_params {
     /// should be prefetched, this parameter can be used to avoid
     /// thread oversubscription.
     std::size_t num_parallel_reads{};
-    /// See @ref last_example_handling.
-    last_example_handling last_example_hnd = last_example_handling::none;
-    /// See @ref bad_example_handling.
-    bad_example_handling bad_example_hnd = bad_example_handling::error;
+    /// See @ref Last_example_handling.
+    Last_example_handling last_example_handling = Last_example_handling::none;
+    /// See @ref Bad_example_handling.
+    Bad_example_handling bad_example_handling = Bad_example_handling::error;
     /// A boolean value indicating whether a warning will be output for
-    /// each bad instance.
-    bool warn_bad_instances = true;
-    /// The number of @ref instance "data instances" to skip from the
+    /// each bad Instance.
+    bool warn_bad_instances = false;
+    /// The number of @ref Instance "data instances" to skip from the
     /// beginning of the dataset.
     std::size_t num_instances_to_skip{};
-    /// The number of @ref instance "data instances" to read. The rest
+    /// The number of @ref Instance "data instances" to read. The rest
     /// of the dataset will be ignored.
     std::optional<std::size_t> num_instances_to_read{};
     /// The index of the shard to read.
@@ -116,10 +116,10 @@ struct MLIO_API data_reader_params {
     /// should be read. The dataset will be sampled based on this
     /// number.
     std::optional<float> sample_ratio{};
-    /// A boolean value indicating whether to shuffle the @ref instance
+    /// A boolean value indicating whether to shuffle the @ref Instance
     /// "data instances" while reading from the dataset.
     bool shuffle_instances = false;
-    /// The number of @ref instance "data instances" to buffer and
+    /// The number of @ref Instance "data instances" to buffer and
     /// sample from. The selected data instances will be replaced with
     /// new data instances read from the dataset.
     ///
@@ -131,53 +131,50 @@ struct MLIO_API data_reader_params {
     /// internally
     std::optional<std::uint_fast64_t> shuffle_seed{};
     /// A boolean value indicating whether the dataset should be
-    /// reshuffled after every @ref data_reader::reset() call.
+    /// reshuffled after every @ref Data_reader::reset() call.
     bool reshuffle_each_epoch = true;
 };
 
-/// Represents an interface for classes that read @ref example "examples"
+/// Represents an interface for classes that read @ref Example "examples"
 /// from a dataset in a particular data format.
-class MLIO_API data_reader : public intrusive_ref_counter<data_reader> {
+class MLIO_API Data_reader : public Intrusive_ref_counter<Data_reader> {
 public:
-    data_reader() noexcept = default;
+    Data_reader() noexcept = default;
 
-    data_reader(const data_reader &) = delete;
+    Data_reader(const Data_reader &) = delete;
 
-    data_reader(data_reader &&) = delete;
+    Data_reader &operator=(const Data_reader &) = delete;
 
-    virtual ~data_reader();
+    Data_reader(Data_reader &&) = delete;
 
-public:
-    data_reader &operator=(const data_reader &) = delete;
+    Data_reader &operator=(Data_reader &&) = delete;
 
-    data_reader &operator=(data_reader &&) = delete;
+    virtual ~Data_reader();
 
-public:
-    /// Returns the @ref schema of the dataset.
-    virtual intrusive_ptr<schema const> read_schema() = 0;
+    /// Returns the @ref Schema of the dataset.
+    virtual Intrusive_ptr<const Schema> read_schema() = 0;
 
-    /// Returns the next @ref example read from the dataset.
+    /// Returns the next @ref Example read from the dataset.
     ///
     /// @remark
     ///     If the end of the dataset is reached, returns an
     ///     @c std::nullptr.
-    virtual intrusive_ptr<example> read_example() = 0;
+    virtual Intrusive_ptr<Example> read_example() = 0;
 
-    /// Returns the next @ref example read from the dataset without
+    /// Returns the next @ref Example read from the dataset without
     /// consuming it.
-    virtual intrusive_ptr<example> peek_example() = 0;
+    virtual Intrusive_ptr<Example> peek_example() = 0;
 
     /// Resets the state of the reader. Calling @ref read_example()
     /// the next time will start reading from the beginning of the
     /// dataset.
     virtual void reset() noexcept = 0;
 
-public:
     /// Gets the number of bytes read from the dataset.
     ///
     /// @remark
     ///     The returned number won't include the size of the discarded
-    ///     parts of the dataset such as record headers.
+    ///     parts of the dataset such as Record headers.
     ///
     /// @remark
     ///     The returned number can be greater than expected as MLIO

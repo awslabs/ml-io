@@ -26,59 +26,57 @@ inline namespace abi_v1 {
 /// @addtogroup records Records
 /// @{
 
-enum class record_kind {
-    /// The record contains a whole data instance.
+enum class Record_kind {
+    /// The Record contains a whole data Instance.
     complete,
-    /// The record contains the beginning of a data instance.
+    /// The Record contains the beginning of a data Instance.
     begin,
-    /// The record contains a mid-section of a data instance.
+    /// The Record contains a mid-section of a data Instance.
     middle,
-    /// The record contains the end of a data instance.
+    /// The Record contains the end of a data Instance.
     end
 };
 
-/// Represents an encoded record read from a dataset.
+/// Represents an encoded Record read from a dataset.
 ///
 /// @remark
-///     Note that for some data formats such as RecordIO a data instance
+///     Note that for some data formats such as RecordIO a data Instance
 ///     can be split into multiple records; meaning a one-to-one mapping
 ///     between records and data instances is not always true.
-class MLIO_API record {
+class MLIO_API Record {
 public:
-    explicit record(memory_slice payload, record_kind knd = {}) noexcept
-        : payload_{std::move(payload)}, kind_{knd}
+    explicit Record(Memory_slice payload, Record_kind kind = {}) noexcept
+        : payload_{std::move(payload)}, kind_{kind}
     {}
 
-    record(const record &) noexcept = default;
+    Record(const Record &) noexcept = default;
 
-    record(record &&) noexcept = default;
+    Record &operator=(const Record &) noexcept = default;
 
-    ~record() = default;
+    Record(Record &&) noexcept = default;
 
-public:
-    record &operator=(const record &) noexcept = default;
+    Record &operator=(Record &&) noexcept = default;
 
-    record &operator=(record &&) noexcept = default;
+    ~Record() = default;
 
-public:
-    const memory_slice &payload() const &noexcept
+    const Memory_slice &payload() const &noexcept
     {
         return payload_;
     }
 
-    memory_slice &&payload() &&noexcept
+    Memory_slice &&payload() && noexcept
     {
         return std::move(payload_);
     }
 
-    record_kind kind() const noexcept
+    Record_kind kind() const noexcept
     {
         return kind_;
     }
 
 private:
-    memory_slice payload_;
-    record_kind kind_;
+    Memory_slice payload_;
+    Record_kind kind_;
 };
 
 /// @}

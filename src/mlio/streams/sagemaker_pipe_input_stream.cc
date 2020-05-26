@@ -30,139 +30,41 @@
 #include <fmt/format.h>
 
 #include "mlio/detail/error.h"
-#include "mlio/detail/pathname.h"
+#include "mlio/detail/path.h"
 #include "mlio/detail/system_call.h"
 #include "mlio/logger.h"
 #include "mlio/streams/stream_error.h"
 #include "mlio/util/cast.h"
 
 using mlio::detail::current_error_code;
-using mlio::detail::sagemaker_pipe_input_stream_access;
+using mlio::detail::Sagemaker_pipe_input_stream_access;
 
 namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
-
-struct sagemaker_pipe_input_stream_access {
-    static inline intrusive_ptr<sagemaker_pipe_input_stream>
-    make(std::string &&pathname, std::chrono::seconds timeout, std::optional<std::size_t> fifo_id)
-    {
-        auto *ptr = new sagemaker_pipe_input_stream{std::move(pathname), timeout, fifo_id};
-
-        auto strm = wrap_intrusive(ptr);
-
-        strm->open_fifo();
-
-        return strm;
-    }
-};
-
 namespace {
 
-// For each SageMaker pipe channel that is opened by this process, this
-// container holds the pathname-to-FIFO mapping. If a new
-// sagemaker_pipe_input_stream is instantiated, it replaces the FIFO ID
-// with -1 indicating that it acquired that pipe channel. Right before
-// getting destructed, the stream increments the original FIFO ID and
-// puts it back to the container.
+// For each SageMaker pipe channel that gets opened in this process,
+// this container holds the path-to-FIFO mapping. If a new stream is
+// instantiated, it replaces the FIFO ID with -1 indicating that it
+// acquired the channel. Right before getting destructed, the stream
+// increments the original FIFO ID and puts it back to the container.
 std::unordered_map<std::string, std::atomic_ptrdiff_t> fifo_ids_{};
 
 }  // namespace
 }  // namespace detail
 
-intrusive_ptr<sagemaker_pipe_input_stream>
-make_sagemaker_pipe_input_stream(std::string pathname,
-                                 std::chrono::seconds timeout,
-                                 std::optional<std::size_t> fifo_id)
-{
-    return sagemaker_pipe_input_stream_access::make(std::move(pathname), timeout, fifo_id);
-}
 
-sagemaker_pipe_input_stream::sagemaker_pipe_input_stream(std::string &&pathname,
-                                                         std::chrono::seconds timeout,
-                                                         std::optional<std::size_t> fifo_id)
-    : pathname_{std::move(pathname)}, timeout_{timeout}
-{
-    detail::validate_file_pathname(pathname_);
-
-    fifo_id_ = detail::fifo_ids_[pathname_].exchange(-1);
-    if (fifo_id_ == -1) {
-        auto err = std::make_error_code(std::errc::permission_denied);
-        throw std::system_error{err, "The SageMaker pipe channel is already open."};
-    }
-
-    // Overwrite the stored FIFO id with the specified one.
-    if (fifo_id) {
-        fifo_id_ = as_ssize(*fifo_id);
-    }
-}
-
-sagemaker_pipe_input_stream::~sagemaker_pipe_input_stream()
+Sagemaker_pipe_input_stream::~Sagemaker_pipe_input_stream()
 {
     close();
 }
 
-void sagemaker_pipe_input_stream::open_fifo()
-{
-    std::string fifo_name = fmt::format("{0}_{1}", pathname_, fifo_id_);
-
-    constexpr int max_num_attempts = 3;
-
-    // Although the default behavior of pipe mode is to create the next
-    // FIFO in advance there is no guarantee for that. In order to make
-    // sure that we do not fail if it has not been created yet we use a
-    // basic retry logic.
-    int attempt_count = 0;
-    while (true) {
-        // We open the read end of the FIFO in non-blocking mode to make
-        // sure that we do not block indefinitely in case SageMaker
-        // fails to open the write end.
-        fifo_fd_ = ::open(fifo_name.c_str(), O_RDONLY | O_NONBLOCK | O_CLOEXEC);
-        if (fifo_fd_ != -1) {
-            logger::debug(
-                "FIFO {0:n} of the SageMaker pipe channel '{1}' is opened.", fifo_id_, pathname_);
-
-            fifo_id_++;
-
-            // We make sure that the write end is opened by waiting for
-            // some data to be written into the FIFO buffer; otherwise
-            // our first read attempt will have zero-bytes which will
-            // wrongfully indicate EOF to the caller.
-            wait_for_data();
-
-            return;
-        }
-
-        if (++attempt_count == max_num_attempts) {
-            break;
-        }
-
-        sleep();
-    }
-
-    std::error_code err = current_error_code();
-    throw std::system_error{
-        err, fmt::format("FIFO {0:n} of the SageMaker pipe channel cannot be opened.", fifo_id_)};
-}
-
-void sagemaker_pipe_input_stream::sleep() noexcept
-{
-    constexpr std::chrono::seconds attempt_pause{1};
-
-    ::timespec req{};
-    req.tv_sec = attempt_pause.count();
-
-    // We do not care about the signal interrupts here as we sleep for a
-    // brief period of time and repeat the call in case the FIFO is not
-    // there yet.
-    ::nanosleep(&req, nullptr);
-}
-
-std::size_t sagemaker_pipe_input_stream::read(mutable_memory_span dest)
+std::size_t Sagemaker_pipe_input_stream::read(Mutable_memory_span destination)
 {
     check_if_closed();
 
-    if (dest.empty()) {
+    if (destination.empty()) {
         return 0;
     }
 
@@ -174,7 +76,7 @@ std::size_t sagemaker_pipe_input_stream::read(mutable_memory_span dest)
         // to read from the FIFO before checking if there is any data
         // available. As long as the write end behaves as expected this
         // call won't fail and it will spare us the costly system calls.
-        ssize_t num_bytes_read = ::read(fifo_fd_.get(), dest.data(), dest.size());
+        ssize_t num_bytes_read = ::read(fifo_fd_.get(), destination.data(), destination.size());
         if (num_bytes_read == -1) {
             if (errno == EAGAIN) {
                 attempt_count++;
@@ -206,7 +108,89 @@ std::size_t sagemaker_pipe_input_stream::read(mutable_memory_span dest)
     }
 }
 
-void sagemaker_pipe_input_stream::wait_for_data()
+void Sagemaker_pipe_input_stream::close() noexcept
+{
+    fifo_fd_ = {};
+
+    detail::fifo_ids_[path_].exchange(fifo_id_);
+}
+
+Sagemaker_pipe_input_stream::Sagemaker_pipe_input_stream(std::string &&path,
+                                                         std::chrono::seconds timeout,
+                                                         std::optional<std::size_t> fifo_id)
+    : path_{std::move(path)}, timeout_{timeout}
+{
+    detail::validate_file_path(path_);
+
+    fifo_id_ = detail::fifo_ids_[path_].exchange(-1);
+    if (fifo_id_ == -1) {
+        auto err = std::make_error_code(std::errc::permission_denied);
+        throw std::system_error{err, "The SageMaker pipe channel is already open."};
+    }
+
+    // Overwrite the stored FIFO ID with the specified one.
+    if (fifo_id) {
+        fifo_id_ = as_ssize(*fifo_id);
+    }
+}
+
+void Sagemaker_pipe_input_stream::open_fifo()
+{
+    std::string fifo_name = fmt::format("{0}_{1}", path_, fifo_id_);
+
+    constexpr int max_num_attempts = 3;
+
+    // Although the default behavior of pipe mode is to create the next
+    // FIFO in advance there is no guarantee for that. In order to make
+    // sure that we do not fail if it has not been created yet we use a
+    // basic retry logic.
+    int attempt_count = 0;
+    while (true) {
+        // We open the read end of the FIFO in non-blocking mode to make
+        // sure that we do not block indefinitely in case SageMaker
+        // fails to open the write end.
+        fifo_fd_ = ::open(fifo_name.c_str(), O_RDONLY | O_NONBLOCK | O_CLOEXEC);
+        if (fifo_fd_ != -1) {
+            logger::debug(
+                "FIFO {0:n} of the SageMaker pipe channel '{1}' is opened.", fifo_id_, path_);
+
+            fifo_id_++;
+
+            // We make sure that the write end is opened by waiting for
+            // some data to be written into the FIFO buffer; otherwise
+            // our first read attempt will have zero-bytes which will
+            // wrongfully indicate EOF to the caller.
+            wait_for_data();
+
+            return;
+        }
+
+        if (++attempt_count == max_num_attempts) {
+            break;
+        }
+
+        sleep();
+    }
+
+    std::error_code err = current_error_code();
+    throw std::system_error{
+        err, fmt::format("FIFO {0:n} of the SageMaker pipe channel cannot be opened.", fifo_id_)};
+}
+
+void Sagemaker_pipe_input_stream::sleep() noexcept
+{
+    constexpr std::chrono::seconds attempt_pause{1};
+
+    ::timespec req{};
+    req.tv_sec = attempt_pause.count();
+
+    // We do not care about the signal interrupts here as we sleep for a
+    // brief period of time and repeat the call in case the FIFO is not
+    // there yet.
+    ::nanosleep(&req, nullptr);
+}
+
+void Sagemaker_pipe_input_stream::wait_for_data()
 {
     ::fd_set readfds{};
     // NOLINTNEXTLINE(readability-isolate-declaration)
@@ -248,20 +232,39 @@ void sagemaker_pipe_input_stream::wait_for_data()
     }
 }
 
-void sagemaker_pipe_input_stream::close() noexcept
-{
-    fifo_fd_ = {};
-
-    detail::fifo_ids_[pathname_].exchange(fifo_id_);
-}
-
-void sagemaker_pipe_input_stream::check_if_closed() const
+void Sagemaker_pipe_input_stream::check_if_closed() const
 {
     if (fifo_fd_.is_open()) {
         return;
     }
 
-    throw stream_error{"The input stream is closed."};
+    throw Stream_error{"The input stream is closed."};
+}
+
+namespace detail {
+
+struct Sagemaker_pipe_input_stream_access {
+    static inline Intrusive_ptr<Sagemaker_pipe_input_stream>
+    make(std::string &&path, std::chrono::seconds timeout, std::optional<std::size_t> fifo_id)
+    {
+        auto *ptr = new Sagemaker_pipe_input_stream{std::move(path), timeout, fifo_id};
+
+        auto stream = wrap_intrusive(ptr);
+
+        stream->open_fifo();
+
+        return stream;
+    }
+};
+
+}  // namespace detail
+
+Intrusive_ptr<Sagemaker_pipe_input_stream>
+make_sagemaker_pipe_input_stream(std::string path,
+                                 std::chrono::seconds timeout,
+                                 std::optional<std::size_t> fifo_id)
+{
+    return Sagemaker_pipe_input_stream_access::make(std::move(path), timeout, fifo_id);
 }
 
 }  // namespace abi_v1

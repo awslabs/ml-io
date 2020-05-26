@@ -29,9 +29,9 @@ inline namespace abi_v1 {
 /// @{
 
 /// Represents a memory allocator that allocates from the process heap.
-class MLIO_API heap_memory_allocator final : public memory_allocator {
+class MLIO_API Heap_memory_allocator final : public Memory_allocator {
 public:
-    intrusive_ptr<mutable_memory_block> allocate(std::size_t size) final;
+    Intrusive_ptr<Mutable_memory_block> allocate(std::size_t size) final;
 };
 
 /// @}

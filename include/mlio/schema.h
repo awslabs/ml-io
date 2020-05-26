@@ -36,39 +36,32 @@ inline namespace abi_v1 {
 /// @addtogroup data_readers Data Readers
 /// @{
 
-/// Describes an attribute which defines a measurable property of a
+/// Describes an Attribute which defines a measurable property of a
 /// dataset.
-class MLIO_API attribute {
-    friend class attribute_builder;
+class MLIO_API Attribute {
+    friend class Attribute_builder;
 
 public:
-    explicit attribute(std::string &&name, data_type dt, size_vector &&shape);
+    explicit Attribute(std::string &&name, Data_type dt, Size_vector &&shape);
 
-private:
-    explicit attribute() noexcept = default;
-
-    void init();
-
-public:
     std::string repr() const;
 
-public:
     const std::string &name() const noexcept
     {
         return name_;
     }
 
-    data_type dtype() const noexcept
+    Data_type data_type() const noexcept
     {
         return data_type_;
     }
 
-    const size_vector &shape() const noexcept
+    const Size_vector &shape() const noexcept
     {
         return shape_;
     }
 
-    const ssize_vector &strides() const noexcept
+    const Ssize_vector &strides() const noexcept
     {
         return strides_;
     }
@@ -79,54 +72,57 @@ public:
     }
 
 private:
+    explicit Attribute() noexcept = default;
+
+    void init();
+
     std::string name_{};
-    data_type data_type_{};
-    size_vector shape_{};
-    ssize_vector strides_{};
+    Data_type data_type_{};
+    Size_vector shape_{};
+    Ssize_vector strides_{};
     bool sparse_{};
 };
 
 MLIO_API
-bool operator==(const attribute &lhs, const attribute &rhs) noexcept;
+bool operator==(const Attribute &lhs, const Attribute &rhs) noexcept;
 
 MLIO_API
-inline bool operator!=(const attribute &lhs, const attribute &rhs) noexcept
+inline bool operator!=(const Attribute &lhs, const Attribute &rhs) noexcept
 {
     return !(lhs == rhs);
 }
 
 MLIO_API
-inline std::ostream &operator<<(std::ostream &strm, const attribute &attr)
+inline std::ostream &operator<<(std::ostream &s, const Attribute &attr)
 {
-    return strm << attr.repr();
+    return s << attr.repr();
 }
 
-/// Builds a @ref attribute instance.
-class MLIO_API attribute_builder {
+/// Builds a @ref Attribute Instance.
+class MLIO_API Attribute_builder {
 public:
-    explicit attribute_builder(std::string name, data_type dt, size_vector shape) noexcept
+    explicit Attribute_builder(std::string name, Data_type dt, Size_vector shape) noexcept
     {
         attr_.name_ = std::move(name);
         attr_.data_type_ = dt;
         attr_.shape_ = std::move(shape);
     }
 
-public:
-    attribute_builder &with_sparsity(bool value) noexcept
+    Attribute_builder &with_sparsity(bool value) noexcept
     {
         attr_.sparse_ = value;
 
         return *this;
     }
 
-    attribute_builder &with_strides(ssize_vector strides) noexcept
+    Attribute_builder &with_strides(Ssize_vector strides) noexcept
     {
         attr_.strides_ = std::move(strides);
 
         return *this;
     }
 
-    attribute &&build()
+    Attribute &&build()
     {
         attr_.init();
 
@@ -134,51 +130,49 @@ public:
     }
 
     // NOLINTNEXTLINE(google-explicit-constructor)
-    operator attribute &&()
+    operator Attribute &&()
     {
         return build();
     }
 
 private:
-    attribute attr_{};
+    Attribute attr_{};
 };
 
-/// Represents a schema that contains the descriptions of all the
+/// Represents a Schema that contains the descriptions of all the
 /// features contained in a particular dataset.
-class MLIO_API schema : public intrusive_ref_counter<schema> {
+class MLIO_API Schema : public Intrusive_ref_counter<Schema> {
 public:
-    explicit schema(std::vector<attribute> attrs);
+    explicit Schema(std::vector<Attribute> attrs);
 
-public:
-    /// Returns the index of the attribute with the specified name.
+    /// Returns the index of the Attribute with the specified name.
     std::optional<std::size_t> get_index(const std::string &name) const noexcept;
 
     std::string repr() const;
 
-public:
-    std::vector<attribute> const &attributes() const noexcept
+    const std::vector<Attribute> &attributes() const noexcept
     {
         return attributes_;
     }
 
 private:
-    std::vector<attribute> attributes_;
+    std::vector<Attribute> attributes_;
     std::unordered_map<std::string, std::size_t> name_index_map_;
 };
 
 MLIO_API
-bool operator==(const schema &lhs, const schema &rhs) noexcept;
+bool operator==(const Schema &lhs, const Schema &rhs) noexcept;
 
 MLIO_API
-inline bool operator!=(const schema &lhs, const schema &rhs) noexcept
+inline bool operator!=(const Schema &lhs, const Schema &rhs) noexcept
 {
     return !(lhs == rhs);
 }
 
 MLIO_API
-inline std::ostream &operator<<(std::ostream &strm, const schema &shm)
+inline std::ostream &operator<<(std::ostream &s, const Schema &schema)
 {
-    return strm << shm.repr();
+    return s << schema.repr();
 }
 
 /// @}
@@ -189,15 +183,15 @@ inline std::ostream &operator<<(std::ostream &strm, const schema &shm)
 namespace std {
 
 template<>
-struct MLIO_API hash<mlio::attribute> {
-    size_t operator()(const mlio::attribute &attr) const noexcept;
+struct MLIO_API hash<mlio::Attribute> {
+    size_t operator()(const mlio::Attribute &attr) const noexcept;
 };
 
 template<>
-struct MLIO_API hash<mlio::schema> {
-    inline size_t operator()(const mlio::schema &shm) const noexcept
+struct MLIO_API hash<mlio::Schema> {
+    inline size_t operator()(const mlio::Schema &schema) const noexcept
     {
-        return mlio::detail::hash_range(shm.attributes());
+        return mlio::detail::hash_range(schema.attributes());
     }
 };
 

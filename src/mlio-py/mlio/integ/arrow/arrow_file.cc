@@ -20,6 +20,7 @@
 
 #include <arrow/result.h>
 #include <arrow/status.h>
+#include <mlio/span.h>
 
 #include "arrow_buffer.h"
 #include "arrow_util.h"
@@ -28,16 +29,16 @@ using namespace mlio;
 
 namespace pymlio {
 
-arrow_file::arrow_file(intrusive_ptr<input_stream> strm) : stream_{std::move(strm)}
+Arrow_file::Arrow_file(Intrusive_ptr<Input_stream> stream) : stream_{std::move(stream)}
 {
     if (!stream_->seekable()) {
         throw std::invalid_argument{"The input stream is not seekable."};
     }
 }
 
-arrow_file::~arrow_file() = default;
+Arrow_file::~Arrow_file() = default;
 
-arrow::Result<std::int64_t> arrow_file::Read(std::int64_t nbytes, void *out) noexcept
+arrow::Result<std::int64_t> Arrow_file::Read(std::int64_t nbytes, void *out) noexcept
 {
     RETURN_NOT_OK(check_if_closed());
 
@@ -46,24 +47,24 @@ arrow::Result<std::int64_t> arrow_file::Read(std::int64_t nbytes, void *out) noe
 
         auto bits = static_cast<std::byte *>(out);
 
-        mutable_memory_span dest{bits, size};
+        Mutable_memory_span destination{bits, size};
 
-        return static_cast<std::int64_t>(stream_->read(dest));
+        return static_cast<std::int64_t>(stream_->read(destination));
     });
 }
 
-arrow::Result<std::shared_ptr<arrow::Buffer>> arrow_file::Read(std::int64_t nbytes) noexcept
+arrow::Result<std::shared_ptr<arrow::Buffer>> Arrow_file::Read(std::int64_t nbytes) noexcept
 {
     RETURN_NOT_OK(check_if_closed());
 
     return arrow_boundary<std::shared_ptr<arrow::Buffer>>([=]() {
         auto size = static_cast<std::size_t>(nbytes);
 
-        return std::make_shared<arrow_buffer>(stream_->read(size));
+        return std::make_shared<Arrow_buffer>(stream_->read(size));
     });
 }
 
-arrow::Status arrow_file::Seek(std::int64_t position) noexcept
+arrow::Status Arrow_file::Seek(std::int64_t position) noexcept
 {
     RETURN_NOT_OK(check_if_closed());
 
@@ -72,14 +73,14 @@ arrow::Status arrow_file::Seek(std::int64_t position) noexcept
     });
 }
 
-arrow::Status arrow_file::Close() noexcept
+arrow::Status Arrow_file::Close() noexcept
 {
     stream_->close();
 
     return arrow::Status::OK();
 }
 
-arrow::Result<std::int64_t> arrow_file::Tell() const noexcept
+arrow::Result<std::int64_t> Arrow_file::Tell() const noexcept
 {
     RETURN_NOT_OK(check_if_closed());
 
@@ -88,7 +89,7 @@ arrow::Result<std::int64_t> arrow_file::Tell() const noexcept
     });
 }
 
-arrow::Result<std::int64_t> arrow_file::GetSize() noexcept
+arrow::Result<std::int64_t> Arrow_file::GetSize() noexcept
 {
     RETURN_NOT_OK(check_if_closed());
 
@@ -97,20 +98,20 @@ arrow::Result<std::int64_t> arrow_file::GetSize() noexcept
     });
 }
 
-arrow::Status arrow_file::check_if_closed() const noexcept
+arrow::Status Arrow_file::check_if_closed() const noexcept
 {
     if (stream_->closed()) {
-        return arrow::Status::Invalid("Invalid operation on closed file.");
+        return arrow::Status::Invalid("Invalid operation on closed File.");
     }
     return arrow::Status::OK();
 }
 
-bool arrow_file::supports_zero_copy() const noexcept
+bool Arrow_file::supports_zero_copy() const noexcept
 {
     return stream_->supports_zero_copy();
 }
 
-bool arrow_file::closed() const noexcept
+bool Arrow_file::closed() const noexcept
 {
     return stream_->closed();
 }

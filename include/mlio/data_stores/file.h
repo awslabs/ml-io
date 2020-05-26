@@ -32,59 +32,59 @@ inline namespace abi_v1 {
 /// @addtogroup data_stores Data Stores
 /// @{
 
-/// Represents a file as a @ref data_store.
-class MLIO_API file final : public data_store {
+/// Represents a file as a @ref Data_store.
+class MLIO_API File final : public Data_store {
 public:
-    /// @param mmap
+    /// @param memory_map
     ///     A boolean value indicating whether the file should be
     ///     memory-mapped.
     ///
-    /// @param cmp
+    /// @param compression
     ///     The compression type of the file. If set to @c infer, the
     ///     compression will be inferred from the filename.
-    explicit file(std::string pathname, bool mmap = true, compression cmp = compression::infer);
+    explicit File(std::string path,
+                  bool memory_map = true,
+                  Compression compression = Compression::infer);
 
-public:
-    intrusive_ptr<input_stream> open_read() const final;
+    Intrusive_ptr<Input_stream> open_read() const final;
 
     std::string repr() const final;
 
-public:
     const std::string &id() const noexcept final
     {
-        return pathname_;
+        return path_;
     }
 
 private:
-    std::string pathname_;
-    bool mmap_;
-    compression compression_;
+    std::string path_;
+    bool memory_map_;
+    Compression compression_;
 };
 
-struct MLIO_API list_files_params {
-    using predicate_callback = std::function<bool(const std::string &)>;
+struct MLIO_API List_files_params {
+    using Predicate_callback = std::function<bool(const std::string &)>;
 
-    /// The list of pathnames to traverse.
-    stdx::span<std::string const> pathnames{};
+    /// The list of paths to traverse.
+    stdx::span<const std::string> paths{};
     /// The pattern to match the filenames against.
     const std::string *pattern{};
     /// The callback function for user-specific filtering.
-    const predicate_callback *predicate{};
+    const Predicate_callback *predicate{};
     /// A boolean value indicating whether the files should be
     /// memory-mapped.
-    bool mmap = true;
+    bool memory_map = true;
     /// The compression type of the files. If set to @c infer, the
     /// compression will be inferred from the filenames.
-    compression cmp = compression::infer;
+    Compression compression = Compression::infer;
 };
 
-/// Recursively lists all files residing under the specified pathnames.
+/// Recursively lists all files residing under the specified paths.
 MLIO_API
-std::vector<intrusive_ptr<data_store>> list_files(const list_files_params &prm);
+std::vector<Intrusive_ptr<Data_store>> list_files(const List_files_params &params);
 
 MLIO_API
-std::vector<intrusive_ptr<data_store>>
-list_files(const std::string &pathname, const std::string &pattern = {});
+std::vector<Intrusive_ptr<Data_store>>
+list_files(const std::string &path, const std::string &pattern = {});
 
 /// @}
 

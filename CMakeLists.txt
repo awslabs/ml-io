@@ -13,10 +13,6 @@
 
 cmake_minimum_required(VERSION 3.13)
 
-# ------------------------------------------------------------
-# Lookup Paths
-# ------------------------------------------------------------
-
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 
 # ------------------------------------------------------------
@@ -30,7 +26,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 # ------------------------------------------------------------
-# Cache Entries
+# Build Options
 # ------------------------------------------------------------
 
 include(CMakeDependentOption)
@@ -55,7 +51,7 @@ option(MLIO_BUILD_IMAGE_READER "If set, builds with image reader support.")
 option(MLIO_TREAT_WARNINGS_AS_ERRORS "If set, treats compilation warnings as errors.")
 
 # Optimizations
-option(MLIO_BUILD_FOR_NATIVE_ARCH "If set, builds for the processor type of the compiling machine.")
+option(MLIO_BUILD_FOR_NATIVE_ARCHITECTURE "If set, builds for the processor type of the compiling machine.")
 option(MLIO_ENABLE_LTO "If set, enables link time optimization." ON)
 
 # Sanitizers
@@ -96,10 +92,6 @@ set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-if(MSVC)
-    set(CMAKE_DEBUG_POSTFIX d)
-endif()
-
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 
@@ -116,7 +108,7 @@ endif()
 set(THREADS_PREFER_PTHREAD_FLAG TRUE)
 
 # ------------------------------------------------------------
-# Global Compiler and Linker Options
+# Compiler Settings
 # ------------------------------------------------------------
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
@@ -177,7 +169,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
         add_compile_options(-Werror)
     endif()
 
-    if(MLIO_BUILD_FOR_NATIVE_ARCH)
+    if(MLIO_BUILD_FOR_NATIVE_ARCHITECTURE)
         add_compile_options(-march=native -mtune=native)
     endif()
 
@@ -188,6 +180,10 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 else()
     message(FATAL_ERROR "Unsupported compiler!")
 endif()
+
+# ------------------------------------------------------------
+# Linker Settings
+# ------------------------------------------------------------
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     add_link_options(

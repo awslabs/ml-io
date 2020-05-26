@@ -22,21 +22,19 @@
 namespace mlio {
 inline namespace abi_v1 {
 
-class MLIO_API mlio_error : public std::runtime_error {
+class MLIO_API Mlio_error : public std::runtime_error {
 public:
     using std::runtime_error::runtime_error;
 
-public:
-    mlio_error(const mlio_error &) = default;
+    Mlio_error(const Mlio_error &) = default;
 
-    mlio_error(mlio_error &&) = default;
+    Mlio_error &operator=(const Mlio_error &) = default;
 
-    ~mlio_error() override;
+    Mlio_error(Mlio_error &&) = default;
 
-public:
-    mlio_error &operator=(const mlio_error &) = default;
+    Mlio_error &operator=(Mlio_error &&) = default;
 
-    mlio_error &operator=(mlio_error &&) = default;
+    ~Mlio_error() override;
 };
 
 }  // namespace abi_v1

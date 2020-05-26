@@ -27,27 +27,21 @@ inline namespace abi_v1 {
 /// @addtogroup memory Memory
 /// @{
 
-/// Represents a file-mapped read-only memory block.
-class MLIO_API file_mapped_memory_block final : public memory_block {
+/// Represents a File-mapped read-only memory block.
+class MLIO_API File_mapped_memory_block final : public Memory_block {
 public:
-    explicit file_mapped_memory_block(std::string pathname);
+    explicit File_mapped_memory_block(std::string path);
 
-    file_mapped_memory_block(const file_mapped_memory_block &) = delete;
+    File_mapped_memory_block(const File_mapped_memory_block &) = delete;
 
-    file_mapped_memory_block(file_mapped_memory_block &&) = delete;
+    File_mapped_memory_block &operator=(const File_mapped_memory_block &) = delete;
 
-    ~file_mapped_memory_block() final;
+    File_mapped_memory_block(File_mapped_memory_block &&) = delete;
 
-public:
-    file_mapped_memory_block &operator=(const file_mapped_memory_block &) = delete;
+    File_mapped_memory_block &operator=(File_mapped_memory_block &&) = delete;
 
-    file_mapped_memory_block &operator=(file_mapped_memory_block &&) = delete;
+    ~File_mapped_memory_block() final;
 
-private:
-    MLIO_HIDDEN
-    void init_memory_map();
-
-public:
     const_pointer data() const noexcept final
     {
         return data_;
@@ -59,7 +53,10 @@ public:
     }
 
 private:
-    std::string pathname_;
+    MLIO_HIDDEN
+    void init_memory_map();
+
+    std::string path_;
     std::byte *data_{};
     std::size_t size_{};
 };

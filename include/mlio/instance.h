@@ -29,33 +29,25 @@ inline namespace abi_v1 {
 /// @addtogroup data_readers Data Readers
 /// @{
 
-/// Represents a data instance read from a dataset.
-class MLIO_API instance {
+/// Represents a data Instance read from a dataset.
+class MLIO_API Instance {
 public:
-    /// @param ds
-    ///     The data store that represents the instance.
-    explicit instance(const data_store &ds) noexcept : store_{&ds}
+    /// @param store
+    ///     The data store that represents the Instance.
+    explicit Instance(const Data_store &store) noexcept : store_{&store}
     {}
 
-    /// @param ds
-    ///     The data store from which the instance was read.
+    /// @param store
+    ///     The data store from which the Instance was read.
     /// @param index
-    ///     The position of the instance in the data store.
+    ///     The position of the Instance in the data store.
     /// @param bits
-    ///     The raw data of the instance.
-    explicit instance(const data_store &ds, std::size_t index, memory_slice &&bits) noexcept
-        : store_{&ds}, index_{index}, bits_{std::move(bits)}
+    ///     The raw data of the Instance.
+    explicit Instance(const Data_store &store, std::size_t index, Memory_slice &&bits) noexcept
+        : store_{&store}, index_{index}, bits_{std::move(bits)}
     {}
 
-private:
-    memory_slice load_bits_from_store() const;
-
-    memory_slice read_stream(input_stream &strm) const;
-
-    [[noreturn]] void handle_errors() const;
-
-public:
-    const data_store &get_data_store() const noexcept
+    const Data_store &data_store() const noexcept
     {
         return *store_;
     }
@@ -65,7 +57,7 @@ public:
         return index_;
     }
 
-    const memory_slice &bits() const
+    const Memory_slice &bits() const
     {
         // If we do not have instance data, it means that we should
         // treat the whole data store as a single instance.
@@ -77,9 +69,15 @@ public:
     }
 
 private:
-    const data_store *store_;
+    Memory_slice load_bits_from_store() const;
+
+    Memory_slice read_stream(Input_stream &stream) const;
+
+    [[noreturn]] void handle_errors() const;
+
+    const Data_store *store_;
     std::size_t index_{};
-    mutable std::optional<memory_slice> bits_{};
+    mutable std::optional<Memory_slice> bits_{};
 };
 
 /// @}

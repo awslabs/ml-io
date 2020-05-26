@@ -25,65 +25,65 @@ using namespace pybind11::literals;
 namespace pymlio {
 namespace {
 
-intrusive_ptr<tensor> get_feature(example &exm, const std::string &name)
+Intrusive_ptr<Tensor> get_feature(Example &example, const std::string &name)
 {
-    intrusive_ptr<tensor> tsr = exm.find_feature(name);
-    if (tsr == nullptr) {
-        throw py::key_error{"The example does not contain a feature with the specified name."};
+    Intrusive_ptr<Tensor> tensor = example.find_feature(name);
+    if (tensor == nullptr) {
+        throw py::key_error{"The Example does not contain a feature with the specified name."};
     }
 
-    return tsr;
+    return tensor;
 }
 
-intrusive_ptr<tensor> get_feature(example &exm, std::size_t index)
+Intrusive_ptr<Tensor> get_feature(Example &example, std::size_t index)
 {
-    if (index >= exm.features().size()) {
+    if (index >= example.features().size()) {
         throw py::key_error{"The index is out of range."};
     }
 
-    return exm.features()[index];
+    return example.features()[index];
 }
 
 }  // namespace
 
 void register_example(py::module &m)
 {
-    py::class_<example, intrusive_ptr<example>>(
-        m, "Example", "Represents an example that holds a ``Schema`` and a set of features.")
-        .def(py::init<intrusive_ptr<schema const>, std::vector<intrusive_ptr<tensor>>>(),
-             "schema"_a,
+    py::class_<Example, Intrusive_ptr<Example>>(
+        m, "Example", "Represents an Example that holds a ``Schema`` and a set of features.")
+        .def(py::init<Intrusive_ptr<const Schema>, std::vector<Intrusive_ptr<Tensor>>>(),
+             "Schema"_a,
              "features"_a,
              R"(
             Parameters
             ----------
-            schema : Schema
-                The schema that describes the `features` container in the
-                example.
+            Schema : Schema
+                The Schema that describes the `features` container in the
+                Example.
             features : list of tensors.
-                The features of the example.
+                The features of the Example.
             )")
         .def("__len__",
-             [](example &self) {
+             [](Example &self) {
                  return self.features().size();
              })
-        .def("__getitem__", py::overload_cast<example &, const std::string &>(&get_feature))
-        .def("__getitem__", py::overload_cast<example &, std::size_t>(&get_feature))
+        .def("__getitem__", py::overload_cast<Example &, const std::string &>(&get_feature))
+        .def("__getitem__", py::overload_cast<Example &, std::size_t>(&get_feature))
         .def("__contains__",
-             [](example &self, const std::string &name) {
-                 return self.get_schema().get_index(name) != std::nullopt;
+             [](Example &self, const std::string &name) {
+                 return self.schema().get_index(name) != std::nullopt;
              })
         .def("__contains__",
-             [](example &self, std::size_t index) {
+             [](Example &self, std::size_t index) {
                  return index < self.features().size();
              })
         .def("__iter__",
-             [](example &self) {
+             [](Example &self) {
                  return py::make_iterator(self.features().begin(), self.features().end());
              })
-        .def("__repr__", &example::repr)
-        .def_property_readonly("schema", &example::get_schema, "Gets the schema of the example.")
+        .def("__repr__", &Example::repr)
+        .def_property_readonly("Schema", &Example::schema, "Gets the Schema of the Example.")
         .def_readwrite("padding",
-                       &example::padding,
+                       &Example::padding,
                        R"(
             If the padding is greater than zero, it means that the last
             `padding` number of elements in the batch dimension are

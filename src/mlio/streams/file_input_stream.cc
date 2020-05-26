@@ -24,7 +24,7 @@
 #include <unistd.h>
 
 #include "mlio/detail/error.h"
-#include "mlio/detail/pathname.h"
+#include "mlio/detail/path.h"
 #include "mlio/logger.h"
 #include "mlio/streams/stream_error.h"
 
@@ -33,11 +33,11 @@ using mlio::detail::current_error_code;
 namespace mlio {
 inline namespace abi_v1 {
 
-file_input_stream::file_input_stream(std::string pathname) : pathname_{std::move(pathname)}
+File_input_stream::File_input_stream(std::string path) : path_{std::move(path)}
 {
-    detail::validate_file_pathname(pathname_);
+    detail::validate_file_path(path_);
 
-    fd_ = ::open(pathname_.c_str(), O_RDONLY | O_CLOEXEC);
+    fd_ = ::open(path_.c_str(), O_RDONLY | O_CLOEXEC);
     if (fd_ == -1) {
         throw std::system_error{current_error_code(), "The file cannot be opened."};
     }
@@ -45,27 +45,27 @@ file_input_stream::file_input_stream(std::string pathname) : pathname_{std::move
 #ifdef MLIO_PLATFORM_LINUX
     int r = ::posix_fadvise(fd_.get(), 0, 0, POSIX_FADV_SEQUENTIAL);
     if (r != 0) {
-        logger::warn("The read-ahead size of the file '{0}' cannot be increased.", pathname_);
+        logger::warn("The read-ahead size of the file '{0}' cannot be increased.", path_);
     }
 #endif
 }
 
-std::size_t file_input_stream::read(mutable_memory_span dest)
+std::size_t File_input_stream::read(Mutable_memory_span destination)
 {
     check_if_closed();
 
-    if (dest.empty()) {
+    if (destination.empty()) {
         return 0;
     }
 
-    ssize_t num_bytes_read = ::read(fd_.get(), dest.data(), dest.size());
+    ssize_t num_bytes_read = ::read(fd_.get(), destination.data(), destination.size());
     if (num_bytes_read == -1) {
         throw std::system_error{current_error_code(), "The file cannot be read."};
     }
     return static_cast<std::size_t>(num_bytes_read);
 }
 
-void file_input_stream::seek(std::size_t position)
+void File_input_stream::seek(std::size_t position)
 {
     check_if_closed();
 
@@ -87,26 +87,17 @@ void file_input_stream::seek(std::size_t position)
     }
 }
 
-void file_input_stream::close() noexcept
+void File_input_stream::close() noexcept
 {
     fd_ = {};
 }
 
-void file_input_stream::check_if_closed() const
-{
-    if (fd_.is_open()) {
-        return;
-    }
-
-    throw stream_error{"The input stream is closed."};
-}
-
-std::size_t file_input_stream::size() const
+std::size_t File_input_stream::size() const
 {
     check_if_closed();
 
     if (size_ == 0) {
-        struct ::stat buf {};
+        struct ::stat buf = {};
         if (::fstat(fd_.get(), &buf) == -1) {
             throw std::system_error{current_error_code(),
                                     "The size of the file cannot be retrieved."};
@@ -117,7 +108,7 @@ std::size_t file_input_stream::size() const
     return size_;
 }
 
-std::size_t file_input_stream::position() const
+std::size_t File_input_stream::position() const
 {
     check_if_closed();
 
@@ -136,6 +127,15 @@ std::size_t file_input_stream::position() const
         throw std::system_error{err, msg};
     }
     return static_cast<std::size_t>(o);
+}
+
+void File_input_stream::check_if_closed() const
+{
+    if (fd_.is_open()) {
+        return;
+    }
+
+    throw Stream_error{"The input stream is closed."};
 }
 
 }  // namespace abi_v1

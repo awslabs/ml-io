@@ -36,16 +36,16 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-core_instance_reader::core_instance_reader(const data_reader_params &prm,
-                                           record_reader_factory &&fct)
-    : params_{&prm}, record_reader_factory_{std::move(fct)}
+Core_instance_reader::Core_instance_reader(const Data_reader_params &params,
+                                           Record_reader_factory &&factory)
+    : params_{&params}, record_reader_factory_{std::move(factory)}
 {
     store_iter_ = params_->dataset.begin();
 }
 
-std::optional<instance> core_instance_reader::read_instance_core()
+std::optional<Instance> Core_instance_reader::read_instance_core()
 {
-    std::optional<memory_slice> payload;
+    std::optional<Memory_slice> payload;
     try {
         payload = read_record_payload();
     }
@@ -58,96 +58,96 @@ std::optional<instance> core_instance_reader::read_instance_core()
         // not read a record from the current data store, it means the
         // data store itself is an instance (e.g. an image file).
         if (store_ != nullptr) {
-            return instance{*store_};
+            return Instance{*store_};
         }
 
         return {};
     }
 
-    return instance{*store_, instance_idx_++, std::move(*payload)};
+    return Instance{*store_, instance_idx_++, std::move(*payload)};
 }
 
-void core_instance_reader::handle_errors()
+void Core_instance_reader::handle_errors()
 {
     try {
         throw;
     }
-    catch (const record_too_large_error &) {
-        std::throw_with_nested(data_reader_error{fmt::format(
+    catch (const Record_too_large_error &) {
+        std::throw_with_nested(Data_reader_error{fmt::format(
             "The record #{1:n} in the data store '{0}' is too large. See nested exception for details.",
             store_->id(),
             record_idx_)});
     }
-    catch (const corrupt_record_error &) {
-        std::throw_with_nested(data_reader_error{fmt::format(
+    catch (const Corrupt_record_error &) {
+        std::throw_with_nested(Data_reader_error{fmt::format(
             "The record #{1:n} in the data store '{0}' is corrupt. See nested exception for details.",
             store_->id(),
             record_idx_)});
     }
-    catch (const stream_error &) {
-        std::throw_with_nested(data_reader_error{fmt::format(
+    catch (const Stream_error &) {
+        std::throw_with_nested(Data_reader_error{fmt::format(
             "The data store '{0}' contains corrupt data. See nested exception for details.",
             store_->id())});
     }
-    catch (const not_supported_error &) {
-        std::throw_with_nested(data_reader_error{
+    catch (const Not_supported_error &) {
+        std::throw_with_nested(Data_reader_error{
             fmt::format("The data store '{0}' cannot be read. See nested exception for details.",
                         store_->id())});
     }
     catch (const std::system_error &) {
-        std::throw_with_nested(data_reader_error{fmt::format(
+        std::throw_with_nested(Data_reader_error{fmt::format(
             "A system error occurred while trying to read from the data store '{0}'. See nested exception for details.",
             store_->id())});
     }
 }
 
-std::optional<memory_slice> core_instance_reader::read_record_payload()
+std::optional<Memory_slice> Core_instance_reader::read_record_payload()
 {
     if (has_corrupt_split_record_) {
         throw_corrupt_split_record_error();
     }
 
-    std::optional<record> rec = read_record();
-    if (rec == std::nullopt) {
+    std::optional<Record> record = read_record();
+    if (record == std::nullopt) {
         return {};
     }
 
-    if (rec->kind() == record_kind::complete) {
-        return std::move(*rec).payload();
+    if (record->kind() == Record_kind::complete) {
+        return std::move(*record).payload();
     }
 
-    return read_split_record_payload(std::move(rec));
+    return read_split_record_payload(std::move(record));
 }
 
-std::optional<memory_slice>
-core_instance_reader::read_split_record_payload(std::optional<record> rec)
+std::optional<Memory_slice>
+Core_instance_reader::read_split_record_payload(std::optional<Record> record)
 {
-    std::vector<record> records{};
+    std::vector<Record> records{};
 
     std::size_t payload_size = 0;
 
     // A split record must start with a 'begin' record...
-    if (rec->kind() == record_kind::begin) {
-        payload_size += rec->payload().size();
+    if (record->kind() == Record_kind::begin) {
+        payload_size += record->payload().size();
 
-        records.emplace_back(std::move(*rec));
+        records.emplace_back(std::move(*record));
     }
     else {
         throw_corrupt_split_record_error();
     }
 
     // continue with zero or more 'middle' records...
-    while ((rec = read_record()) && rec->kind() == record_kind::middle) {
-        payload_size += rec->payload().size();
+    while ((record = read_record()) && record->kind() == Record_kind::middle) {
+        payload_size += record->payload().size();
 
-        records.emplace_back(std::move(*rec));
+        records.emplace_back(std::move(*record));
     }
 
     // and end with an 'end' record.
-    if (rec && rec->kind() == record_kind::end) {
-        payload_size += rec->payload().size();
+    if (record && record->kind() == Record_kind::end) {
+        payload_size += record->payload().size();
 
-        records.emplace_back(std::move(*rec));
+        records.emplace_back(std::move(*record));
     }
     else {
         throw_corrupt_split_record_error();
@@ -155,24 +155,24 @@ core_instance_reader::read_split_record_payload(std::optional<record> rec)
 
     // Once we have collected all records we merge their payloads in a
     // single buffer.
-    auto payload = get_memory_allocator().allocate(payload_size);
+    auto payload = memory_allocator().allocate(payload_size);
 
     auto pos = payload->begin();
-    for (const record &r : records) {
+    for (const Record &r : records) {
         pos = std::copy(r.payload().begin(), r.payload().end(), pos);
     }
 
     return std::move(payload);
 }
 
-void core_instance_reader::throw_corrupt_split_record_error()
+void Core_instance_reader::throw_corrupt_split_record_error()
 {
     has_corrupt_split_record_ = true;
 
-    throw corrupt_record_error{"Corrupt split record encountered."};
+    throw Corrupt_record_error{"Corrupt split Record encountered."};
 }
 
-std::optional<record> core_instance_reader::read_record()
+std::optional<Record> Core_instance_reader::read_record()
 {
     if (record_reader_ == nullptr) {
         if (!init_next_record_reader()) {
@@ -180,9 +180,9 @@ std::optional<record> core_instance_reader::read_record()
         }
     }
 
-    std::optional<record> rec{};
+    std::optional<Record> record{};
 
-    while ((rec = record_reader_->read_record()) == std::nullopt) {
+    while ((record = record_reader_->read_record()) == std::nullopt) {
         if (!init_next_record_reader()) {
             return {};
         }
@@ -190,10 +190,10 @@ std::optional<record> core_instance_reader::read_record()
 
     record_idx_++;
 
-    return rec;
+    return record;
 }
 
-bool core_instance_reader::init_next_record_reader()
+bool Core_instance_reader::init_next_record_reader()
 {
     instance_idx_ = 0;
 
@@ -214,19 +214,19 @@ bool core_instance_reader::init_next_record_reader()
     }
     catch (const std::system_error &e) {
         if (e.code() == std::errc::no_such_file_or_directory) {
-            throw data_reader_error{
+            throw Data_reader_error{
                 fmt::format("The data store '{0}' does not exist.", store_->id())};
         }
 
         if (e.code() == std::errc::permission_denied) {
-            throw data_reader_error{fmt::format(
+            throw Data_reader_error{fmt::format(
                 "The permission to read the data store '{0}' is denied.", store_->id())};
         }
 
         throw;
     }
 
-    // Move to the next data store after we get the reader instance;
+    // Move to the next data store only after we get the record reader;
     // otherwise we might break the class invariant if the factory
     // throws an exception.
     ++store_iter_;
@@ -234,7 +234,7 @@ bool core_instance_reader::init_next_record_reader()
     return record_reader_ != nullptr;
 }
 
-void core_instance_reader::reset_core() noexcept
+void Core_instance_reader::reset_core() noexcept
 {
     store_iter_ = params_->dataset.begin();
 

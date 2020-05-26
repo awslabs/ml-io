@@ -27,25 +27,23 @@ inline namespace abi_v1 {
 /// @addtogroup records Records
 /// @{
 
-class MLIO_API record_reader : public intrusive_ref_counter<record_reader> {
+class MLIO_API Record_reader : public Intrusive_ref_counter<Record_reader> {
 public:
-    record_reader() noexcept = default;
+    Record_reader() noexcept = default;
 
-    record_reader(const record_reader &) = delete;
+    Record_reader(const Record_reader &) = delete;
 
-    record_reader(record_reader &&) = delete;
+    Record_reader &operator=(const Record_reader &) = delete;
 
-    virtual ~record_reader();
+    Record_reader(Record_reader &&) = delete;
 
-public:
-    record_reader &operator=(const record_reader &) = delete;
+    Record_reader &operator=(Record_reader &&) = delete;
 
-    record_reader &operator=(record_reader &&) = delete;
+    virtual ~Record_reader();
 
-public:
-    virtual std::optional<record> read_record() = 0;
+    virtual std::optional<Record> read_record() = 0;
 
-    virtual std::optional<record> peek_record() = 0;
+    virtual std::optional<Record> peek_record() = 0;
 };
 
 /// @}

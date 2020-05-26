@@ -24,7 +24,7 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-std::optional<record> read_line(memory_slice &chunk,
+std::optional<Record> read_line(Memory_slice &chunk,
                                 bool ignore_leftover,
                                 std::optional<std::size_t> max_line_length = {});
 

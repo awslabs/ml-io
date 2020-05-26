@@ -23,9 +23,9 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-std::optional<recordio_header> decode_recordio_header(memory_span bits)
+std::optional<Recordio_header> decode_recordio_header(Memory_span bits)
 {
-    auto ints = as_span<std::uint32_t const>(bits);
+    auto ints = as_span<const std::uint32_t>(bits);
     if (ints.size() < 2) {
         return {};
     }
@@ -33,15 +33,15 @@ std::optional<recordio_header> decode_recordio_header(memory_span bits)
     // There is no formal specification about the correct byte order of
     // the RecordIO format. We assume that it is always little-endian.
     constexpr std::uint32_t magic =
-        (byte_order::host == byte_order::little ? 0xced7'230a : 0x0a23'd7ce);
+        (Byte_order::host == Byte_order::little ? 0xced7'230a : 0x0a23'd7ce);
 
     if (ints[0] != magic) {
-        throw corrupt_header_error{"The header does not start with the RecordIO magic number."};
+        throw Corrupt_header_error{"The header does not start with the RecordIO magic number."};
     }
 
     auto data = little_to_host_order(ints[1]);
 
-    return recordio_header{data};
+    return Recordio_header{data};
 }
 
 }  // namespace detail

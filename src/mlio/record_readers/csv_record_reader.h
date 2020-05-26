@@ -27,8 +27,14 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-class csv_record_reader final : public text_record_reader {
-    enum class parser_state {
+class Csv_record_reader final : public Text_record_reader {
+public:
+    explicit Csv_record_reader(Intrusive_ptr<Input_stream> stream, const Csv_params &params)
+        : Text_record_reader{std::move(stream)}, params_{&params}
+    {}
+
+private:
+    enum class Parser_state {
         new_field,
         in_field,
         in_quoted_field,
@@ -36,28 +42,21 @@ class csv_record_reader final : public text_record_reader {
         has_carriage
     };
 
-public:
-    explicit csv_record_reader(intrusive_ptr<input_stream> strm, const csv_params &prm)
-        : text_record_reader{std::move(strm)}, params_{&prm}
-    {}
+    std::optional<Record> decode_text_record(Memory_slice &chunk, bool ignore_leftover) final;
 
-private:
-    std::optional<record> decode_text_record(memory_slice &chunk, bool ignore_leftover) final;
+    bool is_comment_line(const Memory_slice &chunk);
 
-    bool is_comment_line(const memory_slice &chunk);
+    std::optional<Record> read_line(Memory_slice &chunk, bool ignore_leftover);
 
-    std::optional<record> read_line(memory_slice &chunk, bool ignore_leftover);
-
-    static bool try_get_next_char(stdx::span<char const> const &chrs,
-                                  stdx::span<char const>::iterator &pos,
+    static bool try_get_next_char(const stdx::span<const char> &chars,
+                                  stdx::span<const char>::iterator &pos,
                                   char &chr) noexcept;
 
-    static void check_line_length(stdx::span<char const> const &chrs,
-                                  stdx::span<char const>::iterator &pos,
+    static void check_line_length(const stdx::span<const char> &chars,
+                                  stdx::span<const char>::iterator &pos,
                                   std::size_t max_line_length);
 
-private:
-    const csv_params *params_;
+    const Csv_params *params_;
 };
 
 }  // namespace detail

@@ -18,9 +18,8 @@
 #include <utility>
 
 #include <fmt/format.h>
-#include <fmt/ostream.h>
 
-#include "mlio/detail/pathname.h"
+#include "mlio/detail/path.h"
 #include "mlio/logger.h"
 #include "mlio/not_supported_error.h"
 #include "mlio/streams/input_stream.h"
@@ -29,37 +28,36 @@
 namespace mlio {
 inline namespace abi_v1 {
 
-sagemaker_pipe::sagemaker_pipe(std::string pathname,
+Sagemaker_pipe::Sagemaker_pipe(std::string path,
                                std::chrono::seconds timeout,
                                std::optional<std::size_t> fifo_id,  // NOLINT
-                               compression cmp)
-    : pathname_{std::move(pathname)}, timeout_{timeout}, fifo_id_{fifo_id}, compression_{cmp}
+                               Compression compression)
+    : path_{std::move(path)}, timeout_{timeout}, fifo_id_{fifo_id}, compression_{compression}
 {
-    detail::validate_file_pathname(pathname_);
+    detail::validate_file_path(path_);
 
-    if (compression_ == compression::infer) {
-        throw not_supported_error{
+    if (compression_ == Compression::infer) {
+        throw Not_supported_error{
             "The SageMaker pipe channel does not support inferring compression."};
     }
 }
 
-intrusive_ptr<input_stream> sagemaker_pipe::open_read() const
+Intrusive_ptr<Input_stream> Sagemaker_pipe::open_read() const
 {
-    logger::info("The SageMaker pipe '{0}' is being opened.", pathname_);
+    logger::info("The SageMaker pipe '{0}' is being opened.", path_);
 
-    auto strm = make_sagemaker_pipe_input_stream(
-        pathname_, timeout_, std::exchange(fifo_id_, std::nullopt));
+    auto stream =
+        make_sagemaker_pipe_input_stream(path_, timeout_, std::exchange(fifo_id_, std::nullopt));
 
-    if (compression_ == compression::none) {
-        return std::move(strm);
+    if (compression_ == Compression::none) {
+        return std::move(stream);
     }
-    return make_inflate_stream(std::move(strm), compression_);
+    return make_inflate_stream(std::move(stream), compression_);
 }
 
-std::string sagemaker_pipe::repr() const
+std::string Sagemaker_pipe::repr() const
 {
-    return fmt::format(
-        "<sagemaker_pipe pathname='{0}' compression='{1}'>", pathname_, compression_);
+    return fmt::format("<Sagemaker_pipe path='{0}' compression='{1}'>", path_, compression_);
 }
 
 }  // namespace abi_v1

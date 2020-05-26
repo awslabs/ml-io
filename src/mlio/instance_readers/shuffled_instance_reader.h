@@ -30,25 +30,24 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-class shuffled_instance_reader final : public instance_reader_base {
+class Shuffled_instance_reader final : public Instance_reader_base {
 public:
-    explicit shuffled_instance_reader(const data_reader_params &prm,
-                                      std::unique_ptr<instance_reader> &&inner);
+    explicit Shuffled_instance_reader(const Data_reader_params &params,
+                                      std::unique_ptr<Instance_reader> &&inner);
 
 private:
-    std::optional<instance> read_instance_core() final;
+    std::optional<Instance> read_instance_core() final;
 
     void fill_buffer_from_inner();
 
-    std::optional<instance> pop_random_instance_from_buffer();
+    std::optional<Instance> pop_random_instance_from_buffer();
 
     void reset_core() noexcept final;
 
-private:
-    const data_reader_params *params_;
-    std::unique_ptr<instance_reader> inner_;
+    const Data_reader_params *params_;
+    std::unique_ptr<Instance_reader> inner_;
     std::size_t shuffle_window_;
-    std::vector<instance> buffer_{};
+    std::vector<Instance> buffer_{};
     bool inner_has_instance_ = true;
     std::random_device rd_{};
     std::uint_fast64_t seed_{rd_()};

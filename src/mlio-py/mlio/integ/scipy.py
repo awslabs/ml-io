@@ -19,11 +19,11 @@ from scipy.sparse import coo_matrix
 
 def to_coo_matrix(tensor):
     """
-    Converts the specified tensor to a ``coo_matrix``.
+    Converts the specified Tensor to a ``coo_matrix``.
     """
 
     if not isinstance(tensor, CooTensor):
-        raise ValueError("The tensor must be an instance of CooTensor.")
+        raise ValueError("The Tensor must be an Instance of CooTensor.")
 
     s = tensor.shape
 
@@ -43,7 +43,7 @@ def to_coo_matrix(tensor):
 
 def to_tensor(mtx):
     """
-    Converts the specified ``coo_matrix`` to a tensor.
+    Converts the specified ``coo_matrix`` to a Tensor.
     """
 
     if not isinstance(mtx, coo_matrix):

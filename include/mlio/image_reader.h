@@ -35,14 +35,14 @@ inline namespace abi_v1 {
 /// @{
 
 /// Specifies the frame of an image.
-enum class image_frame {
-    none,     ///< The image is contained in a regular file.
-    recordio  ///< The image is contained in an MXNet RecordIO record.
+enum class Image_frame {
+    none,     ///< The image is contained in a regular File.
+    recordio  ///< The image is contained in an MXNet RecordIO Record.
 };
 
-struct MLIO_API image_reader_params final {
-    /// See @ref image_frame.
-    image_frame img_frame{image_frame::none};
+struct MLIO_API Image_reader_params final {
+    /// See @ref Image_frame.
+    Image_frame image_frame{Image_frame::none};
     /// Scales the shorter edge of the image to the specified size
     /// before applying other augmentations.
     std::optional<std::size_t> resize{};
@@ -53,53 +53,50 @@ struct MLIO_API image_reader_params final {
     bool to_rgb = false;
 };
 
-/// Represents a @ref data_reader for reading image datasets.
-class MLIO_API image_reader final : public parallel_data_reader {
-private:
-    static std::size_t constexpr image_dimensions_size_ = 3;
-    static std::size_t constexpr recordio_image_header_offset_ = 24;
-
+/// Represents a @ref Data_reader for reading image datasets.
+class MLIO_API Image_reader final : public Parallel_data_reader {
 public:
-    explicit image_reader(data_reader_params prm, image_reader_params img_prm);
+    explicit Image_reader(Data_reader_params params, Image_reader_params img_params);
 
-    image_reader(const image_reader &) = delete;
+    Image_reader(const Image_reader &) = delete;
 
-    image_reader(image_reader &&) = delete;
+    Image_reader &operator=(const Image_reader &) = delete;
 
-    ~image_reader() final;
+    Image_reader(Image_reader &&) = delete;
 
-public:
-    image_reader &operator=(const image_reader &) = delete;
+    Image_reader &operator=(Image_reader &&) = delete;
 
-    image_reader &operator=(image_reader &&) = delete;
-
-private:
-    MLIO_HIDDEN
-    intrusive_ptr<record_reader> make_record_reader(const data_store &ds) final;
-
-    MLIO_HIDDEN
-    intrusive_ptr<schema const> infer_schema(std::optional<instance> const &ins) final;
-
-    MLIO_HIDDEN
-    intrusive_ptr<example> decode(const instance_batch &batch) const final;
-
-    MLIO_HIDDEN
-    intrusive_ptr<dense_tensor> make_tensor(std::size_t batch_size, std::size_t batch_stride) const;
-
-    MLIO_HIDDEN
-    bool decode_core(stdx::span<std::uint8_t> out, const instance &ins) const;
-
-    MLIO_HIDDEN
-    cv::Mat decode_image(const cv::Mat &buf, int mode, const instance &ins) const;
-
-    MLIO_HIDDEN
-    bool resize(cv::Mat &src, cv::Mat &dst, const instance &ins) const;
-
-    MLIO_HIDDEN
-    bool crop(cv::Mat &src, cv::Mat &dst, const instance &ins) const;
+    ~Image_reader() final;
 
 private:
-    image_reader_params params_;
+    MLIO_HIDDEN
+    Intrusive_ptr<Record_reader> make_record_reader(const Data_store &store) final;
+
+    MLIO_HIDDEN
+    Intrusive_ptr<const Schema> infer_schema(const std::optional<Instance> &instance) final;
+
+    MLIO_HIDDEN
+    Intrusive_ptr<Example> decode(const Instance_batch &batch) const final;
+
+    MLIO_HIDDEN
+    Intrusive_ptr<Dense_tensor> make_tensor(std::size_t batch_size, std::size_t batch_stride) const;
+
+    MLIO_HIDDEN
+    bool decode_core(stdx::span<std::uint8_t> out, const Instance &instance) const;
+
+    MLIO_HIDDEN
+    cv::Mat decode_image(const cv::Mat &buf, int mode, const Instance &instance) const;
+
+    MLIO_HIDDEN
+    bool resize(cv::Mat &src, cv::Mat &dst, const Instance &instance) const;
+
+    MLIO_HIDDEN
+    bool crop(cv::Mat &src, cv::Mat &dst, const Instance &instance) const;
+
+    static constexpr std::size_t image_dimensions_size_ = 3;
+    static constexpr std::size_t recordio_image_header_offset_ = 24;
+
+    Image_reader_params params_;
     std::array<int, image_dimensions_size_> img_dims_{};
     bool error_bad_example_;
 };

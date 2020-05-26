@@ -16,7 +16,6 @@
 #include "mlio/memory/file_mapped_memory_block.h"
 
 #include <cstddef>
-#include <string>
 #include <system_error>
 #include <utility>
 
@@ -27,32 +26,31 @@
 
 #include "mlio/detail/error.h"
 #include "mlio/detail/file_descriptor.h"
-#include "mlio/detail/pathname.h"
+#include "mlio/detail/path.h"
 
 using mlio::detail::current_error_code;
-using mlio::detail::file_descriptor;
+using mlio::detail::File_descriptor;
 
 namespace mlio {
 inline namespace abi_v1 {
 
-file_mapped_memory_block::file_mapped_memory_block(std::string pathname)
-    : pathname_{std::move(pathname)}
+File_mapped_memory_block::File_mapped_memory_block(std::string path) : path_{std::move(path)}
 {
-    detail::validate_file_pathname(pathname_);
+    detail::validate_file_path(path_);
 
     init_memory_map();
 }
 
-file_mapped_memory_block::~file_mapped_memory_block()
+File_mapped_memory_block::~File_mapped_memory_block()
 {
     if (data_ != nullptr) {
         ::munmap(data_, size_);
     }
 }
 
-void file_mapped_memory_block::init_memory_map()
+void File_mapped_memory_block::init_memory_map()
 {
-    file_descriptor fd = ::open(pathname_.c_str(), O_RDONLY | O_CLOEXEC);
+    File_descriptor fd = ::open(path_.c_str(), O_RDONLY | O_CLOEXEC);
     if (fd == -1) {
         throw std::system_error{current_error_code(), "The file cannot be opened."};
     }

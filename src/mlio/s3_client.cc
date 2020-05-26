@@ -45,7 +45,8 @@ Aws::Auth::AWSCredentials get_default_aws_credentials()
 
     // Compilers are allowed to initialize local static variables before
     // entering the main function. As the credentials provider chain has
-    // to be constructed after Aws::InitAPI() we initialize lazily.
+    // to be constructed after calling the Aws::InitAPI function here we
+    // initialize lazily.
     std::call_once(chain_initialized, [&chain]() {
         chain = std::make_unique<Aws::Auth::DefaultAWSCredentialsProviderChain>();
     });
@@ -56,7 +57,7 @@ Aws::Auth::AWSCredentials get_default_aws_credentials()
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wswitch-enum"
 
-[[noreturn]] void throw_s3_error(Aws::Client::AWSError<Aws::S3::S3Errors> const &err)
+[[noreturn]] void throw_s3_error(const Aws::Client::AWSError<Aws::S3::S3Errors> &err)
 {
     std::error_code ec;
 
@@ -96,34 +97,35 @@ inline void check_s3_error(const Outcome &outcome)
 }  // namespace
 }  // namespace detail
 
-s3_client::s3_client() : core_{}
+S3_client::S3_client() : native_client_{}
 {
-    Aws::Auth::AWSCredentials crd = detail::get_default_aws_credentials();
+    Aws::Auth::AWSCredentials credentials = detail::get_default_aws_credentials();
 
-    core_ = std::make_unique<Aws::S3::S3Client>(crd);
+    native_client_ = std::make_unique<Aws::S3::S3Client>(credentials);
 }
 
-s3_client::s3_client(std::unique_ptr<Aws::S3::S3Client> clt) noexcept : core_{std::move(clt)}
+S3_client::S3_client(std::unique_ptr<Aws::S3::S3Client> native_client) noexcept
+    : native_client_{std::move(native_client)}
 {}
 
-s3_client::~s3_client() = default;
+S3_client::~S3_client() = default;
 
-void s3_client::list_objects(std::string_view bucket,
+void S3_client::list_objects(std::string_view bucket,
                              std::string_view prefix,
-                             std::function<void(std::string uri)> const &callback) const
+                             const std::function<void(std::string uri)> &callback) const
 {
-    Aws::S3::Model::ListObjectsV2Request req{};
-    req.SetBucket(Aws::String{bucket});
-    req.SetMaxKeys(1000);
+    Aws::S3::Model::ListObjectsV2Request request{};
+    request.SetBucket(Aws::String{bucket});
+    request.SetMaxKeys(1000);
 
     if (!prefix.empty()) {
-        req.SetPrefix(Aws::String{prefix});
+        request.SetPrefix(Aws::String{prefix});
     }
 
     std::string base_uri{"s3://" + std::string{bucket} + "/"};
 
     while (true) {
-        auto outcome = core_->ListObjectsV2(req);
+        auto outcome = native_client_->ListObjectsV2(request);
         detail::check_s3_error(outcome);
 
         const auto &result = outcome.GetResult();
@@ -135,82 +137,82 @@ void s3_client::list_objects(std::string_view bucket,
         if (!result.GetIsTruncated()) {
             break;
         }
-        req.SetContinuationToken(result.GetNextContinuationToken());
+        request.SetContinuationToken(result.GetNextContinuationToken());
     }
 }
 
-std::size_t s3_client::read_object(std::string_view bucket,
+std::size_t S3_client::read_object(std::string_view bucket,
                                    std::string_view key,
                                    std::string_view version_id,
                                    std::size_t offset,
-                                   mutable_memory_span dest) const
+                                   Mutable_memory_span destination) const
 {
     std::string range_str =
-        "bytes=" + std::to_string(offset) + "-" + std::to_string(offset + dest.size());
+        "bytes=" + std::to_string(offset) + "-" + std::to_string(offset + destination.size());
 
-    Aws::S3::Model::GetObjectRequest req{};
-    req.SetBucket(Aws::String{bucket});
-    req.SetKey(Aws::String{key});
-    req.SetRange(Aws::String{range_str});
+    Aws::S3::Model::GetObjectRequest request{};
+    request.SetBucket(Aws::String{bucket});
+    request.SetKey(Aws::String{key});
+    request.SetRange(Aws::String{range_str});
 
     if (!version_id.empty()) {
-        req.SetVersionId(Aws::String{version_id});
+        request.SetVersionId(Aws::String{version_id});
     }
 
-    auto outcome = core_->GetObject(req);
+    auto outcome = native_client_->GetObject(request);
     detail::check_s3_error(outcome);
 
-    auto chrs = as_span<char>(dest);
+    auto chars = as_span<char>(destination);
 
     auto &body = outcome.GetResult().GetBody();
-    body.read(chrs.data(), static_cast<std::streamsize>(chrs.size()));
+    body.read(chars.data(), static_cast<std::streamsize>(chars.size()));
 
     return static_cast<std::size_t>(body.gcount()) * sizeof(char);
 }
 
-std::size_t s3_client::read_object_size(std::string_view bucket,
+std::size_t S3_client::read_object_size(std::string_view bucket,
                                         std::string_view key,
                                         std::string_view version_id) const
 {
-    Aws::S3::Model::HeadObjectRequest req{};
-    req.SetBucket(Aws::String{bucket});
-    req.SetKey(Aws::String{key});
+    Aws::S3::Model::HeadObjectRequest request{};
+    request.SetBucket(Aws::String{bucket});
+    request.SetKey(Aws::String{key});
 
     if (!version_id.empty()) {
-        req.SetVersionId(Aws::String{version_id});
+        request.SetVersionId(Aws::String{version_id});
     }
 
-    auto outcome = core_->HeadObject(req);
+    auto outcome = native_client_->HeadObject(request);
     detail::check_s3_error(outcome);
 
     return as_size(outcome.GetResult().GetContentLength());
 }
 
-intrusive_ptr<s3_client> s3_client_builder::build()
+Intrusive_ptr<S3_client> S3_client_builder::build()
 {
-    Aws::Auth::AWSCredentials crd{};
+    Aws::Auth::AWSCredentials credentials{};
     if (access_key_id_.empty() && secret_key_.empty()) {
-        crd = detail::get_default_aws_credentials();
+        credentials = detail::get_default_aws_credentials();
     }
     else {
-        crd = Aws::Auth::AWSCredentials{
+        credentials = Aws::Auth::AWSCredentials{
             Aws::String{access_key_id_}, Aws::String{secret_key_}, Aws::String{session_token_}};
     }
 
-    Aws::Client::ClientConfiguration cfg{};
+    Aws::Client::ClientConfiguration config{};
     if (!profile_.empty()) {
-        cfg = Aws::Client::ClientConfiguration{profile_.c_str()};
+        config = Aws::Client::ClientConfiguration{profile_.c_str()};
     }
     if (!region_.empty()) {
-        cfg.region = region_;
+        config.region = region_;
     }
-    if (!https_) {
-        cfg.scheme = Aws::Http::Scheme::HTTP;
+    if (!use_https_) {
+        config.scheme = Aws::Http::Scheme::HTTP;
     }
 
-    auto clt = std::make_unique<Aws::S3::S3Client>(crd, cfg);
+    auto native_client = std::make_unique<Aws::S3::S3Client>(credentials, config);
 
-    return make_intrusive<s3_client>(std::move(clt));
+    return make_intrusive<S3_client>(std::move(native_client));
 }
 
 }  // namespace abi_v1
@@ -218,7 +220,7 @@ intrusive_ptr<s3_client> s3_client_builder::build()
 
 #else
 
-#include "mlio/not_supported_error.h"
+#include "mlio/Not_supported_error.h"
 
 namespace Aws::S3 {
 
@@ -232,42 +234,42 @@ inline namespace abi_v1 {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmissing-noreturn"
 
-s3_client::s3_client() : core_{}
+S3_client::S3_client() : native_client_{}
 {
-    throw not_supported_error{"MLIO was not built with S3 support."};
+    throw Not_supported_error{"MLIO was not built with S3 support."};
 }
 
-s3_client::s3_client(std::unique_ptr<Aws::S3::S3Client>) noexcept : core_{}
+S3_client::S3_client(std::unique_ptr<Aws::S3::S3Client>) noexcept : native_client_{}
 {}
 
-s3_client::~s3_client() = default;
+S3_client::~S3_client() = default;
 
 // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
-void s3_client::list_objects(std::string_view,
+void S3_client::list_objects(std::string_view,
                              std::string_view,
-                             std::function<void(std::string)> const &) const
+                             const std::function<void(std::string)> &) const
 {}
 
 // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
-std::size_t s3_client::read_object(std::string_view,
+std::size_t S3_client::read_object(std::string_view,
                                    std::string_view,
                                    std::string_view,
                                    std::size_t,
-                                   mutable_memory_span) const
+                                   Mutable_memory_span) const
 {
     return 0;
 }
 
 // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
-std::size_t s3_client::read_object_size(std::string_view, std::string_view, std::string_view) const
+std::size_t S3_client::read_object_size(std::string_view, std::string_view, std::string_view) const
 {
     return 0;
 }
 
 // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
-intrusive_ptr<s3_client> s3_client_builder::build()
+Intrusive_ptr<S3_client> S3_client_builder::build()
 {
-    throw not_supported_error{"MLIO was not built with S3 support."};
+    throw Not_supported_error{"MLIO was not built with S3 support."};
 }
 
 #pragma GCC diagnostic pop

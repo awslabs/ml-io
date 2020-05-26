@@ -31,48 +31,45 @@ inline namespace abi_v1 {
 /// @{
 
 /// Represents a repository of data.
-class MLIO_API data_store : public intrusive_ref_counter<data_store> {
+class MLIO_API Data_store : public Intrusive_ref_counter<Data_store> {
 public:
-    data_store() noexcept = default;
+    Data_store() noexcept = default;
 
-    data_store(const data_store &) = delete;
+    Data_store(const Data_store &) = delete;
 
-    data_store(data_store &&) = delete;
+    Data_store &operator=(const Data_store &) = delete;
 
-    virtual ~data_store();
+    Data_store(Data_store &&) = delete;
 
-public:
-    data_store &operator=(const data_store &) = delete;
+    Data_store &operator=(Data_store &&) = delete;
 
-    data_store &operator=(data_store &&) = delete;
+    virtual ~Data_store();
 
-public:
-    /// Returns an @ref input_stream for reading from the data store.
-    virtual intrusive_ptr<input_stream> open_read() const = 0;
+    /// Returns an @ref Input_stream for reading from the data store.
+    virtual Intrusive_ptr<Input_stream> open_read() const = 0;
 
     virtual std::string repr() const = 0;
 
-public:
     /// Returns a unique identifier for the data store.
     virtual const std::string &id() const = 0;
 };
 
 MLIO_API
-inline bool operator==(const data_store &lhs, const data_store &rhs) noexcept
+inline bool operator==(const Data_store &lhs, const Data_store &rhs) noexcept
 {
     return lhs.id() == rhs.id();
 }
 
 MLIO_API
-inline bool operator!=(const data_store &lhs, const data_store &rhs) noexcept
+inline bool operator!=(const Data_store &lhs, const Data_store &rhs) noexcept
 {
     return lhs.id() != rhs.id();
 }
 
 MLIO_API
-inline std::ostream &operator<<(std::ostream &strm, const data_store &ds)
+inline std::ostream &operator<<(std::ostream &s, const Data_store &store)
 {
-    return strm << ds.repr();
+    return s << store.repr();
 }
 
 /// @}
@@ -83,10 +80,10 @@ inline std::ostream &operator<<(std::ostream &strm, const data_store &ds)
 namespace std {
 
 template<>
-struct MLIO_API hash<mlio::data_store> {
-    inline size_t operator()(const mlio::data_store &ds) const noexcept
+struct MLIO_API hash<mlio::Data_store> {
+    inline size_t operator()(const mlio::Data_store &store) const noexcept
     {
-        return hash<string>{}(ds.id());
+        return hash<string>{}(store.id());
     }
 };
 

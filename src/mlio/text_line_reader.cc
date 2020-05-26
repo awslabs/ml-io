@@ -32,54 +32,55 @@ using mlio::detail::text_line_record_reader;
 namespace mlio {
 inline namespace abi_v1 {
 
-text_line_reader::text_line_reader(data_reader_params prm) : parallel_data_reader{std::move(prm)}
+Text_line_reader::Text_line_reader(Data_reader_params params)
+    : Parallel_data_reader{std::move(params)}
 {}
 
-text_line_reader::~text_line_reader()
+Text_line_reader::~Text_line_reader()
 {
     stop();
 }
 
-intrusive_ptr<record_reader> text_line_reader::make_record_reader(const data_store &ds)
+Intrusive_ptr<Record_reader> Text_line_reader::make_record_reader(const Data_store &store)
 {
-    auto strm = make_utf8_stream(ds.open_read());
-    return make_intrusive<text_line_record_reader>(std::move(strm), false);
+    auto stream = make_utf8_stream(store.open_read());
+    return make_intrusive<text_line_record_reader>(std::move(stream), false);
 }
 
-intrusive_ptr<schema const> text_line_reader::infer_schema(std::optional<instance> const &)
+Intrusive_ptr<const Schema> Text_line_reader::infer_schema(const std::optional<Instance> &)
 {
-    std::vector<attribute> attrs{};
-    attrs.emplace_back("value", data_type::string, size_vector{params().batch_size, 1});
+    std::vector<Attribute> attrs{};
+    attrs.emplace_back("value", Data_type::string, Size_vector{params().batch_size, 1});
 
-    return make_intrusive<schema>(std::move(attrs));
+    return make_intrusive<Schema>(std::move(attrs));
 }
 
-intrusive_ptr<example> text_line_reader::decode(const instance_batch &batch) const
+Intrusive_ptr<Example> Text_line_reader::decode(const Instance_batch &batch) const
 {
-    intrusive_ptr<dense_tensor> tsr = make_tensor(batch.size());
+    Intrusive_ptr<Dense_tensor> tensor = make_tensor(batch.size());
 
-    auto row_pos = tsr->data().as<std::string>().begin();
-    for (const instance &ins : batch.instances()) {
-        *row_pos++ = as_string_view(ins.bits());
+    auto row_pos = tensor->data().as<std::string>().begin();
+    for (const Instance &instance : batch.instances()) {
+        *row_pos++ = as_string_view(instance.bits());
     }
 
-    std::vector<intrusive_ptr<tensor>> tensors{};
-    tensors.emplace_back(std::move(tsr));
+    std::vector<Intrusive_ptr<Tensor>> tensors{};
+    tensors.emplace_back(std::move(tensor));
 
-    auto exm = make_intrusive<example>(get_schema(), std::move(tensors));
+    auto example = make_intrusive<Example>(schema(), std::move(tensors));
 
-    exm->padding = batch.size() - batch.instances().size();
+    example->padding = batch.size() - batch.instances().size();
 
-    return exm;
+    return example;
 }
 
-intrusive_ptr<dense_tensor> text_line_reader::make_tensor(std::size_t batch_size)
+Intrusive_ptr<Dense_tensor> Text_line_reader::make_tensor(std::size_t batch_size)
 {
-    size_vector shp{batch_size, 1};
+    Size_vector shape{batch_size, 1};
 
-    auto arr = make_cpu_array(data_type::string, batch_size);
+    auto arr = make_cpu_array(Data_type::string, batch_size);
 
-    return make_intrusive<dense_tensor>(std::move(shp), std::move(arr));
+    return make_intrusive<Dense_tensor>(std::move(shape), std::move(arr));
 }
 
 }  // namespace abi_v1

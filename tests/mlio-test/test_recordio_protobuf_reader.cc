@@ -3,11 +3,11 @@
 
 namespace mlio {
 
-class test_recordio_protobuf_reader : public ::testing::Test {
+class Test_recordio_protobuf_reader : public ::testing::Test {
 protected:
-    test_recordio_protobuf_reader() = default;
+    Test_recordio_protobuf_reader() = default;
 
-    ~test_recordio_protobuf_reader() override;
+    ~Test_recordio_protobuf_reader() override;
 
 protected:
     std::string const resources_path_ = "../resources/recordio/";
@@ -16,17 +16,17 @@ protected:
     std::string const corrupt_split_records_path_ = resources_path_ + "corrupted_split_records.pr";
 };
 
-test_recordio_protobuf_reader::~test_recordio_protobuf_reader() = default;
+Test_recordio_protobuf_reader::~Test_recordio_protobuf_reader() = default;
 
-TEST_F(test_recordio_protobuf_reader, test_complete_records_path)
+TEST_F(Test_recordio_protobuf_reader, test_complete_records_path)
 {
-    mlio::data_reader_params prm{};
-    prm.dataset.emplace_back(mlio::make_intrusive<mlio::file>(complete_records_path_));
+    mlio::Data_reader_params prm{};
+    prm.dataset.emplace_back(mlio::make_intrusive<mlio::File>(complete_records_path_));
     prm.batch_size = 1;
 
-    auto reader = mlio::make_intrusive<mlio::recordio_protobuf_reader>(prm);
+    auto reader = mlio::make_intrusive<mlio::Recordio_protobuf_reader>(prm);
     for (int i = 0; i < 2; i++) {
-        mlio::intrusive_ptr<mlio::example> exm;
+        mlio::Intrusive_ptr<mlio::Example> exm;
         while ((exm = reader->read_example()) != nullptr) {
         }
         reader->reset();
@@ -35,16 +35,16 @@ TEST_F(test_recordio_protobuf_reader, test_complete_records_path)
     EXPECT_TRUE(true);
 }
 
-TEST_F(test_recordio_protobuf_reader, test_split_records_path)
+TEST_F(Test_recordio_protobuf_reader, test_split_records_path)
 {
     mlio::initialize();
-    mlio::data_reader_params prm{};
-    prm.dataset.emplace_back(mlio::make_intrusive<mlio::file>(split_records_path_));
+    mlio::Data_reader_params prm{};
+    prm.dataset.emplace_back(mlio::make_intrusive<mlio::File>(split_records_path_));
     prm.batch_size = 1;
 
-    auto reader = mlio::make_intrusive<mlio::recordio_protobuf_reader>(prm);
+    auto reader = mlio::make_intrusive<mlio::Recordio_protobuf_reader>(prm);
     for (int i = 0; i < 2; i++) {
-        mlio::intrusive_ptr<mlio::example> exm;
+        mlio::Intrusive_ptr<mlio::Example> exm;
         while ((exm = reader->read_example()) != nullptr) {
         }
         reader->reset();
@@ -53,26 +53,26 @@ TEST_F(test_recordio_protobuf_reader, test_split_records_path)
     EXPECT_TRUE(true);
 }
 
-TEST_F(test_recordio_protobuf_reader, test_corrupt_split_records_patH)
+TEST_F(Test_recordio_protobuf_reader, test_corrupt_split_records_patH)
 {
     mlio::initialize();
-    // Check that the third record is corrupt.
-    mlio::data_reader_params prm{};
-    prm.dataset.emplace_back(mlio::make_intrusive<mlio::file>(corrupt_split_records_path_));
+    // Check that the third Record is corrupt.
+    mlio::Data_reader_params prm{};
+    prm.dataset.emplace_back(mlio::make_intrusive<mlio::File>(corrupt_split_records_path_));
     prm.batch_size = 10;
     prm.num_prefetched_examples = 1;
 
-    std::string error_substring = "The record #13 in the data store";
+    std::string error_substring = "The Record #13 in the data store";
 
-    auto reader = mlio::make_intrusive<mlio::recordio_protobuf_reader>(prm);
-    mlio::intrusive_ptr<mlio::example> exm;
+    auto reader = mlio::make_intrusive<mlio::Recordio_protobuf_reader>(prm);
+    mlio::Intrusive_ptr<mlio::Example> exm;
 
-    // Try to read batch, should fail due to corrupt record
+    // Try to read batch, should fail due to corrupt Record
     try {
         exm = reader->read_example();
-        FAIL() << "Expected corrupt error exception on 3rd record.";
+        FAIL() << "Expected corrupt error exception on 3rd Record.";
     }
-    catch (data_reader_error const &corrupt_record_err) {
+    catch (Data_reader_error const &corrupt_record_err) {
         EXPECT_TRUE(std::string(corrupt_record_err.what()).find(error_substring) !=
                     std::string::npos)
             << "Error thrown:" + std::string(corrupt_record_err.what());
@@ -84,9 +84,9 @@ TEST_F(test_recordio_protobuf_reader, test_corrupt_split_records_patH)
     // Try to read batch, should fail again
     try {
         exm = reader->read_example();
-        FAIL() << "Expected corrupt error exception on 3rd record.";
+        FAIL() << "Expected corrupt error exception on 3rd Record.";
     }
-    catch (data_reader_error const &corrupt_record_err) {
+    catch (Data_reader_error const &corrupt_record_err) {
         EXPECT_TRUE(std::string(corrupt_record_err.what()).find(error_substring) !=
                     std::string::npos)
             << "Error thrown:" + std::string(corrupt_record_err.what());
@@ -101,9 +101,9 @@ TEST_F(test_recordio_protobuf_reader, test_corrupt_split_records_patH)
     // Try to read batch, should fail again
     try {
         exm = reader->read_example();
-        FAIL() << "Expected corrupt error exception on 3rd record.";
+        FAIL() << "Expected corrupt error exception on 3rd Record.";
     }
-    catch (data_reader_error const &corrupt_record_err) {
+    catch (Data_reader_error const &corrupt_record_err) {
         EXPECT_TRUE(std::string(corrupt_record_err.what()).find(error_substring) !=
                     std::string::npos)
             << "Error thrown:" + std::string(corrupt_record_err.what());

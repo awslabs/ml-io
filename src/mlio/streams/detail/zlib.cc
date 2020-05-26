@@ -25,7 +25,7 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-zlib_inflater::zlib_inflater()
+Zlib_inflater::Zlib_inflater()
 {
     // Inflate both zlib and gzip.
     int r = ::inflateInit2(&stream_, MAX_WBITS + 32);
@@ -37,21 +37,21 @@ zlib_inflater::zlib_inflater()
         throw std::bad_alloc{};
     }
     if (r == Z_VERSION_ERROR) {
-        throw not_supported_error{"The zlib library has an unsupported version."};
+        throw Not_supported_error{"The zlib library has an unsupported version."};
     }
     assert(false);
 }
 
-zlib_inflater::~zlib_inflater()
+Zlib_inflater::~Zlib_inflater()
 {
     ::inflateEnd(&stream_);
 }
 
-void zlib_inflater::inflate(memory_span &inp, mutable_memory_span &out)
+void Zlib_inflater::inflate(Memory_span &inp, Mutable_memory_span &out)
 {
     validate_state();
 
-    auto i_buf = as_span<::Bytef const>(inp);
+    auto i_buf = as_span<const ::Bytef>(inp);
     auto o_buf = as_span<::Bytef>(out);
 
     // We do not use the ZLIB_CONST macro because some older
@@ -75,7 +75,7 @@ void zlib_inflater::inflate(memory_span &inp, mutable_memory_span &out)
     out = out.last(stream_.avail_out);
 }
 
-void zlib_inflater::validate_state() const
+void Zlib_inflater::validate_state() const
 {
     switch (state_) {
     case Z_OK:
@@ -84,7 +84,7 @@ void zlib_inflater::validate_state() const
 
     case Z_NEED_DICT:
     case Z_DATA_ERROR:
-        throw inflate_error{"The zlib stream contains invalid or incomplete deflate data."};
+        throw Inflate_error{"The zlib stream contains invalid or incomplete deflate data."};
 
     case Z_MEM_ERROR:
         throw std::bad_alloc{};

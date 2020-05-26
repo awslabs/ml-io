@@ -21,12 +21,12 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-coo_tensor_builder::~coo_tensor_builder() = default;
+Coo_tensor_builder::~Coo_tensor_builder() = default;
 
-bool coo_tensor_builder::append_core(stdx::span<std::uint64_t const> keys)
+bool Coo_tensor_builder::append_indices(stdx::span<const std::uint64_t> indices)
 {
-    // The first element of the shape and the strides corresponds to the
-    // batch dimension. We do not need it for computing the indices.
+    // The first elements of the shape and the strides correspond to the
+    // batch dimension. We do not need them to compute the indices.
 
     auto dim_beg = attr_->shape().begin() + 1;
     auto dim_end = attr_->shape().end();
@@ -34,39 +34,37 @@ bool coo_tensor_builder::append_core(stdx::span<std::uint64_t const> keys)
     auto stride_beg = attr_->strides().begin() + 1;
     auto stride_end = attr_->strides().end();
 
-    auto indices_beg = coords_.begin() + 1;
-    auto indices_end = coords_.end();
+    auto coordinates_beg = coordinates_.begin() + 1;
+    auto coordinates_end = coordinates_.end();
 
-    auto zip_beg = tbb::make_zip_iterator(dim_beg, stride_beg, indices_beg);
-    auto zip_end = tbb::make_zip_iterator(dim_end, stride_end, indices_end);
+    auto zip_beg = tbb::make_zip_iterator(dim_beg, stride_beg, coordinates_beg);
+    auto zip_end = tbb::make_zip_iterator(dim_end, stride_end, coordinates_end);
 
-    for (auto uint_key : keys) {
-        std::size_t key{};
-        // On a 32-bit system we might not be able to convert the key
-        // from 64-bit to 32-bit without truncating.
-        if (!try_narrow(uint_key, key)) {
+    for (auto uint_idx : indices) {
+        std::size_t idx{};
+        // On a 32-bit system we might not be able to convert the index
+        // from 64-bit to 32-bit without narrowing.
+        if (!try_narrow(uint_idx, idx)) {
             return false;
         }
 
-        coords_[0].emplace_back(row_idx_);
+        coordinates_[0].emplace_back(row_idx_);
 
         for (auto zip_pos = zip_beg; zip_pos < zip_end; ++zip_pos) {
             std::size_t stride = as_size(std::get<1>(*zip_pos));
 
-            std::size_t d = key / stride;
-            std::size_t r = key % stride;
-
-            std::size_t dim_idx = d;
+            std::size_t dim_idx = idx / stride;
 
             // Make sure that the index is within the dimension.
             if (dim_idx >= std::get<0>(*zip_pos)) {
                 return false;
             }
 
+            // Put the index to the corresponding coordinate vector.
             std::get<2>(*zip_pos).emplace_back(dim_idx);
 
-            // Use the remainder as the new key.
-            key = r;
+            // Use the remainder as the new index.
+            idx = idx % stride;
         }
     }
 
@@ -75,24 +73,24 @@ bool coo_tensor_builder::append_core(stdx::span<std::uint64_t const> keys)
     return true;
 }
 
-intrusive_ptr<tensor> coo_tensor_builder::build_core(std::unique_ptr<device_array> &&data)
+Intrusive_ptr<Tensor> Coo_tensor_builder::build_core(std::unique_ptr<Device_array> &&data)
 {
     // Wrap index lists into device arrays.
-    std::vector<std::unique_ptr<device_array>> layout{};
-    layout.reserve(coords_.size());
+    std::vector<std::unique_ptr<Device_array>> layout{};
+    layout.reserve(coordinates_.size());
 
-    for (std::vector<std::size_t> &indices : coords_) {
-        auto arr = wrap_cpu_array<data_type::size>(std::move(indices));
+    for (std::vector<std::size_t> &indices : coordinates_) {
+        auto arr = wrap_cpu_array<Data_type::size>(std::move(indices));
         layout.emplace_back(std::move(arr));
     }
 
-    size_vector shape = attr_->shape();
+    Size_vector shape = attr_->shape();
 
-    // The passed batch size can be less than the actual batch size if
+    // The provided batch size can be less than the actual batch size if
     // there is padding.
     shape[0] = batch_size_;
 
-    return make_intrusive<coo_tensor>(std::move(shape), std::move(data), std::move(layout));
+    return make_intrusive<Coo_tensor>(std::move(shape), std::move(data), std::move(layout));
 }
 
 }  // namespace detail

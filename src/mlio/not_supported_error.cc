@@ -18,7 +18,7 @@
 namespace mlio {
 inline namespace abi_v1 {
 
-not_supported_error::~not_supported_error() = default;
+Not_supported_error::~Not_supported_error() = default;
 
 }  // namespace abi_v1
 }  // namespace mlio

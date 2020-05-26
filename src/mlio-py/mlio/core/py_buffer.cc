@@ -29,7 +29,7 @@ namespace pymlio {
 namespace {
 
 template<typename T>
-class py_buffer_container {
+class Py_buffer_container {
 public:
     using value_type = T;
     using size_type = std::size_t;
@@ -42,7 +42,7 @@ public:
     using const_iterator = const T *;
 
 public:
-    explicit py_buffer_container(T *data, size_type size, py::buffer_info &&info) noexcept
+    explicit Py_buffer_container(T *data, size_type size, py::buffer_info &&info) noexcept
         : data_{data}, size_{size}, info_{std::move(info)}
     {}
 
@@ -109,7 +109,7 @@ private:
     py::buffer_info info_;
 };
 
-std::optional<data_type> get_data_type(const py::buffer_info &info)
+std::optional<Data_type> get_data_type(const py::buffer_info &info)
 {
     const std::string &fmt_str = info.format;
 
@@ -131,87 +131,87 @@ std::optional<data_type> get_data_type(const py::buffer_info &info)
     switch (fmt) {
     case 'N':
         if (itemsize == sizeof(std::size_t)) {
-            return data_type::size;
+            return Data_type::size;
         }
         break;
 
     case 'e':
         if (itemsize == sizeof(std::uint16_t)) {
-            return data_type::float16;
+            return Data_type::float16;
         }
         break;
 
     case 'f':
         if (itemsize == sizeof(float)) {
-            return data_type::float32;
+            return Data_type::float32;
         }
         break;
 
     case 'd':
         if (itemsize == sizeof(double)) {
-            return data_type::float64;
+            return Data_type::float64;
         }
         break;
 
     case 'b':
         if (itemsize == sizeof(std::int8_t)) {
-            return data_type::sint8;
+            return Data_type::int8;
         }
         break;
     case 'h':
         if (itemsize == sizeof(std::int16_t)) {
-            return data_type::sint16;
+            return Data_type::int16;
         }
         break;
     case 'i':
         if (itemsize == sizeof(std::int32_t)) {
-            return data_type::sint32;
+            return Data_type::int32;
         }
         break;
     case 'l':
         if (itemsize == sizeof(std::int32_t)) {
-            return data_type::sint32;
+            return Data_type::int32;
         }
         else if (itemsize == sizeof(std::int64_t)) {
-            return data_type::sint64;
+            return Data_type::int64;
         }
         break;
     case 'q':
         if (itemsize == sizeof(std::int64_t)) {
-            return data_type::sint64;
+            return Data_type::int64;
         }
         break;
     case 'B':
         if (itemsize == sizeof(std::uint8_t)) {
-            return data_type::uint8;
+            return Data_type::uint8;
         }
         break;
     case 'H':
         if (itemsize == sizeof(std::uint16_t)) {
-            return data_type::uint16;
+            return Data_type::uint16;
         }
         break;
     case 'I':
         if (itemsize == sizeof(std::uint32_t)) {
-            return data_type::uint32;
+            return Data_type::uint32;
         }
         break;
     case 'L':
         if (itemsize == sizeof(std::uint32_t)) {
-            return data_type::uint32;
+            return Data_type::uint32;
         }
         else if (itemsize == sizeof(std::uint64_t)) {
-            return data_type::uint64;
+            return Data_type::uint64;
         }
         break;
     case 'Q':
         if (itemsize == sizeof(std::uint64_t)) {
-            return data_type::uint64;
+            return Data_type::uint64;
         }
         break;
     case 'O':
         if (itemsize == sizeof(PyObject *)) {
-            return data_type::string;
+            return Data_type::string;
         }
         break;
     }
@@ -219,11 +219,11 @@ std::optional<data_type> get_data_type(const py::buffer_info &info)
     return {};
 }
 
-template<data_type dt>
-struct make_cpu_array_op {
+template<Data_type dt>
+struct Make_cpu_array_op {
     using T = data_type_t<dt>;
 
-    std::unique_ptr<device_array> operator()(py::buffer_info &&info, bool cpy)
+    std::unique_ptr<Device_array> operator()(py::buffer_info &&info, bool cpy)
     {
         auto *data = static_cast<T *>(info.ptr);
 
@@ -237,14 +237,14 @@ struct make_cpu_array_op {
             return wrap_cpu_array<dt>(std::move(lst));
         }
 
-        py_buffer_container<T> cont{data, size, std::move(info)};
+        Py_buffer_container<T> container{data, size, std::move(info)};
 
-        return wrap_cpu_array<dt>(std::move(cont));
+        return wrap_cpu_array<dt>(std::move(container));
     }
 };
 
 template<>
-struct make_cpu_array_op<data_type::string> {
+struct Make_cpu_array_op<Data_type::string> {
     static std::vector<std::string> make_string_list(const py::buffer_info &info)
     {
         auto size = static_cast<std::size_t>(info.size);
@@ -261,7 +261,7 @@ struct make_cpu_array_op<data_type::string> {
         return lst;
     }
 
-    std::unique_ptr<device_array> operator()(py::buffer_info &&info, bool cpy)
+    std::unique_ptr<Device_array> operator()(py::buffer_info &&info, bool cpy)
     {
         if (!cpy) {
             throw std::invalid_argument{"A Python string buffer cannot be used without copying."};
@@ -269,24 +269,24 @@ struct make_cpu_array_op<data_type::string> {
 
         std::vector<std::string> lst = make_string_list(info);
 
-        return wrap_cpu_array<data_type::string>(std::move(lst));
+        return wrap_cpu_array<Data_type::string>(std::move(lst));
     }
 };
 
 }  // namespace
 
-std::unique_ptr<device_array> make_device_array(py::buffer &buf, bool cpy)
+std::unique_ptr<Device_array> make_device_array(py::buffer &buf, bool cpy)
 {
     bool writable = !cpy;
 
     py::buffer_info info = buf.request(writable);
 
-    std::optional<data_type> dt = get_data_type(info);
+    std::optional<Data_type> dt = get_data_type(info);
     if (dt == std::nullopt) {
         throw std::invalid_argument{"The Python buffer contains an unsupported data type."};
     }
 
-    return dispatch<make_cpu_array_op>(*dt, std::move(info), cpy);
+    return dispatch<Make_cpu_array_op>(*dt, std::move(info), cpy);
 }
 
 }  // namespace pymlio

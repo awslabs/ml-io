@@ -19,7 +19,6 @@
 #include <stdexcept>
 
 #include <fmt/format.h>
-#include <fmt/ostream.h>
 
 #include "mlio/tensor_visitor.h"
 #include "mlio/util/cast.h"
@@ -29,19 +28,21 @@ inline namespace abi_v1 {
 namespace detail {
 namespace {
 
-std::string repr(const tensor &tsr, std::string_view type_name)
+std::string repr(const Tensor &tensor, std::string_view type_name)
 {
     return fmt::format("<{0} data_type='{1}' shape=({2}) strides=({3})>",
                        type_name,
-                       tsr.dtype(),
-                       fmt::join(tsr.shape(), ", "),
-                       fmt::join(tsr.strides(), ", "));
+                       tensor.data_type(),
+                       fmt::join(tensor.shape(), ", "),
+                       fmt::join(tensor.strides(), ", "));
 }
 
 }  // namespace
 }  // namespace detail
 
-tensor::tensor(data_type dt, size_vector &&shape, ssize_vector &&strides)
+Tensor::~Tensor() = default;
+
+Tensor::Tensor(Data_type dt, Size_vector &&shape, Ssize_vector &&strides)
     : data_type_{dt}, shape_{std::move(shape)}, strides_{std::move(strides)}
 {
     if (strides_.empty()) {
@@ -53,15 +54,13 @@ tensor::tensor(data_type dt, size_vector &&shape, ssize_vector &&strides)
     }
 }
 
-tensor::~tensor() = default;
-
-ssize_vector tensor::default_strides(const size_vector &shape)
+Ssize_vector Tensor::default_strides(const Size_vector &shape)
 {
     if (shape.empty()) {
         return {};
     }
 
-    ssize_vector strides(shape.size(), 1);
+    Ssize_vector strides(shape.size(), 1);
 
     auto d = shape.rbegin();
     for (auto s = strides.rbegin() + 1; s < strides.rend(); ++s, ++d) {
@@ -71,15 +70,30 @@ ssize_vector tensor::default_strides(const size_vector &shape)
     return strides;
 }
 
-dense_tensor::dense_tensor(size_vector shape,
-                           std::unique_ptr<device_array> &&data,
-                           ssize_vector strides)
-    : tensor{data->dtype(), std::move(shape), std::move(strides)}, data_{std::move(data)}
+Dense_tensor::Dense_tensor(Size_vector shape,
+                           std::unique_ptr<Device_array> &&data,
+                           Ssize_vector strides)
+    : Tensor{data->data_type(), std::move(shape), std::move(strides)}, data_{std::move(data)}
 {
     validate_data_size();
 }
 
-void dense_tensor::validate_data_size() const
+std::string Dense_tensor::repr() const
+{
+    return detail::repr(*this, "Dense_tensor");
+}
+
+void Dense_tensor::accept(Tensor_visitor &visitor)
+{
+    visitor.visit(*this);
+}
+
+void Dense_tensor::accept(Tensor_visitor &visitor) const
+{
+    visitor.visit(*this);
+}
+
+void Dense_tensor::validate_data_size() const
 {
     if (shape().empty()) {
         return;
@@ -101,27 +115,12 @@ void dense_tensor::validate_data_size() const
     }
 }
 
-std::string dense_tensor::repr() const
-{
-    return detail::repr(*this, "dense_tensor");
-}
-
-void dense_tensor::accept(tensor_visitor &vst)
-{
-    vst.visit(*this);
-}
-
-void dense_tensor::accept(tensor_visitor &vst) const
-{
-    vst.visit(*this);
-}
-
-coo_tensor::coo_tensor(size_vector shape,
-                       std::unique_ptr<device_array> &&data,
-                       std::vector<std::unique_ptr<device_array>> &&coords)
-    : tensor{data->dtype(), std::move(shape), {}}
+Coo_tensor::Coo_tensor(Size_vector shape,
+                       std::unique_ptr<Device_array> &&data,
+                       std::vector<std::unique_ptr<Device_array>> &&coordinates)
+    : Tensor{data->data_type(), std::move(shape), {}}
     , data_{std::move(data)}
-    , coordinates_{std::move(coords)}
+    , coordinates_{std::move(coordinates)}
 {
     if (this->shape().size() != coordinates_.size()) {
         throw std::invalid_argument{
@@ -136,31 +135,31 @@ coo_tensor::coo_tensor(size_vector shape,
     }
 }
 
-std::string coo_tensor::repr() const
+std::string Coo_tensor::repr() const
 {
-    return detail::repr(*this, "coo_tensor");
+    return detail::repr(*this, "Coo_tensor");
 }
 
-void coo_tensor::accept(tensor_visitor &vst)
+void Coo_tensor::accept(Tensor_visitor &visitor)
 {
-    vst.visit(*this);
+    visitor.visit(*this);
 }
 
-void coo_tensor::accept(tensor_visitor &vst) const
+void Coo_tensor::accept(Tensor_visitor &visitor) const
 {
-    vst.visit(*this);
+    visitor.visit(*this);
 }
 
-csr_tensor::csr_tensor(size_vector shape,
-                       std::unique_ptr<device_array> &&data,
-                       std::unique_ptr<device_array> &&indices,
-                       std::unique_ptr<device_array> &&indptr)
-    : tensor{data->dtype(), std::move(shape), {}}
+Csr_tensor::Csr_tensor(Size_vector shape,
+                       std::unique_ptr<Device_array> &&data,
+                       std::unique_ptr<Device_array> &&indices,
+                       std::unique_ptr<Device_array> &&indptr)
+    : Tensor{data->data_type(), std::move(shape), {}}
     , data_{std::move(data)}
     , indices_{std::move(indices)}
     , indptr_{std::move(indptr)}
 {
-    const size_vector &shp = this->shape();
+    const Size_vector &shp = this->shape();
 
     if (shp.size() > 2) {
         throw std::invalid_argument{"A CSR tensor cannot have a rank greater than 2."};
@@ -188,19 +187,19 @@ csr_tensor::csr_tensor(size_vector shape,
     }
 }
 
-std::string csr_tensor::repr() const
+std::string Csr_tensor::repr() const
 {
-    return detail::repr(*this, "csr_tensor");
+    return detail::repr(*this, "Csr_tensor");
 }
 
-void csr_tensor::accept(tensor_visitor &vst)
+void Csr_tensor::accept(Tensor_visitor &visitor)
 {
-    vst.visit(*this);
+    visitor.visit(*this);
 }
 
-void csr_tensor::accept(tensor_visitor &vst) const
+void Csr_tensor::accept(Tensor_visitor &visitor) const
 {
-    vst.visit(*this);
+    visitor.visit(*this);
 }
 
 }  // namespace abi_v1

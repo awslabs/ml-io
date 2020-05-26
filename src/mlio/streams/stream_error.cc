@@ -18,9 +18,9 @@
 namespace mlio {
 inline namespace abi_v1 {
 
-stream_error::~stream_error() = default;
+Stream_error::~Stream_error() = default;
 
-inflate_error::~inflate_error() = default;
+Inflate_error::~Inflate_error() = default;
 
 }  // namespace abi_v1
 }  // namespace mlio

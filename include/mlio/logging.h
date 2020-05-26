@@ -23,21 +23,21 @@
 namespace mlio {
 inline namespace abi_v1 {
 
-enum class log_level { off, warning, info, debug };
+enum class Log_level { off, warning, info, debug };
 
 /// Represents a delegate function that handles logging on behalf of
 /// the library.
-using log_message_handler = std::function<void(log_level, std::string_view)>;
+using Log_message_handler = std::function<void(Log_level, std::string_view)>;
 
 /// Sets the logging handler.
 ///
 /// The passsed handler can be called by multiple threads
 /// simultaneously; therefore it should be thread-safe.
 MLIO_API
-log_message_handler set_log_message_handler(log_message_handler hdl) noexcept;
+Log_message_handler set_log_message_handler(Log_message_handler handler) noexcept;
 
 MLIO_API
-void set_log_level(log_level lvl) noexcept;
+void set_log_level(Log_level level) noexcept;
 
 }  // namespace abi_v1
 }  // namespace mlio

@@ -15,8 +15,6 @@
 
 #include "mlio/example.h"
 
-#include <algorithm>
-#include <iterator>
 #include <optional>
 #include <stdexcept>
 #include <tuple>
@@ -31,8 +29,8 @@
 namespace mlio {
 inline namespace abi_v1 {
 
-example::example(intrusive_ptr<schema const> shm, std::vector<intrusive_ptr<tensor>> &&features)
-    : schema_{std::move(shm)}, features_{std::move(features)}
+Example::Example(Intrusive_ptr<const Schema> schema, std::vector<Intrusive_ptr<Tensor>> &&features)
+    : schema_{std::move(schema)}, features_{std::move(features)}
 {
     if (schema_->attributes().size() != features_.size()) {
         throw std::invalid_argument{
@@ -40,7 +38,7 @@ example::example(intrusive_ptr<schema const> shm, std::vector<intrusive_ptr<tens
     }
 }
 
-intrusive_ptr<tensor> example::find_feature(const std::string &name) const noexcept
+Intrusive_ptr<Tensor> Example::find_feature(const std::string &name) const noexcept
 {
     std::optional<std::size_t> idx = schema_->get_index(name);
     if (idx == std::nullopt) {
@@ -49,7 +47,7 @@ intrusive_ptr<tensor> example::find_feature(const std::string &name) const noexc
     return features_[*idx];
 }
 
-std::string example::repr() const
+std::string Example::repr() const
 {
     auto dsc_beg = schema_->attributes().begin();
     auto dsc_end = schema_->attributes().end();
@@ -75,7 +73,7 @@ std::string example::repr() const
 
     s += "}";
 
-    return fmt::format("<example features={{{0}}} padding={1}>", s, padding);
+    return fmt::format("<Example features={{{0}}} padding={1}>", s, padding);
 }
 
 }  // namespace abi_v1

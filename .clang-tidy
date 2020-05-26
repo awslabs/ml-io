@@ -26,18 +26,13 @@ Checks: "*,\
     -readability-qualified-auto,\
     -readability-redundant-access-specifiers"
 
-HeaderFilterRegex: "mlio"
-
 CheckOptions:
     # Some types such as std::span<> do not have user-declared move
-    # functions.
+    # semantics.
   - key:   cppcoreguidelines-special-member-functions.AllowMissingMoveFunctions
     value: 1
 
     # An std::optional<> with a trivial template argument is itself
     # trivially move constructible/assignable.
-    #
-    # TODO: Use a proper regex once you figure out the correct type name
-    # LLVM uses.
   - key:   performance-unnecessary-value-param.AllowedTypes
     value: "optional"

@@ -25,25 +25,23 @@
 namespace mlio {
 inline namespace abi_v1 {
 
-class MLIO_API text_encoding {
+class MLIO_API Text_encoding {
 public:
-    static text_encoding const ascii_latin1;
-    static text_encoding const utf8;
-    static text_encoding const utf16;
-    static text_encoding const utf16_le;
-    static text_encoding const utf16_be;
-    static text_encoding const utf32;
-    static text_encoding const utf32_le;
-    static text_encoding const utf32_be;
+    static Text_encoding const ascii_latin1;
+    static Text_encoding const utf8;
+    static Text_encoding const utf16;
+    static Text_encoding const utf16_le;
+    static Text_encoding const utf16_be;
+    static Text_encoding const utf32;
+    static Text_encoding const utf32_le;
+    static Text_encoding const utf32_be;
 
-public:
     /// @remark
     ///     The specified name should be a valid encoding name that is
     ///     accepted by @e iconv(1).
-    explicit text_encoding(std::string name) : name_{std::move(name)}
+    explicit Text_encoding(std::string name) : name_{std::move(name)}
     {}
 
-public:
     const std::string &name() const noexcept
     {
         return name_;
@@ -54,13 +52,13 @@ private:
 };
 
 MLIO_API
-inline bool operator==(const text_encoding &lhs, const text_encoding &rhs) noexcept
+inline bool operator==(const Text_encoding &lhs, const Text_encoding &rhs) noexcept
 {
     return lhs.name() == rhs.name();
 }
 
 MLIO_API
-inline bool operator!=(const text_encoding &lhs, const text_encoding &rhs) noexcept
+inline bool operator!=(const Text_encoding &lhs, const Text_encoding &rhs) noexcept
 {
     return lhs.name() != rhs.name();
 }
@@ -71,10 +69,10 @@ inline bool operator!=(const text_encoding &lhs, const text_encoding &rhs) noexc
 namespace std {
 
 template<>
-struct MLIO_API hash<mlio::text_encoding> {
-    inline size_t operator()(const mlio::text_encoding &enc) const noexcept
+struct MLIO_API hash<mlio::Text_encoding> {
+    inline size_t operator()(const mlio::Text_encoding &encoding) const noexcept
     {
-        return hash<string>{}(enc.name());
+        return hash<string>{}(encoding.name());
     }
 };
 

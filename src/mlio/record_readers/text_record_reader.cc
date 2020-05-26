@@ -25,11 +25,11 @@
 namespace mlio {
 inline namespace abi_v1 {
 
-text_record_reader::text_record_reader(intrusive_ptr<input_stream> strm)
-    : stream_record_reader{std::move(strm)}
+Text_record_reader::Text_record_reader(Intrusive_ptr<Input_stream> stream)
+    : Stream_record_reader{std::move(stream)}
 {}
 
-std::optional<record> text_record_reader::decode_record(memory_slice &chunk, bool ignore_leftover)
+std::optional<Record> Text_record_reader::decode_record(Memory_slice &chunk, bool ignore_leftover)
 {
     if (chunk.empty()) {
         return {};
@@ -42,9 +42,9 @@ std::optional<record> text_record_reader::decode_record(memory_slice &chunk, boo
     return {};
 }
 
-bool text_record_reader::skip_utf8_bom(memory_slice &chunk, bool ignore_leftover) noexcept
+bool Text_record_reader::skip_utf8_bom(Memory_slice &chunk, bool ignore_leftover) noexcept
 {
-    auto bits = as_span<unsigned char const>(chunk);
+    auto bits = as_span<const unsigned char>(chunk);
     if (bits.size() >= 3) {
         if (bits[0] == 0xEF && bits[1] == 0xBB && bits[2] == 0xBF) {
             chunk = chunk.subslice(sizeof(unsigned char) * 3);

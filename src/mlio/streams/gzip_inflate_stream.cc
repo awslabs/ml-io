@@ -22,24 +22,24 @@
 #include "mlio/streams/stream_error.h"
 #include "mlio/util/cast.h"
 
-using mlio::detail::zlib_inflater;
+using mlio::detail::Zlib_inflater;
 
 namespace mlio {
 inline namespace abi_v1 {
 
-gzip_inflate_stream::gzip_inflate_stream(intrusive_ptr<input_stream> inner)
+Gzip_inflate_stream::Gzip_inflate_stream(Intrusive_ptr<Input_stream> inner)
     : inner_{std::move(inner)}
 {
-    inflater_ = std::make_unique<zlib_inflater>();
+    inflater_ = std::make_unique<Zlib_inflater>();
 }
 
-gzip_inflate_stream::~gzip_inflate_stream() = default;
+Gzip_inflate_stream::~Gzip_inflate_stream() = default;
 
-std::size_t gzip_inflate_stream::read(mutable_memory_span dest)
+std::size_t Gzip_inflate_stream::read(Mutable_memory_span destination)
 {
     check_if_closed();
 
-    if (dest.empty()) {
+    if (destination.empty()) {
         return 0;
     }
 
@@ -53,25 +53,25 @@ std::size_t gzip_inflate_stream::read(mutable_memory_span dest)
 
         if (buffer_.empty()) {
             if (!inflater_->eof()) {
-                throw inflate_error{"The zlib stream contains invalid or incomplete deflate data."};
+                throw Inflate_error{"The zlib stream contains invalid or incomplete deflate data."};
             }
 
             return 0;
         }
     }
 
-    memory_span inp{buffer_pos_, buffer_.end()};
+    Memory_span inp{buffer_pos_, buffer_.end()};
 
-    auto out = dest;
+    auto out = destination;
 
     inflater_->inflate(inp, out);
 
     buffer_pos_ = buffer_.end() - stdx::ssize(inp);
 
-    return dest.size() - out.size();
+    return destination.size() - out.size();
 }
 
-void gzip_inflate_stream::close() noexcept
+void Gzip_inflate_stream::close() noexcept
 {
     inner_->close();
 
@@ -80,16 +80,16 @@ void gzip_inflate_stream::close() noexcept
     buffer_ = {};
 }
 
-void gzip_inflate_stream::check_if_closed() const
-{
-    if (inner_->closed()) {
-        throw stream_error{"The input stream is closed."};
-    }
-}
-
-bool gzip_inflate_stream::closed() const noexcept
+bool Gzip_inflate_stream::closed() const noexcept
 {
     return inner_->closed();
+}
+
+void Gzip_inflate_stream::check_if_closed() const
+{
+    if (inner_->closed()) {
+        throw Stream_error{"The input stream is closed."};
+    }
 }
 
 }  // namespace abi_v1

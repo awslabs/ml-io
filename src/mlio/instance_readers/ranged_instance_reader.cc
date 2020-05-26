@@ -24,19 +24,19 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-ranged_instance_reader::ranged_instance_reader(const data_reader_params &prm,
-                                               std::unique_ptr<instance_reader> &&inner)
-    : params_{&prm}, inner_{std::move(inner)}
+Ranged_instance_reader::Ranged_instance_reader(const Data_reader_params &params,
+                                               std::unique_ptr<Instance_reader> &&inner)
+    : params_{&params}, inner_{std::move(inner)}
 {}
 
-std::optional<instance> ranged_instance_reader::read_instance_core()
+std::optional<Instance> Ranged_instance_reader::read_instance_core()
 {
     if (first_read_) {
         first_read_ = false;
 
         for (std::size_t i = 0; i < params_->num_instances_to_skip; i++) {
-            std::optional<instance> ins = inner_->read_instance();
-            if (ins == std::nullopt) {
+            std::optional<Instance> instance = inner_->read_instance();
+            if (instance == std::nullopt) {
                 return {};
             }
         }
@@ -46,17 +46,17 @@ std::optional<instance> ranged_instance_reader::read_instance_core()
         return {};
     }
 
-    std::optional<instance> ins = inner_->read_instance();
-    if (ins == std::nullopt) {
+    std::optional<Instance> instance = inner_->read_instance();
+    if (instance == std::nullopt) {
         return {};
     }
 
     num_instances_read_++;
 
-    return ins;
+    return instance;
 }
 
-inline bool ranged_instance_reader::should_stop_reading() const noexcept
+inline bool Ranged_instance_reader::should_stop_reading() const noexcept
 {
     if (params_->num_instances_to_read == std::nullopt) {
         return false;
@@ -65,7 +65,7 @@ inline bool ranged_instance_reader::should_stop_reading() const noexcept
     return num_instances_read_ == *params_->num_instances_to_read;
 }
 
-void ranged_instance_reader::reset_core() noexcept
+void Ranged_instance_reader::reset_core() noexcept
 {
     inner_->reset();
 

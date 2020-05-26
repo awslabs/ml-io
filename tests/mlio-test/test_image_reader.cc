@@ -10,17 +10,17 @@
 
 namespace mlio {
 
-class test_image_reader : public ::testing::Test {
+class Test_image_reader : public ::testing::Test {
 protected:
-    test_image_reader() = default;
+    Test_image_reader() = default;
 
-    ~test_image_reader() override;
+    ~Test_image_reader() override;
 
 protected:
     std::string source_dir_{"../resources/images/"};
-    std::vector<intrusive_ptr<data_store>> jpeg_dataset_ = mlio::list_files(source_dir_, "*.jpg");
-    std::vector<intrusive_ptr<data_store>> png_dataset_ = mlio::list_files(source_dir_, "*.png");
-    std::vector<intrusive_ptr<data_store>> recordio_dataset_ =
+    std::vector<Intrusive_ptr<Data_store>> jpeg_dataset_ = mlio::list_files(source_dir_, "*.jpg");
+    std::vector<Intrusive_ptr<Data_store>> png_dataset_ = mlio::list_files(source_dir_, "*.png");
+    std::vector<Intrusive_ptr<Data_store>> recordio_dataset_ =
         mlio::list_files(source_dir_, "*.rec");
 
     int ret_img_1channel_ = 1;       // channel
@@ -80,7 +80,7 @@ public:
         return img(roi);
     }
 
-    void assert_schema(const schema &sch, size_t batch_size, int channel) const
+    void assert_schema(const Schema &sch, size_t batch_size, int channel) const
     {
         ASSERT_EQ(sch.attributes()[0].shape()[0], batch_size);
         ASSERT_EQ(sch.attributes()[0].shape()[1], ret_img_height_);
@@ -88,7 +88,7 @@ public:
         ASSERT_EQ(sch.attributes()[0].shape()[3], channel);
     }
 
-    void assert_tensor_shape(dense_tensor *tsr, size_t batch_size, int channel) const
+    void assert_tensor_shape(Dense_tensor *tsr, size_t batch_size, int channel) const
     {
         ASSERT_EQ(tsr->shape()[0], batch_size);
         ASSERT_EQ(tsr->shape()[1], ret_img_height_);
@@ -97,18 +97,18 @@ public:
     }
 };
 
-test_image_reader::~test_image_reader() = default;
+Test_image_reader::~Test_image_reader() = default;
 
-TEST_F(test_image_reader, test_jpg_3_channel_last_batch_dropped)
+TEST_F(Test_image_reader, test_jpg_3_channel_last_batch_dropped)
 {
     size_t batch_size = 2;
-    mlio::data_reader_params prm{jpeg_dataset_, batch_size, {}, {}, last_example_handling::drop};
-    mlio::image_reader_params img_prm{image_frame::none, {}, image_dimensions_std_, false};
-    auto reader = mlio::make_intrusive<mlio::image_reader>(prm, img_prm);
+    mlio::Data_reader_params prm{jpeg_dataset_, batch_size, {}, {}, Last_example_handling::drop};
+    mlio::Image_reader_params img_prm{Image_frame::none, {}, image_dimensions_std_, false};
+    auto reader = mlio::make_intrusive<mlio::Image_reader>(prm, img_prm);
     for (auto i = 0; i < 2; i++) {
-        mlio::intrusive_ptr<mlio::example> exm;
+        mlio::Intrusive_ptr<mlio::Example> exm;
         while ((exm = reader->read_example()) != nullptr) {
-            auto lbl = static_cast<dense_tensor *>(exm->find_feature("value").get());
+            auto lbl = static_cast<Dense_tensor *>(exm->find_feature("value").get());
             auto image_buffer = lbl->data().as<std::uint8_t>();
             cv::Mat img_0{ret_img_height_, ret_img_width_, CV_8UC3, image_buffer.data()};
             cv::Mat img_1{ret_img_height_,
@@ -124,7 +124,7 @@ TEST_F(test_image_reader, test_jpg_3_channel_last_batch_dropped)
             ASSERT_EQ(cv::countNonZero(output.reshape(1)), 0);
             cv::bitwise_xor(get_expected_image(img1_path_jpg_, resize), img_1, output);
             ASSERT_EQ(cv::countNonZero(output.reshape(1)), 0);
-            auto schema = exm->get_schema();
+            auto schema = exm->schema();
             assert_schema(schema, batch_size, ret_img_3channel_);
             assert_tensor_shape(lbl, batch_size, ret_img_3channel_);
         }
@@ -133,17 +133,17 @@ TEST_F(test_image_reader, test_jpg_3_channel_last_batch_dropped)
     ASSERT_TRUE(true);
 }
 
-TEST_F(test_image_reader, test_jpg_3_channel_with_resize_last_batch_dropped)
+TEST_F(Test_image_reader, test_jpg_3_channel_with_resize_last_batch_dropped)
 {
     size_t batch_size = 2;
-    mlio::data_reader_params prm{jpeg_dataset_, batch_size, {}, {}, last_example_handling::drop};
+    mlio::Data_reader_params prm{jpeg_dataset_, batch_size, {}, {}, Last_example_handling::drop};
     std::size_t resize = 300;
-    mlio::image_reader_params img_prm{image_frame::none, resize, image_dimensions_std_, false};
-    auto reader = mlio::make_intrusive<mlio::image_reader>(prm, img_prm);
+    mlio::Image_reader_params img_prm{Image_frame::none, resize, image_dimensions_std_, false};
+    auto reader = mlio::make_intrusive<mlio::Image_reader>(prm, img_prm);
     for (auto i = 0; i < 2; i++) {
-        mlio::intrusive_ptr<mlio::example> exm;
+        mlio::Intrusive_ptr<mlio::Example> exm;
         while ((exm = reader->read_example()) != nullptr) {
-            auto lbl = static_cast<dense_tensor *>(exm->find_feature("value").get());
+            auto lbl = static_cast<Dense_tensor *>(exm->find_feature("value").get());
 
             auto image_buffer = lbl->data().as<std::uint8_t>();
             cv::Mat img_0{ret_img_height_, ret_img_width_, CV_8UC3, image_buffer.data()};
@@ -159,7 +159,7 @@ TEST_F(test_image_reader, test_jpg_3_channel_with_resize_last_batch_dropped)
             ASSERT_EQ(cv::countNonZero(output.reshape(1)), 0);
             cv::bitwise_xor(get_expected_image(img1_path_jpg_, resize), img_1, output);
             ASSERT_EQ(cv::countNonZero(output.reshape(1)), 0);
-            auto schema = exm->get_schema();
+            auto schema = exm->schema();
             assert_schema(schema, batch_size, ret_img_3channel_);
             assert_tensor_shape(lbl, batch_size, ret_img_3channel_);
         }
@@ -167,16 +167,16 @@ TEST_F(test_image_reader, test_jpg_3_channel_with_resize_last_batch_dropped)
     }
 }
 
-TEST_F(test_image_reader, test_jpg_1_channel)
+TEST_F(Test_image_reader, test_jpg_1_channel)
 {
     size_t batch_size = 2;
-    mlio::data_reader_params prm{jpeg_dataset_, batch_size};
+    mlio::Data_reader_params prm{jpeg_dataset_, batch_size};
     std::size_t resize = 300;
-    mlio::image_reader_params img_prm{image_frame::none, resize, image_dimensions_1_ch_, false};
-    auto reader = mlio::make_intrusive<mlio::image_reader>(prm, img_prm);
+    mlio::Image_reader_params img_prm{Image_frame::none, resize, image_dimensions_1_ch_, false};
+    auto reader = mlio::make_intrusive<mlio::Image_reader>(prm, img_prm);
 
     auto exm = reader->read_example();
-    auto lbl = static_cast<dense_tensor *>(exm->find_feature("value").get());
+    auto lbl = static_cast<Dense_tensor *>(exm->find_feature("value").get());
     auto image_buffer = lbl->data().as<std::uint8_t>();
     cv::Mat img_0{ret_img_height_, ret_img_width_, CV_8UC1, image_buffer.data()};
     cv::Mat img_1{ret_img_height_,
@@ -191,20 +191,20 @@ TEST_F(test_image_reader, test_jpg_1_channel)
     ASSERT_EQ(cv::countNonZero(output), 0);
     cv::bitwise_xor(
         get_expected_image(img1_path_jpg_, resize, cv::IMREAD_GRAYSCALE), img_1, output);
-    auto schema = exm->get_schema();
+    auto schema = exm->schema();
     assert_schema(schema, batch_size, ret_img_1channel_);
     assert_tensor_shape(lbl, batch_size, ret_img_1channel_);
 }
 
-TEST_F(test_image_reader, test_png_3_channel_happy_path)
+TEST_F(Test_image_reader, test_png_3_channel_happy_path)
 {
     size_t batch_size = 1;
-    mlio::data_reader_params prm{png_dataset_, batch_size};
-    mlio::image_reader_params img_prm{image_frame::none, {}, image_dimensions_std_, false};
-    auto reader = mlio::make_intrusive<mlio::image_reader>(prm, img_prm);
+    mlio::Data_reader_params prm{png_dataset_, batch_size};
+    mlio::Image_reader_params img_prm{Image_frame::none, {}, image_dimensions_std_, false};
+    auto reader = mlio::make_intrusive<mlio::Image_reader>(prm, img_prm);
 
     auto exm = reader->read_example();
-    auto lbl = static_cast<dense_tensor *>(exm->find_feature("value").get());
+    auto lbl = static_cast<Dense_tensor *>(exm->find_feature("value").get());
     auto image_buffer = lbl->data().as<std::uint8_t>();
     cv::Mat img_0{ret_img_height_, ret_img_width_, CV_8UC3, image_buffer.data()};
 
@@ -213,21 +213,21 @@ TEST_F(test_image_reader, test_png_3_channel_happy_path)
     std::size_t resize = 0;
     cv::bitwise_xor(get_expected_image(img0_path_png_, resize), img_0, output);
     ASSERT_EQ(cv::countNonZero(output.reshape(1)), 0);
-    auto schema = exm->get_schema();
+    auto schema = exm->schema();
     assert_schema(schema, batch_size, ret_img_3channel_);
     assert_tensor_shape(lbl, batch_size, ret_img_3channel_);
 }
 
-TEST_F(test_image_reader, test_png_3_channel_happy_path_with_resize)
+TEST_F(Test_image_reader, test_png_3_channel_happy_path_with_resize)
 {
     size_t batch_size = 1;
-    mlio::data_reader_params prm{png_dataset_, 1};
+    mlio::Data_reader_params prm{png_dataset_, 1};
     std::size_t resize = 100;
-    mlio::image_reader_params img_prm{image_frame::none, resize, image_dimensions_std_, false};
-    auto reader = mlio::make_intrusive<mlio::image_reader>(prm, img_prm);
+    mlio::Image_reader_params img_prm{Image_frame::none, resize, image_dimensions_std_, false};
+    auto reader = mlio::make_intrusive<mlio::Image_reader>(prm, img_prm);
 
     auto exm = reader->read_example();
-    auto lbl = static_cast<dense_tensor *>(exm->find_feature("value").get());
+    auto lbl = static_cast<Dense_tensor *>(exm->find_feature("value").get());
     auto image_buffer = lbl->data().as<std::uint8_t>();
     cv::Mat img{ret_img_height_, ret_img_width_, CV_8UC3, image_buffer.data()};
 
@@ -235,21 +235,21 @@ TEST_F(test_image_reader, test_png_3_channel_happy_path_with_resize)
     cv::Mat output;
     cv::bitwise_xor(get_expected_image(img0_path_png_, resize), img, output);
     ASSERT_EQ(cv::countNonZero(output.reshape(1)), 0);
-    auto schema = exm->get_schema();
+    auto schema = exm->schema();
     assert_schema(schema, batch_size, ret_img_3channel_);
     assert_tensor_shape(lbl, batch_size, ret_img_3channel_);
 }
 
-TEST_F(test_image_reader, test_png_1_channel)
+TEST_F(Test_image_reader, test_png_1_channel)
 {
     size_t batch_size = 1;
-    mlio::data_reader_params prm{png_dataset_, 1};
+    mlio::Data_reader_params prm{png_dataset_, 1};
     std::size_t resize = 100;
-    mlio::image_reader_params img_prm{image_frame::none, resize, image_dimensions_1_ch_, false};
-    auto reader = mlio::make_intrusive<mlio::image_reader>(prm, img_prm);
+    mlio::Image_reader_params img_prm{Image_frame::none, resize, image_dimensions_1_ch_, false};
+    auto reader = mlio::make_intrusive<mlio::Image_reader>(prm, img_prm);
 
     auto exm = reader->read_example();
-    auto lbl = static_cast<dense_tensor *>(exm->find_feature("value").get());
+    auto lbl = static_cast<Dense_tensor *>(exm->find_feature("value").get());
     auto image_buffer = lbl->data().as<std::uint8_t>();
     cv::Mat img{ret_img_height_, ret_img_width_, CV_8UC1, image_buffer.data()};
 
@@ -257,21 +257,21 @@ TEST_F(test_image_reader, test_png_1_channel)
     cv::Mat output;
     cv::bitwise_xor(get_expected_image(img0_path_png_, resize, cv::IMREAD_GRAYSCALE), img, output);
     ASSERT_EQ(cv::countNonZero(output.reshape(1)), 0);
-    auto schema = exm->get_schema();
+    auto schema = exm->schema();
     assert_schema(schema, batch_size, ret_img_1channel_);
     assert_tensor_shape(lbl, batch_size, ret_img_1channel_);
 }
 
-TEST_F(test_image_reader, test_invalid_image_dimensions_parameter)
+TEST_F(Test_image_reader, test_invalid_image_dimensions_parameter)
 {
     // invalid image_dimensions. crop_width and crop_height are larger than the
     // input image
-    mlio::data_reader_params prm{jpeg_dataset_, 2};
+    mlio::Data_reader_params prm{jpeg_dataset_, 2};
     std::size_t crop_width = 500;
     std::size_t crop_height = 500;
     std::vector<std::size_t> image_dimensions{3, crop_height, crop_width};
-    mlio::image_reader_params img_prm{image_frame::none, {}, image_dimensions, false};
-    auto reader = mlio::make_intrusive<mlio::image_reader>(prm, img_prm);
+    mlio::Image_reader_params img_prm{Image_frame::none, {}, image_dimensions, false};
+    auto reader = mlio::make_intrusive<mlio::Image_reader>(prm, img_prm);
     try {
         reader->read_example();
         FAIL() << "Invalid argument exception expected";
@@ -282,8 +282,8 @@ TEST_F(test_image_reader, test_invalid_image_dimensions_parameter)
 
     // invalid number of channel
     image_dimensions = {5, crop_height, crop_width};
-    img_prm = {image_frame::none, {}, image_dimensions, false};
-    reader = mlio::make_intrusive<mlio::image_reader>(prm, img_prm);
+    img_prm = {Image_frame::none, {}, image_dimensions, false};
+    reader = mlio::make_intrusive<mlio::Image_reader>(prm, img_prm);
     try {
         reader->read_example();
         FAIL() << "Invalid argument exception expected";
@@ -294,9 +294,9 @@ TEST_F(test_image_reader, test_invalid_image_dimensions_parameter)
 
     // image_dimensions missing param
     image_dimensions = {crop_height, crop_width};
-    img_prm = {image_frame::none, {}, image_dimensions, false};
+    img_prm = {Image_frame::none, {}, image_dimensions, false};
     try {
-        reader = mlio::make_intrusive<mlio::image_reader>(prm, img_prm);
+        reader = mlio::make_intrusive<mlio::Image_reader>(prm, img_prm);
         FAIL() << "Invalid argument exception expected";
     }
     catch (std::invalid_argument &ex) {
@@ -304,17 +304,17 @@ TEST_F(test_image_reader, test_invalid_image_dimensions_parameter)
     }
 }
 
-TEST_F(test_image_reader, test_bgr_to_rgb)
+TEST_F(Test_image_reader, test_bgr_to_rgb)
 {
     size_t batch_size = 1;
     bool bgr_to_rgb = true;
-    mlio::data_reader_params prm{png_dataset_, 1};
+    mlio::Data_reader_params prm{png_dataset_, 1};
     std::size_t resize = 100;
-    mlio::image_reader_params img_prm{image_frame::none, resize, image_dimensions_std_, bgr_to_rgb};
-    auto reader = mlio::make_intrusive<mlio::image_reader>(prm, img_prm);
+    mlio::Image_reader_params img_prm{Image_frame::none, resize, image_dimensions_std_, bgr_to_rgb};
+    auto reader = mlio::make_intrusive<mlio::Image_reader>(prm, img_prm);
 
     auto exm = reader->read_example();
-    auto lbl = static_cast<dense_tensor *>(exm->find_feature("value").get());
+    auto lbl = static_cast<Dense_tensor *>(exm->find_feature("value").get());
     auto image_buffer = lbl->data().as<std::uint8_t>();
     cv::Mat img{ret_img_height_, ret_img_width_, CV_8UC3, image_buffer.data()};
 
@@ -324,66 +324,66 @@ TEST_F(test_image_reader, test_bgr_to_rgb)
     cv::cvtColor(expected_image, expected_image, cv::COLOR_BGR2RGB);
     cv::bitwise_xor(expected_image, img, output);
     ASSERT_EQ(cv::countNonZero(output.reshape(1)), 0);
-    auto schema = exm->get_schema();
+    auto schema = exm->schema();
     assert_schema(schema, batch_size, ret_img_3channel_);
     assert_tensor_shape(lbl, batch_size, ret_img_3channel_);
 }
 
-TEST_F(test_image_reader, test_recordio_3_channel)
+TEST_F(Test_image_reader, test_recordio_3_channel)
 {
     size_t batch_size = 1;
 
-    mlio::data_reader_params prm{recordio_dataset_, batch_size};
-    mlio::image_reader_params img_prm{image_frame::recordio, {}, image_dimensions_std_, false};
-    auto reader = mlio::make_intrusive<mlio::image_reader>(prm, img_prm);
+    mlio::Data_reader_params prm{recordio_dataset_, batch_size};
+    mlio::Image_reader_params img_prm{Image_frame::recordio, {}, image_dimensions_std_, false};
+    auto reader = mlio::make_intrusive<mlio::Image_reader>(prm, img_prm);
 
     auto exm = reader->read_example();
-    auto lbl = static_cast<dense_tensor *>(exm->find_feature("value").get());
+    auto lbl = static_cast<Dense_tensor *>(exm->find_feature("value").get());
     auto image_buffer = lbl->data().as<std::uint8_t>();
     cv::Mat img_0{ret_img_height_, ret_img_width_, CV_8UC3, image_buffer.data()};
 
     ASSERT_NE(image_buffer.data(), nullptr);
-    auto schema = exm->get_schema();
+    auto schema = exm->schema();
     assert_schema(schema, batch_size, ret_img_3channel_);
     assert_tensor_shape(lbl, batch_size, ret_img_3channel_);
 }
 
-TEST_F(test_image_reader, test_recordio_1_channel)
+TEST_F(Test_image_reader, test_recordio_1_channel)
 {
     size_t batch_size = 1;
 
-    mlio::data_reader_params prm{recordio_dataset_, batch_size};
-    mlio::image_reader_params img_prm{image_frame::recordio, {}, image_dimensions_1_ch_, false};
-    auto reader = mlio::make_intrusive<mlio::image_reader>(prm, img_prm);
+    mlio::Data_reader_params prm{recordio_dataset_, batch_size};
+    mlio::Image_reader_params img_prm{Image_frame::recordio, {}, image_dimensions_1_ch_, false};
+    auto reader = mlio::make_intrusive<mlio::Image_reader>(prm, img_prm);
 
     auto exm = reader->read_example();
-    auto lbl = static_cast<dense_tensor *>(exm->find_feature("value").get());
+    auto lbl = static_cast<Dense_tensor *>(exm->find_feature("value").get());
     auto image_buffer = lbl->data().as<std::uint8_t>();
     cv::Mat img_0{ret_img_height_, ret_img_width_, CV_8UC3, image_buffer.data()};
 
     ASSERT_NE(image_buffer.data(), nullptr);
-    auto schema = exm->get_schema();
+    auto schema = exm->schema();
     assert_schema(schema, batch_size, ret_img_1channel_);
     assert_tensor_shape(lbl, batch_size, ret_img_1channel_);
 }
 
-TEST_F(test_image_reader, test_bad_example_handling_skip)
+TEST_F(Test_image_reader, test_bad_example_handling_skip)
 {
     size_t batch_size = 2;
-    mlio::data_reader_params prm{
-        jpeg_dataset_, batch_size, {}, {}, last_example_handling::none, bad_example_handling::skip};
+    mlio::Data_reader_params prm{
+        jpeg_dataset_, batch_size, {}, {}, Last_example_handling::none, Bad_example_handling::skip};
 
     // passing in a larger width so that crop operation on the second
     // image would fail, as required width would be greater than
     // the source image width. This would cause the batch to be skipped. Next
     // batch would only contain a single image, as there are 3 jpeg images
     // in total, and that is what we assert on.
-    mlio::image_reader_params img_prm{image_frame::none, {}, image_dimensions_large_width_, false};
-    auto reader = mlio::make_intrusive<mlio::image_reader>(prm, img_prm);
+    mlio::Image_reader_params img_prm{Image_frame::none, {}, image_dimensions_large_width_, false};
+    auto reader = mlio::make_intrusive<mlio::Image_reader>(prm, img_prm);
     for (auto i = 0; i < 2; i++) {
-        mlio::intrusive_ptr<mlio::example> exm;
+        mlio::Intrusive_ptr<mlio::Example> exm;
         while ((exm = reader->read_example()) != nullptr) {
-            auto lbl = static_cast<dense_tensor *>(exm->find_feature("value").get());
+            auto lbl = static_cast<Dense_tensor *>(exm->find_feature("value").get());
             auto image_buffer = lbl->data().as<std::uint8_t>();
             cv::Mat img_0{ret_img_height_, ret_img_width_large_, CV_8UC3, image_buffer.data()};
 
@@ -399,7 +399,7 @@ TEST_F(test_image_reader, test_bad_example_handling_skip)
 
             cv::bitwise_xor(im2, img_0, output);
             ASSERT_EQ(cv::countNonZero(output.reshape(1)), 0);
-            auto schema = exm->get_schema();
+            auto schema = exm->schema();
             ASSERT_EQ(lbl->shape()[0], 1);
             ASSERT_EQ(lbl->shape()[1], ret_img_height_);
             ASSERT_EQ(lbl->shape()[2], ret_img_width_large_);

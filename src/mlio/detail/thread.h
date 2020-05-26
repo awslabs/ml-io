@@ -31,7 +31,7 @@ namespace detail {
 template<typename Func, typename... Args>
 std::thread start_thread(Func &&f, Args &&... args)
 {
-    // Block all asynchronous signals on the new thread.
+    // Block all asynchronous signals in the new thread.
     ::sigset_t mask{};
     ::sigset_t original_mask{};
     sigfillset(&mask);

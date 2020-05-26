@@ -21,7 +21,6 @@
 #include <type_traits>
 
 #include <absl/strings/numbers.h>
-#include <absl/strings/string_view.h>
 
 #include "mlio/util/string.h"
 
@@ -49,122 +48,122 @@ struct parser_traits<T, std::enable_if_t<std::is_integral_v<T>>> {
 };
 
 template<typename T>
-parse_result try_parse_float_core(const float_parse_params &prm, T &result)
+Parse_result try_parse_float_core(const Float_parse_params &params, T &result)
 {
     T v = 0.0;
 
-    if (!parser_traits<T>::parse_func(prm.s, &v)) {
-        auto *nan_values = prm.nan_values;
+    if (!parser_traits<T>::parse_func(params.s, &v)) {
+        auto *nan_values = params.nan_values;
         if (nan_values != nullptr && !nan_values->empty()) {
-            auto trimmed = static_cast<std::string>(trim(prm.s));
+            auto trimmed = static_cast<std::string>(trim(params.s));
             if (nan_values->find(trimmed) != nan_values->end()) {
                 result = std::numeric_limits<T>::quiet_NaN();
 
-                return parse_result::ok;
+                return Parse_result::ok;
             }
         }
-        return parse_result::failed;
+        return Parse_result::failed;
     }
 
     if (std::isinf(v)) {
-        return parse_result::overflowed;
+        return Parse_result::overflowed;
     }
 
     result = v;
 
-    return parse_result::ok;
+    return Parse_result::ok;
 }
 
 template<typename T>
-std::enable_if_t<sizeof(T) >= 4, parse_result>
-try_parse_int_core(const int_parse_params &prm, T &result) noexcept
+std::enable_if_t<sizeof(T) >= 4, Parse_result>
+try_parse_int_core(const Int_parse_params &params, T &result) noexcept
 {
     // Do not use 0; otherwise we cannot distinguish between a failure
     // and an overflow for unsigned types.
     T v = 1;
 
-    if (!parser_traits<T>::parse_func(prm.s, &v)) {
+    if (!parser_traits<T>::parse_func(params.s, &v)) {
         if (v == std::numeric_limits<T>::max() || v == std::numeric_limits<T>::min()) {
-            return parse_result::overflowed;
+            return Parse_result::overflowed;
         }
-        return parse_result::failed;
+        return Parse_result::failed;
     }
 
     result = v;
 
-    return parse_result::ok;
+    return Parse_result::ok;
 }
 
 template<typename T>
-std::enable_if_t<sizeof(T) <= 2, parse_result>
-try_parse_int_core(const int_parse_params &prm, T &result) noexcept
+std::enable_if_t<sizeof(T) <= 2, Parse_result>
+try_parse_int_core(const Int_parse_params &params, T &result) noexcept
 {
     using U = std::conditional_t<std::is_signed_v<T>, std::int32_t, std::uint32_t>;
 
     U v;
 
-    parse_result r = try_parse_int_core<U>(prm, v);
-    if (r != parse_result::ok) {
+    Parse_result r = try_parse_int_core<U>(params, v);
+    if (r != Parse_result::ok) {
         return r;
     }
 
     if (v < std::numeric_limits<T>::min() || v > std::numeric_limits<T>::max()) {
-        return parse_result::overflowed;
+        return Parse_result::overflowed;
     }
 
     result = static_cast<T>(v);
 
-    return parse_result::ok;
+    return Parse_result::ok;
 }
 
 }  // namespace
 }  // namespace detail
 
 template<typename T>
-inline parse_result try_parse_float(const float_parse_params &prm, T &result)
+inline Parse_result try_parse_float(const Float_parse_params &params, T &result)
 {
-    return detail::try_parse_float_core(prm, result);
+    return detail::try_parse_float_core(params, result);
 }
 
-template parse_result try_parse_float<float>(const float_parse_params &prm, float &result);
+template Parse_result try_parse_float<float>(const Float_parse_params &params, float &result);
 
-template parse_result try_parse_float<double>(const float_parse_params &prm, double &result);
+template Parse_result try_parse_float<double>(const Float_parse_params &params, double &result);
 
 template<typename T>
-inline parse_result try_parse_int(const int_parse_params &prm, T &result) noexcept
+inline Parse_result try_parse_int(const Int_parse_params &params, T &result) noexcept
 {
-    return detail::try_parse_int_core(prm, result);
+    return detail::try_parse_int_core(params, result);
 }
 
 // clang-format off
 
-template parse_result
-try_parse_int<std::int8_t>  (const int_parse_params &prm, std::int8_t   &result) noexcept;
+template Parse_result
+try_parse_int<std::int8_t>  (const Int_parse_params &params, std::int8_t   &result) noexcept;
 
-template parse_result
-try_parse_int<std::int16_t> (const int_parse_params &prm, std::int16_t  &result) noexcept;
+template Parse_result
+try_parse_int<std::int16_t> (const Int_parse_params &params, std::int16_t  &result) noexcept;
 
-template parse_result
-try_parse_int<std::int32_t> (const int_parse_params &prm, std::int32_t  &result) noexcept;
+template Parse_result
+try_parse_int<std::int32_t> (const Int_parse_params &params, std::int32_t  &result) noexcept;
 
-template parse_result
-try_parse_int<std::int64_t> (const int_parse_params &prm, std::int64_t  &result) noexcept;
+template Parse_result
+try_parse_int<std::int64_t> (const Int_parse_params &params, std::int64_t  &result) noexcept;
 
-template parse_result
-try_parse_int<std::uint8_t> (const int_parse_params &prm, std::uint8_t  &result) noexcept;
+template Parse_result
+try_parse_int<std::uint8_t> (const Int_parse_params &params, std::uint8_t  &result) noexcept;
 
-template parse_result
-try_parse_int<std::uint16_t>(const int_parse_params &prm, std::uint16_t &result) noexcept;
+template Parse_result
+try_parse_int<std::uint16_t>(const Int_parse_params &params, std::uint16_t &result) noexcept;
 
-template parse_result
-try_parse_int<std::uint32_t>(const int_parse_params &prm, std::uint32_t &result) noexcept;
+template Parse_result
+try_parse_int<std::uint32_t>(const Int_parse_params &params, std::uint32_t &result) noexcept;
 
-template parse_result
-try_parse_int<std::uint64_t>(const int_parse_params &prm, std::uint64_t &result) noexcept;
+template Parse_result
+try_parse_int<std::uint64_t>(const Int_parse_params &params, std::uint64_t &result) noexcept;
 
 // clang-format on
 
-parse_result try_parse_size_t(std::string_view s, std::size_t &result) noexcept
+Parse_result try_parse_size_t(std::string_view s, std::size_t &result) noexcept
 {
     return try_parse_int(s, result);
 }

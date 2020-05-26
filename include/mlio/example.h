@@ -32,40 +32,38 @@ inline namespace abi_v1 {
 /// @addtogroup data_readers Data Readers
 /// @{
 
-/// Represents an example that holds a @ref schema and a set of
+/// Represents an Example that holds a @ref Schema and a set of
 /// features.
 ///
 /// @remark
-///     An example does not necessarily have a one-to-one mapping to a
-///     @ref instance "data instance" in a dataset. More than one data
-///     instance can be @e batched into a single example.
-class MLIO_API example : public intrusive_ref_counter<example> {
+///     An Example does not necessarily have a one-to-one mapping to a
+///     @ref Instance "data Instance" in a dataset. More than one data
+///     Instance can be @e batched into a single Example.
+class MLIO_API Example : public Intrusive_ref_counter<Example> {
 public:
-    /// @param shm
-    ///     The schema that describes the @p features contained in the
-    ///     example.
+    /// @param schema
+    ///     The Schema that describes the @p features contained in the
+    ///     Example.
     /// @param features
-    ///     The features of the example.
-    explicit example(intrusive_ptr<schema const> shm,
-                     std::vector<intrusive_ptr<tensor>> &&features);
+    ///     The features of the Example.
+    explicit Example(Intrusive_ptr<const Schema> schema,
+                     std::vector<Intrusive_ptr<Tensor>> &&features);
 
-public:
     /// Finds the feature that has the specified name.
     ///
     /// @return
-    ///     The @ref tensor instance if the feature is found in the
-    ///     example; otherwise an @c std::nullptr.
-    intrusive_ptr<tensor> find_feature(const std::string &name) const noexcept;
+    ///     The @ref Tensor Instance if the feature is found in the
+    ///     Example; otherwise an @c std::nullptr.
+    Intrusive_ptr<Tensor> find_feature(const std::string &name) const noexcept;
 
     std::string repr() const;
 
-public:
-    const schema &get_schema() const noexcept
+    const Schema &schema() const noexcept
     {
         return *schema_;
     }
 
-    std::vector<intrusive_ptr<tensor>> const &features() const noexcept
+    const std::vector<Intrusive_ptr<Tensor>> &features() const noexcept
     {
         return features_;
     }
@@ -79,14 +77,14 @@ public:
     std::size_t padding{};
 
 private:
-    intrusive_ptr<schema const> schema_;
-    std::vector<intrusive_ptr<tensor>> features_;
+    Intrusive_ptr<const Schema> schema_;
+    std::vector<Intrusive_ptr<Tensor>> features_;
 };
 
 MLIO_API
-inline std::ostream &operator<<(std::ostream &strm, const example &exm)
+inline std::ostream &operator<<(std::ostream &s, const Example &example)
 {
-    return strm << exm.repr();
+    return s << example.repr();
 }
 
 /// @}

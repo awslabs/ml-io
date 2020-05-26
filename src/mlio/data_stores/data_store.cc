@@ -18,7 +18,7 @@
 namespace mlio {
 inline namespace abi_v1 {
 
-data_store::~data_store() = default;
+Data_store::~Data_store() = default;
 
 }  // namespace abi_v1
 }  // namespace mlio

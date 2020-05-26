@@ -19,41 +19,34 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-class chunk_reader;
-class coo_tensor_builder;
-class iconv_desc;
-class instance_batch_reader;
-class instance_reader;
-class zlib_inflater;
+class Chunk_reader;
+class Coo_tensor_builder;
+class Iconv_desc;
+class Instance_batch_reader;
+class Instance_reader;
+class Zlib_inflater;
 
 }  // namespace detail
 
-class attribute;
-class coo_tensor;
-class csr_tensor;
-class data_store;
-class data_store;
-class dense_tensor;
-class example;
-class example;
-class input_stream;
-class input_stream;
-class instance;
-class instance;
-class instance_batch;
-class instance_batch;
-class memory_slice;
-class mutable_memory_block;
-class record;
-class record_reader;
-class record_reader;
-class tensor;
-class tensor;
-class tensor_visitor;
-class text_encoding;
+class Attribute;
+class Coo_tensor;
+class Csr_tensor;
+class Data_store;
+class Dense_tensor;
+class Example;
+class Input_stream;
+class Instance;
+class Instance_batch;
+class Memory_slice;
+class Mutable_memory_block;
+class Record;
+class Record_reader;
+class Tensor;
+class Tensor_visitor;
+class Text_encoding;
 
-struct csv_params;
-struct data_reader_params;
+struct Csv_params;
+struct Data_reader_params;
 
 }  // namespace abi_v1
 }  // namespace mlio

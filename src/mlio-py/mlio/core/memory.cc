@@ -23,8 +23,8 @@ namespace pymlio {
 
 void register_memory_slice(py::module &m)
 {
-    py::class_<memory_slice>(m, "MemorySlice", py::buffer_protocol())
-        .def_buffer([](memory_slice &self) {
+    py::class_<Memory_slice>(m, "MemorySlice", py::buffer_protocol())
+        .def_buffer([](Memory_slice &self) {
             // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
             auto data = const_cast<std::byte *>(self.data());
 

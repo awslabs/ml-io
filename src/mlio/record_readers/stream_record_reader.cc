@@ -25,20 +25,30 @@
 namespace mlio {
 inline namespace abi_v1 {
 
-stream_record_reader::stream_record_reader(intrusive_ptr<input_stream> strm)
+Stream_record_reader::~Stream_record_reader() = default;
+
+std::size_t Stream_record_reader::record_size_hint() const noexcept
 {
-    chunk_reader_ = detail::make_chunk_reader(std::move(strm));
+    return chunk_reader_->chunk_size_hint();
 }
 
-stream_record_reader::~stream_record_reader() = default;
-
-std::optional<record> stream_record_reader::read_record_core()
+void Stream_record_reader::set_record_size_hint(std::size_t value) noexcept
 {
-    std::optional<record> rec{};
+    chunk_reader_->set_chunk_size_hint(value);
+}
+
+Stream_record_reader::Stream_record_reader(Intrusive_ptr<Input_stream> stream)
+{
+    chunk_reader_ = detail::make_chunk_reader(std::move(stream));
+}
+
+std::optional<Record> Stream_record_reader::read_record_core()
+{
+    std::optional<Record> record{};
 
     while (true) {
-        rec = decode_record(chunk_, !chunk_reader_->eof());
-        if (rec) {
+        record = decode_record(chunk_, !chunk_reader_->eof());
+        if (record) {
             break;
         }
 
@@ -48,17 +58,7 @@ std::optional<record> stream_record_reader::read_record_core()
         }
     }
 
-    return rec;
-}
-
-std::size_t stream_record_reader::record_size_hint() const noexcept
-{
-    return chunk_reader_->chunk_size_hint();
-}
-
-void stream_record_reader::set_record_size_hint(std::size_t value) noexcept
-{
-    chunk_reader_->set_chunk_size_hint(value);
+    return record;
 }
 
 }  // namespace abi_v1

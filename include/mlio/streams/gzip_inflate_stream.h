@@ -32,42 +32,38 @@ inline namespace abi_v1 {
 /// @addtogroup streams Streams
 /// @{
 
-/// Represents an @ref input_stream that inflates an underlying
+/// Represents an @ref Input_stream that inflates an underlying
 /// stream that was deflated with gzip or zlib.
-class MLIO_API gzip_inflate_stream final : public input_stream_base {
+class MLIO_API Gzip_inflate_stream final : public Input_stream_base {
 public:
-    explicit gzip_inflate_stream(intrusive_ptr<input_stream> inner);
+    explicit Gzip_inflate_stream(Intrusive_ptr<Input_stream> inner);
 
-    gzip_inflate_stream(const gzip_inflate_stream &) = delete;
+    Gzip_inflate_stream(const Gzip_inflate_stream &) = delete;
 
-    gzip_inflate_stream(gzip_inflate_stream &&) = delete;
+    Gzip_inflate_stream &operator=(const Gzip_inflate_stream &) = delete;
 
-    ~gzip_inflate_stream() final;
+    Gzip_inflate_stream(Gzip_inflate_stream &&) = delete;
 
-public:
-    gzip_inflate_stream &operator=(const gzip_inflate_stream &) = delete;
+    Gzip_inflate_stream &operator=(Gzip_inflate_stream &&) = delete;
 
-    gzip_inflate_stream &operator=(gzip_inflate_stream &&) = delete;
+    ~Gzip_inflate_stream() final;
 
-public:
-    using input_stream_base::read;
+    using Input_stream_base::read;
 
-    std::size_t read(mutable_memory_span dest) final;
+    std::size_t read(Mutable_memory_span destination) final;
 
     void close() noexcept final;
+
+    bool closed() const noexcept final;
 
 private:
     MLIO_HIDDEN
     void check_if_closed() const;
 
-public:
-    bool closed() const noexcept final;
-
-private:
-    intrusive_ptr<input_stream> inner_;
-    std::unique_ptr<detail::zlib_inflater> inflater_;
-    memory_slice buffer_{};
-    memory_block::iterator buffer_pos_ = buffer_.begin();
+    Intrusive_ptr<Input_stream> inner_;
+    std::unique_ptr<detail::Zlib_inflater> inflater_;
+    Memory_slice buffer_{};
+    Memory_block::iterator buffer_pos_ = buffer_.begin();
 };
 
 /// @}

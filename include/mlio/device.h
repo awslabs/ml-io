@@ -29,24 +29,21 @@ inline namespace abi_v1 {
 /// @addtogroup tensors Tensors
 /// @{
 
-/// Represents a device kind that has data processing capabilities such
+/// Represents a Device kind that has data processing capabilities such
 /// as CPU or CUDA.
-class MLIO_API device_kind {
+class MLIO_API Device_kind {
 public:
-    /// A convenience function for the CPU device kind.
-    static device_kind cpu() noexcept;
+    /// A convenience function for the CPU Device kind.
+    static Device_kind cpu() noexcept;
 
-public:
     /// @param name
     ///     The name can be any arbitrary string, but it must be unique
-    ///     among device kinds.
-    explicit constexpr device_kind(std::string_view name) noexcept : name_{name}
+    ///     among Device kinds.
+    explicit constexpr Device_kind(std::string_view name) noexcept : name_{name}
     {}
 
-public:
     std::string repr() const;
 
-public:
     constexpr std::string_view name() const noexcept
     {
         return name_;
@@ -57,34 +54,32 @@ private:
 };
 
 MLIO_API
-inline bool operator==(const device_kind &lhs, const device_kind &rhs) noexcept
+inline bool operator==(const Device_kind &lhs, const Device_kind &rhs) noexcept
 {
     return lhs.name() == rhs.name();
 }
 
 MLIO_API
-inline bool operator!=(const device_kind &lhs, const device_kind &rhs) noexcept
+inline bool operator!=(const Device_kind &lhs, const Device_kind &rhs) noexcept
 {
     return lhs.name() != rhs.name();
 }
 
 MLIO_API
-inline std::ostream &operator<<(std::ostream &strm, const device_kind &kind)
+inline std::ostream &operator<<(std::ostream &s, const Device_kind &kind)
 {
-    return strm << kind.repr();
+    return s << kind.repr();
 }
 
 /// Represents a particular data processing unit on the host system.
-class MLIO_API device {
+class MLIO_API Device {
 public:
-    explicit constexpr device(device_kind kind, std::size_t id = 0) noexcept : kind_{kind}, id_{id}
+    explicit constexpr Device(Device_kind kind, std::size_t id = 0) noexcept : kind_{kind}, id_{id}
     {}
 
-public:
     std::string repr() const;
 
-public:
-    constexpr device_kind kind() const noexcept
+    constexpr Device_kind kind() const noexcept
     {
         return kind_;
     }
@@ -95,26 +90,26 @@ public:
     }
 
 private:
-    device_kind kind_;
+    Device_kind kind_;
     std::size_t id_;
 };
 
 MLIO_API
-inline bool operator==(const device &lhs, const device &rhs) noexcept
+inline bool operator==(const Device &lhs, const Device &rhs) noexcept
 {
     return lhs.kind() == rhs.kind() && lhs.id() == rhs.id();
 }
 
 MLIO_API
-inline bool operator!=(const device &lhs, const device &rhs) noexcept
+inline bool operator!=(const Device &lhs, const Device &rhs) noexcept
 {
     return lhs.kind() != rhs.kind() || lhs.id() != rhs.id();
 }
 
 MLIO_API
-inline std::ostream &operator<<(std::ostream &strm, const device &dev)
+inline std::ostream &operator<<(std::ostream &s, const Device &dev)
 {
-    return strm << dev.repr();
+    return s << dev.repr();
 }
 
 /// @}
@@ -125,16 +120,16 @@ inline std::ostream &operator<<(std::ostream &strm, const device &dev)
 namespace std {
 
 template<>
-struct MLIO_API hash<mlio::device_kind> {
-    inline size_t operator()(const mlio::device_kind &kind) const noexcept
+struct MLIO_API hash<mlio::Device_kind> {
+    inline size_t operator()(const mlio::Device_kind &kind) const noexcept
     {
         return hash<string_view>{}(kind.name());
     }
 };
 
 template<>
-struct MLIO_API hash<mlio::device> {
-    inline size_t operator()(const mlio::device &dev) const noexcept
+struct MLIO_API hash<mlio::Device> {
+    inline size_t operator()(const mlio::Device &dev) const noexcept
     {
         size_t seed = 0;
 

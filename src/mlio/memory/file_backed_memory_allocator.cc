@@ -29,17 +29,15 @@ inline namespace abi_v1 {
 namespace detail {
 namespace {
 
-// This class internally holds a heap_memory_block once initialized and
-// migrates to a file_backed_memory_block if it gets resized and the new
+// This class internally holds a Heap_memory_block once initialized and
+// migrates to a File_backed_memory_block if it gets resized and the new
 // size exceeds the specified threshold.
-class hybrid_memory_block final : public mutable_memory_block {
+class Hybrid_memory_block final : public Mutable_memory_block {
 public:
-    explicit hybrid_memory_block(size_type size, size_type oversize_threshold);
+    explicit Hybrid_memory_block(size_type size, size_type oversize_threshold);
 
-public:
     void resize(size_type size) final;
 
-public:
     pointer data() noexcept final
     {
         return inner_->data();
@@ -61,18 +59,18 @@ public:
     }
 
 private:
-    intrusive_ptr<mutable_memory_block> inner_;
+    Intrusive_ptr<Mutable_memory_block> inner_;
     size_type oversize_threshold_;
     bool file_backed_{};
 };
 
-hybrid_memory_block::hybrid_memory_block(size_type size, size_type oversize_threshold)
+Hybrid_memory_block::Hybrid_memory_block(size_type size, size_type oversize_threshold)
     : oversize_threshold_{oversize_threshold}
 {
-    inner_ = make_intrusive<heap_memory_block>(size);
+    inner_ = make_intrusive<Heap_memory_block>(size);
 }
 
-void hybrid_memory_block::resize(size_type size)
+void Hybrid_memory_block::resize(size_type size)
 {
     // If the requested size exceeds the threshold, we move the data
     // from the heap to a file-backed block. Note that the reverse is
@@ -85,11 +83,11 @@ void hybrid_memory_block::resize(size_type size)
             inner_->size(),
             size);
 
-        auto blk = make_intrusive<file_backed_memory_block>(size);
+        auto block = make_intrusive<File_backed_memory_block>(size);
 
-        std::copy(inner_->begin(), inner_->end(), blk->begin());
+        std::copy(inner_->begin(), inner_->end(), block->begin());
 
-        inner_ = std::move(blk);
+        inner_ = std::move(block);
 
         file_backed_ = true;
     }
@@ -116,9 +114,9 @@ std::size_t default_oversize_threshold() noexcept
 }  // namespace
 }  // namespace detail
 
-using mlio::detail::hybrid_memory_block;
+using mlio::detail::Hybrid_memory_block;
 
-file_backed_memory_allocator::file_backed_memory_allocator(std::size_t oversize_threshold) noexcept
+File_backed_memory_allocator::File_backed_memory_allocator(std::size_t oversize_threshold) noexcept
     : oversize_threshold_{oversize_threshold}
 {
     if (oversize_threshold_ == 0) {
@@ -126,12 +124,12 @@ file_backed_memory_allocator::file_backed_memory_allocator(std::size_t oversize_
     }
 }
 
-intrusive_ptr<mutable_memory_block> file_backed_memory_allocator::allocate(std::size_t size)
+Intrusive_ptr<Mutable_memory_block> File_backed_memory_allocator::allocate(std::size_t size)
 {
     if (size > oversize_threshold_) {
-        return make_intrusive<file_backed_memory_block>(size);
+        return make_intrusive<File_backed_memory_block>(size);
     }
-    return make_intrusive<hybrid_memory_block>(size, oversize_threshold_);
+    return make_intrusive<Hybrid_memory_block>(size, oversize_threshold_);
 }
 
 }  // namespace abi_v1

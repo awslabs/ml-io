@@ -22,14 +22,7 @@
 namespace mlio {
 inline namespace abi_v1 {
 
-data_reader_base::data_reader_base(data_reader_params &&prm) noexcept : params_{std::move(prm)}
-{
-    if (params_.warn_bad_instances) {
-        warn_bad_instances_ = logger::is_enabled_for(log_level::warning);
-    }
-}
-
-intrusive_ptr<example> data_reader_base::read_example()
+Intrusive_ptr<Example> Data_reader_base::read_example()
 {
     if (peeked_example_) {
         return std::exchange(peeked_example_, nullptr);
@@ -37,7 +30,7 @@ intrusive_ptr<example> data_reader_base::read_example()
     return read_example_core();
 }
 
-intrusive_ptr<example> data_reader_base::peek_example()
+Intrusive_ptr<Example> Data_reader_base::peek_example()
 {
     if (peeked_example_ == nullptr) {
         peeked_example_ = read_example_core();
@@ -45,9 +38,17 @@ intrusive_ptr<example> data_reader_base::peek_example()
     return peeked_example_;
 }
 
-void data_reader_base::reset() noexcept
+void Data_reader_base::reset() noexcept
 {
     peeked_example_ = nullptr;
+}
+
+Data_reader_base::Data_reader_base(Data_reader_params &&params) noexcept
+    : params_{std::move(params)}
+{
+    if (params_.warn_bad_instances) {
+        warn_bad_instances_ = logger::is_enabled_for(Log_level::warning);
+    }
 }
 
 }  // namespace abi_v1

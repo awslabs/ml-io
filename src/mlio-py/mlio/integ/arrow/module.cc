@@ -18,11 +18,15 @@
 #include <memory>
 
 #include <arrow/io/interfaces.h>
-#include <mlio.h>
+#include <mlio/data_stores/data_store.h>
+#include <mlio/intrusive_ptr.h>
+#include <mlio/record_readers/record.h>
+#include <mlio/streams/input_stream.h>
+#include <mlio/streams/memory_input_stream.h>
 
 #include "arrow_file.h"
 
-PYBIND11_DECLARE_HOLDER_TYPE(T, mlio::intrusive_ptr<T>, true);
+PYBIND11_DECLARE_HOLDER_TYPE(T, mlio::Intrusive_ptr<T>, true);
 
 namespace py = pybind11;
 
@@ -32,55 +36,55 @@ using namespace pybind11::literals;
 namespace pymlio {
 
 // The memory layout of Arrow's Cython NativeFile type.
-struct py_arrow_native_file {
+struct Py_arrow_native_file {
     PyObject_HEAD void *vtable;
     std::shared_ptr<arrow::io::InputStream> input_stream;
     std::shared_ptr<arrow::io::RandomAccessFile> random_access;
     std::shared_ptr<arrow::io::OutputStream> output_stream;
-    int is_readable;
-    int is_writable;
-    int is_seekable;
+    int readable;
+    int writable;
+    int seekable;
     int own_file;
 };
 
-static py::object make_py_arrow_native_file(intrusive_ptr<input_stream> &&strm)
+static py::object make_py_arrow_native_file(Intrusive_ptr<Input_stream> &&stream)
 {
     auto nf_type = py::module::import("pyarrow").attr("NativeFile");
 
     auto nf_inst = nf_type();
 
-    auto *obj = reinterpret_cast<py_arrow_native_file *>(nf_inst.ptr());
+    auto *obj = reinterpret_cast<Py_arrow_native_file *>(nf_inst.ptr());
 
-    obj->random_access = std::make_shared<arrow_file>(std::move(strm));
+    obj->random_access = std::make_shared<Arrow_file>(std::move(stream));
     obj->input_stream = obj->random_access;
     obj->output_stream = nullptr;
-    obj->is_readable = 1;
-    obj->is_writable = 0;
-    obj->is_seekable = 1;
+    obj->readable = 1;
+    obj->writable = 0;
+    obj->seekable = 1;
     obj->own_file = 1;
 
     return nf_inst;
 }
 
-static py::object as_arrow_file(const data_store &st)
+static py::object as_arrow_file(const Data_store &st)
 {
-    auto strm = st.open_read();
+    auto stream = st.open_read();
 
-    return make_py_arrow_native_file(std::move(strm));
+    return make_py_arrow_native_file(std::move(stream));
 }
 
-static py::object as_arrow_file(const record &rec)
+static py::object as_arrow_file(const Record &record)
 {
-    auto strm = make_intrusive<memory_input_stream>(rec.payload());
+    auto stream = make_intrusive<Memory_input_stream>(record.payload());
 
-    return make_py_arrow_native_file(std::move(strm));
+    return make_py_arrow_native_file(std::move(stream));
 }
 
 PYBIND11_MODULE(arrow, m)
 {
-    m.def("as_arrow_file", py::overload_cast<const data_store &>(&as_arrow_file), "store"_a);
+    m.def("as_arrow_file", py::overload_cast<const Data_store &>(&as_arrow_file), "store"_a);
 
-    m.def("as_arrow_file", py::overload_cast<const record &>(&as_arrow_file), "record"_a);
+    m.def("as_arrow_file", py::overload_cast<const Record &>(&as_arrow_file), "Record"_a);
 }
 
 }  // namespace pymlio

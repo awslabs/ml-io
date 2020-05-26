@@ -25,22 +25,22 @@
 
 namespace pymlio {
 
-class py_device_array {
+class Py_device_array {
 public:
-    explicit py_device_array(mlio::intrusive_ptr<mlio::tensor> tsr, mlio::device_array_span s)
-        : tensor_{std::move(tsr)}, span_{s}
+    explicit Py_device_array(mlio::Intrusive_ptr<mlio::Tensor> tensor, mlio::Device_array_span s)
+        : tensor_{std::move(tensor)}, span_{s}
     {}
 
-    py_device_array(const py_device_array &) = delete;
+    Py_device_array(const Py_device_array &) = delete;
 
-    py_device_array(py_device_array &&) noexcept = default;
+    Py_device_array(Py_device_array &&) noexcept = default;
 
-    ~py_device_array();
+    ~Py_device_array();
 
 public:
-    py_device_array &operator=(const py_device_array &) = delete;
+    Py_device_array &operator=(const Py_device_array &) = delete;
 
-    py_device_array &operator=(py_device_array &&) noexcept = default;
+    Py_device_array &operator=(Py_device_array &&) noexcept = default;
 
 public:
     void *data() noexcept;
@@ -55,22 +55,22 @@ public:
         return span_.empty();
     }
 
-    mlio::data_type dtype() const noexcept
+    mlio::Data_type data_type() const noexcept
     {
-        return span_.dtype();
+        return span_.data_type();
     }
 
-    mlio::device get_device() const noexcept
+    mlio::Device device() const noexcept
     {
-        return span_.get_device();
+        return span_.device();
     }
 
 private:
     void *make_or_get_string_buffer();
 
 private:
-    mlio::intrusive_ptr<mlio::tensor> tensor_;
-    mlio::device_array_span span_;
+    mlio::Intrusive_ptr<mlio::Tensor> tensor_;
+    mlio::Device_array_span span_;
     std::vector<PyObject *> string_buf_{};
 };
 

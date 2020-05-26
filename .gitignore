@@ -1,6 +1,8 @@
 # Build Directories
 build/
+build-*/
 cmake-build/
+cmake-build-*/
 
 # Python Artifacts
 dist/

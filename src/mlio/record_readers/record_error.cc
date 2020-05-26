@@ -18,15 +18,15 @@
 namespace mlio {
 inline namespace abi_v1 {
 
-record_error::~record_error() = default;
+Record_error::~Record_error() = default;
 
-corrupt_record_error::~corrupt_record_error() = default;
+Corrupt_record_error::~Corrupt_record_error() = default;
 
-corrupt_header_error::~corrupt_header_error() = default;
+Corrupt_header_error::~Corrupt_header_error() = default;
 
-corrupt_footer_error::~corrupt_footer_error() = default;
+Corrupt_footer_error::~Corrupt_footer_error() = default;
 
-record_too_large_error::~record_too_large_error() = default;
+Record_too_large_error::~Record_too_large_error() = default;
 
 }  // namespace abi_v1
 }  // namespace mlio

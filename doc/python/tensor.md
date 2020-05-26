@@ -17,7 +17,7 @@ The tensor types in MLIO are deliberately designed to be lightweight. Their prim
 Represents an abstract base class that only defines the data type and the shape of a tensor. Derived types specify how the tensor data is laid out in memory.
 
 ### Properties
-#### dtype
+#### data_type
 Gets the [data type](#DataType) of the tensor.
 
 #### shape
@@ -76,7 +76,7 @@ Represents a memory block of a specific [data type](#DataType) that is stored on
 #### size
 Gets the size of the array.
 
-#### dtype
+#### data_type
 Gets the [data type](#DataType) of the array.
 
 #### device
@@ -118,15 +118,15 @@ Specifies the data type of a [Tensor](#Tensor) or a [DeviceArray](#DeviceArray).
 | Value     | Description                                            |
 |-----------|--------------------------------------------------------|
 | `SIZE`    | A platform-specific unsigned integer type that can store the maximum size of a theoretically possible array (corresponds to `size_t` in C and C++). |
-| `FLOAT16` | 16-bit floating-point number (a.k.a. half precision)   |
-| `FLOAT32` | 32-bit floating-point number (a.k.a. single precision) |
-| `FLOAT64` | 64-bit floating-point number (a.k.a. double precision) |
-| `SINT8`   | Signed 8-bit integer                                   |
-| `SINT16`  | Signed 16-bit integer                                  |
-| `SINT32`  | Signed 32-bit integer                                  |
-| `SINT64`  | Signed 64-bit integer                                  |
-| `UINT8`   | Unsigned 8-bit integer                                 |
-| `UINT16`  | Unsigned 16-bit integer                                |
-| `UINT32`  | Unsigned 32-bit integer                                |
-| `UINT64`  | Unsigned 64-bit integer                                |
+| `FLOAT16` | 16-bit floating-point number (half precision)   |
+| `FLOAT32` | 32-bit floating-point number (single precision) |
+| `FLOAT64` | 64-bit floating-point number (double precision) |
+| `INT8`    | Signed 8-bit integer                            |
+| `INT16`   | Signed 16-bit integer                           |
+| `INT32`   | Signed 32-bit integer                           |
+| `INT64`   | Signed 64-bit integer                           |
+| `UINT8`   | Unsigned 8-bit integer                          |
+| `UINT16`  | Unsigned 16-bit integer                         |
+| `UINT32`  | Unsigned 32-bit integer                         |
+| `UINT64`  | Unsigned 64-bit integer                         |
 | `STRING`  | A null-terminated string; in Python it is exposed as a `str` instance. |

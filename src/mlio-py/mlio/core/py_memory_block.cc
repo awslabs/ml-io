@@ -17,7 +17,7 @@
 
 namespace pymlio {
 
-py_memory_block::~py_memory_block()
+Py_memory_block::~Py_memory_block()
 {
     ::PyBuffer_Release(&buffer_);
 }

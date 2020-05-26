@@ -31,84 +31,80 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-class coo_tensor_builder {
+class Coo_tensor_builder {
 public:
-    explicit coo_tensor_builder(const attribute &attr, std::size_t batch_size)
-        : attr_{&attr}, batch_size_{batch_size}, coords_(attr.shape().size())
+    explicit Coo_tensor_builder(const Attribute &attr, std::size_t batch_size)
+        : attr_{&attr}, batch_size_{batch_size}, coordinates_(attr.shape().size())
     {}
 
-    coo_tensor_builder(const coo_tensor_builder &) = delete;
+    Coo_tensor_builder(const Coo_tensor_builder &) = delete;
 
-    coo_tensor_builder(coo_tensor_builder &&) = delete;
+    Coo_tensor_builder &operator=(const Coo_tensor_builder &) = delete;
 
-    virtual ~coo_tensor_builder();
+    Coo_tensor_builder(Coo_tensor_builder &&) = delete;
 
-public:
-    coo_tensor_builder &operator=(const coo_tensor_builder &) = delete;
+    Coo_tensor_builder &operator=(Coo_tensor_builder &&) = delete;
 
-    coo_tensor_builder &operator=(coo_tensor_builder &&) = delete;
+    virtual ~Coo_tensor_builder();
 
-public:
-    virtual intrusive_ptr<tensor> build() = 0;
+    virtual Intrusive_ptr<Tensor> build() = 0;
 
 protected:
-    bool append_core(stdx::span<std::uint64_t const> keys);
+    bool append_indices(stdx::span<const std::uint64_t> indices);
 
-    intrusive_ptr<tensor> build_core(std::unique_ptr<device_array> &&data);
+    Intrusive_ptr<Tensor> build_core(std::unique_ptr<Device_array> &&data);
 
 private:
-    const attribute *attr_;
+    const Attribute *attr_;
     std::size_t batch_size_;
     std::size_t row_idx_{};
-    std::vector<std::vector<std::size_t>> coords_{};
+    std::vector<std::vector<std::size_t>> coordinates_{};
 };
 
-template<data_type dt>
-class coo_tensor_builder_impl final : public coo_tensor_builder {
+template<Data_type dt>
+class Coo_tensor_builder_impl final : public Coo_tensor_builder {
 public:
     using value_type = data_type_t<dt>;
 
-public:
-    using coo_tensor_builder::coo_tensor_builder;
+    using Coo_tensor_builder::Coo_tensor_builder;
 
-public:
-    bool append(stdx::span<value_type const> data, stdx::span<std::uint64_t const> keys);
+    bool append(stdx::span<const value_type> values, stdx::span<const std::uint64_t> indices);
 
-    intrusive_ptr<tensor> build() final;
+    Intrusive_ptr<Tensor> build() final;
 
 private:
     std::vector<value_type> data_{};
 };
 
-template<data_type dt>
-bool coo_tensor_builder_impl<dt>::append(stdx::span<value_type const> data,
-                                         stdx::span<std::uint64_t const> keys)
+template<Data_type dt>
+bool Coo_tensor_builder_impl<dt>::append(stdx::span<const value_type> values,
+                                         stdx::span<const std::uint64_t> indices)
 {
-    data_.insert(data_.end(), data.begin(), data.end());
+    data_.insert(data_.end(), values.begin(), values.end());
 
-    return append_core(keys);
+    return append_indices(indices);
 }
 
-template<data_type dt>
-intrusive_ptr<tensor> coo_tensor_builder_impl<dt>::build()
+template<Data_type dt>
+Intrusive_ptr<Tensor> Coo_tensor_builder_impl<dt>::build()
 {
     auto data = wrap_cpu_array<dt>(std::move(data_));
 
     return build_core(std::move(data));
 }
 
-template<data_type dt>
+template<Data_type dt>
 struct make_coo_tensor_builder_op {
-    std::unique_ptr<coo_tensor_builder> operator()(const attribute &attr, std::size_t batch_size)
+    std::unique_ptr<Coo_tensor_builder> operator()(const Attribute &attr, std::size_t batch_size)
     {
-        return std::make_unique<coo_tensor_builder_impl<dt>>(attr, batch_size);
+        return std::make_unique<Coo_tensor_builder_impl<dt>>(attr, batch_size);
     }
 };
 
-inline std::unique_ptr<coo_tensor_builder>
-make_coo_tensor_builder(const attribute &attr, std::size_t batch_size)
+inline std::unique_ptr<Coo_tensor_builder>
+make_coo_tensor_builder(const Attribute &attr, std::size_t batch_size)
 {
-    return dispatch<make_coo_tensor_builder_op>(attr.dtype(), attr, batch_size);
+    return dispatch<make_coo_tensor_builder_op>(attr.data_type(), attr, batch_size);
 }
 
 }  // namespace detail

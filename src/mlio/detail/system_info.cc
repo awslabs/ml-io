@@ -55,8 +55,8 @@ std::size_t get_total_ram() noexcept
 {
     std::array<int, 2> name{CTL_HW, HW_MEMSIZE};
 
-    std::size_t data;
-    std::size_t size;
+    std::size_t data{};
+    std::size_t size{};
 
     if (::sysctl(name.data(), name.size(), &data, &size, nullptr, 0) == -1) {
         return 0;

@@ -21,21 +21,19 @@
 namespace mlio {
 inline namespace abi_v1 {
 
-class MLIO_API not_supported_error : public mlio_error {
+class MLIO_API Not_supported_error : public Mlio_error {
 public:
-    using mlio_error::mlio_error;
+    using Mlio_error::Mlio_error;
 
-public:
-    not_supported_error(const not_supported_error &) = default;
+    Not_supported_error(const Not_supported_error &) = default;
 
-    not_supported_error(not_supported_error &&) = default;
+    Not_supported_error &operator=(const Not_supported_error &) = default;
 
-    ~not_supported_error() override;
+    Not_supported_error(Not_supported_error &&) = default;
 
-public:
-    not_supported_error &operator=(const not_supported_error &) = default;
+    Not_supported_error &operator=(Not_supported_error &&) = default;
 
-    not_supported_error &operator=(not_supported_error &&) = default;
+    ~Not_supported_error() override;
 };
 
 }  // namespace abi_v1

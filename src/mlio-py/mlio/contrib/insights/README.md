@@ -45,7 +45,7 @@ for column_info in results.columns:
     print(column_info.to_dict())
 ```
 
-Each column in this example will print a dictionary like the following:
+Each column in this Example will print a dictionary like the following:
 
 ```
 {

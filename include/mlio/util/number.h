@@ -27,72 +27,74 @@
 namespace mlio {
 inline namespace abi_v1 {
 
-struct MLIO_API float_parse_params {
+struct MLIO_API Float_parse_params {
     std::string_view s{};
     std::unordered_set<std::string> const *nan_values{};
 };
 
 template<typename T>
 MLIO_API
-parse_result try_parse_float(const float_parse_params &prm, T &result);
+Parse_result try_parse_float(const Float_parse_params &params, T &result);
 
 template<typename T>
 MLIO_API
-inline parse_result try_parse_float(std::string_view s, T &result)
+inline Parse_result try_parse_float(std::string_view s, T &result)
 {
-    return try_parse_float(float_parse_params{s}, result);
+    return try_parse_float(Float_parse_params{s}, result);
 }
 
-extern template parse_result try_parse_float<float>(const float_parse_params &prm, float &result);
+extern template Parse_result
+try_parse_float<float>(const Float_parse_params &params, float &result);
 
-extern template parse_result try_parse_float<double>(const float_parse_params &prm, double &result);
+extern template Parse_result
+try_parse_float<double>(const Float_parse_params &params, double &result);
 
-struct MLIO_API int_parse_params {
+struct MLIO_API Int_parse_params {
     std::string_view s{};
     int base{};
 };
 
 template<typename T>
 MLIO_API
-parse_result try_parse_int(const int_parse_params &prm, T &result) noexcept;
+Parse_result try_parse_int(const Int_parse_params &params, T &result) noexcept;
 
 // clang-format off
 
-extern template parse_result
-try_parse_int<std::int8_t>  (const int_parse_params &prm, std::int8_t   &result) noexcept;
+extern template Parse_result
+try_parse_int<std::int8_t>  (const Int_parse_params &params, std::int8_t   &result) noexcept;
 
-extern template parse_result
-try_parse_int<std::int16_t> (const int_parse_params &prm, std::int16_t  &result) noexcept;
+extern template Parse_result
+try_parse_int<std::int16_t> (const Int_parse_params &params, std::int16_t  &result) noexcept;
 
-extern template parse_result
-try_parse_int<std::int32_t> (const int_parse_params &prm, std::int32_t  &result) noexcept;
+extern template Parse_result
+try_parse_int<std::int32_t> (const Int_parse_params &params, std::int32_t  &result) noexcept;
 
-extern template parse_result
-try_parse_int<std::int64_t> (const int_parse_params &prm, std::int64_t  &result) noexcept;
+extern template Parse_result
+try_parse_int<std::int64_t> (const Int_parse_params &params, std::int64_t  &result) noexcept;
 
-extern template parse_result
-try_parse_int<std::uint8_t> (const int_parse_params &prm, std::uint8_t  &result) noexcept;
+extern template Parse_result
+try_parse_int<std::uint8_t> (const Int_parse_params &params, std::uint8_t  &result) noexcept;
 
-extern template parse_result
-try_parse_int<std::uint16_t>(const int_parse_params &prm, std::uint16_t &result) noexcept;
+extern template Parse_result
+try_parse_int<std::uint16_t>(const Int_parse_params &params, std::uint16_t &result) noexcept;
 
-extern template parse_result
-try_parse_int<std::uint32_t>(const int_parse_params &prm, std::uint32_t &result) noexcept;
+extern template Parse_result
+try_parse_int<std::uint32_t>(const Int_parse_params &params, std::uint32_t &result) noexcept;
 
-extern template parse_result
-try_parse_int<std::uint64_t>(const int_parse_params &prm, std::uint64_t &result) noexcept;
+extern template Parse_result
+try_parse_int<std::uint64_t>(const Int_parse_params &params, std::uint64_t &result) noexcept;
 
 // clang-format on
 
 template<typename T>
 MLIO_API
-inline parse_result try_parse_int(std::string_view s, T &result) noexcept
+inline Parse_result try_parse_int(std::string_view s, T &result) noexcept
 {
-    return try_parse_int(int_parse_params{s}, result);
+    return try_parse_int(Int_parse_params{s}, result);
 }
 
 MLIO_API
-parse_result try_parse_size_t(std::string_view s, std::size_t &result) noexcept;
+Parse_result try_parse_size_t(std::string_view s, std::size_t &result) noexcept;
 
 }  // namespace abi_v1
 }  // namespace mlio

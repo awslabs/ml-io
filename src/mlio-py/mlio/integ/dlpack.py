@@ -16,10 +16,10 @@ import mlio._core
 
 def as_dlpack(tensor, version=0x10):
     """
-    Wraps the specified tensor as a DLPack structure.
+    Wraps the specified Tensor as a DLPack structure.
 
     Returns
     -------
-        A Python capsule instance.
+        A Python capsule Instance.
     """
     return mlio._core.as_dlpack(tensor, version)

@@ -18,7 +18,7 @@
 namespace mlio {
 inline namespace abi_v1 {
 
-device_array::~device_array() = default;
+Device_array::~Device_array() = default;
 
 }  // namespace abi_v1
 }  // namespace mlio

@@ -36,87 +36,85 @@ namespace mlio {
 inline namespace abi_v1 {
 
 /// Represents a client to access Amazon S3.
-class MLIO_API s3_client : public intrusive_ref_counter<s3_client> {
+class MLIO_API S3_client : public Intrusive_ref_counter<S3_client> {
 public:
-    explicit s3_client();
+    explicit S3_client();
 
-    explicit s3_client(std::unique_ptr<Aws::S3::S3Client> clt) noexcept;
+    explicit S3_client(std::unique_ptr<Aws::S3::S3Client> native_client) noexcept;
 
-    s3_client(const s3_client &) = delete;
+    S3_client(const S3_client &) = delete;
 
-    s3_client(s3_client &&) = delete;
+    S3_client &operator=(const S3_client &) = delete;
 
-    ~s3_client();
+    S3_client(S3_client &&) = delete;
 
-public:
-    s3_client &operator=(const s3_client &) = delete;
+    S3_client &operator=(S3_client &&) = delete;
 
-    s3_client &operator=(s3_client &&) = delete;
+    ~S3_client();
 
-public:
     void list_objects(std::string_view bucket,
                       std::string_view prefix,
-                      std::function<void(std::string uri)> const &callback) const;
+                      const std::function<void(std::string uri)> &callback) const;
 
     std::size_t read_object(std::string_view bucket,
                             std::string_view key,
                             std::string_view version_id,
                             std::size_t offset,
-                            mutable_memory_span dest) const;
+                            Mutable_memory_span destination) const;
 
     std::size_t read_object_size(std::string_view bucket,
                                  std::string_view key,
                                  std::string_view version_id) const;
 
 private:
-    std::unique_ptr<Aws::S3::S3Client> core_;
+    std::unique_ptr<Aws::S3::S3Client> native_client_;
 };
 
-class MLIO_API s3_client_builder {
+class MLIO_API S3_client_builder {
 public:
-    s3_client_builder &with_access_key_id(std::string value) noexcept
+    S3_client_builder &with_access_key_id(std::string value) noexcept
     {
         access_key_id_ = std::move(value);
 
         return *this;
     }
 
-    s3_client_builder &with_secret_key(std::string value) noexcept
+    S3_client_builder &with_secret_key(std::string value) noexcept
     {
         secret_key_ = std::move(value);
 
         return *this;
     }
 
-    s3_client_builder &with_session_token(std::string value) noexcept
+    S3_client_builder &with_session_token(std::string value) noexcept
     {
         session_token_ = std::move(value);
 
         return *this;
     }
 
-    s3_client_builder &with_profile(std::string value) noexcept
+    S3_client_builder &with_profile(std::string value) noexcept
     {
         profile_ = std::move(value);
 
         return *this;
     }
 
-    s3_client_builder &with_region(std::string value) noexcept
+    S3_client_builder &with_region(std::string value) noexcept
     {
         region_ = std::move(value);
 
         return *this;
     }
 
-    s3_client_builder &with_https(bool value) noexcept
+    S3_client_builder &use_https(bool value) noexcept
     {
-        https_ = value;
+        use_https_ = value;
 
         return *this;
     }
 
-    intrusive_ptr<s3_client> build();
+    Intrusive_ptr<S3_client> build();
 
 private:
     std::string access_key_id_{};
@@ -124,7 +122,7 @@ private:
     std::string session_token_{};
     std::string profile_{};
     std::string region_{};
-    bool https_{true};
+    bool use_https_{true};
 };
 
 }  // namespace abi_v1

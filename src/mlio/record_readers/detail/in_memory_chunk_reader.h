@@ -26,15 +26,13 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-class in_memory_chunk_reader : public chunk_reader {
+class In_memory_chunk_reader : public Chunk_reader {
 public:
-    explicit in_memory_chunk_reader(memory_slice &&chunk) noexcept : chunk_{std::move(chunk)}
+    explicit In_memory_chunk_reader(Memory_slice &&chunk) noexcept : chunk_{std::move(chunk)}
     {}
 
-public:
-    memory_slice read_chunk(memory_span leftover) final;
+    Memory_slice read_chunk(Memory_span leftover) final;
 
-public:
     bool eof() const noexcept final
     {
         return chunk_.empty();
@@ -49,7 +47,7 @@ public:
     {}
 
 private:
-    memory_slice chunk_;
+    Memory_slice chunk_;
 };
 
 }  // namespace detail

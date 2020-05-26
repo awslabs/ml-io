@@ -30,22 +30,20 @@ inline namespace abi_v1 {
 /// @addtogroup data_stores Data Stores
 /// @{
 
-/// Represents a memory block as a @ref data_store.
-class MLIO_API in_memory_store final : public data_store {
+/// Represents a memory block as a @ref Data_store.
+class MLIO_API In_memory_store final : public Data_store {
 public:
-    explicit in_memory_store(memory_slice chunk, compression cmp = {});
+    explicit In_memory_store(Memory_slice chunk, Compression compression = {});
 
-public:
-    intrusive_ptr<input_stream> open_read() const final;
+    Intrusive_ptr<Input_stream> open_read() const final;
 
     std::string repr() const final;
 
-public:
     const std::string &id() const final;
 
 private:
-    memory_slice chunk_;
-    compression compression_;
+    Memory_slice chunk_;
+    Compression compression_;
     mutable std::string id_{};
 };
 

@@ -18,11 +18,11 @@
 namespace mlio {
 inline namespace abi_v1 {
 
-std::size_t instance_batch::size_bytes() const
+std::size_t Instance_batch::size_bytes() const
 {
     if (size_bytes_ == 0) {
-        for (const instance &ins : instances_) {
-            size_bytes_ += ins.bits().size();
+        for (const Instance &instance : instances_) {
+            size_bytes_ += instance.bits().size();
         }
     }
 

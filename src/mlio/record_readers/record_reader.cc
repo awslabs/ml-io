@@ -18,7 +18,7 @@
 namespace mlio {
 inline namespace abi_v1 {
 
-record_reader::~record_reader() = default;
+Record_reader::~Record_reader() = default;
 
 }  // namespace abi_v1
 }  // namespace mlio

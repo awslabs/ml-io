@@ -23,21 +23,21 @@
 namespace mlio {
 inline namespace abi_v1 {
 
-device_kind device_kind::cpu() noexcept
+Device_kind Device_kind::cpu() noexcept
 {
     static std::string name = "CPU";
 
-    return device_kind{name};
+    return Device_kind{name};
 }
 
-std::string device_kind::repr() const
+std::string Device_kind::repr() const
 {
-    return fmt::format("<device_kind name='{0}'>", name_);
+    return fmt::format("<Device_kind name='{0}'>", name_);
 }
 
-std::string device::repr() const
+std::string Device::repr() const
 {
-    return fmt::format("<device kind={0} id={1}>", kind_, id_);
+    return fmt::format("<Device kind={0} id={1}>", kind_, id_);
 }
 
 }  // namespace abi_v1

@@ -18,7 +18,7 @@
 namespace mlio {
 inline namespace abi_v1 {
 
-input_stream::~input_stream() = default;
+Input_stream::~Input_stream() = default;
 
 }  // namespace abi_v1
 }  // namespace mlio

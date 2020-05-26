@@ -24,24 +24,24 @@
 namespace mlio {
 inline namespace abi_v1 {
 
-intrusive_ptr<mutable_memory_block>
-resize_memory_block(intrusive_ptr<mutable_memory_block> &blk, std::size_t size)
+Intrusive_ptr<Mutable_memory_block>
+resize_memory_block(Intrusive_ptr<Mutable_memory_block> &block, std::size_t size)
 {
-    if (blk->resizable()) {
-        blk->resize(size);
+    if (block->resizable()) {
+        block->resize(size);
 
-        return std::move(blk);
+        return std::move(block);
     }
 
-    auto new_blk = get_memory_allocator().allocate(size);
+    auto new_block = memory_allocator().allocate(size);
 
-    if (size > blk->size()) {
-        size = blk->size();
+    if (size > block->size()) {
+        size = block->size();
     }
 
-    std::copy_n(blk->begin(), size, new_blk->begin());
+    std::copy_n(block->begin(), size, new_block->begin());
 
-    return new_blk;
+    return new_block;
 }
 
 }  // namespace abi_v1

@@ -16,7 +16,6 @@
 #include "mlio/record_readers/detail/text_line.h"
 
 #include <cstddef>
-#include <string_view>
 #include <utility>
 
 #include <fmt/format.h>
@@ -31,24 +30,24 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-std::optional<record>
-read_line(memory_slice &chunk, bool ignore_leftover, std::optional<std::size_t> max_line_length)
+std::optional<Record>
+read_line(Memory_slice &chunk, bool ignore_leftover, std::optional<std::size_t> max_line_length)
 {
-    // Assumes chunk is not empty.
-    auto chrs = as_span<char const>(chunk);
-    if (chrs.empty()) {
+    // Assumes the chunk is not empty.
+    auto chars = as_span<const char>(chunk);
+    if (chars.empty()) {
         if (ignore_leftover) {
             return {};
         }
 
-        throw corrupt_record_error{"The text line ends with a corrupt character."};
+        throw Corrupt_record_error{"The text line ends with a corrupt character."};
     }
 
     bool has_carriage = false;
 
-    auto pos = chrs.begin();
+    auto pos = chars.begin();
 
-    for (auto chr = *pos; pos < chrs.end(); ++pos, chr = *pos) {
+    for (auto chr = *pos; pos < chars.end(); ++pos, chr = *pos) {
         if (chr == '\n') {
             break;
         }
@@ -56,9 +55,9 @@ read_line(memory_slice &chunk, bool ignore_leftover, std::optional<std::size_t> 
         if (chr == '\r') {
             auto next_pos = pos + 1;
 
-            // Check if we have a new line with a new-line character
-            // and make sure that we eat the carriage in such case.
-            if (next_pos < chrs.end() && *next_pos == '\n') {
+            // Check if we have a new line with a new-line character and
+            // make sure that we eat the carriage in such case.
+            if (next_pos < chars.end() && *next_pos == '\n') {
                 has_carriage = true;
 
                 pos = next_pos;
@@ -68,20 +67,20 @@ read_line(memory_slice &chunk, bool ignore_leftover, std::optional<std::size_t> 
         }
     }
 
-    std::size_t num_chrs_read = as_size(pos - chrs.begin());
+    std::size_t num_chars_read = as_size(pos - chars.begin());
 
-    if (max_line_length && num_chrs_read >= *max_line_length) {
-        throw record_too_large_error{
+    if (max_line_length && num_chars_read >= *max_line_length) {
+        throw Record_too_large_error{
             fmt::format("The text line exceeds the maximum length of {0:n}.", *max_line_length)};
     }
 
-    if (pos == chrs.end() && ignore_leftover) {
+    if (pos == chars.end() && ignore_leftover) {
         return {};
     }
 
-    auto offset = sizeof(char) * num_chrs_read;
+    auto offset = sizeof(char) * num_chars_read;
 
-    memory_slice payload;
+    Memory_slice payload;
     if (has_carriage) {
         payload = chunk.first(offset - sizeof(char));
     }
@@ -91,7 +90,7 @@ read_line(memory_slice &chunk, bool ignore_leftover, std::optional<std::size_t> 
 
     // Check if we reached the end of the stream or encountered a
     // new-line character.
-    if (pos != chrs.end()) {
+    if (pos != chars.end()) {
         // Skip the new-line character.
         offset += sizeof(char);
 
@@ -101,7 +100,7 @@ read_line(memory_slice &chunk, bool ignore_leftover, std::optional<std::size_t> 
         chunk = {};
     }
 
-    return record{std::move(payload)};
+    return Record{std::move(payload)};
 }
 
 }  // namespace detail

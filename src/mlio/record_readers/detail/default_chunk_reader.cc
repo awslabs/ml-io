@@ -26,7 +26,7 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-memory_slice default_chunk_reader::read_chunk(memory_span leftover)
+Memory_slice Default_chunk_reader::read_chunk(Memory_span leftover)
 {
     if (eof_) {
         return {};
@@ -45,9 +45,9 @@ memory_slice default_chunk_reader::read_chunk(memory_span leftover)
 
             reuse_buffer = true;
 
-            // If the chunk is owned only by this chunk_reader and its
-            // associated stream_record_reader, we can safely re-use it for
-            // the next fill operation.
+            // If the chunk is owned only by this Chunk_reader and its
+            // associated Stream_record_reader, we can safely re-use it
+            // for the next fill operation.
         }
         else if (chunk_->use_count() <= 2) {
             if (!leftover.empty()) {
@@ -64,7 +64,7 @@ memory_slice default_chunk_reader::read_chunk(memory_span leftover)
         }
     }
     else {
-        chunk_ = get_memory_allocator().allocate(next_chunk_size_);
+        chunk_ = memory_allocator().allocate(next_chunk_size_);
 
         if (!leftover.empty()) {
             std::copy(leftover.begin(), leftover.end(), chunk_->begin());
@@ -83,7 +83,7 @@ memory_slice default_chunk_reader::read_chunk(memory_span leftover)
         remaining = remaining.subspan(num_bytes_read);
     }
 
-    intrusive_ptr<mutable_memory_block> chunk;
+    Intrusive_ptr<Mutable_memory_block> chunk;
     if (eof_) {
         chunk = std::move(chunk_);
     }
@@ -91,10 +91,10 @@ memory_slice default_chunk_reader::read_chunk(memory_span leftover)
         chunk = chunk_;
     }
 
-    return memory_slice{chunk}.first(chunk->end() - stdx::ssize(remaining));
+    return Memory_slice{chunk}.first(chunk->end() - stdx::ssize(remaining));
 }
 
-void default_chunk_reader::set_chunk_size_hint(std::size_t value) noexcept
+void Default_chunk_reader::set_chunk_size_hint(std::size_t value) noexcept
 {
     while (value > next_chunk_size_) {
         next_chunk_size_ <<= 1;

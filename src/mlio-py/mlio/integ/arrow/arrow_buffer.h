@@ -16,27 +16,27 @@
 #pragma once
 
 #include <arrow/buffer.h>
-#include <mlio.h>
+#include <mlio/memory/memory_slice.h>
 
 namespace pymlio {
 
-class arrow_buffer final : public arrow::Buffer {
+class Arrow_buffer final : public arrow::Buffer {
 public:
-    explicit arrow_buffer(mlio::memory_slice s) noexcept;
+    explicit Arrow_buffer(mlio::Memory_slice s) noexcept;
 
-    arrow_buffer(const arrow_buffer &) = delete;
+    Arrow_buffer(const Arrow_buffer &) = delete;
 
-    arrow_buffer(arrow_buffer &&) = delete;
+    Arrow_buffer(Arrow_buffer &&) = delete;
 
-    ~arrow_buffer() final;
+    ~Arrow_buffer() final;
 
 public:
-    arrow_buffer &operator=(const arrow_buffer &) = delete;
+    Arrow_buffer &operator=(const Arrow_buffer &) = delete;
 
-    arrow_buffer &operator=(arrow_buffer &&) = delete;
+    Arrow_buffer &operator=(Arrow_buffer &&) = delete;
 
 private:
-    mlio::memory_slice slice_;
+    mlio::Memory_slice slice_;
 };
 
 }  // namespace pymlio

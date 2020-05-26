@@ -25,38 +25,36 @@ inline namespace abi_v1 {
 /// @{
 
 /// Provides an implementation of the GoF visitor pattern for performing
-/// operations on tensor classes.
-class MLIO_API tensor_visitor {
+/// operations on Tensor classes.
+class MLIO_API Tensor_visitor {
 public:
-    tensor_visitor() noexcept = default;
+    Tensor_visitor() noexcept = default;
 
-    tensor_visitor(const tensor_visitor &) = delete;
+    Tensor_visitor(const Tensor_visitor &) = delete;
 
-    tensor_visitor(tensor_visitor &&) = delete;
+    Tensor_visitor &operator=(const Tensor_visitor &) = delete;
 
-    virtual ~tensor_visitor();
+    Tensor_visitor(Tensor_visitor &&) = delete;
 
-public:
-    tensor_visitor &operator=(const tensor_visitor &) = delete;
+    Tensor_visitor &operator=(Tensor_visitor &&) = delete;
 
-    tensor_visitor &operator=(tensor_visitor &&) = delete;
+    virtual ~Tensor_visitor();
 
-public:
-    virtual void visit(tensor &tsr);
+    virtual void visit(Tensor &tensor);
 
-    virtual void visit(const tensor &tsr);
+    virtual void visit(const Tensor &tensor);
 
-    virtual void visit(dense_tensor &tsr);
+    virtual void visit(Dense_tensor &tensor);
 
-    virtual void visit(const dense_tensor &tsr);
+    virtual void visit(const Dense_tensor &tensor);
 
-    virtual void visit(coo_tensor &tsr);
+    virtual void visit(Coo_tensor &tensor);
 
-    virtual void visit(const coo_tensor &tsr);
+    virtual void visit(const Coo_tensor &tensor);
 
-    virtual void visit(csr_tensor &tsr);
+    virtual void visit(Csr_tensor &tensor);
 
-    virtual void visit(const csr_tensor &tsr);
+    virtual void visit(const Csr_tensor &tensor);
 };
 
 // @}

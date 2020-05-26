@@ -18,7 +18,6 @@
 #include <utility>
 
 #include <fmt/format.h>
-#include <fmt/ostream.h>
 
 #include "mlio/logger.h"
 #include "mlio/not_supported_error.h"
@@ -28,29 +27,29 @@
 namespace mlio {
 inline namespace abi_v1 {
 
-in_memory_store::in_memory_store(memory_slice chunk, compression cmp)
-    : chunk_{std::move(chunk)}, compression_{cmp}
+In_memory_store::In_memory_store(Memory_slice chunk, Compression compression)
+    : chunk_{std::move(chunk)}, compression_{compression}
 {
-    if (compression_ == compression::infer) {
-        throw not_supported_error{"The in-memory store does not support inferring compression."};
+    if (compression_ == Compression::infer) {
+        throw Not_supported_error{"The in-memory store does not support inferring compression."};
     }
 }
 
-intrusive_ptr<input_stream> in_memory_store::open_read() const
+Intrusive_ptr<Input_stream> In_memory_store::open_read() const
 {
-    if (logger::is_enabled_for(log_level::info)) {
+    if (logger::is_enabled_for(Log_level::info)) {
         logger::info("The in-memory store '{0}' is being opened.", id());
     }
 
-    auto strm = make_intrusive<memory_input_stream>(chunk_);
+    auto stream = make_intrusive<Memory_input_stream>(chunk_);
 
-    if (compression_ == compression::none) {
-        return std::move(strm);
+    if (compression_ == Compression::none) {
+        return std::move(stream);
     }
-    return make_inflate_stream(std::move(strm), compression_);
+    return make_inflate_stream(std::move(stream), compression_);
 }
 
-const std::string &in_memory_store::id() const
+const std::string &In_memory_store::id() const
 {
     if (id_.empty()) {
         auto *ptr = static_cast<const void *>(chunk_.data());
@@ -60,11 +59,11 @@ const std::string &in_memory_store::id() const
     return id_;
 }
 
-std::string in_memory_store::repr() const
+std::string In_memory_store::repr() const
 {
     auto *ptr = static_cast<const void *>(chunk_.data());
 
-    return fmt::format("<in_memory_store address={0:p} size={1:#04x} compression='{2}'>",
+    return fmt::format("<In_memory_store address={0:p} size={1:#04x} compression='{2}'>",
                        ptr,
                        chunk_.size(),
                        compression_);

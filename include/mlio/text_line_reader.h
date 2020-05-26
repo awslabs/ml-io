@@ -29,30 +29,29 @@ inline namespace abi_v1 {
 /// @addtogroup data_readers Data Readers
 /// @{
 
-/// Represents a @ref data_reader for reading simple text-based datasets.
-class MLIO_API text_line_reader final : public parallel_data_reader {
+/// Represents a @ref Data_reader for reading simple text-based datasets.
+class MLIO_API Text_line_reader final : public Parallel_data_reader {
 public:
-    explicit text_line_reader(data_reader_params prm);
+    explicit Text_line_reader(Data_reader_params params);
 
-    text_line_reader(const text_line_reader &) = delete;
+    Text_line_reader(const Text_line_reader &) = delete;
 
-    text_line_reader(text_line_reader &&) = delete;
+    Text_line_reader &operator=(const Text_line_reader &) = delete;
 
-    ~text_line_reader() final;
+    Text_line_reader(Text_line_reader &&) = delete;
 
-public:
-    text_line_reader &operator=(const text_line_reader &) = delete;
+    Text_line_reader &operator=(Text_line_reader &&) = delete;
 
-    text_line_reader &operator=(text_line_reader &&) = delete;
+    ~Text_line_reader() final;
 
 private:
-    intrusive_ptr<record_reader> make_record_reader(const data_store &ds) final;
+    Intrusive_ptr<Record_reader> make_record_reader(const Data_store &store) final;
 
-    intrusive_ptr<schema const> infer_schema(std::optional<instance> const &ins) final;
+    Intrusive_ptr<const Schema> infer_schema(const std::optional<Instance> &instance) final;
 
-    intrusive_ptr<example> decode(const instance_batch &batch) const final;
+    Intrusive_ptr<Example> decode(const Instance_batch &batch) const final;
 
-    static intrusive_ptr<dense_tensor> make_tensor(std::size_t batch_size);
+    static Intrusive_ptr<Dense_tensor> make_tensor(std::size_t batch_size);
 };
 
 /// @}

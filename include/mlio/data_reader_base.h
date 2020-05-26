@@ -27,30 +27,22 @@ inline namespace abi_v1 {
 /// @{
 
 /// Represents an abstract base class for data readers.
-class MLIO_API data_reader_base : public data_reader {
-protected:
-    explicit data_reader_base(data_reader_params &&prm) noexcept;
-
+class MLIO_API Data_reader_base : public Data_reader {
 public:
-    intrusive_ptr<example> read_example() final;
+    Intrusive_ptr<Example> read_example() final;
 
-    intrusive_ptr<example> peek_example() final;
+    Intrusive_ptr<Example> peek_example() final;
 
-private:
-    /// When implemented in a derived class, returns the next @ref
-    /// example read from the dataset.
-    virtual intrusive_ptr<example> read_example_core() = 0;
-
-public:
     void reset() noexcept override;
 
-public:
-    const data_reader_params &params() const noexcept
+    const Data_reader_params &params() const noexcept
     {
         return params_;
     }
 
 protected:
+    explicit Data_reader_base(Data_reader_params &&params) noexcept;
+
     /// Gets the effective boolean value indicating whether a warning
     /// will be output for each bad instance.
     bool warn_bad_instances() const noexcept
@@ -59,9 +51,13 @@ protected:
     }
 
 private:
-    data_reader_params params_;
+    /// When implemented in a derived class, returns the next @ref
+    /// Example read from the dataset.
+    virtual Intrusive_ptr<Example> read_example_core() = 0;
+
+    Data_reader_params params_;
     bool warn_bad_instances_{};
-    intrusive_ptr<example> peeked_example_{};
+    Intrusive_ptr<Example> peeked_example_{};
 };
 
 /// @}

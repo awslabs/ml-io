@@ -27,19 +27,16 @@ inline namespace abi_v1 {
 /// @addtogroup records Records
 /// @{
 
-class MLIO_API record_reader_base : public record_reader {
+class MLIO_API Record_reader_base : public Record_reader {
 public:
-    std::optional<record> read_record() final;
+    std::optional<Record> read_record() final;
 
-    std::optional<record> peek_record() final;
+    std::optional<Record> peek_record() final;
 
-private:
-    std::optional<record> read_record_internal();
-
-    virtual std::optional<record> read_record_core() = 0;
+    virtual std::optional<Record> read_record_core() = 0;
 
 private:
-    std::optional<record> peeked_record_{};
+    std::optional<Record> peeked_record_{};
 };
 
 /// @}

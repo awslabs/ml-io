@@ -27,16 +27,15 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-class text_line_record_reader final : public text_record_reader {
+class text_line_record_reader final : public Text_record_reader {
 public:
-    explicit text_line_record_reader(intrusive_ptr<input_stream> strm, bool skip_blank)
-        : text_record_reader{std::move(strm)}, skip_blank_{skip_blank}
+    explicit text_line_record_reader(Intrusive_ptr<Input_stream> stream, bool skip_blank)
+        : Text_record_reader{std::move(stream)}, skip_blank_{skip_blank}
     {}
 
 private:
-    std::optional<record> decode_text_record(memory_slice &chunk, bool ignore_leftover) final;
+    std::optional<Record> decode_text_record(Memory_slice &chunk, bool ignore_leftover) final;
 
-private:
     bool skip_blank_;
 };
 

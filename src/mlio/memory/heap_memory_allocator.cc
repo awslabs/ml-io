@@ -21,9 +21,9 @@
 namespace mlio {
 inline namespace abi_v1 {
 
-intrusive_ptr<mutable_memory_block> heap_memory_allocator::allocate(std::size_t size)
+Intrusive_ptr<Mutable_memory_block> Heap_memory_allocator::allocate(std::size_t size)
 {
-    return make_intrusive<heap_memory_block>(size);
+    return make_intrusive<Heap_memory_block>(size);
 }
 
 }  // namespace abi_v1

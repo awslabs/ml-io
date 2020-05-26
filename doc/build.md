@@ -73,24 +73,24 @@ $ cmake --build .
 ```
 
 ## Build Options
-| Name                           | Description                                                          | Default |
-|--------------------------------|----------------------------------------------------------------------|---------|
-| MLIO_INCLUDE_LIB               | Generates build target 'mlio' for the runtime library                | ON      |
-| MLIO_INCLUDE_CONTRIB           | Generates build target 'mlio-contrib' for the contrib library        | OFF     |
-| MLIO_INCLUDE_PYTHON_EXTENSION  | Generates build target 'mlio-py' for the Python C extension          | OFF     |
-| MLIO_INCLUDE_ARROW_INTEGRATION | Generates build target 'mlio-arrow' for the Apache Arrow integration | OFF     |
-| MLIO_INCLUDE_TESTS             | Generates build target 'mlio-test' for the tests                     | ON      |
-| MLIO_INCLUDE_DOC               | Generates build target 'mlio-doc' for the documentation              | OFF     |
-| MLIO_BUILD_S3                  | Builds with Amazon S3 support                                        | OFF     |
-| MLIO_BUILD_IMAGE_READER        | Builds with image reader support                                     | OFF     |
-| MLIO_BUILD_FOR_NATIVE_ARCH     | Builds for the processor type of the compiling machine               | OFF     |
-| MLIO_TREAT_WARNINGS_AS_ERRORS  | Treats compilation warnings as errors                                | OFF     |
-| MLIO_ENABLE_LTO                | Enables link time optimization                                       | ON      |
-| MLIO_ENABLE_ASAN               | Enables address sanitizer                                            | OFF     |
-| MLIO_ENABLE_USAN               | Enables undefined behavior sanitizer                                 | OFF     |
-| MLIO_ENABLE_TSAN               | Enables thread sanitizer                                             | OFF     |
-| MLIO_USE_CLANG_TIDY            | Uses clang-tidy as static analyzer (supported only with clang)       | OFF     |
-| MLIO_USE_IWYU                  | Uses include-what-you-use (supported only with clang)                | OFF     |
+| Name                               | Description                                                          | Default |
+|------------------------------------|----------------------------------------------------------------------|---------|
+| MLIO_INCLUDE_LIB                   | Generates build target 'mlio' for the runtime library                | ON      |
+| MLIO_INCLUDE_CONTRIB               | Generates build target 'mlio-contrib' for the contrib library        | OFF     |
+| MLIO_INCLUDE_PYTHON_EXTENSION      | Generates build target 'mlio-py' for the Python C extension          | OFF     |
+| MLIO_INCLUDE_ARROW_INTEGRATION     | Generates build target 'mlio-arrow' for the Apache Arrow integration | OFF     |
+| MLIO_INCLUDE_TESTS                 | Generates build target 'mlio-test' for the tests                     | ON      |
+| MLIO_INCLUDE_DOC                   | Generates build target 'mlio-doc' for the documentation              | OFF     |
+| MLIO_BUILD_S3                      | Builds with Amazon S3 support                                        | OFF     |
+| MLIO_BUILD_IMAGE_READER            | Builds with image reader support                                     | OFF     |
+| MLIO_BUILD_FOR_NATIVE_ARCHITECTURE | Builds for the processor type of the compiling machine               | OFF     |
+| MLIO_TREAT_WARNINGS_AS_ERRORS      | Treats compilation warnings as errors                                | OFF     |
+| MLIO_ENABLE_LTO                    | Enables link time optimization                                       | ON      |
+| MLIO_ENABLE_ASAN                   | Enables address sanitizer                                            | OFF     |
+| MLIO_ENABLE_UBSAN                  | Enables undefined behavior sanitizer                                 | OFF     |
+| MLIO_ENABLE_TSAN                   | Enables thread sanitizer                                             | OFF     |
+| MLIO_USE_CLANG_TIDY                | Uses clang-tidy as static analyzer (supported only with clang)       | OFF     |
+| MLIO_USE_IWYU                      | Uses include-what-you-use (supported only with clang)                | OFF     |
 
 To specify a different value for one of the options listed above, you can call cmake like:
 

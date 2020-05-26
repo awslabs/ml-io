@@ -16,11 +16,9 @@
 #include "mlio/record_readers/csv_record_reader.h"
 
 #include <cstddef>
-#include <string_view>
 
 #include <fmt/format.h>
 
-#include "mlio/config.h"
 #include "mlio/csv_reader.h"
 #include "mlio/memory/memory_slice.h"
 #include "mlio/record_readers/detail/text_line.h"
@@ -33,8 +31,8 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-std::optional<record>
-csv_record_reader::decode_text_record(memory_slice &chunk, bool ignore_leftover)
+std::optional<Record>
+Csv_record_reader::decode_text_record(Memory_slice &chunk, bool ignore_leftover)
 {
     while (!chunk.empty()) {
         if (is_comment_line(chunk)) {
@@ -43,20 +41,20 @@ csv_record_reader::decode_text_record(memory_slice &chunk, bool ignore_leftover)
             }
         }
         else {
-            std::optional<record> rec;
+            std::optional<Record> record;
             if (params_->allow_quoted_new_lines) {
-                rec = read_line(chunk, ignore_leftover);
+                record = read_line(chunk, ignore_leftover);
             }
             else {
-                rec = detail::read_line(chunk, ignore_leftover, params_->max_line_length);
+                record = detail::read_line(chunk, ignore_leftover, params_->max_line_length);
             }
 
-            if (rec == std::nullopt) {
+            if (record == std::nullopt) {
                 return {};
             }
 
-            if (!params_->skip_blank_lines || !rec->payload().empty()) {
-                return rec;
+            if (!params_->skip_blank_lines || !record->payload().empty()) {
+                return record;
             }
         }
     }
@@ -64,37 +62,37 @@ csv_record_reader::decode_text_record(memory_slice &chunk, bool ignore_leftover)
     return {};
 }
 
-inline bool csv_record_reader::is_comment_line(const memory_slice &chunk)
+inline bool Csv_record_reader::is_comment_line(const Memory_slice &chunk)
 {
     if (params_->comment_char == std::nullopt) {
         return false;
     }
 
-    auto chrs = as_span<char const>(chunk);
-    return !chrs.empty() && chrs[0] == *params_->comment_char;
+    auto chars = as_span<const char>(chunk);
+    return !chars.empty() && chars[0] == *params_->comment_char;
 }
 
-std::optional<record> csv_record_reader::read_line(memory_slice &chunk, bool ignore_leftover)
+std::optional<Record> Csv_record_reader::read_line(Memory_slice &chunk, bool ignore_leftover)
 {
-    auto chrs = as_span<char const>(chunk);
-    if (chrs.empty()) {
+    auto chars = as_span<const char>(chunk);
+    if (chars.empty()) {
         if (ignore_leftover) {
             return {};
         }
 
-        throw corrupt_record_error{"The text line ends with a corrupt character."};
+        throw Corrupt_record_error{"The text line ends with a corrupt character."};
     }
 
-    auto pos = chrs.begin();
+    auto pos = chars.begin();
 
     char chr{};
 
-    parser_state state;
+    Parser_state state;
 
 new_field:
-    state = parser_state::new_field;
+    state = Parser_state::new_field;
 
-    if (!try_get_next_char(chrs, pos, chr)) {
+    if (!try_get_next_char(chars, pos, chr)) {
         goto end;  // NOLINT
     }
 
@@ -115,9 +113,9 @@ new_field:
     }
 
 in_field:
-    state = parser_state::in_field;
+    state = Parser_state::in_field;
 
-    if (!try_get_next_char(chrs, pos, chr)) {
+    if (!try_get_next_char(chars, pos, chr)) {
         goto end;  // NOLINT
     }
 
@@ -135,9 +133,9 @@ in_field:
     }
 
 in_quoted_field:
-    state = parser_state::in_quoted_field;
+    state = Parser_state::in_quoted_field;
 
-    if (!try_get_next_char(chrs, pos, chr)) {
+    if (!try_get_next_char(chars, pos, chr)) {
         goto end;  // NOLINT
     }
 
@@ -149,9 +147,9 @@ in_quoted_field:
     }
 
 quote_in_quoted_field:
-    state = parser_state::quote_in_quoted_field;
+    state = Parser_state::quote_in_quoted_field;
 
-    if (!try_get_next_char(chrs, pos, chr)) {
+    if (!try_get_next_char(chars, pos, chr)) {
         goto end;  // NOLINT
     }
 
@@ -172,16 +170,16 @@ quote_in_quoted_field:
     }
 
 has_carriage:
-    state = parser_state::has_carriage;
+    state = Parser_state::has_carriage;
 
-    if (!try_get_next_char(chrs, pos, chr)) {
+    if (!try_get_next_char(chars, pos, chr)) {
         goto end;  // NOLINT
     }
 
     // If we only have a carriage without a new-line character move back
     // to not lose the character we just read.
     if (chr != '\n') {
-        state = parser_state::new_field;
+        state = Parser_state::new_field;
 
         --pos;
     }
@@ -190,13 +188,13 @@ has_carriage:
 
 new_line : {
     if (params_->max_line_length) {
-        check_line_length(chrs, pos, *params_->max_line_length);
+        check_line_length(chars, pos, *params_->max_line_length);
     }
 
-    auto offset = sizeof(char) * as_size(pos - chrs.begin());
+    auto offset = sizeof(char) * as_size(pos - chars.begin());
 
-    memory_slice payload;
-    if (state == parser_state::has_carriage) {
+    Memory_slice payload;
+    if (state == Parser_state::has_carriage) {
         payload = chunk.first(offset - sizeof(char) * 2);
     }
     else {
@@ -205,45 +203,45 @@ new_line : {
 
     chunk = chunk.subslice(offset);
 
-    return record{std::move(payload)};
+    return Record{std::move(payload)};
 }
 
 end:
     if (params_->max_line_length) {
-        check_line_length(chrs, pos, *params_->max_line_length);
+        check_line_length(chars, pos, *params_->max_line_length);
     }
 
     if (ignore_leftover) {
         return {};
     }
 
-    memory_slice payload;
+    Memory_slice payload;
 
     switch (state) {
-    case parser_state::new_field:
-    case parser_state::in_field:
-    case parser_state::quote_in_quoted_field:
+    case Parser_state::new_field:
+    case Parser_state::in_field:
+    case Parser_state::quote_in_quoted_field:
         payload = std::move(chunk);
         break;
 
-    case parser_state::has_carriage:
+    case Parser_state::has_carriage:
         payload = chunk.first(chunk.end() - sizeof(char));
         break;
 
-    case parser_state::in_quoted_field:
-        throw corrupt_record_error{"EOF reached inside a quoted field."};
+    case Parser_state::in_quoted_field:
+        throw Corrupt_record_error{"EOF reached inside a quoted field."};
     }
 
     chunk = {};
 
-    return record{std::move(payload)};
+    return Record{std::move(payload)};
 }
 
-inline bool csv_record_reader::try_get_next_char(stdx::span<char const> const &chrs,
-                                                 stdx::span<char const>::iterator &pos,
+inline bool Csv_record_reader::try_get_next_char(const stdx::span<const char> &chars,
+                                                 stdx::span<const char>::iterator &pos,
                                                  char &chr) noexcept
 {
-    if (pos == chrs.end()) {
+    if (pos == chars.end()) {
         return false;
     }
 
@@ -254,13 +252,13 @@ inline bool csv_record_reader::try_get_next_char(stdx::span<char const> const &c
     return true;
 }
 
-inline void csv_record_reader::check_line_length(stdx::span<char const> const &chrs,
-                                                 stdx::span<char const>::iterator &pos,
+inline void Csv_record_reader::check_line_length(const stdx::span<const char> &chars,
+                                                 stdx::span<const char>::iterator &pos,
                                                  std::size_t max_line_length)
 {
-    std::size_t num_chrs_read = as_size(pos - chrs.begin());
-    if (num_chrs_read >= max_line_length) {
-        throw record_too_large_error{
+    std::size_t num_chars_read = as_size(pos - chars.begin());
+    if (num_chars_read >= max_line_length) {
+        throw Record_too_large_error{
             fmt::format("The text line exceeds the maximum length of {0:n}.", max_line_length)};
     }
 }

@@ -327,7 +327,7 @@ extern "C" {
 #endif
 
 /* These definitions are only present to allow
- * static allocation of XXH state, on stack or in a struct for example.
+ * static allocation of XXH state, on stack or in a struct for Example.
  * Never **ever** use members directly. */
 
 struct XXH32_state_s {
@@ -411,7 +411,7 @@ struct XXH64_state_s {
  * seed input parameter for a 128-bit hash. But 128-bit seed is more difficult
  * to use, since it requires to pass a structure instead of a scalar value.
  *                          Such a variant could either replace current one, or
- * become an additional one. Farmhash, for example, offers both variants (the
+ * become an additional one. Farmhash, for Example, offers both variants (the
  * 128-bits seed variant is called `doubleSeed`). Follow up question : if both
  * 64-bit and 128-bit seeds are allowed, which variant should be called XXH128
  * ?

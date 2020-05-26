@@ -32,78 +32,73 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-struct utf8_input_stream_access;
+struct Utf8_input_stream_access;
 
 }  // namespace detail
 
 /// @addtogroup streams Streams
 /// @{
 
-/// Represents an @ref input_stream that converts the bits read from
+/// Represents an @ref Input_stream that converts the bits read from
 /// the underlying stream to UTF-8.
-class MLIO_API utf8_input_stream final : public input_stream_base {
-    friend struct detail::utf8_input_stream_access;
-
-private:
-    explicit utf8_input_stream(intrusive_ptr<input_stream> inner, text_encoding &&enc);
+class MLIO_API Utf8_input_stream final : public Input_stream_base {
+    friend struct detail::Utf8_input_stream_access;
 
 public:
-    utf8_input_stream(const utf8_input_stream &) = delete;
+    Utf8_input_stream(const Utf8_input_stream &) = delete;
 
-    utf8_input_stream(utf8_input_stream &&) = delete;
+    Utf8_input_stream &operator=(const Utf8_input_stream &) = delete;
 
-    ~utf8_input_stream() final;
+    Utf8_input_stream(Utf8_input_stream &&) = delete;
 
-public:
-    utf8_input_stream &operator=(const utf8_input_stream &) = delete;
+    Utf8_input_stream &operator=(Utf8_input_stream &&) = delete;
 
-    utf8_input_stream &operator=(utf8_input_stream &&) = delete;
+    ~Utf8_input_stream() final;
 
-public:
-    using input_stream_base::read;
+    using Input_stream_base::read;
 
-    std::size_t read(mutable_memory_span dest) final;
+    std::size_t read(Mutable_memory_span destination) final;
 
     void close() noexcept final;
 
+    bool closed() const noexcept final;
+
 private:
+    explicit Utf8_input_stream(Intrusive_ptr<Input_stream> inner, Text_encoding &&encoding);
+
     MLIO_HIDDEN
-    std::size_t convert(mutable_memory_span dest);
+    std::size_t convert(Mutable_memory_span destination);
 
     MLIO_HIDDEN
     void fill_buffer();
 
     MLIO_HIDDEN
-    std::size_t copy_from_remainder(mutable_memory_span dest) noexcept;
+    std::size_t copy_from_remainder(Mutable_memory_span destination) noexcept;
 
     MLIO_HIDDEN
-    void set_preamble(memory_span value) noexcept;
+    void set_preamble(Memory_span value) noexcept;
 
     MLIO_HIDDEN
     void check_if_closed() const;
 
-public:
-    bool closed() const noexcept final;
-
-private:
-    intrusive_ptr<input_stream> inner_;
+    Intrusive_ptr<Input_stream> inner_;
     bool is_utf8_;
-    std::unique_ptr<detail::iconv_desc> converter_;
-    intrusive_ptr<mutable_memory_block> buffer_{};
-    mutable_memory_block::iterator buffer_pos_{};
-    mutable_memory_block::iterator buffer_end_{};
+    std::unique_ptr<detail::Iconv_desc> converter_;
+    Intrusive_ptr<Mutable_memory_block> buffer_{};
+    Mutable_memory_block::iterator buffer_pos_{};
+    Mutable_memory_block::iterator buffer_end_{};
     bool should_fill_buffer_ = true;
     std::array<std::byte, 4> char_buffer_{};
-    memory_span remaining_bits_{};
+    Memory_span remaining_bits_{};
 };
 
-/// Constructs a new @ref utf8_input_stream from the specified @ref
-/// input_stream. If no encoding is specified, the encoding is inferred
+/// Constructs a new @ref Utf8_input_stream from the specified @ref
+/// Input_stream. If no encoding is specified, the encoding is inferred
 /// from the preamble of the underlying stream. If no preamble is found,
 /// falls back to UTF-8.
 MLIO_API
-intrusive_ptr<input_stream>
-make_utf8_stream(intrusive_ptr<input_stream> strm, std::optional<text_encoding> enc = {});
+Intrusive_ptr<Input_stream>
+make_utf8_stream(Intrusive_ptr<Input_stream> stream, std::optional<Text_encoding> encoding = {});
 
 /// @}
 

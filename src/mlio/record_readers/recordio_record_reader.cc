@@ -29,30 +29,30 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-std::optional<record>
-recordio_record_reader::decode_record(memory_slice &chunk, bool ignore_leftover)
+std::optional<Record>
+Recordio_record_reader::decode_record(Memory_slice &chunk, bool ignore_leftover)
 {
     if (chunk.empty()) {
         return {};
     }
 
-    auto hdr = detail::decode_recordio_header(chunk);
-    if (hdr == std::nullopt) {
+    auto header = detail::decode_recordio_header(chunk);
+    if (header == std::nullopt) {
         if (ignore_leftover) {
             return {};
         }
 
-        throw corrupt_header_error{"The record does not have a valid RecordIO header."};
+        throw Corrupt_header_error{"The record does not have a valid RecordIO header."};
     }
 
-    std::size_t payload_size = hdr->payload_size();
+    std::size_t payload_size = header->payload_size();
 
     // The MXNet RecordIO format requires records to be on 4-byte
     // boundary.
     std::size_t aligned_payload_size =
-        detail::align(payload_size, detail::recordio_header::alignment);
+        detail::align(payload_size, detail::Recordio_header::alignment);
 
-    std::size_t record_size = hdr->size() + aligned_payload_size;
+    std::size_t record_size = header->size() + aligned_payload_size;
 
     if (record_size > chunk.size()) {
         if (ignore_leftover) {
@@ -61,17 +61,17 @@ recordio_record_reader::decode_record(memory_slice &chunk, bool ignore_leftover)
             return {};
         }
 
-        throw corrupt_header_error{fmt::format(
+        throw Corrupt_header_error{fmt::format(
             "The record payload has a size of {0:n} byte(s) while the size specified in the RecordIO header is {1:n} byte(s).",
-            chunk.size() - hdr->size(),
+            chunk.size() - header->size(),
             aligned_payload_size)};
     }
 
-    auto payload = chunk.subslice(hdr->size(), payload_size);
+    auto payload = chunk.subslice(header->size(), payload_size);
 
     chunk = chunk.subslice(record_size);
 
-    return record{std::move(payload), hdr->get_record_kind()};
+    return Record{std::move(payload), header->record_kind()};
 }
 
 }  // namespace detail

@@ -64,40 +64,40 @@ void throw_nested_error(const std::exception &exc, const py::object &py_exc)
     try {
         std::rethrow_if_nested(exc);
     }
-    catch (const not_supported_error &e) {
+    catch (const Not_supported_error &e) {
         set_nested_error(py_exc, e, "NotSupportedError");
     }
-    catch (const invalid_instance_error &e) {
+    catch (const Invalid_instance_error &e) {
         set_nested_error(py_exc, e, "InvalidInstanceError");
     }
-    catch (const schema_error &e) {
+    catch (const Schema_error &e) {
         set_nested_error(py_exc, e, "SchemaError");
     }
-    catch (const data_reader_error &e) {
+    catch (const Data_reader_error &e) {
         set_nested_error(py_exc, e, "DataReaderError");
     }
-    catch (const record_too_large_error &e) {
+    catch (const Record_too_large_error &e) {
         set_nested_error(py_exc, e, "RecordTooLargeError");
     }
-    catch (const corrupt_footer_error &e) {
+    catch (const Corrupt_footer_error &e) {
         set_nested_error(py_exc, e, "CorruptFooterError");
     }
-    catch (const corrupt_header_error &e) {
+    catch (const Corrupt_header_error &e) {
         set_nested_error(py_exc, e, "CorruptHeaderError");
     }
-    catch (const corrupt_record_error &e) {
+    catch (const Corrupt_record_error &e) {
         set_nested_error(py_exc, e, "CorruptRecordError");
     }
-    catch (const record_error &e) {
+    catch (const Record_error &e) {
         set_nested_error(py_exc, e, "RecordError");
     }
-    catch (const inflate_error &e) {
+    catch (const Inflate_error &e) {
         set_nested_error(py_exc, e, "InflateError");
     }
-    catch (const stream_error &e) {
+    catch (const Stream_error &e) {
         set_nested_error(py_exc, e, "StreamError");
     }
-    catch (const mlio_error &e) {
+    catch (const Mlio_error &e) {
         set_nested_error(py_exc, e, "MLIOError");
     }
     catch (const std::system_error &e) {
@@ -131,34 +131,34 @@ void register_exceptions(py::module &m)
 {
     // clang-format off
 
-    PyObject *py_mlio_error = register_exception<mlio_error>(
+    PyObject *py_mlio_error = register_exception<Mlio_error>(
         m, "MLIOError", ::PyExc_RuntimeError);
 
-    PyObject *py_stream_error = register_exception<stream_error>(
+    PyObject *py_stream_error = register_exception<Stream_error>(
         m, "StreamError", py_mlio_error);
-    register_exception<inflate_error>(
+    register_exception<Inflate_error>(
         m, "InflateError", py_stream_error);
 
-    PyObject *py_record_error = register_exception<record_error>(
+    PyObject *py_record_error = register_exception<Record_error>(
         m, "RecordError", py_mlio_error);
 
-    PyObject *py_corrupt_record_error = register_exception<corrupt_record_error>(
+    PyObject *py_corrupt_record_error = register_exception<Corrupt_record_error>(
         m, "CorruptRecordError", py_record_error);
-    register_exception<corrupt_header_error>(
+    register_exception<Corrupt_header_error>(
         m, "CorruptHeaderError", py_corrupt_record_error);
-    register_exception<corrupt_footer_error>(
+    register_exception<Corrupt_footer_error>(
         m, "CorruptFooterError", py_corrupt_record_error);
-    register_exception<record_too_large_error>(
+    register_exception<Record_too_large_error>(
         m, "RecordTooLargeError", py_record_error);
 
-    PyObject *py_data_reader_error = register_exception<data_reader_error>(
+    PyObject *py_data_reader_error = register_exception<Data_reader_error>(
         m, "DataReaderError", py_mlio_error);
-    register_exception<schema_error>(
+    register_exception<Schema_error>(
         m, "SchemaError", py_data_reader_error);
-    register_exception<invalid_instance_error>(
+    register_exception<Invalid_instance_error>(
         m, "InvalidInstanceError", py_data_reader_error);
 
-    register_exception<not_supported_error>(
+    register_exception<Not_supported_error>(
         m, "NotSupportedError", py_mlio_error);
 
     // clang-format on
@@ -172,40 +172,40 @@ void register_exceptions(py::module &m)
         try {
             std::rethrow_exception(ptr);
         }
-        catch (const not_supported_error &e) {
+        catch (const Not_supported_error &e) {
             set_error(e, "NotSupportedError");
         }
-        catch (const invalid_instance_error &e) {
+        catch (const Invalid_instance_error &e) {
             set_error(e, "InvalidInstanceError");
         }
-        catch (const schema_error &e) {
+        catch (const Schema_error &e) {
             set_error(e, "SchemaError");
         }
-        catch (const data_reader_error &e) {
+        catch (const Data_reader_error &e) {
             set_error(e, "DataReaderError");
         }
-        catch (const record_too_large_error &e) {
+        catch (const Record_too_large_error &e) {
             set_error(e, "RecordTooLargeError");
         }
-        catch (const corrupt_footer_error &e) {
+        catch (const Corrupt_footer_error &e) {
             set_error(e, "CorruptFooterError");
         }
-        catch (const corrupt_header_error &e) {
+        catch (const Corrupt_header_error &e) {
             set_error(e, "CorruptHeaderError");
         }
-        catch (const corrupt_record_error &e) {
+        catch (const Corrupt_record_error &e) {
             set_error(e, "CorruptRecordError");
         }
-        catch (const record_error &e) {
+        catch (const Record_error &e) {
             set_error(e, "RecordError");
         }
-        catch (const inflate_error &e) {
+        catch (const Inflate_error &e) {
             set_error(e, "InflateError");
         }
-        catch (const stream_error &e) {
+        catch (const Stream_error &e) {
             set_error(e, "StreamError");
         }
-        catch (const mlio_error &e) {
+        catch (const Mlio_error &e) {
             set_error(e, "MLIOError");
         }
         catch (const std::system_error &e) {

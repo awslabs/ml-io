@@ -23,52 +23,49 @@ namespace mlio {
 inline namespace abi_v1 {
 
 template<typename T>
-class MLIO_API intrusive_ref_counter {
+class MLIO_API Intrusive_ref_counter {
 public:
-    intrusive_ref_counter() noexcept = default;
+    Intrusive_ref_counter() noexcept = default;
 
-    intrusive_ref_counter(const intrusive_ref_counter &) noexcept
+    Intrusive_ref_counter(const Intrusive_ref_counter &) noexcept
     {}
 
-    intrusive_ref_counter(intrusive_ref_counter &&) noexcept
-    {}
-
-protected:
-    ~intrusive_ref_counter() = default;
-
-public:
-    intrusive_ref_counter &
+    Intrusive_ref_counter &
     // NOLINTNEXTLINE(cert-oop54-cpp)
-    operator=(const intrusive_ref_counter &) noexcept
+    operator=(const Intrusive_ref_counter &) noexcept
     {
         return *this;
     }
 
-    intrusive_ref_counter &operator=(intrusive_ref_counter &&) noexcept
+    Intrusive_ref_counter(Intrusive_ref_counter &&) noexcept
+    {}
+
+    Intrusive_ref_counter &operator=(Intrusive_ref_counter &&) noexcept
     {
         return *this;
     }
 
-public:
     std::size_t use_count() const noexcept
     {
         return ref_count_.load();
     }
 
-public:
     MLIO_API
-    friend inline void intrusive_ptr_inc_ref(const intrusive_ref_counter *ptr) noexcept
+    friend inline void intrusive_ptr_inc_ref(const Intrusive_ref_counter *ptr) noexcept
     {
         ptr->ref_count_.fetch_add(1, std::memory_order_acq_rel);
     }
 
     MLIO_API
-    friend inline void intrusive_ptr_dec_ref(const intrusive_ref_counter *ptr) noexcept
+    friend inline void intrusive_ptr_dec_ref(const Intrusive_ref_counter *ptr) noexcept
     {
         if (ptr->ref_count_.fetch_sub(1, std::memory_order_acq_rel) == 1) {
             delete static_cast<const T *>(ptr);
         }
     }
+
+protected:
+    ~Intrusive_ref_counter() = default;
 
 private:
     mutable std::atomic_size_t ref_count_{0};

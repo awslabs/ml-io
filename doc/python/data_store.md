@@ -34,11 +34,11 @@ Note also that all data store instances are hashable and can be used in dictiona
 Represents a local file as a data store. Inherits from [DataStore](#DataStore).
 
 ```python
-File(pathname : str, mmap : bool = True, compression : Compression = Compression.INFER)
+File(pathname : str, memory_map : bool = True, compression : Compression = Compression.INFER)
 ```
 
 - `pathname`: The path to a file in the local file system.
-- `mmap`: A boolean value indicating whether the file should be memory-mapped. A memory-mapped file usually offers faster read and write performance.
+- `memory_map`: A boolean value indicating whether the file should be memory-mapped. A memory-mapped file usually offers faster read and write performance.
 - `compression`: The [compression](#Compression) format of the file. If set to `INFER`, the compression will be inferred from the filename.
 
 ## InMemoryStore
@@ -101,14 +101,14 @@ A convenience function that returns a list of [`File`](#File) instances in natur
 list_files(pathnames : List[str], 
            pattern : str = None,
            predicate : Callback = None,
-           mmap : bool = True,
+           memory_map : bool = True,
            compression : Compression = Compression.INFER)
 ```
 
 - `pathnames`: One or more directory paths to traverse. In case a pathname points to a regular file, the file gets returned as if it was the result of a directory walk.
 - `pattern`: A glob pattern with wildcard characters (e.g. `*.csv`) to specify a subset of files to return.
 - `predicate`: A callback function in the form `callback(pathname : str) -> bool` that gets passed the full path of a file and that should return a boolean value indicating whether to include the file in the final list. Returning `True` means to include it; otherwise, it will be discarded.
-- `mmap`: A boolean value indicating whether the files should be memory-mapped. A memory-mapped file usually offers faster read and write performance.
+- `memory_map`: A boolean value indicating whether the files should be memory-mapped. A memory-mapped file usually offers faster read and write performance.
 - `compression`: The [compression](#Compression) format of the files. If set to `INFER`, the compression will be inferred individually for each file.
 
 There is also a light version of `list_files()` with a simplified signature as described below:

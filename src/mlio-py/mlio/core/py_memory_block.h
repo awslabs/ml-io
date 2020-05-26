@@ -21,25 +21,25 @@
 
 namespace pymlio {
 
-class py_memory_block final : public mlio::memory_block {
+class Py_memory_block final : public mlio::Memory_block {
 public:
-    explicit py_memory_block(const pybind11::buffer &buf)
+    explicit Py_memory_block(const pybind11::buffer &buf)
     {
         if (::PyObject_GetBuffer(buf.ptr(), &buffer_, PyBUF_SIMPLE) != 0) {
             throw pybind11::error_already_set();
         }
     }
 
-    py_memory_block(const py_memory_block &) = delete;
+    Py_memory_block(const Py_memory_block &) = delete;
 
-    py_memory_block(py_memory_block &&) = delete;
+    Py_memory_block(Py_memory_block &&) = delete;
 
-    ~py_memory_block() final;
+    ~Py_memory_block() final;
 
 public:
-    py_memory_block &operator=(const py_memory_block &) = delete;
+    Py_memory_block &operator=(const Py_memory_block &) = delete;
 
-    py_memory_block &operator=(py_memory_block &&) = delete;
+    Py_memory_block &operator=(Py_memory_block &&) = delete;
 
 public:
     const_pointer data() const noexcept final
@@ -61,7 +61,7 @@ private:
     Py_buffer buffer_{};
 };
 
-class py_mutable_memory_block final : public mlio::mutable_memory_block {
+class py_mutable_memory_block final : public mlio::Mutable_memory_block {
 public:
     explicit py_mutable_memory_block(const pybind11::buffer &buf)
     {
@@ -84,7 +84,7 @@ public:
 public:
     void resize(size_type) final
     {
-        throw mlio::not_supported_error{"The Python buffer does not support resizing."};
+        throw mlio::Not_supported_error{"The Python buffer does not support resizing."};
     }
 
 public:

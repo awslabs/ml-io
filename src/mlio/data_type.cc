@@ -21,33 +21,33 @@
 namespace mlio {
 inline namespace abi_v1 {
 
-data_type infer_data_type(std::string_view s) noexcept
+Data_type infer_data_type(std::string_view s) noexcept
 {
     if (s.empty()) {
-        return data_type::string;
+        return Data_type::string;
     }
 
-    std::int64_t sint64_val{};
-    parse_result r = try_parse_int<std::int64_t>(s, sint64_val);
-    if (r == parse_result::ok) {
-        return data_type::sint64;
+    std::int64_t int64_val{};
+    Parse_result r = try_parse_int<std::int64_t>(s, int64_val);
+    if (r == Parse_result::ok) {
+        return Data_type::int64;
     }
 
-    if (r == parse_result::overflowed) {
+    if (r == Parse_result::overflowed) {
         std::uint64_t uint64_val{};
         r = try_parse_int<std::uint64_t>(s, uint64_val);
-        if (r == parse_result::ok) {
-            return data_type::uint64;
+        if (r == Parse_result::ok) {
+            return Data_type::uint64;
         }
     }
 
     double double_val{};
     r = try_parse_float<double>(s, double_val);
-    if (r == parse_result::ok) {
-        return data_type::float64;
+    if (r == Parse_result::ok) {
+        return Data_type::float64;
     }
 
-    return data_type::string;
+    return Data_type::string;
 }
 
 }  // namespace abi_v1

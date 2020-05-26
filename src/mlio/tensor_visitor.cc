@@ -21,46 +21,46 @@
 namespace mlio {
 inline namespace abi_v1 {
 
-tensor_visitor::~tensor_visitor() = default;
+Tensor_visitor::~Tensor_visitor() = default;
 
-void tensor_visitor::visit(tensor &)
+void Tensor_visitor::visit(Tensor &)
 {
-    throw not_supported_error{"The operation is not supported for the specified tensor."};
+    throw Not_supported_error{"The operation is not supported for the specified tensor."};
 }
 
-void tensor_visitor::visit(const tensor &)
+void Tensor_visitor::visit(const Tensor &)
 {
-    throw not_supported_error{"The operation is not supported for the specified tensor."};
+    throw Not_supported_error{"The operation is not supported for the specified tensor."};
 }
 
-void tensor_visitor::visit(dense_tensor &tsr)
+void Tensor_visitor::visit(Dense_tensor &tensor)
 {
-    visit(static_cast<tensor &>(tsr));
+    visit(static_cast<Tensor &>(tensor));
 }
 
-void tensor_visitor::visit(const dense_tensor &tsr)
+void Tensor_visitor::visit(const Dense_tensor &tensor)
 {
-    visit(static_cast<const tensor &>(tsr));
+    visit(static_cast<const Tensor &>(tensor));
 }
 
-void tensor_visitor::visit(coo_tensor &tsr)
+void Tensor_visitor::visit(Coo_tensor &tensor)
 {
-    visit(static_cast<tensor &>(tsr));
+    visit(static_cast<Tensor &>(tensor));
 }
 
-void tensor_visitor::visit(const coo_tensor &tsr)
+void Tensor_visitor::visit(const Coo_tensor &tensor)
 {
-    visit(static_cast<const tensor &>(tsr));
+    visit(static_cast<const Tensor &>(tensor));
 }
 
-void tensor_visitor::visit(csr_tensor &tsr)
+void Tensor_visitor::visit(Csr_tensor &tensor)
 {
-    visit(static_cast<tensor &>(tsr));
+    visit(static_cast<Tensor &>(tensor));
 }
 
-void tensor_visitor::visit(const csr_tensor &tsr)
+void Tensor_visitor::visit(const Csr_tensor &tensor)
 {
-    visit(static_cast<const tensor &>(tsr));
+    visit(static_cast<const Tensor &>(tensor));
 }
 
 }  // namespace abi_v1

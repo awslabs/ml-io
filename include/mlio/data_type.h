@@ -31,16 +31,16 @@ inline namespace abi_v1 {
 /// @addtogroup tensors Tensors
 /// @{
 
-/// Specifies the data type of a @ref tensor instance.
-enum class data_type {
+/// Specifies the data type of a @ref Tensor Instance.
+enum class Data_type {
     size,
     float16,
     float32,
     float64,
-    sint8,
-    sint16,
-    sint32,
-    sint64,
+    int8,
+    int16,
+    int32,
+    int64,
     uint8,
     uint16,
     uint32,
@@ -50,108 +50,108 @@ enum class data_type {
 
 // clang-format off
 
-template<data_type dt>
-struct data_type_traits;
+template<Data_type dt>
+struct Data_type_traits;
 
 template<>
-struct data_type_traits<data_type::size>    {
+struct Data_type_traits<Data_type::size>    {
     using type = std::size_t;
 };
 
 template<>
-struct data_type_traits<data_type::float16> {
+struct Data_type_traits<Data_type::float16> {
     using type = std::uint16_t;
 };
 
 template<>
-struct data_type_traits<data_type::float32> {
+struct Data_type_traits<Data_type::float32> {
     using type = float;
 };
 
 template<>
-struct data_type_traits<data_type::float64> {
+struct Data_type_traits<Data_type::float64> {
     using type = double;
 };
 
 template<>
-struct data_type_traits<data_type::sint8>   {
+struct Data_type_traits<Data_type::int8>    {
     using type = std::int8_t;
 };
 
 template<>
-struct data_type_traits<data_type::sint16>  {
+struct Data_type_traits<Data_type::int16>   {
     using type = std::int16_t;
 };
 
 template<>
-struct data_type_traits<data_type::sint32>  {
+struct Data_type_traits<Data_type::int32>   {
     using type = std::int32_t;
 };
 
 template<>
-struct data_type_traits<data_type::sint64>  {
+struct Data_type_traits<Data_type::int64>   {
     using type = std::int64_t;
 };
 
 template<>
-struct data_type_traits<data_type::uint8>   {
+struct Data_type_traits<Data_type::uint8>   {
     using type = std::uint8_t;
 };
 
 template<>
-struct data_type_traits<data_type::uint16>  {
+struct Data_type_traits<Data_type::uint16>  {
     using type = std::uint16_t;
 };
 
 template<>
-struct data_type_traits<data_type::uint32>  {
+struct Data_type_traits<Data_type::uint32>  {
     using type = std::uint32_t;
 };
 
 template<>
-struct data_type_traits<data_type::uint64>  {
+struct Data_type_traits<Data_type::uint64>  {
     using type = std::uint64_t;
 };
 
 template<>
-struct data_type_traits<data_type::string>  {
+struct Data_type_traits<Data_type::string>  {
     using type = std::string;
 };
 
-template<data_type dt>
-using data_type_t = typename data_type_traits<dt>::type;
+template<Data_type dt>
+using data_type_t = typename Data_type_traits<dt>::type;
 
-template<template<data_type dt> class Op, typename... Args>
+template<template<Data_type dt> class Op, typename... Args>
 decltype(auto)
-dispatch(data_type dt, Args &&...args)
+dispatch(Data_type dt, Args &&...args)
 {
     switch (dt) {
-    case data_type::size:
-        return Op<data_type::size>   ()(std::forward<Args>(args)...);
-    case data_type::float16:
-        return Op<data_type::float16>()(std::forward<Args>(args)...);
-    case data_type::float32:
-        return Op<data_type::float32>()(std::forward<Args>(args)...);
-    case data_type::float64:
-        return Op<data_type::float64>()(std::forward<Args>(args)...);
-    case data_type::sint8:
-        return Op<data_type::sint8>  ()(std::forward<Args>(args)...);
-    case data_type::sint16:
-        return Op<data_type::sint16> ()(std::forward<Args>(args)...);
-    case data_type::sint32:
-        return Op<data_type::sint32> ()(std::forward<Args>(args)...);
-    case data_type::sint64:
-        return Op<data_type::sint64> ()(std::forward<Args>(args)...);
-    case data_type::uint8:
-        return Op<data_type::uint8>  ()(std::forward<Args>(args)...);
-    case data_type::uint16:
-        return Op<data_type::uint16> ()(std::forward<Args>(args)...);
-    case data_type::uint32:
-        return Op<data_type::uint32> ()(std::forward<Args>(args)...);
-    case data_type::uint64:
-        return Op<data_type::uint64> ()(std::forward<Args>(args)...);
-    case data_type::string:
-        return Op<data_type::string> ()(std::forward<Args>(args)...);
+    case Data_type::size:
+        return Op<Data_type::size>   ()(std::forward<Args>(args)...);
+    case Data_type::float16:
+        return Op<Data_type::float16>()(std::forward<Args>(args)...);
+    case Data_type::float32:
+        return Op<Data_type::float32>()(std::forward<Args>(args)...);
+    case Data_type::float64:
+        return Op<Data_type::float64>()(std::forward<Args>(args)...);
+    case Data_type::int8:
+        return Op<Data_type::int8>   ()(std::forward<Args>(args)...);
+    case Data_type::int16:
+        return Op<Data_type::int16>  ()(std::forward<Args>(args)...);
+    case Data_type::int32:
+        return Op<Data_type::int32>  ()(std::forward<Args>(args)...);
+    case Data_type::int64:
+        return Op<Data_type::int64>  ()(std::forward<Args>(args)...);
+    case Data_type::uint8:
+        return Op<Data_type::uint8>  ()(std::forward<Args>(args)...);
+    case Data_type::uint16:
+        return Op<Data_type::uint16> ()(std::forward<Args>(args)...);
+    case Data_type::uint32:
+        return Op<Data_type::uint32> ()(std::forward<Args>(args)...);
+    case Data_type::uint64:
+        return Op<Data_type::uint64> ()(std::forward<Args>(args)...);
+    case Data_type::string:
+        return Op<Data_type::string> ()(std::forward<Args>(args)...);
     }
 
     throw std::invalid_argument{"The specified data type is not valid."};
@@ -162,55 +162,55 @@ dispatch(data_type dt, Args &&...args)
 /// Tries to infer the type of the data represented by the specified
 /// string.
 ///
-/// @return The inferred data type; otherwise @ref data_type::string.
+/// @return The inferred data type; otherwise @ref Data_type::string.
 MLIO_API
-data_type infer_data_type(std::string_view s) noexcept;
+Data_type infer_data_type(std::string_view s) noexcept;
 
 MLIO_API
-inline std::ostream &operator<<(std::ostream &strm, data_type dt)
+inline std::ostream &operator<<(std::ostream &s, Data_type dt)
 {
     switch (dt) {
-    case data_type::size:
-        strm << "size";
+    case Data_type::size:
+        s << "size";
         break;
-    case data_type::float16:
-        strm << "float16";
+    case Data_type::float16:
+        s << "float16";
         break;
-    case data_type::float32:
-        strm << "float32";
+    case Data_type::float32:
+        s << "float32";
         break;
-    case data_type::float64:
-        strm << "float64";
+    case Data_type::float64:
+        s << "float64";
         break;
-    case data_type::sint8:
-        strm << "sint8";
+    case Data_type::int8:
+        s << "int8";
         break;
-    case data_type::sint16:
-        strm << "sint16";
+    case Data_type::int16:
+        s << "int16";
         break;
-    case data_type::sint32:
-        strm << "sint32";
+    case Data_type::int32:
+        s << "int32";
         break;
-    case data_type::sint64:
-        strm << "sint64";
+    case Data_type::int64:
+        s << "int64";
         break;
-    case data_type::uint8:
-        strm << "uint8";
+    case Data_type::uint8:
+        s << "uint8";
         break;
-    case data_type::uint16:
-        strm << "uint16";
+    case Data_type::uint16:
+        s << "uint16";
         break;
-    case data_type::uint32:
-        strm << "uint32";
+    case Data_type::uint32:
+        s << "uint32";
         break;
-    case data_type::uint64:
-        strm << "uint64";
+    case Data_type::uint64:
+        s << "uint64";
         break;
-    case data_type::string:
-        strm << "string";
+    case Data_type::string:
+        s << "string";
         break;
     }
-    return strm;
+    return s;
 }
 
 /// @}
@@ -221,10 +221,10 @@ inline std::ostream &operator<<(std::ostream &strm, data_type dt)
 namespace std {
 
 template<>
-struct MLIO_API hash<mlio::data_type> {
-    inline size_t operator()(const mlio::data_type &dt) const noexcept
+struct MLIO_API hash<mlio::Data_type> {
+    inline size_t operator()(const mlio::Data_type &dt) const noexcept
     {
-        using T = underlying_type_t<mlio::data_type>;
+        using T = underlying_type_t<mlio::Data_type>;
 
         return hash<T>{}(static_cast<T>(dt));
     }

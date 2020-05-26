@@ -22,7 +22,6 @@
 #include <fnmatch.h>
 
 #include <fmt/format.h>
-#include <fmt/ostream.h>
 #include <strnatcmp.h>
 
 #include "mlio/data_stores/detail/util.h"
@@ -34,37 +33,37 @@
 namespace mlio {
 inline namespace abi_v1 {
 
-s3_object::s3_object(intrusive_ptr<s3_client const> client,
+S3_object::S3_object(Intrusive_ptr<const S3_client> client,
                      std::string uri,
                      std::string version_id,
-                     compression cmp)
+                     Compression compression)
     : client_{std::move(client)}
     , uri_{std::move(uri)}
     , version_id_{std::move(version_id)}
-    , compression_{cmp}
+    , compression_{compression}
 {
     detail::validate_s3_uri(uri_);
 
-    if (compression_ == compression::infer) {
+    if (compression_ == Compression::infer) {
         compression_ = detail::infer_compression(uri_);
     }
 }
 
-intrusive_ptr<input_stream> s3_object::open_read() const
+Intrusive_ptr<Input_stream> S3_object::open_read() const
 {
-    if (logger::is_enabled_for(log_level::info)) {
+    if (logger::is_enabled_for(Log_level::info)) {
         logger::info("The S3 object '{0}' is being opened.", id());
     }
 
-    intrusive_ptr<input_stream> strm = make_s3_input_stream(client_, uri_, version_id_);
+    Intrusive_ptr<Input_stream> stream = make_s3_input_stream(client_, uri_, version_id_);
 
-    if (compression_ == compression::none) {
-        return strm;
+    if (compression_ == Compression::none) {
+        return stream;
     }
-    return make_inflate_stream(std::move(strm), compression_);
+    return make_inflate_stream(std::move(stream), compression_);
 }
 
-const std::string &s3_object::id() const
+const std::string &S3_object::id() const
 {
     if (id_.empty()) {
         if (version_id_.empty()) {
@@ -77,24 +76,24 @@ const std::string &s3_object::id() const
     return id_;
 }
 
-std::string s3_object::repr() const
+std::string S3_object::repr() const
 {
     return fmt::format(
-        "<s3_object uri='{0}' version='{1}' compression='{2}'>", uri_, version_id_, compression_);
+        "<S3_object uri='{0}' version='{1}' compression='{2}'>", uri_, version_id_, compression_);
 }
 
 namespace detail {
 namespace {
 
-void list_s3_objects(const list_s3_objects_params &prm,
+void list_s3_objects(const List_s3_objects_params &params,
                      const std::string &uri,
                      std::vector<std::string> &object_uris)
 {
     auto [bucket, prefix] = detail::split_s3_uri_to_bucket_and_key(uri);
 
-    prm.client->list_objects(bucket, prefix, [&](std::string object_uri) {
+    params.client->list_objects(bucket, prefix, [&](std::string object_uri) {
         // Pattern match.
-        const std::string *pattern = prm.pattern;
+        const std::string *pattern = params.pattern;
         if (pattern != nullptr && !pattern->empty()) {
             int r = ::fnmatch(pattern->c_str(), object_uri.c_str(), 0);
             if (r == FNM_NOMATCH) {
@@ -106,7 +105,7 @@ void list_s3_objects(const list_s3_objects_params &prm,
         }
 
         // Predicate match.
-        const auto *predicate = prm.predicate;
+        const auto *predicate = params.predicate;
         if (predicate != nullptr && *predicate != nullptr) {
             if (!(*predicate)(object_uri)) {
                 return;
@@ -120,34 +119,34 @@ void list_s3_objects(const list_s3_objects_params &prm,
 }  // namespace
 }  // namespace detail
 
-std::vector<intrusive_ptr<data_store>> list_s3_objects(const list_s3_objects_params &prm)
+std::vector<Intrusive_ptr<Data_store>> list_s3_objects(const List_s3_objects_params &params)
 {
     std::vector<std::string> object_uris{};
 
-    for (const std::string &uri : prm.uris) {
-        detail::list_s3_objects(prm, uri, object_uris);
+    for (const std::string &uri : params.uris) {
+        detail::list_s3_objects(params, uri, object_uris);
     }
 
     std::sort(object_uris.begin(), object_uris.end(), [](const auto &a, const auto &b) {
         return ::strnatcmp(a.c_str(), b.c_str()) < 0;
     });
 
-    auto clt = wrap_intrusive(prm.client);
+    auto clt = wrap_intrusive(params.client);
 
-    std::vector<intrusive_ptr<data_store>> stores{};
+    std::vector<Intrusive_ptr<Data_store>> stores{};
     stores.reserve(object_uris.size());
 
     for (const std::string &uri : object_uris) {
-        stores.emplace_back(make_intrusive<s3_object>(clt, uri, std::string{}, prm.cmp));
+        stores.emplace_back(make_intrusive<S3_object>(clt, uri, std::string{}, params.compression));
     }
 
     return stores;
 }
 
-std::vector<intrusive_ptr<data_store>>
-list_s3_objects(const s3_client &client, const std::string &uri, const std::string &pattern)
+std::vector<Intrusive_ptr<Data_store>>
+list_s3_objects(const S3_client &client, const std::string &uri, const std::string &pattern)
 {
-    stdx::span<std::string const> uris{&uri, 1};
+    stdx::span<const std::string> uris{&uri, 1};
 
     return list_s3_objects({&client, uris, &pattern});
 }

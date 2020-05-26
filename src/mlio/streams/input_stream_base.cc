@@ -25,28 +25,28 @@
 namespace mlio {
 inline namespace abi_v1 {
 
-memory_slice input_stream_base::read(std::size_t size)
+Memory_slice Input_stream_base::read(std::size_t size)
 {
-    auto blk = get_memory_allocator().allocate(size);
+    auto block = memory_allocator().allocate(size);
 
-    std::size_t num_bytes_read = read(*blk);
+    std::size_t num_bytes_read = read(*block);
 
-    return memory_slice{std::move(blk)}.first(num_bytes_read);
+    return Memory_slice{std::move(block)}.first(num_bytes_read);
 }
 
-void input_stream_base::seek(std::size_t)
+void Input_stream_base::seek(std::size_t)
 {
-    throw not_supported_error{"The input stream is not seekable."};
+    throw Not_supported_error{"The input stream is not seekable."};
 }
 
-std::size_t input_stream_base::size() const
+std::size_t Input_stream_base::size() const
 {
-    throw not_supported_error{"The input stream is not seekable."};
+    throw Not_supported_error{"The input stream is not seekable."};
 }
 
-std::size_t input_stream_base::position() const
+std::size_t Input_stream_base::position() const
 {
-    throw not_supported_error{"The input stream is not seekable."};
+    throw Not_supported_error{"The input stream is not seekable."};
 }
 
 }  // namespace abi_v1

@@ -23,23 +23,21 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-class zlib_inflater {
+class Zlib_inflater {
 public:
-    explicit zlib_inflater();
+    explicit Zlib_inflater();
 
-    zlib_inflater(const zlib_inflater &) = delete;
+    Zlib_inflater(const Zlib_inflater &) = delete;
 
-    zlib_inflater(zlib_inflater &&) = delete;
+    Zlib_inflater &operator=(const Zlib_inflater &) = delete;
 
-    ~zlib_inflater();
+    Zlib_inflater(Zlib_inflater &&) = delete;
 
-public:
-    zlib_inflater &operator=(const zlib_inflater &) = delete;
+    Zlib_inflater &operator=(Zlib_inflater &&) = delete;
 
-    zlib_inflater &operator=(zlib_inflater &&) = delete;
+    ~Zlib_inflater();
 
-public:
-    void inflate(memory_span &inp, mutable_memory_span &out);
+    void inflate(Memory_span &inp, Mutable_memory_span &out);
 
     bool eof() const noexcept
     {
@@ -49,7 +47,6 @@ public:
 private:
     void validate_state() const;
 
-private:
     ::z_stream stream_{};
     int state_ = Z_STREAM_END;
 };

@@ -23,7 +23,7 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-compression infer_compression(std::string_view pathname) noexcept;
+Compression infer_compression(std::string_view path) noexcept;
 
 }  // namespace detail
 }  // namespace abi_v1

@@ -18,7 +18,7 @@
 namespace mlio {
 inline namespace abi_v1 {
 
-data_reader::~data_reader() = default;
+Data_reader::~Data_reader() = default;
 
 }  // namespace abi_v1
 }  // namespace mlio

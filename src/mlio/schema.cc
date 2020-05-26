@@ -23,33 +23,22 @@
 #include "mlio/util/cast.h"
 
 template<typename Char>
-struct fmt::formatter<mlio::attribute, Char>
-    : fmt::v6::internal::fallback_formatter<mlio::attribute, Char> {};
+struct fmt::formatter<mlio::Attribute, Char>
+    : fmt::v6::internal::fallback_formatter<mlio::Attribute, Char> {};
 
 namespace mlio {
 inline namespace abi_v1 {
 
-attribute::attribute(std::string &&name, data_type dt, size_vector &&shape)
+Attribute::Attribute(std::string &&name, Data_type dt, Size_vector &&shape)
     : name_{std::move(name)}, data_type_{dt}, shape_{std::move(shape)}
 {
     init();
 }
 
-void attribute::init()
-{
-    if (strides_.empty()) {
-        strides_ = tensor::default_strides(shape_);
-    }
-    else if (strides_.size() != shape_.size()) {
-        throw std::invalid_argument{
-            "The number of strides does not match the number of dimensions."};
-    }
-}
-
-std::string attribute::repr() const
+std::string Attribute::repr() const
 {
     return fmt::format(
-        "<attribute name='{0}' data_type='{1}' shape=({2}) strides=({3}) sparse='{4}'>",
+        "<Attribute name='{0}' data_type='{1}' shape=({2}) strides=({3}) sparse='{4}'>",
         name_,
         data_type_,
         fmt::join(shape_, ", "),
@@ -57,13 +46,25 @@ std::string attribute::repr() const
         sparse_);
 }
 
-bool operator==(const attribute &lhs, const attribute &rhs) noexcept
+void Attribute::init()
 {
-    return lhs.name() == rhs.name() && lhs.dtype() == rhs.dtype() && lhs.sparse() == rhs.sparse() &&
-           lhs.shape() == rhs.shape() && lhs.strides() == rhs.strides();
+    if (strides_.empty()) {
+        strides_ = Tensor::default_strides(shape_);
+    }
+    else if (strides_.size() != shape_.size()) {
+        throw std::invalid_argument{
+            "The number of strides does not match the number of dimensions."};
+    }
 }
 
-schema::schema(std::vector<attribute> attrs) : attributes_{std::move(attrs)}
+bool operator==(const Attribute &lhs, const Attribute &rhs) noexcept
+{
+    return lhs.name() == rhs.name() && lhs.data_type() == rhs.data_type() &&
+           lhs.sparse() == rhs.sparse() && lhs.shape() == rhs.shape() &&
+           lhs.strides() == rhs.strides();
+}
+
+Schema::Schema(std::vector<Attribute> attrs) : attributes_{std::move(attrs)}
 {
     std::size_t idx = 0;
 
@@ -77,7 +78,7 @@ schema::schema(std::vector<attribute> attrs) : attributes_{std::move(attrs)}
     }
 }
 
-std::optional<std::size_t> schema::get_index(const std::string &name) const noexcept
+std::optional<std::size_t> Schema::get_index(const std::string &name) const noexcept
 {
     auto pos = name_index_map_.find(name);
     if (pos == name_index_map_.end()) {
@@ -86,12 +87,12 @@ std::optional<std::size_t> schema::get_index(const std::string &name) const noex
     return pos->second;
 }
 
-std::string schema::repr() const
+std::string Schema::repr() const
 {
-    return fmt::format("<schema attributes={{{0}}}>", fmt::join(attributes_, ", "));
+    return fmt::format("<Schema attributes={{{0}}}>", fmt::join(attributes_, ", "));
 }
 
-bool operator==(const schema &lhs, const schema &rhs) noexcept
+bool operator==(const Schema &lhs, const Schema &rhs) noexcept
 {
     return lhs.attributes() == rhs.attributes();
 }
@@ -101,12 +102,12 @@ bool operator==(const schema &lhs, const schema &rhs) noexcept
 
 namespace std {  // NOLINT(cert-dcl58-cpp)
 
-size_t hash<mlio::attribute>::operator()(const mlio::attribute &attr) const noexcept
+size_t hash<mlio::Attribute>::operator()(const mlio::Attribute &attr) const noexcept
 {
     size_t seed = 0;
 
     mlio::detail::hash_combine(seed, attr.name());
-    mlio::detail::hash_combine(seed, attr.dtype());
+    mlio::detail::hash_combine(seed, attr.data_type());
     mlio::detail::hash_combine(seed, attr.sparse());
 
     mlio::detail::hash_range(seed, attr.shape());

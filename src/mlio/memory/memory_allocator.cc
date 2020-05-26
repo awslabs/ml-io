@@ -22,19 +22,19 @@ inline namespace abi_v1 {
 namespace detail {
 namespace {
 
-std::unique_ptr<memory_allocator> memory_allocator_{};
+std::unique_ptr<Memory_allocator> memory_allocator_{};
 
 }  // namespace
 }  // namespace detail
 
-memory_allocator::~memory_allocator() = default;
+Memory_allocator::~Memory_allocator() = default;
 
-memory_allocator &get_memory_allocator() noexcept
+Memory_allocator &memory_allocator() noexcept
 {
     return *detail::memory_allocator_;
 }
 
-void set_memory_allocator(std::unique_ptr<memory_allocator> &&alloc) noexcept
+void set_memory_allocator(std::unique_ptr<Memory_allocator> &&alloc) noexcept
 {
     detail::memory_allocator_ = std::move(alloc);
 }

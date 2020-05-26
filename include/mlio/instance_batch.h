@@ -28,13 +28,13 @@ inline namespace abi_v1 {
 /// @addtogroup data_readers Data Readers
 /// @{
 
-/// Represents a batch of @ref instance "data instances".
-class MLIO_API instance_batch {
+/// Represents a batch of @ref Instance "data instances".
+class MLIO_API Instance_batch {
 public:
     /// @param index
     ///     The position of the batch relative to other batches read
     ///     from the dataset.
-    /// @param lst
+    /// @param instances
     ///     The list of data instances included in this batch.
     /// @param size
     ///     The size of the batch.
@@ -43,19 +43,18 @@ public:
     ///     In case this is the last batch of the dataset and the value
     ///     of the @ref last_batch_handling is @c pad, the size can be
     ///     greater than the number of data instances.
-    explicit instance_batch(std::size_t index,
-                            std::vector<instance> &&lst,
+    explicit Instance_batch(std::size_t index,
+                            std::vector<Instance> &&instances,
                             std::size_t size) noexcept
-        : index_{index}, instances_{std::move(lst)}, size_{size}
+        : index_{index}, instances_{std::move(instances)}, size_{size}
     {}
 
-public:
     std::size_t index() const noexcept
     {
         return index_;
     }
 
-    std::vector<instance> const &instances() const noexcept
+    const std::vector<Instance> &instances() const noexcept
     {
         return instances_;
     }
@@ -69,7 +68,7 @@ public:
 
 private:
     std::size_t index_;
-    std::vector<instance> instances_;
+    std::vector<Instance> instances_;
     std::size_t size_;
     mutable std::size_t size_bytes_{};
 };

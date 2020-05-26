@@ -26,22 +26,22 @@ using namespace pybind11::literals;
 
 namespace pymlio {
 
-py_device_array::~py_device_array()
+Py_device_array::~Py_device_array()
 {
     for (py::handle obj : string_buf_) {
         obj.dec_ref();
     }
 }
 
-void *py_device_array::data() noexcept
+void *Py_device_array::data() noexcept
 {
-    if (span_.dtype() == data_type::string) {
+    if (span_.data_type() == Data_type::string) {
         return make_or_get_string_buffer();
     }
     return span_.data();
 }
 
-void *py_device_array::make_or_get_string_buffer()
+void *Py_device_array::make_or_get_string_buffer()
 {
     if (string_buf_.empty()) {
         string_buf_.reserve(span_.size());
@@ -53,7 +53,7 @@ void *py_device_array::make_or_get_string_buffer()
         catch (std::runtime_error &) {
             PyErr_SetString(
                 PyExc_ValueError,
-                "The string tensor contains an invalid UTF-8 sequence. Please make sure that you "
+                "The string Tensor contains an invalid UTF-8 sequence. Please make sure that you "
                 "specify an explicit text encoding if the text is supposed to be in a different "
                 "encoding.");
             return nullptr;
@@ -65,15 +65,15 @@ void *py_device_array::make_or_get_string_buffer()
 
 namespace {
 
-py::buffer_info to_py_buffer(py_device_array &arr)
+py::buffer_info to_py_buffer(Py_device_array &arr)
 {
     auto size = static_cast<py::ssize_t>(arr.size());
 
     std::size_t item_size{};
     std::string fmt{};
 
-    switch (arr.dtype()) {
-    case data_type::size:
+    switch (arr.data_type()) {
+    case Data_type::size:
         item_size = sizeof(std::size_t);
 #if SIZE_MAX == UINT32_MAX
         fmt = "i";
@@ -83,51 +83,51 @@ py::buffer_info to_py_buffer(py_device_array &arr)
 #error "Only 32-bit and 64-bit systems are supported."
 #endif
         break;
-    case data_type::float16:
+    case Data_type::float16:
         item_size = sizeof(std::uint16_t);
         fmt = "e";
         break;
-    case data_type::float32:
+    case Data_type::float32:
         item_size = sizeof(float);
         fmt = "f";
         break;
-    case data_type::float64:
+    case Data_type::float64:
         item_size = sizeof(double);
         fmt = "d";
         break;
-    case data_type::sint8:
+    case Data_type::int8:
         item_size = sizeof(std::int8_t);
         fmt = "b";
         break;
-    case data_type::sint16:
+    case Data_type::int16:
         item_size = sizeof(std::int16_t);
         fmt = "h";
         break;
-    case data_type::sint32:
+    case Data_type::int32:
         item_size = sizeof(std::int32_t);
         fmt = "i";
         break;
-    case data_type::sint64:
+    case Data_type::int64:
         item_size = sizeof(std::int64_t);
         fmt = "q";
         break;
-    case data_type::uint8:
+    case Data_type::uint8:
         item_size = sizeof(std::uint8_t);
         fmt = "B";
         break;
-    case data_type::uint16:
+    case Data_type::uint16:
         item_size = sizeof(std::uint16_t);
         fmt = "H";
         break;
-    case data_type::uint32:
+    case Data_type::uint32:
         item_size = sizeof(std::uint32_t);
         fmt = "I";
         break;
-    case data_type::uint64:
+    case Data_type::uint64:
         item_size = sizeof(std::uint64_t);
         fmt = "Q";
         break;
-    case data_type::string:
+    case Data_type::string:
         item_size = sizeof(PyObject *);
         fmt = "O";
         break;
@@ -142,51 +142,52 @@ py::buffer_info to_py_buffer(py_device_array &arr)
 
 void register_device_array(py::module &m)
 {
-    py::class_<device_kind>(m,
+    py::class_<Device_kind>(m,
                             "DeviceKind",
-                            "Represents a device kind that has data processing capabilities such "
+                            "Represents a Device kind that has data processing capabilities such "
                             "as CPU or CUDA.")
         .def("__eq__",
-             [](const device_kind &self, const device_kind &other) {
+             [](const Device_kind &self, const Device_kind &other) {
                  return self == other;
              })
         .def("__hash__",
-             [](const device_kind &self) {
-                 return std::hash<device_kind>{}(self);
+             [](const Device_kind &self) {
+                 return std::hash<Device_kind>{}(self);
              })
-        .def("__repr__", &device_kind::repr)
+        .def("__repr__", &Device_kind::repr)
         .def_property_readonly_static(
             "cpu",
             [](py::object &) {
-                return device_kind::cpu();
+                return Device_kind::cpu();
             },
-            "Gets an instance for the CPU device kind.")
-        .def_property_readonly("name", &device_kind::name, "Gets the name of the device kind.");
+            "Gets an Instance for the CPU Device kind.")
+        .def_property_readonly("name", &Device_kind::name, "Gets the name of the Device kind.");
 
-    py::class_<device>(
+    py::class_<Device>(
         m, "Device", "Represents a particular data processing unit on the host system.")
-        .def(py::init<device_kind, std::size_t>(), "kind"_a, "id"_a)
+        .def(py::init<Device_kind, std::size_t>(), "kind"_a, "id"_a)
         .def("__eq__",
-             [](const device &self, const device &other) {
+             [](const Device &self, const Device &other) {
                  return self == other;
              })
         .def("__hash__",
-             [](const device &self) {
-                 return std::hash<device>{}(self);
+             [](const Device &self) {
+                 return std::hash<Device>{}(self);
              })
-        .def("__repr__", &device::repr)
-        .def_property_readonly("kind", &device::kind, "Gets the kind of the device.")
-        .def_property_readonly("id", &device::id, "Gets the id of the device.");
+        .def("__repr__", &Device::repr)
+        .def_property_readonly("kind", &Device::kind, "Gets the kind of the Device.")
+        .def_property_readonly("id", &Device::id, "Gets the id of the Device.");
 
-    py::class_<py_device_array>(m,
+    py::class_<Py_device_array>(m,
                                 "DeviceArray",
                                 py::buffer_protocol(),
                                 "Represents a memory region of a specific data type that is stored "
-                                "on a ``device``.")
-        .def_property_readonly("size", &py_device_array::size, "Gets the size of the array.")
-        .def_property_readonly("dtype", &py_device_array::dtype, "Gets the data type of the array.")
+                                "on a ``Device``.")
+        .def_property_readonly("size", &Py_device_array::size, "Gets the size of the array.")
         .def_property_readonly(
-            "device", &py_device_array::get_device, "Gets the device on which the array is stored.")
+            "data_type", &Py_device_array::data_type, "Gets the data type of the array.")
+        .def_property_readonly(
+            "Device", &Py_device_array::device, "Gets the device on which the array is stored.")
         .def_buffer(&to_py_buffer);
 }
 

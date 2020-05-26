@@ -27,14 +27,14 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-class recordio_record_reader final : public stream_record_reader {
+class Recordio_record_reader final : public Stream_record_reader {
 public:
-    explicit recordio_record_reader(intrusive_ptr<input_stream> strm)
-        : stream_record_reader{std::move(strm)}
+    explicit Recordio_record_reader(Intrusive_ptr<Input_stream> stream)
+        : Stream_record_reader{std::move(stream)}
     {}
 
 private:
-    std::optional<record> decode_record(memory_slice &chunk, bool ignore_leftover) final;
+    std::optional<Record> decode_record(Memory_slice &chunk, bool ignore_leftover) final;
 };
 
 }  // namespace detail

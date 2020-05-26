@@ -14,7 +14,7 @@ add_library(mlio
     data_stores/in_memory_store.cc
     data_stores/s3_object.cc
     data_stores/sagemaker_pipe.cc
-    detail/pathname.cc
+    detail/path.cc
     detail/s3_utils.cc
     detail/system_info.cc
     instance_readers/core_instance_reader.cc
@@ -91,7 +91,8 @@ add_library(mlio
     tensor.cc
     tensor_visitor.cc
     text_encoding.cc
-    text_line_reader.cc)
+    text_line_reader.cc
+)
 
 target_include_directories(mlio
     PUBLIC
@@ -109,15 +110,14 @@ target_include_directories(mlio SYSTEM
 
 if(MLIO_STATIC_LIB)
     target_compile_definitions(mlio
-        PUBLIC
+        PRIVATE
             MLIO_STATIC_LIB
     )
 endif()
 
 target_link_libraries(mlio
     PRIVATE
-        absl::strings dlpack::dlpack fmt::fmt natsort::strnatcmp
-        protobuf::libprotobuf TBB::tbb
+        absl::strings dlpack::dlpack fmt::fmt natsort::strnatcmp protobuf::libprotobuf TBB::tbb
 )
 
 target_link_libraries(mlio
@@ -127,7 +127,7 @@ target_link_libraries(mlio
 
 if(MLIO_BUILD_S3)
     target_compile_definitions(mlio
-        PUBLIC
+        PRIVATE
             MLIO_BUILD_S3
     )
 
@@ -139,14 +139,20 @@ endif()
 
 if(MLIO_BUILD_IMAGE_READER)
     target_compile_definitions(mlio
-        PUBLIC
+        PRIVATE
             MLIO_BUILD_IMAGE_READER
      )
 
     target_link_libraries(mlio
         PRIVATE
-            opencv_core opencv_imgcodecs opencv_imgproc)
+            opencv_core opencv_imgcodecs opencv_imgproc
+    )
 endif()
+
+target_compile_features(mlio
+    PUBLIC
+        cxx_std_17
+)
 
 set_target_properties(mlio PROPERTIES
     VERSION

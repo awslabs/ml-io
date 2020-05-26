@@ -41,7 +41,7 @@ void free_data(std::byte *data)
 }  // namespace
 }  // namespace detail
 
-heap_memory_block::heap_memory_block(size_type size) : size_{size}
+Heap_memory_block::Heap_memory_block(size_type size) : size_{size}
 {
     if (size_ == 0) {
         data_ = nullptr;
@@ -51,12 +51,12 @@ heap_memory_block::heap_memory_block(size_type size) : size_{size}
     }
 }
 
-heap_memory_block::~heap_memory_block()
+Heap_memory_block::~Heap_memory_block()
 {
     detail::free_data(data_);
 }
 
-void heap_memory_block::resize(size_type size)
+void Heap_memory_block::resize(size_type size)
 {
     if (size == 0) {
         detail::free_data(data_);

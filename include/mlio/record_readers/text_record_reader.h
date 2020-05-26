@@ -29,16 +29,16 @@ inline namespace abi_v1 {
 /// @{
 
 /// Represents an abstract helper base class for reading text-based
-/// records from an @ref input_stream.
-class MLIO_API text_record_reader : public stream_record_reader {
+/// records from an @ref Input_stream.
+class MLIO_API Text_record_reader : public Stream_record_reader {
 protected:
-    explicit text_record_reader(intrusive_ptr<input_stream> strm);
+    explicit Text_record_reader(Intrusive_ptr<Input_stream> stream);
 
 private:
     MLIO_HIDDEN
-    std::optional<record> decode_record(memory_slice &chunk, bool ignore_leftover) final;
+    std::optional<Record> decode_record(Memory_slice &chunk, bool ignore_leftover) final;
 
-    /// When implemented in a derived class, tries to decode a record
+    /// When implemented in a derived class, tries to decode a Record
     /// from the specified chunk.
     ///
     /// @param chunk
@@ -46,12 +46,12 @@ private:
     ///     is guaranteed to have no Unicode BOM bits.
     /// @param ignore_leftover
     ///     A boolean value indicating whether to ignore any leftover
-    ///     bits than cannot be interpreted as a record. If false, the
+    ///     bits than cannot be interpreted as a Record. If false, the
     ///     reader should throw an exception with a descriptive message.
-    virtual std::optional<record> decode_text_record(memory_slice &chunk, bool ignore_leftover) = 0;
+    virtual std::optional<Record> decode_text_record(Memory_slice &chunk, bool ignore_leftover) = 0;
 
     MLIO_HIDDEN
-    static bool skip_utf8_bom(memory_slice &chunk, bool ignore_leftover) noexcept;
+    static bool skip_utf8_bom(Memory_slice &chunk, bool ignore_leftover) noexcept;
 };
 
 /// @}

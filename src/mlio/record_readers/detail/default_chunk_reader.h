@@ -29,16 +29,14 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-class default_chunk_reader : public chunk_reader {
+class Default_chunk_reader : public Chunk_reader {
 public:
-    explicit default_chunk_reader(intrusive_ptr<input_stream> strm) noexcept
-        : stream_{std::move(strm)}
+    explicit Default_chunk_reader(Intrusive_ptr<Input_stream> stream) noexcept
+        : stream_{std::move(stream)}
     {}
 
-public:
-    memory_slice read_chunk(memory_span leftover) final;
+    Memory_slice read_chunk(Memory_span leftover) final;
 
-public:
     bool eof() const noexcept final
     {
         return eof_;
@@ -52,9 +50,9 @@ public:
     void set_chunk_size_hint(std::size_t value) noexcept final;
 
 private:
-    intrusive_ptr<input_stream> stream_;
+    Intrusive_ptr<Input_stream> stream_;
     std::size_t next_chunk_size_ = 0x200'0000;  // 32 MiB
-    intrusive_ptr<mutable_memory_block> chunk_{};
+    Intrusive_ptr<Mutable_memory_block> chunk_{};
     bool eof_{};
 };
 

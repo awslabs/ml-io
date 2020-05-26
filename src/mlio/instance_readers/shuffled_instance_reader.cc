@@ -25,9 +25,9 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-shuffled_instance_reader::shuffled_instance_reader(const data_reader_params &prm,
-                                                   std::unique_ptr<instance_reader> &&inner)
-    : params_{&prm}
+Shuffled_instance_reader::Shuffled_instance_reader(const Data_reader_params &params,
+                                                   std::unique_ptr<Instance_reader> &&inner)
+    : params_{&params}
     , inner_{std::move(inner)}
     , shuffle_window_{params_->shuffle_window}
     , dist_{0, shuffle_window_ - 1}
@@ -49,7 +49,7 @@ shuffled_instance_reader::shuffled_instance_reader(const data_reader_params &prm
     }
 }
 
-std::optional<instance> shuffled_instance_reader::read_instance_core()
+std::optional<Instance> Shuffled_instance_reader::read_instance_core()
 {
     if (shuffle_window_ == 1) {
         return inner_->read_instance();
@@ -65,18 +65,18 @@ std::optional<instance> shuffled_instance_reader::read_instance_core()
         return pop_random_instance_from_buffer();
     }
 
-    instance ins = std::move(buffer_.back());
+    Instance instance = std::move(buffer_.back());
 
     buffer_.pop_back();
 
-    return std::move(ins);
+    return std::move(instance);
 }
 
-void shuffled_instance_reader::fill_buffer_from_inner()
+void Shuffled_instance_reader::fill_buffer_from_inner()
 {
     while (inner_has_instance_ && buffer_.size() < shuffle_window_) {
-        std::optional<instance> ins = inner_->read_instance();
-        if (ins == std::nullopt) {
+        std::optional<Instance> instance = inner_->read_instance();
+        if (instance == std::nullopt) {
             inner_has_instance_ = false;
 
             std::shuffle(buffer_.begin(), buffer_.end(), mt_);
@@ -84,15 +84,15 @@ void shuffled_instance_reader::fill_buffer_from_inner()
             break;
         }
 
-        buffer_.emplace_back(std::move(*ins));
+        buffer_.emplace_back(std::move(*instance));
     }
 }
 
-std::optional<instance> shuffled_instance_reader::pop_random_instance_from_buffer()
+std::optional<Instance> Shuffled_instance_reader::pop_random_instance_from_buffer()
 {
     std::size_t random_idx = dist_(mt_);
 
-    instance ins = std::move(buffer_[random_idx]);
+    Instance instance = std::move(buffer_[random_idx]);
 
     if (random_idx != buffer_.size() - 1) {
         buffer_[random_idx] = std::move(buffer_.back());
@@ -100,10 +100,10 @@ std::optional<instance> shuffled_instance_reader::pop_random_instance_from_buffe
 
     buffer_.pop_back();
 
-    return std::move(ins);
+    return std::move(instance);
 }
 
-void shuffled_instance_reader::reset_core() noexcept
+void Shuffled_instance_reader::reset_core() noexcept
 {
     inner_->reset();
 

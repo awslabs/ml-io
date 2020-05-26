@@ -33,30 +33,28 @@ inline namespace abi_v1 {
 /// @addtogroup data_stores Data Stores
 /// @{
 
-/// Represents an Amazon SageMaker pipe channel as a @ref data_store.
-class MLIO_API sagemaker_pipe final : public data_store {
+/// Represents an Amazon SageMaker pipe channel as a @ref Data_store.
+class MLIO_API Sagemaker_pipe final : public Data_store {
 public:
-    explicit sagemaker_pipe(std::string pathname,
+    explicit Sagemaker_pipe(std::string path,
                             std::chrono::seconds timeout = sagemaker_pipe_default_timeout,
                             std::optional<std::size_t> fifo_id = {},
-                            compression cmp = {});
+                            Compression compression = {});
 
-public:
-    intrusive_ptr<input_stream> open_read() const final;
+    Intrusive_ptr<Input_stream> open_read() const final;
 
     std::string repr() const final;
 
-public:
     const std::string &id() const noexcept final
     {
-        return pathname_;
+        return path_;
     }
 
 private:
-    std::string pathname_;
+    std::string path_;
     std::chrono::seconds timeout_;
     mutable std::optional<std::size_t> fifo_id_;
-    compression compression_;
+    Compression compression_;
 };
 
 /// @}

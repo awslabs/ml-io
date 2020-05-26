@@ -24,24 +24,24 @@
 namespace mlio {
 inline namespace abi_v1 {
 
-std::size_t memory_input_stream::read(mutable_memory_span dest)
+std::size_t Memory_input_stream::read(Mutable_memory_span destination)
 {
     check_if_closed();
 
-    if (dest.empty()) {
+    if (destination.empty()) {
         return 0;
     }
 
     auto old_pos = pos_;
 
-    advance_position(dest.size());
+    advance_position(destination.size());
 
-    auto last = std::copy(old_pos, pos_, dest.begin());
+    auto last = std::copy(old_pos, pos_, destination.begin());
 
-    return as_size(last - dest.begin());
+    return as_size(last - destination.begin());
 }
 
-memory_slice memory_input_stream::read(std::size_t size)
+Memory_slice Memory_input_stream::read(std::size_t size)
 {
     check_if_closed();
 
@@ -56,7 +56,7 @@ memory_slice memory_input_stream::read(std::size_t size)
     return source_.subslice(old_pos, pos_);
 }
 
-void memory_input_stream::seek(std::size_t position)
+void Memory_input_stream::seek(std::size_t position)
 {
     check_if_closed();
 
@@ -65,37 +65,37 @@ void memory_input_stream::seek(std::size_t position)
     advance_position(position);
 }
 
-void memory_input_stream::close() noexcept
+void Memory_input_stream::close() noexcept
 {
     source_ = {};
 
     closed_ = true;
 }
 
-void memory_input_stream::advance_position(std::size_t dist) noexcept
-{
-    pos_ = std::min(pos_ + as_ssize(dist), source_.end());
-}
-
-void memory_input_stream::check_if_closed() const
-{
-    if (closed_) {
-        throw stream_error{"The input stream is closed."};
-    }
-}
-
-std::size_t memory_input_stream::size() const
+std::size_t Memory_input_stream::size() const
 {
     check_if_closed();
 
     return source_.size();
 }
 
-std::size_t memory_input_stream::position() const
+std::size_t Memory_input_stream::position() const
 {
     check_if_closed();
 
     return as_size(pos_ - source_.begin());
+}
+
+void Memory_input_stream::advance_position(std::size_t distance) noexcept
+{
+    pos_ = std::min(pos_ + as_ssize(distance), source_.end());
+}
+
+void Memory_input_stream::check_if_closed() const
+{
+    if (closed_) {
+        throw Stream_error{"The input stream is closed."};
+    }
 }
 
 }  // namespace abi_v1

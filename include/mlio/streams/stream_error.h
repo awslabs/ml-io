@@ -24,38 +24,34 @@ inline namespace abi_v1 {
 /// @addtogroup streams Streams
 /// @{
 
-class MLIO_API stream_error : public mlio_error {
+class MLIO_API Stream_error : public Mlio_error {
 public:
-    using mlio_error::mlio_error;
+    using Mlio_error::Mlio_error;
 
-public:
-    stream_error(const stream_error &) = default;
+    Stream_error(const Stream_error &) = default;
 
-    stream_error(stream_error &&) = default;
+    Stream_error &operator=(const Stream_error &) = default;
 
-    ~stream_error() override;
+    Stream_error(Stream_error &&) = default;
 
-public:
-    stream_error &operator=(const stream_error &) = default;
+    Stream_error &operator=(Stream_error &&) = default;
 
-    stream_error &operator=(stream_error &&) = default;
+    ~Stream_error() override;
 };
 
-class MLIO_API inflate_error : public stream_error {
+class MLIO_API Inflate_error : public Stream_error {
 public:
-    using stream_error::stream_error;
+    using Stream_error::Stream_error;
 
-public:
-    inflate_error(const inflate_error &) = default;
+    Inflate_error(const Inflate_error &) = default;
 
-    inflate_error(inflate_error &&) = default;
+    Inflate_error &operator=(const Inflate_error &) = default;
 
-    ~inflate_error() override;
+    Inflate_error(Inflate_error &&) = default;
 
-public:
-    inflate_error &operator=(const inflate_error &) = default;
+    Inflate_error &operator=(Inflate_error &&) = default;
 
-    inflate_error &operator=(inflate_error &&) = default;
+    ~Inflate_error() override;
 };
 
 /// @}

@@ -24,89 +24,79 @@ inline namespace abi_v1 {
 /// @addtogroup records Records
 /// @{
 
-class MLIO_API record_error : public mlio_error {
+class MLIO_API Record_error : public Mlio_error {
 public:
-    using mlio_error::mlio_error;
+    using Mlio_error::Mlio_error;
 
-public:
-    record_error(const record_error &) = default;
+    Record_error(const Record_error &) = default;
 
-    record_error(record_error &&) = default;
+    Record_error &operator=(const Record_error &) = default;
 
-    ~record_error() override;
+    Record_error(Record_error &&) = default;
 
-public:
-    record_error &operator=(const record_error &) = default;
+    Record_error &operator=(Record_error &&) = default;
 
-    record_error &operator=(record_error &&) = default;
+    ~Record_error() override;
 };
 
-class MLIO_API corrupt_record_error : public record_error {
+class MLIO_API Corrupt_record_error : public Record_error {
 public:
-    using record_error::record_error;
+    using Record_error::Record_error;
 
-public:
-    corrupt_record_error(const corrupt_record_error &) = default;
+    Corrupt_record_error(const Corrupt_record_error &) = default;
 
-    corrupt_record_error(corrupt_record_error &&) = default;
+    Corrupt_record_error &operator=(const Corrupt_record_error &) = default;
 
-    ~corrupt_record_error() override;
+    Corrupt_record_error(Corrupt_record_error &&) = default;
 
-public:
-    corrupt_record_error &operator=(const corrupt_record_error &) = default;
+    Corrupt_record_error &operator=(Corrupt_record_error &&) = default;
 
-    corrupt_record_error &operator=(corrupt_record_error &&) = default;
+    ~Corrupt_record_error() override;
 };
 
-class MLIO_API corrupt_header_error : public corrupt_record_error {
+class MLIO_API Corrupt_header_error : public Corrupt_record_error {
 public:
-    using corrupt_record_error::corrupt_record_error;
+    using Corrupt_record_error::Corrupt_record_error;
 
-public:
-    corrupt_header_error(const corrupt_header_error &) = default;
+    Corrupt_header_error(const Corrupt_header_error &) = default;
 
-    corrupt_header_error(corrupt_header_error &&) = default;
+    Corrupt_header_error &operator=(const Corrupt_header_error &) = default;
 
-    ~corrupt_header_error() override;
+    Corrupt_header_error(Corrupt_header_error &&) = default;
 
-public:
-    corrupt_header_error &operator=(const corrupt_header_error &) = default;
+    Corrupt_header_error &operator=(Corrupt_header_error &&) = default;
 
-    corrupt_header_error &operator=(corrupt_header_error &&) = default;
+    ~Corrupt_header_error() override;
 };
 
-class MLIO_API corrupt_footer_error : public corrupt_record_error {
+class MLIO_API Corrupt_footer_error : public Corrupt_record_error {
 public:
-    using corrupt_record_error::corrupt_record_error;
+    using Corrupt_record_error::Corrupt_record_error;
 
-public:
-    corrupt_footer_error(const corrupt_footer_error &) = default;
+    Corrupt_footer_error(const Corrupt_footer_error &) = default;
 
-    corrupt_footer_error(corrupt_footer_error &&) = default;
+    Corrupt_footer_error &operator=(const Corrupt_footer_error &) = default;
 
-    ~corrupt_footer_error() override;
+    Corrupt_footer_error(Corrupt_footer_error &&) = default;
 
-public:
-    corrupt_footer_error &operator=(const corrupt_footer_error &) = default;
+    Corrupt_footer_error &operator=(Corrupt_footer_error &&) = default;
 
-    corrupt_footer_error &operator=(corrupt_footer_error &&) = default;
+    ~Corrupt_footer_error() override;
 };
 
-class MLIO_API record_too_large_error : public record_error {
+class MLIO_API Record_too_large_error : public Record_error {
 public:
-    using record_error::record_error;
+    using Record_error::Record_error;
 
-public:
-    record_too_large_error(const record_too_large_error &) = default;
+    Record_too_large_error(const Record_too_large_error &) = default;
 
-    record_too_large_error(record_too_large_error &&) = default;
+    Record_too_large_error &operator=(const Record_too_large_error &) = default;
 
-    ~record_too_large_error() override;
+    Record_too_large_error(Record_too_large_error &&) = default;
 
-public:
-    record_too_large_error &operator=(const record_too_large_error &) = default;
+    Record_too_large_error &operator=(Record_too_large_error &&) = default;
 
-    record_too_large_error &operator=(record_too_large_error &&) = default;
+    ~Record_too_large_error() override;
 };
 
 /// @}

@@ -29,31 +29,28 @@ inline namespace abi_v1 {
 /// @{
 
 /// Represents an input stream of bytes.
-class MLIO_API input_stream : public intrusive_ref_counter<input_stream> {
+class MLIO_API Input_stream : public Intrusive_ref_counter<Input_stream> {
 public:
-    input_stream() noexcept = default;
+    Input_stream() noexcept = default;
 
-    input_stream(const input_stream &) = delete;
+    Input_stream(const Input_stream &) = delete;
 
-    input_stream(input_stream &&) = delete;
+    Input_stream &operator=(const Input_stream &) = delete;
 
-    virtual ~input_stream();
+    Input_stream(Input_stream &&) = delete;
 
-public:
-    input_stream &operator=(const input_stream &) = delete;
+    Input_stream &operator=(Input_stream &&) = delete;
 
-    input_stream &operator=(input_stream &&) = delete;
+    virtual ~Input_stream();
 
-public:
-    virtual std::size_t read(mutable_memory_span dest) = 0;
+    virtual std::size_t read(Mutable_memory_span destination) = 0;
 
-    virtual memory_slice read(std::size_t size) = 0;
+    virtual Memory_slice read(std::size_t size) = 0;
 
     virtual void seek(std::size_t position) = 0;
 
     virtual void close() noexcept = 0;
 
-public:
     virtual std::size_t size() const = 0;
 
     virtual std::size_t position() const = 0;

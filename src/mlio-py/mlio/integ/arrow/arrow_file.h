@@ -20,24 +20,25 @@
 
 #include <arrow/io/interfaces.h>
 #include <arrow/type_fwd.h>
-#include <mlio.h>
+#include <mlio/intrusive_ptr.h>
+#include <mlio/streams/input_stream.h>
 
 namespace pymlio {
 
-class arrow_file final : public arrow::io::RandomAccessFile {
+class Arrow_file final : public arrow::io::RandomAccessFile {
 public:
-    explicit arrow_file(mlio::intrusive_ptr<mlio::input_stream> strm);
+    explicit Arrow_file(mlio::Intrusive_ptr<mlio::Input_stream> stream);
 
-    arrow_file(const arrow_file &) = delete;
+    Arrow_file(const Arrow_file &) = delete;
 
-    arrow_file(arrow_file &&) = delete;
+    Arrow_file(Arrow_file &&) = delete;
 
-    ~arrow_file() final;
+    ~Arrow_file() final;
 
 public:
-    arrow_file &operator=(const arrow_file &) = delete;
+    Arrow_file &operator=(const Arrow_file &) = delete;
 
-    arrow_file &operator=(arrow_file &&) = delete;
+    Arrow_file &operator=(Arrow_file &&) = delete;
 
 public:
     arrow::Result<std::int64_t> Read(std::int64_t nbytes, void *out) noexcept final;
@@ -61,7 +62,7 @@ public:
     bool closed() const noexcept final;
 
 private:
-    mlio::intrusive_ptr<mlio::input_stream> stream_;
+    mlio::Intrusive_ptr<mlio::Input_stream> stream_;
 };
 
 }  // namespace pymlio

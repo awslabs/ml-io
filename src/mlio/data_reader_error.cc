@@ -18,11 +18,11 @@
 namespace mlio {
 inline namespace abi_v1 {
 
-data_reader_error::~data_reader_error() = default;
+Data_reader_error::~Data_reader_error() = default;
 
-schema_error::~schema_error() = default;
+Schema_error::~Schema_error() = default;
 
-invalid_instance_error::~invalid_instance_error() = default;
+Invalid_instance_error::~Invalid_instance_error() = default;
 
 }  // namespace abi_v1
 }  // namespace mlio

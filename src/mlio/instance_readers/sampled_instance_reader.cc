@@ -23,9 +23,9 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-sampled_instance_reader::sampled_instance_reader(const data_reader_params &prm,
-                                                 std::unique_ptr<instance_reader> &&inner)
-    : params_{&prm}, inner_{std::move(inner)}
+Sampled_instance_reader::Sampled_instance_reader(const Data_reader_params &params,
+                                                 std::unique_ptr<Instance_reader> &&inner)
+    : params_{&params}, inner_{std::move(inner)}
 {
     if (params_->sample_ratio <= 0.0F || params_->sample_ratio >= 1.0F) {
         throw std::invalid_argument{"The sample ratio must be greater than 0 and less than 1."};
@@ -36,7 +36,7 @@ sampled_instance_reader::sampled_instance_reader(const data_reader_params &prm,
     buffer_pos_ = buffer_.end();
 }
 
-std::optional<instance> sampled_instance_reader::read_instance_core()
+std::optional<Instance> Sampled_instance_reader::read_instance_core()
 {
     if (buffer_pos_ == buffer_.end()) {
         fill_buffer_from_inner();
@@ -49,17 +49,17 @@ std::optional<instance> sampled_instance_reader::read_instance_core()
     return std::exchange(*buffer_pos_++, {});
 }
 
-void sampled_instance_reader::fill_buffer_from_inner()
+void Sampled_instance_reader::fill_buffer_from_inner()
 {
     buffer_.clear();
 
     while (buffer_.size() < num_instances_to_read_) {
-        std::optional<instance> ins = inner_->read_instance();
-        if (ins == std::nullopt) {
+        std::optional<Instance> instance = inner_->read_instance();
+        if (instance == std::nullopt) {
             break;
         }
 
-        buffer_.emplace_back(std::move(ins));
+        buffer_.emplace_back(std::move(instance));
     }
 
     if (!buffer_.empty()) {
@@ -72,7 +72,7 @@ void sampled_instance_reader::fill_buffer_from_inner()
     buffer_pos_ = buffer_.begin();
 }
 
-void sampled_instance_reader::reset_core() noexcept
+void Sampled_instance_reader::reset_core() noexcept
 {
     inner_->reset();
 

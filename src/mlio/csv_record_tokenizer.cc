@@ -15,20 +15,19 @@
 
 #include "mlio/csv_record_tokenizer.h"
 
-#include "mlio/config.h"
 #include "mlio/record_readers/record_error.h"
 
 namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-bool csv_record_tokenizer::next()
+bool Csv_record_tokenizer::next()
 {
     value_.clear();
 
-    is_truncated_ = false;
+    truncated_ = false;
 
-    if (is_finished_) {
+    if (finished_) {
         eof_ = true;
 
         return false;
@@ -37,7 +36,7 @@ bool csv_record_tokenizer::next()
     char chr{};
 
     // Start of a new field.
-    parser_state state = parser_state::new_field;
+    Parser_state state = Parser_state::new_field;
 
     if (!try_get_next_char(chr)) {
         goto end_line;  // NOLINT
@@ -55,7 +54,7 @@ bool csv_record_tokenizer::next()
     }
 
 in_field:
-    state = parser_state::in_field;
+    state = Parser_state::in_field;
 
     if (!try_get_next_char(chr)) {
         goto end_line;  // NOLINT
@@ -70,7 +69,7 @@ in_field:
     }
 
 in_quoted_field:
-    state = parser_state::in_quoted_field;
+    state = Parser_state::in_quoted_field;
 
     if (!try_get_next_char(chr)) {
         goto end_line;  // NOLINT
@@ -85,7 +84,7 @@ in_quoted_field:
     }
 
 quote_in_quoted_field:
-    state = parser_state::quote_in_quoted_field;
+    state = Parser_state::quote_in_quoted_field;
 
     if (!try_get_next_char(chr)) {
         goto end_line;  // NOLINT
@@ -105,21 +104,21 @@ quote_in_quoted_field:
 
 end_line:
     switch (state) {
-    case parser_state::new_field:
-    case parser_state::in_field:
-    case parser_state::quote_in_quoted_field:
-        is_finished_ = true;
+    case Parser_state::new_field:
+    case Parser_state::in_field:
+    case Parser_state::quote_in_quoted_field:
+        finished_ = true;
         break;
 
-    case parser_state::in_quoted_field:
-        throw corrupt_record_error{"EOF reached inside a quoted field."};
+    case Parser_state::in_quoted_field:
+        throw Corrupt_record_error{"EOF reached inside a quoted field."};
     }
 
 end_field:
     return true;
 }
 
-inline bool csv_record_tokenizer::try_get_next_char(char &chr) noexcept
+inline bool Csv_record_tokenizer::try_get_next_char(char &chr) noexcept
 {
     if (text_pos_ == text_.end()) {
         return false;
@@ -132,23 +131,23 @@ inline bool csv_record_tokenizer::try_get_next_char(char &chr) noexcept
     return true;
 }
 
-inline void csv_record_tokenizer::push_char(char chr) noexcept
+inline void Csv_record_tokenizer::push_char(char chr) noexcept
 {
     if (max_field_length_ && value_.size() == *max_field_length_) {
-        is_truncated_ = true;
+        truncated_ = true;
     }
     else {
         value_.push_back(chr);
     }
 }
 
-void csv_record_tokenizer::reset(memory_span blob)
+void Csv_record_tokenizer::reset(Memory_span blob)
 {
-    text_ = as_span<char const>(blob);
+    text_ = as_span<const char>(blob);
 
     text_pos_ = text_.begin();
 
-    is_finished_ = false;
+    finished_ = false;
 
     eof_ = false;
 }

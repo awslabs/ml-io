@@ -30,29 +30,20 @@ inline namespace abi_v1 {
 /// @addtogroup streams Streams
 /// @{
 
-/// Wraps a @ref memory_slice as an @ref input_stream.
-class MLIO_API memory_input_stream final : public input_stream {
+/// Wraps a @ref Memory_slice as an @ref Input_stream.
+class MLIO_API Memory_input_stream final : public Input_stream {
 public:
-    explicit memory_input_stream(memory_slice source) noexcept : source_{std::move(source)}
+    explicit Memory_input_stream(Memory_slice source) noexcept : source_{std::move(source)}
     {}
 
-public:
-    std::size_t read(mutable_memory_span dest) final;
+    std::size_t read(Mutable_memory_span destination) final;
 
-    memory_slice read(std::size_t size) final;
+    Memory_slice read(std::size_t size) final;
 
     void seek(std::size_t position) final;
 
     void close() noexcept final;
 
-private:
-    MLIO_HIDDEN
-    void advance_position(std::size_t dist) noexcept;
-
-    MLIO_HIDDEN
-    void check_if_closed() const;
-
-public:
     std::size_t size() const final;
 
     std::size_t position() const final;
@@ -73,8 +64,14 @@ public:
     }
 
 private:
-    memory_slice source_;
-    memory_block::iterator pos_ = source_.begin();
+    MLIO_HIDDEN
+    void advance_position(std::size_t distance) noexcept;
+
+    MLIO_HIDDEN
+    void check_if_closed() const;
+
+    Memory_slice source_;
+    Memory_block::iterator pos_ = source_.begin();
     bool closed_{};
 };
 

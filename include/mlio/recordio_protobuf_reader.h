@@ -23,14 +23,12 @@
 #include "mlio/intrusive_ptr.h"
 #include "mlio/parallel_data_reader.h"
 
-namespace aialgs {
-namespace data {
+namespace aialgs::data {
 
 class Record;
 class Value;
 
-}  // namespace data
-}  // namespace aialgs
+}  // namespace aialgs::data
 
 namespace mlio {
 inline namespace abi_v1 {
@@ -38,62 +36,62 @@ inline namespace abi_v1 {
 /// @addtogroup data_readers Data Readers
 /// @{
 
-/// Represents a @ref data_reader for reading Amazon SageMaker
+/// Represents a @ref Data_reader for reading Amazon SageMaker
 /// RecordIO-protobuf datasets.
-class MLIO_API recordio_protobuf_reader final : public parallel_data_reader {
-    class decoder_state;
-    class decoder;
-
+class MLIO_API Recordio_protobuf_reader final : public Parallel_data_reader {
 public:
-    explicit recordio_protobuf_reader(data_reader_params prm);
+    explicit Recordio_protobuf_reader(Data_reader_params params);
 
-    recordio_protobuf_reader(const recordio_protobuf_reader &) = delete;
+    Recordio_protobuf_reader(const Recordio_protobuf_reader &) = delete;
 
-    recordio_protobuf_reader(recordio_protobuf_reader &&) = delete;
+    Recordio_protobuf_reader &operator=(const Recordio_protobuf_reader &) = delete;
 
-    ~recordio_protobuf_reader() final;
+    Recordio_protobuf_reader(Recordio_protobuf_reader &&) = delete;
 
-public:
-    recordio_protobuf_reader &operator=(const recordio_protobuf_reader &) = delete;
+    Recordio_protobuf_reader &operator=(Recordio_protobuf_reader &&) = delete;
 
-    recordio_protobuf_reader &operator=(recordio_protobuf_reader &&) = delete;
+    ~Recordio_protobuf_reader() final;
 
 private:
-    MLIO_HIDDEN
-    intrusive_ptr<record_reader> make_record_reader(const data_store &ds) final;
+    class Decoder_state;
+    class Decoder;
 
     MLIO_HIDDEN
-    intrusive_ptr<schema const> infer_schema(std::optional<instance> const &ins) final;
+    Intrusive_ptr<Record_reader> make_record_reader(const Data_store &store) final;
 
     MLIO_HIDDEN
-    attribute
-    make_attribute(const instance &ins, const std::string &name, const aialgs::data::Value &value);
+    Intrusive_ptr<const Schema> infer_schema(const std::optional<Instance> &instance) final;
 
-    template<data_type dt, typename ProtobufTensor>
     MLIO_HIDDEN
-    attribute
-    make_attribute(const instance &ins, const std::string &name, const ProtobufTensor &tsr);
+    Attribute make_attribute(const Instance &instance,
+                             const std::string &name,
+                             const aialgs::data::Value &value);
 
-    template<typename ProtobufTensor>
+    template<Data_type dt, typename Protobuf_tensor>
     MLIO_HIDDEN
-    void copy_shape(const instance &ins,
+    Attribute make_attribute(const Instance &instance,
+                             const std::string &name,
+                             const Protobuf_tensor &tensor);
+
+    template<typename Protobuf_tensor>
+    MLIO_HIDDEN
+    void copy_shape(const Instance &instance,
                     const std::string &name,
-                    size_vector &shp,
-                    const ProtobufTensor &tsr);
+                    Size_vector &shape,
+                    const Protobuf_tensor &tensor);
 
     MLIO_HIDDEN
-    intrusive_ptr<example> decode(const instance_batch &batch) const final;
+    Intrusive_ptr<Example> decode(const Instance_batch &batch) const final;
 
     MLIO_HIDDEN
-    std::optional<std::size_t> decode_ser(decoder_state &state, const instance_batch &batch) const;
+    std::optional<std::size_t> decode_serial(Decoder_state &state, const Instance_batch &batch) const;
 
     MLIO_HIDDEN
-    std::optional<std::size_t> decode_prl(decoder_state &state, const instance_batch &batch) const;
+    std::optional<std::size_t> decode_parallel(Decoder_state &state, const Instance_batch &batch) const;
 
     MLIO_HIDDEN
-    static const aialgs::data::Record *parse_proto(const instance &ins);
+    static const aialgs::data::Record *parse_proto(const Instance &instance);
 
-private:
     bool has_sparse_feature_{};
     std::size_t num_values_per_instance_{};
 };

@@ -30,41 +30,43 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-struct sagemaker_pipe_input_stream_access;
+struct Sagemaker_pipe_input_stream_access;
 
 }  // namespace detail
 
 /// @addtogroup streams Streams
 /// @{
 
-class MLIO_API sagemaker_pipe_input_stream final : public input_stream_base {
-    friend struct detail::sagemaker_pipe_input_stream_access;
-
-private:
-    explicit sagemaker_pipe_input_stream(std::string &&pathname,
-                                         std::chrono::seconds timeout,
-                                         std::optional<std::size_t> fifo_id);
+class MLIO_API Sagemaker_pipe_input_stream final : public Input_stream_base {
+    friend struct detail::Sagemaker_pipe_input_stream_access;
 
 public:
-    sagemaker_pipe_input_stream(const sagemaker_pipe_input_stream &) = delete;
+    Sagemaker_pipe_input_stream(const Sagemaker_pipe_input_stream &) = delete;
 
-    sagemaker_pipe_input_stream(sagemaker_pipe_input_stream &&) = delete;
+    Sagemaker_pipe_input_stream &operator=(const Sagemaker_pipe_input_stream &) = delete;
 
-    ~sagemaker_pipe_input_stream() final;
+    Sagemaker_pipe_input_stream(Sagemaker_pipe_input_stream &&) = delete;
 
-public:
-    sagemaker_pipe_input_stream &operator=(const sagemaker_pipe_input_stream &) = delete;
+    Sagemaker_pipe_input_stream &operator=(Sagemaker_pipe_input_stream &&) = delete;
 
-    sagemaker_pipe_input_stream &operator=(sagemaker_pipe_input_stream &&) = delete;
+    ~Sagemaker_pipe_input_stream() final;
 
-public:
-    using input_stream_base::read;
+    using Input_stream_base::read;
 
-    std::size_t read(mutable_memory_span dest) final;
+    std::size_t read(Mutable_memory_span destination) final;
 
     void close() noexcept final;
 
+    bool closed() const noexcept final
+    {
+        return !fifo_fd_.is_open();
+    }
+
 private:
+    explicit Sagemaker_pipe_input_stream(std::string &&path,
+                                         std::chrono::seconds timeout,
+                                         std::optional<std::size_t> fifo_id);
+
     MLIO_HIDDEN
     void open_fifo();
 
@@ -77,24 +79,17 @@ private:
     MLIO_HIDDEN
     void check_if_closed() const;
 
-public:
-    bool closed() const noexcept final
-    {
-        return !fifo_fd_.is_open();
-    }
-
-private:
-    std::string pathname_;
+    std::string path_;
     std::ptrdiff_t fifo_id_ = -1;
-    detail::file_descriptor fifo_fd_{};
+    detail::File_descriptor fifo_fd_{};
     std::chrono::seconds timeout_;
 };
 
 inline constexpr std::chrono::seconds sagemaker_pipe_default_timeout{60};
 
 MLIO_API
-intrusive_ptr<sagemaker_pipe_input_stream>
-make_sagemaker_pipe_input_stream(std::string pathname,
+Intrusive_ptr<Sagemaker_pipe_input_stream>
+make_sagemaker_pipe_input_stream(std::string path,
                                  std::chrono::seconds timeout = sagemaker_pipe_default_timeout,
                                  std::optional<std::size_t> fifo_id = {});
 

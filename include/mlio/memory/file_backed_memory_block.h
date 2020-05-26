@@ -27,37 +27,24 @@ inline namespace abi_v1 {
 /// @addtogroup memory Memory
 /// @{
 
-/// Represents a memory block backed by a temporary file instead of the
+/// Represents a memory block backed by a temporary File instead of the
 /// process heap.
-class MLIO_API file_backed_memory_block final : public mutable_memory_block {
+class MLIO_API File_backed_memory_block final : public Mutable_memory_block {
 public:
-    explicit file_backed_memory_block(size_type size);
+    explicit File_backed_memory_block(size_type size);
 
-    file_backed_memory_block(const file_backed_memory_block &) = delete;
+    File_backed_memory_block(const File_backed_memory_block &) = delete;
 
-    file_backed_memory_block(file_backed_memory_block &&) = delete;
+    File_backed_memory_block &operator=(const File_backed_memory_block &) = delete;
 
-    ~file_backed_memory_block() final;
+    File_backed_memory_block(File_backed_memory_block &&) = delete;
 
-public:
-    file_backed_memory_block &operator=(const file_backed_memory_block &) = delete;
+    File_backed_memory_block &operator=(File_backed_memory_block &&) = delete;
 
-    file_backed_memory_block &operator=(file_backed_memory_block &&) = delete;
+    ~File_backed_memory_block() final;
 
-public:
     void resize(size_type size) final;
 
-private:
-    MLIO_HIDDEN
-    void make_temporary_file();
-
-    MLIO_HIDDEN
-    std::byte *init_memory_map(std::size_t size);
-
-    MLIO_HIDDEN
-    static void validate_mapped_address(void *addr);
-
-public:
     pointer data() noexcept final
     {
         return data_;
@@ -79,7 +66,16 @@ public:
     }
 
 private:
-    detail::file_descriptor fd_{};
+    MLIO_HIDDEN
+    void make_temporary_file();
+
+    MLIO_HIDDEN
+    std::byte *init_memory_map(std::size_t size);
+
+    MLIO_HIDDEN
+    static void validate_mapped_address(void *addr);
+
+    detail::File_descriptor fd_{};
     std::byte *data_{};
     std::size_t size_{};
 };

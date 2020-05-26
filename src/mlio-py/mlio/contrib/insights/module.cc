@@ -29,7 +29,7 @@
 #include "column_analyzer.h"
 #include "column_statistics.h"
 
-PYBIND11_DECLARE_HOLDER_TYPE(T, mlio::intrusive_ptr<T>, true);
+PYBIND11_DECLARE_HOLDER_TYPE(T, mlio::Intrusive_ptr<T>, true);
 
 namespace py = pybind11;
 
@@ -38,23 +38,23 @@ using namespace pybind11::literals;
 namespace pymlio {
 namespace {
 
-data_analysis analyze_dataset(mlio::data_reader &reader,
-                              std::unordered_set<std::string> const &null_like_values,
-                              std::unordered_set<size_t> const &capture_columns,
+data_analysis analyze_dataset(mlio::Data_reader &reader,
+                              const std::unordered_set<std::string> &null_like_values,
+                              const std::unordered_set<size_t> &capture_columns,
                               std::size_t max_capture_count)
 {
-    mlio::intrusive_ptr<mlio::example> exm = reader.peek_example();
-    if (exm == nullptr) {
-        throw pybind11::stop_iteration("Reached end of file without reading an example.");
+    mlio::Intrusive_ptr<mlio::Example> example = reader.peek_example();
+    if (example == nullptr) {
+        throw pybind11::stop_iteration("Reached end of File without reading an Example.");
     }
 
     // Set up the column_analsis objects to store the collected
     // information.
-    std::vector<column_analysis> column_stats;
-    column_stats.reserve(exm->features().size());
+    std::vector<Column_analysis> column_stats;
+    column_stats.reserve(example->features().size());
 
-    for (const mlio::attribute &attr : exm->get_schema().attributes()) {
-        if (attr.sparse() || attr.dtype() != mlio::data_type::string) {
+    for (const mlio::Attribute &attr : example->schema().attributes()) {
+        if (attr.sparse() || attr.data_type() != mlio::Data_type::string) {
             throw std::runtime_error("Data insights only works with dense string tensors.");
         }
 
@@ -63,11 +63,11 @@ data_analysis analyze_dataset(mlio::data_reader &reader,
 
     std::vector<std::string> null_like_list{null_like_values.begin(), null_like_values.end()};
 
-    column_analyzer analyzer{column_stats, null_like_list, capture_columns, max_capture_count};
+    Column_analyzer analyzer{column_stats, null_like_list, capture_columns, max_capture_count};
 
     // Iterate over the entire dataset.
-    while ((exm = reader.read_example())) {
-        analyzer.analyze(*exm);
+    while ((example = reader.read_example())) {
+        analyzer.analyze(*example);
     }
 
     auto max_len = std::numeric_limits<std::size_t>::max();
@@ -89,36 +89,36 @@ data_analysis analyze_dataset(mlio::data_reader &reader,
 
 PYBIND11_MODULE(insights, m)
 {
-    std::vector<std::pair<const char *, double column_analysis::*>> double_stat_names = {
-        {"numeric_finite_mean", &column_analysis::numeric_finite_mean},
-        {"numeric_finite_min", &column_analysis::numeric_finite_min},
-        {"numeric_finite_max", &column_analysis::numeric_finite_max},
+    std::vector<std::pair<const char *, double Column_analysis::*>> double_stat_names = {
+        {"numeric_finite_mean", &Column_analysis::numeric_finite_mean},
+        {"numeric_finite_min", &Column_analysis::numeric_finite_min},
+        {"numeric_finite_max", &Column_analysis::numeric_finite_max},
     };
 
-    std::vector<std::pair<const char *, size_t column_analysis::*>> long_stat_names = {
-        {"rows_seen", &column_analysis::rows_seen},
-        {"numeric_count", &column_analysis::numeric_count},
-        {"numeric_finite_count", &column_analysis::numeric_count},
-        {"numeric_nan_count", &column_analysis::numeric_nan_count},
-        {"string_empty_count", &column_analysis::str_empty_count},
-        {"string_min_length", &column_analysis::str_min_length},
-        {"string_min_length_not_empty", &column_analysis::str_min_length_not_empty},
-        {"string_max_length", &column_analysis::str_max_length},
-        {"string_only_whitespace_count", &column_analysis::str_only_whitespace_count},
-        {"string_null_like_count", &column_analysis::str_null_like_count},
+    std::vector<std::pair<const char *, size_t Column_analysis::*>> long_stat_names = {
+        {"rows_seen", &Column_analysis::rows_seen},
+        {"numeric_count", &Column_analysis::numeric_count},
+        {"numeric_finite_count", &Column_analysis::numeric_count},
+        {"numeric_nan_count", &Column_analysis::numeric_nan_count},
+        {"string_empty_count", &Column_analysis::str_empty_count},
+        {"string_min_length", &Column_analysis::str_min_length},
+        {"string_min_length_not_empty", &Column_analysis::str_min_length_not_empty},
+        {"string_max_length", &Column_analysis::str_max_length},
+        {"string_only_whitespace_count", &Column_analysis::str_only_whitespace_count},
+        {"string_null_like_count", &Column_analysis::str_null_like_count},
     };
 
-    std::vector<std::pair<const char *, std::string column_analysis::*>> str_stat_names = {
-        {"example_value", &column_analysis::example_value},
+    std::vector<std::pair<const char *, std::string Column_analysis::*>> str_stat_names = {
+        {"example_value", &Column_analysis::example_value},
     };
 
-    auto ca_class = py::class_<column_analysis>(m, "ColumnAnalysis");
+    auto ca_class = py::class_<Column_analysis>(m, "ColumnAnalysis");
 
-    ca_class.def_readwrite("column_name", &column_analysis::column_name);
+    ca_class.def_readwrite("column_name", &Column_analysis::column_name);
     ca_class.def_readwrite("string_captured_unique_values",
-                           &column_analysis::str_captured_unique_values);
+                           &Column_analysis::str_captured_unique_values);
     ca_class.def_readwrite("string_captured_unique_values_overflowed",
-                           &column_analysis::str_captured_unique_values_overflowed);
+                           &Column_analysis::str_captured_unique_values_overflowed);
 
     for (auto &[name, method] : long_stat_names) {
         ca_class.def_readwrite(name, method);
@@ -130,9 +130,9 @@ PYBIND11_MODULE(insights, m)
         ca_class.def_readwrite(name, method);
     }
 
-    ca_class.def("estimate_string_cardinality", &column_analysis::estimate_string_cardinality);
+    ca_class.def("estimate_string_cardinality", &Column_analysis::estimate_string_cardinality);
 
-    ca_class.def("to_dict", [=](const column_analysis &self) {
+    ca_class.def("to_dict", [=](const Column_analysis &self) {
         py::dict result{};
 
         for (auto &[name, method] : long_stat_names) {
@@ -155,7 +155,7 @@ PYBIND11_MODULE(insights, m)
         return result;
     });
 
-    ca_class.def("__repr__", [](const column_analysis &self) {
+    ca_class.def("__repr__", [](const Column_analysis &self) {
         return "ColumnAnalysis(" + self.column_name + ")";
     });
 

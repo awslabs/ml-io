@@ -27,15 +27,14 @@ inline namespace abi_v1 {
 /// @addtogroup streams Streams
 /// @{
 
-class MLIO_API input_stream_base : public input_stream {
+class MLIO_API Input_stream_base : public Input_stream {
 public:
-    using input_stream::read;
+    using Input_stream::read;
 
-    memory_slice read(std::size_t size) override;
+    Memory_slice read(std::size_t size) override;
 
     void seek(std::size_t position) override;
 
-public:
     std::size_t size() const override;
 
     std::size_t position() const override;

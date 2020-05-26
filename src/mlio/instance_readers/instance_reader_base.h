@@ -25,21 +25,20 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-class instance_reader_base : public instance_reader {
+class Instance_reader_base : public Instance_reader {
 public:
-    std::optional<instance> read_instance() final;
+    std::optional<Instance> read_instance() final;
 
-    std::optional<instance> peek_instance() final;
+    std::optional<Instance> peek_instance() final;
 
     void reset() noexcept final;
 
 private:
-    virtual std::optional<instance> read_instance_core() = 0;
+    virtual std::optional<Instance> read_instance_core() = 0;
 
     virtual void reset_core() noexcept = 0;
 
-private:
-    std::optional<instance> peeked_instance_{};
+    std::optional<Instance> peeked_instance_{};
 };
 
 }  // namespace detail

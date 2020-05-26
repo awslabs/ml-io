@@ -26,56 +26,52 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-class csv_record_tokenizer {
-private:
-    enum class parser_state { new_field, in_field, in_quoted_field, quote_in_quoted_field };
-
+class Csv_record_tokenizer {
 public:
-    explicit csv_record_tokenizer(const csv_params &prm) noexcept : csv_record_tokenizer{prm, {}}
+    explicit Csv_record_tokenizer(const Csv_params &params) noexcept
+        : Csv_record_tokenizer{params, {}}
     {}
 
-    explicit csv_record_tokenizer(const csv_params &prm, memory_span blob) noexcept
-        : text_{as_span<char const>(blob)}
-        , delimiter_{prm.delimiter}
-        , quote_char_{prm.quote_char}
-        , max_field_length_{prm.max_field_length}
+    explicit Csv_record_tokenizer(const Csv_params &params, Memory_span blob) noexcept
+        : text_{as_span<const char>(blob)}
+        , delimiter_{params.delimiter}
+        , quote_char_{params.quote_char}
+        , max_field_length_{params.max_field_length}
     {}
 
-public:
     bool next();
 
-    void reset(memory_span blob);
+    void reset(Memory_span blob);
 
-private:
-    bool try_get_next_char(char &chr) noexcept;
-
-    void push_char(char chr) noexcept;
-
-public:
     const std::string &value() const noexcept
     {
         return value_;
     }
 
-    bool is_truncated() const noexcept
+    bool truncated() const noexcept
     {
-        return is_truncated_;
+        return truncated_;
     }
 
     bool eof() const noexcept
     {
         return eof_;
     }
-
 private:
-    stdx::span<char const> text_{};
-    stdx::span<char const>::iterator text_pos_ = text_.begin();
+    enum class Parser_state { new_field, in_field, in_quoted_field, quote_in_quoted_field };
+
+    bool try_get_next_char(char &chr) noexcept;
+
+    void push_char(char chr) noexcept;
+
+    stdx::span<const char> text_{};
+    stdx::span<const char>::iterator text_pos_ = text_.begin();
     char delimiter_;
     char quote_char_;
     std::optional<std::size_t> max_field_length_{};
     std::string value_{};
-    bool is_truncated_{};
-    bool is_finished_{};
+    bool truncated_{};
+    bool finished_{};
     bool eof_{};
 };
 

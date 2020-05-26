@@ -22,7 +22,7 @@ using namespace mlio;
 
 namespace pymlio {
 
-arrow_buffer::arrow_buffer(memory_slice s) noexcept
+Arrow_buffer::Arrow_buffer(Memory_slice s) noexcept
     : arrow::Buffer{nullptr, 0}, slice_{std::move(s)}
 {
     data_ = reinterpret_cast<const std::uint8_t *>(slice_.data());
@@ -32,6 +32,6 @@ arrow_buffer::arrow_buffer(memory_slice s) noexcept
     capacity_ = size_;
 }
 
-arrow_buffer::~arrow_buffer() = default;
+Arrow_buffer::~Arrow_buffer() = default;
 
 }  // namespace pymlio

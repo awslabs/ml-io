@@ -23,16 +23,16 @@ using namespace pybind11::literals;
 namespace pymlio {
 namespace {
 
-class py_log_message_handler {
+class Py_log_message_handler {
 public:
-    explicit py_log_message_handler(py::function hdl) noexcept : hdl_{std::move(hdl)}
+    explicit Py_log_message_handler(py::function hdl) noexcept : hdl_{std::move(hdl)}
     {}
 
-    py_log_message_handler(const py_log_message_handler &) = default;
+    Py_log_message_handler(const Py_log_message_handler &) = default;
 
-    py_log_message_handler(py_log_message_handler &&) = delete;
+    Py_log_message_handler(Py_log_message_handler &&) = delete;
 
-    ~py_log_message_handler()
+    ~Py_log_message_handler()
     {
         py::gil_scoped_acquire acq_gil;
 
@@ -40,12 +40,12 @@ public:
     }
 
 public:
-    py_log_message_handler &operator=(const py_log_message_handler &) = default;
+    Py_log_message_handler &operator=(const Py_log_message_handler &) = default;
 
-    py_log_message_handler &operator=(py_log_message_handler &&) = delete;
+    Py_log_message_handler &operator=(Py_log_message_handler &&) = delete;
 
 public:
-    void operator()(log_level lvl, std::string_view msg) const
+    void operator()(Log_level lvl, std::string_view msg) const
     {
         py::gil_scoped_acquire acq_gil;
 
@@ -56,11 +56,11 @@ private:
     py::function hdl_;
 };
 
-log_message_handler py_set_log_message_handler(py::function hdl)
+Log_message_handler py_set_log_message_handler(py::function hdl)
 {
-    py_log_message_handler py_hdl{std::move(hdl)};
+    Py_log_message_handler py_hdl{std::move(hdl)};
 
-    return set_log_message_handler([py_hdl](log_level lvl, std::string_view msg) {
+    return set_log_message_handler([py_hdl](Log_level lvl, std::string_view msg) {
         py_hdl(lvl, msg);
     });
 }
@@ -69,11 +69,11 @@ log_message_handler py_set_log_message_handler(py::function hdl)
 
 void register_logging(py::module &m)
 {
-    py::enum_<log_level>(m, "LogLevel")
-        .value("OFF", log_level::off)
-        .value("WARNING", log_level::warning)
-        .value("INFO", log_level::info)
-        .value("DEBUG", log_level::debug);
+    py::enum_<Log_level>(m, "LogLevel")
+        .value("OFF", Log_level::off)
+        .value("WARNING", Log_level::warning)
+        .value("INFO", Log_level::info)
+        .value("DEBUG", Log_level::debug);
 
     m.def("set_log_message_handler",
           &py_set_log_message_handler,

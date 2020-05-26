@@ -32,56 +32,54 @@ inline namespace abi_v1 {
 /// @addtogroup data_stores Data Stores
 /// @{
 
-/// Represents an S3 object as a @ref data_store.
-class MLIO_API s3_object final : public data_store {
+/// Represents an S3 object as a @ref Data_store.
+class MLIO_API S3_object final : public Data_store {
 public:
-    /// @param cmp
-    ///     The compression type of the S3 object. If set to @c infer,
-    ///     the compression will be inferred from the URI.
-    explicit s3_object(intrusive_ptr<s3_client const> client,
+    /// @param compression
+    ///     The Compression type of the S3 object. If set to @c infer,
+    ///     the Compression will be inferred from the URI.
+    explicit S3_object(Intrusive_ptr<const S3_client> client,
                        std::string uri,
                        std::string version_id = {},
-                       compression cmp = compression::infer);
+                       Compression compression = Compression::infer);
 
-public:
-    intrusive_ptr<input_stream> open_read() const final;
+    Intrusive_ptr<Input_stream> open_read() const final;
 
     std::string repr() const final;
 
-public:
     const std::string &id() const final;
 
 private:
-    intrusive_ptr<s3_client const> client_;
+    Intrusive_ptr<const S3_client> client_;
     std::string uri_;
     std::string version_id_;
-    compression compression_;
+    Compression compression_;
     mutable std::string id_{};
 };
 
-struct MLIO_API list_s3_objects_params {
+struct MLIO_API List_s3_objects_params {
     using predicate_callback = std::function<bool(const std::string &)>;
 
     /// The S3 client to use.
-    const s3_client *client{};
+    const S3_client *client{};
     /// The list of URIs to traverse.
-    stdx::span<std::string const> uris{};
+    stdx::span<const std::string> uris{};
     /// The pattern to match the S3 objects against.
     const std::string *pattern{};
     /// The callback function for user-specific filtering.
     const predicate_callback *predicate{};
-    /// The compression type of the S3 objects. If set to @c infer, the
-    /// compression will be inferred from the URIs.
-    compression cmp = compression::infer;
+    /// The Compression type of the S3 objects. If set to @c infer, the
+    /// Compression will be inferred from the URIs.
+    Compression compression = Compression::infer;
 };
 
 /// Lists all S3 objects residing under the specified URIs.
 MLIO_API
-std::vector<intrusive_ptr<data_store>> list_s3_objects(const list_s3_objects_params &prm);
+std::vector<Intrusive_ptr<Data_store>> list_s3_objects(const List_s3_objects_params &params);
 
 MLIO_API
-std::vector<intrusive_ptr<data_store>>
-list_s3_objects(const s3_client &client, const std::string &uri, const std::string &pattern = {});
+std::vector<Intrusive_ptr<Data_store>>
+list_s3_objects(const S3_client &client, const std::string &uri, const std::string &pattern = {});
 
 /// @}
 

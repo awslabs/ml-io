@@ -24,34 +24,31 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-enum class iconv_status { ok, incomplete_char, leftover };
+enum class Iconv_status { ok, incomplete_char, leftover };
 
-class iconv_desc {
+class Iconv_desc {
 public:
-    explicit iconv_desc(text_encoding &&enc);
+    explicit Iconv_desc(Text_encoding &&encoding);
 
-    iconv_desc(const iconv_desc &) = delete;
+    Iconv_desc(const Iconv_desc &) = delete;
 
-    iconv_desc(iconv_desc &&) = delete;
+    Iconv_desc &operator=(const Iconv_desc &) = delete;
 
-    ~iconv_desc();
+    Iconv_desc(Iconv_desc &&) = delete;
 
-public:
-    iconv_desc &operator=(const iconv_desc &) = delete;
+    Iconv_desc &operator=(Iconv_desc &&) = delete;
 
-    iconv_desc &operator=(iconv_desc &&) = delete;
+    ~Iconv_desc();
 
-public:
-    iconv_status convert(memory_span &inp, mutable_memory_span &out);
+    Iconv_status convert(Memory_span &inp, Mutable_memory_span &out);
 
-public:
-    const text_encoding &encoding() const noexcept
+    const Text_encoding &encoding() const noexcept
     {
         return encoding_;
     }
 
 private:
-    text_encoding encoding_;
+    Text_encoding encoding_;
     ::iconv_t desc_;
 };
 

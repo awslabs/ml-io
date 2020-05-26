@@ -22,17 +22,17 @@ inline namespace abi_v1 {
 namespace detail {
 
 template<typename T, typename = void>
-struct is_container_helper : std::false_type {};
+struct Is_container_helper : std::false_type {};
 
 template<typename T>
-struct is_container_helper<
+struct Is_container_helper<
     T,
     std::void_t<decltype(std::declval<T>().data()), decltype(std::declval<T>().size())>>
     : std::true_type {};
 
 /// Checks if T is a container having data() and size() accessors.
 template<typename T>
-struct is_container : detail::is_container_helper<T> {};
+struct Is_container : detail::Is_container_helper<T> {};
 
 }  // namespace detail
 }  // namespace abi_v1

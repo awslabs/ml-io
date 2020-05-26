@@ -19,16 +19,16 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-std::optional<instance> instance_reader_base::read_instance()
+std::optional<Instance> Instance_reader_base::read_instance()
 {
-    std::optional<instance> ins{};
+    std::optional<Instance> instance{};
     if (peeked_instance_) {
         return std::exchange(peeked_instance_, std::nullopt);
     }
     return read_instance_core();
 }
 
-std::optional<instance> instance_reader_base::peek_instance()
+std::optional<Instance> Instance_reader_base::peek_instance()
 {
     if (peeked_instance_ == std::nullopt) {
         peeked_instance_ = read_instance_core();
@@ -36,7 +36,7 @@ std::optional<instance> instance_reader_base::peek_instance()
     return peeked_instance_;
 }
 
-void instance_reader_base::reset() noexcept
+void Instance_reader_base::reset() noexcept
 {
     reset_core();
 

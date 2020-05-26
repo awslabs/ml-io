@@ -18,9 +18,9 @@
 namespace mlio {
 inline namespace abi_v1 {
 
-memory_block::~memory_block() = default;
+Memory_block::~Memory_block() = default;
 
-mutable_memory_block::~mutable_memory_block() = default;
+Mutable_memory_block::~Mutable_memory_block() = default;
 
 }  // namespace abi_v1
 }  // namespace mlio

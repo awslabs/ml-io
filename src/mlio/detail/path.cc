@@ -13,7 +13,7 @@
  * language governing permissions and limitations under the License.
  */
 
-#include "mlio/detail/pathname.h"
+#include "mlio/detail/path.h"
 
 #include <stdexcept>
 
@@ -21,14 +21,14 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-void validate_file_pathname(std::string_view pathname)
+void validate_file_path(std::string_view path)
 {
-    if (pathname.empty()) {
-        throw std::invalid_argument{"The pathname cannot be an empty string."};
+    if (path.empty()) {
+        throw std::invalid_argument{"The path cannot be an empty string."};
     }
 
-    if (pathname.back() == '/' || pathname.back() == '\\') {
-        throw std::invalid_argument{"The pathname cannot point to a directory."};
+    if (path.back() == '/' || path.back() == '\\') {
+        throw std::invalid_argument{"The path cannot point to a directory."};
     }
 }
 

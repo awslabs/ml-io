@@ -35,207 +35,192 @@ inline namespace abi_v1 {
 /// @{
 
 /// Represents a vector for dimension data.
-using size_vector = std::vector<std::size_t>;
+using Size_vector = std::vector<std::size_t>;
 
 /// Represents a vector for dimension data that can be negative such as
 /// strides.
-using ssize_vector = std::vector<std::ptrdiff_t>;
+using Ssize_vector = std::vector<std::ptrdiff_t>;
 
 /// Represents a multi-dimensional array.
 ///
 /// This is an abstract class that only defines the data type and shape
-/// of a tensor. Derived types specify how the tensor data is laid out
+/// of a Tensor. Derived types specify how the Tensor data is laid out
 /// in memory.
-class MLIO_API tensor : public intrusive_ref_counter<tensor> {
-    friend attribute;
-
-protected:
-    explicit tensor(data_type dt, size_vector &&shape, ssize_vector &&strides);
+class MLIO_API Tensor : public Intrusive_ref_counter<Tensor> {
+    friend Attribute;
 
 public:
-    tensor(const tensor &) = delete;
+    Tensor(const Tensor &) = delete;
 
-    tensor(tensor &&) = delete;
+    Tensor &operator=(const Tensor &) = delete;
 
-    virtual ~tensor();
+    Tensor(Tensor &&) = delete;
 
-public:
-    tensor &operator=(const tensor &) = delete;
+    Tensor &operator=(Tensor &&) = delete;
 
-    tensor &operator=(tensor &&) = delete;
+    virtual ~Tensor();
 
-private:
-    static ssize_vector default_strides(const size_vector &shape);
-
-public:
     virtual std::string repr() const = 0;
 
-public:
-    data_type dtype() const noexcept
+    Data_type data_type() const noexcept
     {
         return data_type_;
     }
 
-    const size_vector &shape() const noexcept
+    const Size_vector &shape() const noexcept
     {
         return shape_;
     }
 
-    const ssize_vector &strides() const noexcept
+    const Ssize_vector &strides() const noexcept
     {
         return strides_;
     }
 
-public:
-    /// Invokes the specific visit function for this tensor type.
-    virtual void accept(tensor_visitor &vst) = 0;
+    /// Invokes the specific visit function for this Tensor type.
+    virtual void accept(Tensor_visitor &visitor) = 0;
 
-    virtual void accept(tensor_visitor &vst) const = 0;
+    virtual void accept(Tensor_visitor &visitor) const = 0;
+
+protected:
+    explicit Tensor(Data_type dt, Size_vector &&shape, Ssize_vector &&strides);
 
 private:
-    data_type data_type_;
-    size_vector shape_;
-    ssize_vector strides_;
+    static Ssize_vector default_strides(const Size_vector &shape);
+
+    Data_type data_type_;
+    Size_vector shape_;
+    Ssize_vector strides_;
 };
 
 MLIO_API
-inline std::ostream &operator<<(std::ostream &strm, const tensor &tsr)
+inline std::ostream &operator<<(std::ostream &s, const Tensor &tensor)
 {
-    return strm << tsr.repr();
+    return s << tensor.repr();
 }
 
-/// Represents a tensor that stores its data in a contiguous memory
+/// Represents a Tensor that stores its data in a contiguous memory
 /// block.
-class MLIO_API dense_tensor final : public tensor {
+class MLIO_API Dense_tensor final : public Tensor {
 public:
     /// @param data
-    ///     A @ref device_array that holds the data of the tensor.
+    ///     A @ref Device_array that holds the data of the Tensor.
     /// @param strides
     ///     An array of the same length as @p shape giving the number
     ///     of elements to skip to get to a new element in each
     ///     dimension.
-    explicit dense_tensor(size_vector shape,
-                          std::unique_ptr<device_array> &&data,
-                          ssize_vector strides = {});
+    explicit Dense_tensor(Size_vector shape,
+                          std::unique_ptr<Device_array> &&data,
+                          Ssize_vector strides = {});
+
+    std::string repr() const final;
+
+    Device_array_span data() noexcept
+    {
+        return Device_array_span{*data_};
+    }
+
+    Device_array_view data() const noexcept
+    {
+        return Device_array_view{*data_};
+    }
+
+    void accept(Tensor_visitor &visitor) final;
+
+    void accept(Tensor_visitor &visitor) const final;
 
 private:
     void validate_data_size() const;
 
-public:
-    std::string repr() const final;
-
-public:
-    device_array_span data() noexcept
-    {
-        return device_array_span{*data_};
-    }
-
-    device_array_view data() const noexcept
-    {
-        return device_array_view{*data_};
-    }
-
-public:
-    void accept(tensor_visitor &vst) final;
-
-    void accept(tensor_visitor &vst) const final;
-
-private:
-    std::unique_ptr<device_array> data_;
+    std::unique_ptr<Device_array> data_;
 };
 
-/// Represents a tensor that stores its data in coordinate format.
-class MLIO_API coo_tensor final : public tensor {
+/// Represents a Tensor that stores its data in coordinate format.
+class MLIO_API Coo_tensor final : public Tensor {
 public:
-    /// @param coords
+    /// @param coordinates
     ///     A vector of indices per dimension indicating where the
     ///     corresponding data element is stored.
-    explicit coo_tensor(size_vector shape,
-                        std::unique_ptr<device_array> &&data,
-                        std::vector<std::unique_ptr<device_array>> &&coords);
+    explicit Coo_tensor(Size_vector shape,
+                        std::unique_ptr<Device_array> &&data,
+                        std::vector<std::unique_ptr<Device_array>> &&coordinates);
 
-public:
     std::string repr() const final;
 
-public:
-    device_array_span data() noexcept
+    Device_array_span data() noexcept
     {
-        return device_array_span{*data_};
+        return Device_array_span{*data_};
     }
 
-    device_array_view data() const noexcept
+    Device_array_view data() const noexcept
     {
-        return device_array_view{*data_};
+        return Device_array_view{*data_};
     }
 
-    device_array_span indices(std::size_t dim) noexcept
-    {
-        return *coordinates_.at(dim);
-    }
-
-    device_array_view indices(std::size_t dim) const noexcept
+    Device_array_span indices(std::size_t dim) noexcept
     {
         return *coordinates_.at(dim);
     }
 
-public:
-    void accept(tensor_visitor &vst) final;
+    Device_array_view indices(std::size_t dim) const noexcept
+    {
+        return *coordinates_.at(dim);
+    }
 
-    void accept(tensor_visitor &vst) const final;
+    void accept(Tensor_visitor &visitor) final;
+
+    void accept(Tensor_visitor &visitor) const final;
 
 private:
-    std::unique_ptr<device_array> data_;
-    std::vector<std::unique_ptr<device_array>> coordinates_;
+    std::unique_ptr<Device_array> data_;
+    std::vector<std::unique_ptr<Device_array>> coordinates_;
 };
 
-/// Represents a tensor that stores its data as a Compressed Sparse Row
+/// Represents a Tensor that stores its data as a Compressed Sparse Row
 /// matrix.
-class MLIO_API csr_tensor final : public tensor {
+class MLIO_API Csr_tensor final : public Tensor {
 public:
     /// @param data
-    ///     A @ref device_array that holds the data of the tensor.
+    ///     A @ref Device_array that holds the data of the Tensor.
     /// @param indices
-    ///     The index array of the tensor.
+    ///     The index array of the Tensor.
     /// @param indptr
-    ///     The index pointer array of the tensor.
-    explicit csr_tensor(size_vector shape,
-                        std::unique_ptr<device_array> &&data,
-                        std::unique_ptr<device_array> &&indices,
-                        std::unique_ptr<device_array> &&indptr);
+    ///     The index pointer array of the Tensor.
+    explicit Csr_tensor(Size_vector shape,
+                        std::unique_ptr<Device_array> &&data,
+                        std::unique_ptr<Device_array> &&indices,
+                        std::unique_ptr<Device_array> &&indptr);
 
-public:
     std::string repr() const final;
 
-public:
-    device_array_span data() noexcept
+    Device_array_span data() noexcept
     {
-        return device_array_span{*data_};
+        return Device_array_span{*data_};
     }
 
-    device_array_view data() const noexcept
+    Device_array_view data() const noexcept
     {
-        return device_array_view{*data_};
+        return Device_array_view{*data_};
     }
 
-    device_array_view indices() const noexcept
+    Device_array_view indices() const noexcept
     {
-        return device_array_view{*indices_};
+        return Device_array_view{*indices_};
     }
 
-    device_array_view indptr() const noexcept
+    Device_array_view indptr() const noexcept
     {
-        return device_array_view{*indptr_};
+        return Device_array_view{*indptr_};
     }
 
-public:
-    void accept(tensor_visitor &vst) final;
+    void accept(Tensor_visitor &visitor) final;
 
-    void accept(tensor_visitor &vst) const final;
+    void accept(Tensor_visitor &visitor) const final;
 
 private:
-    std::unique_ptr<device_array> data_;
-    std::unique_ptr<device_array> indices_;
-    std::unique_ptr<device_array> indptr_;
+    std::unique_ptr<Device_array> data_;
+    std::unique_ptr<Device_array> indices_;
+    std::unique_ptr<Device_array> indptr_;
 };
 
 /// @}

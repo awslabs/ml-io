@@ -21,7 +21,7 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-memory_slice in_memory_chunk_reader::read_chunk(memory_span)
+Memory_slice In_memory_chunk_reader::read_chunk(Memory_span)
 {
     return std::exchange(chunk_, {});
 }

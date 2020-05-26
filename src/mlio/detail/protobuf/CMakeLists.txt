@@ -4,15 +4,15 @@
 
 protobuf_generate_cpp(
     #SRCS
-        _PROTOBUF_CPP_SRCS
+        _PROTOBUF_CXX_SRCS
     #HDRS
-        _PROTOBUF_CPP_HDRS
+        _PROTOBUF_CXX_HDRS
     #PROTOS
         recordio_protobuf.proto
 )
 
 add_library(mlio-protobuf OBJECT
-    ${_PROTOBUF_CPP_SRCS}
+    ${_PROTOBUF_CXX_SRCS}
 )
 
 target_link_libraries(mlio-protobuf

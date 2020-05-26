@@ -25,24 +25,22 @@ inline namespace abi_v1 {
 /// @{
 
 /// Represents an unowned external memory block.
-class MLIO_API external_memory_block final : public memory_block {
+class MLIO_API External_memory_block final : public Memory_block {
 public:
-    explicit external_memory_block(const_pointer data, size_type size) noexcept
+    explicit External_memory_block(const_pointer data, size_type size) noexcept
         : data_{data}, size_{size}
     {}
 
-    external_memory_block(const external_memory_block &) = delete;
+    External_memory_block(const External_memory_block &) = delete;
 
-    external_memory_block(external_memory_block &&) = delete;
+    External_memory_block &operator=(const External_memory_block &) = delete;
 
-    ~external_memory_block() override;
+    External_memory_block(External_memory_block &&) = delete;
 
-public:
-    external_memory_block &operator=(const external_memory_block &) = delete;
+    External_memory_block &operator=(External_memory_block &&) = delete;
 
-    external_memory_block &operator=(external_memory_block &&) = delete;
+    ~External_memory_block() override;
 
-public:
     const_pointer data() const noexcept final
     {
         return data_;

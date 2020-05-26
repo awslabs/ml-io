@@ -31,28 +31,25 @@ inline namespace abi_v1 {
 /// @{
 
 /// Represents a memory region of a specific data type that is stored on
-/// a @ref device.
-class MLIO_API device_array {
+/// a @ref Device.
+class MLIO_API Device_array {
 public:
-    device_array() noexcept = default;
+    Device_array() noexcept = default;
 
-    device_array(const device_array &) = delete;
+    Device_array(const Device_array &) = delete;
 
-    device_array(device_array &&) = delete;
+    Device_array &operator=(const Device_array &) = delete;
 
-    virtual ~device_array();
+    Device_array(Device_array &&) = delete;
 
-public:
-    device_array &operator=(const device_array &) = delete;
+    Device_array &operator=(Device_array &&) = delete;
 
-    device_array &operator=(device_array &&) = delete;
+    virtual ~Device_array();
 
-public:
-    virtual std::unique_ptr<device_array> clone() const = 0;
+    virtual std::unique_ptr<Device_array> clone() const = 0;
 
-public:
     /// @remark
-    ///     The returned pointer is device specific and might not be
+    ///     The returned pointer is Device specific and might not be
     ///     be accessible in all contexts.
     virtual void *data() noexcept = 0;
 
@@ -62,9 +59,9 @@ public:
 
     [[nodiscard]] virtual bool empty() const noexcept = 0;
 
-    virtual data_type dtype() const noexcept = 0;
+    virtual Data_type data_type() const noexcept = 0;
 
-    virtual device get_device() const noexcept = 0;
+    virtual Device device() const noexcept = 0;
 };
 
 /// @remark
@@ -73,38 +70,37 @@ public:
 ///     cause memory corruption.
 template<typename T>
 MLIO_API
-stdx::span<T> as_span(device_array &arr) noexcept
+stdx::span<T> as_span(Device_array &arr) noexcept
 {
     return {static_cast<T *>(arr.data()), arr.size()};
 }
 
 template<typename T>
 MLIO_API
-stdx::span<T const> as_span(const device_array &arr) noexcept
+stdx::span<const T> as_span(const Device_array &arr) noexcept
 {
     return {static_cast<const T *>(arr.data()), arr.size()};
 }
 
-/// Represents a span that wraps a device array.
+/// Represents a span that wraps a Device array.
 template<typename Arr>
-class MLIO_API basic_device_array_span {
+class MLIO_API Basic_device_array_span {
     template<typename>
-    friend class basic_device_array_span;
+    friend class Basic_device_array_span;
 
 public:
     // NOLINTNEXTLINE(google-explicit-constructor)
-    basic_device_array_span(Arr &arr) noexcept : arr_{&arr}
+    Basic_device_array_span(Arr &arr) noexcept : arr_{&arr}
     {}
 
     template<typename U>
     // NOLINTNEXTLINE(google-explicit-constructor)
-    basic_device_array_span(basic_device_array_span<U> const &other) noexcept : arr_{other.arr_}
+    Basic_device_array_span(const Basic_device_array_span<U> &other) noexcept : arr_{other.arr_}
     {
         static_assert(std::is_same<std::add_const_t<U>, Arr>::value,
-                      "A device array view cannot be assigned to a device array span.");
+                      "A Device array view cannot be assigned to a Device array span.");
     }
 
-public:
     auto data() const noexcept
     {
         return arr_->data();
@@ -120,17 +116,16 @@ public:
         return arr_->empty();
     }
 
-    data_type dtype() const noexcept
+    Data_type data_type() const noexcept
     {
-        return arr_->dtype();
+        return arr_->data_type();
     }
 
-    device get_device() const noexcept
+    Device device() const noexcept
     {
-        return arr_->get_device();
+        return arr_->device();
     }
 
-public:
     template<typename T>
     auto as() const noexcept
     {
@@ -141,8 +136,8 @@ private:
     Arr *arr_;
 };
 
-using device_array_span = basic_device_array_span<device_array>;
-using device_array_view = basic_device_array_span<device_array const>;
+using Device_array_span = Basic_device_array_span<Device_array>;
+using Device_array_view = Basic_device_array_span<const Device_array>;
 
 /// @}
 

@@ -25,25 +25,22 @@ inline namespace abi_v1 {
 /// @{
 
 /// Represents a memory block allocated from the process heap.
-class MLIO_API heap_memory_block final : public mutable_memory_block {
+class MLIO_API Heap_memory_block final : public Mutable_memory_block {
 public:
-    explicit heap_memory_block(size_type size);
+    explicit Heap_memory_block(size_type size);
 
-    heap_memory_block(const heap_memory_block &) = delete;
+    Heap_memory_block(const Heap_memory_block &) = delete;
 
-    heap_memory_block(heap_memory_block &&) = delete;
+    Heap_memory_block &operator=(const Heap_memory_block &) = delete;
 
-    ~heap_memory_block() override;
+    Heap_memory_block(Heap_memory_block &&) = delete;
 
-public:
-    heap_memory_block &operator=(const heap_memory_block &) = delete;
+    Heap_memory_block &operator=(Heap_memory_block &&) = delete;
 
-    heap_memory_block &operator=(heap_memory_block &&) = delete;
+    ~Heap_memory_block() override;
 
-public:
     void resize(size_type size) final;
 
-public:
     pointer data() noexcept final
     {
         return data_;

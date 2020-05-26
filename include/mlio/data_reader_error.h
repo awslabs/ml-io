@@ -24,55 +24,49 @@ inline namespace abi_v1 {
 /// @addtogroup data_readers Data Readers
 /// @{
 
-class MLIO_API data_reader_error : public mlio_error {
+class MLIO_API Data_reader_error : public Mlio_error {
 public:
-    using mlio_error::mlio_error;
+    using Mlio_error::Mlio_error;
 
-public:
-    data_reader_error(const data_reader_error &) = default;
+    Data_reader_error(const Data_reader_error &) = default;
 
-    data_reader_error(data_reader_error &&) = default;
+    Data_reader_error &operator=(const Data_reader_error &) = default;
 
-    ~data_reader_error() override;
+    Data_reader_error(Data_reader_error &&) = default;
 
-public:
-    data_reader_error &operator=(const data_reader_error &) = default;
+    Data_reader_error &operator=(Data_reader_error &&) = default;
 
-    data_reader_error &operator=(data_reader_error &&) = default;
+    ~Data_reader_error() override;
 };
 
-class MLIO_API schema_error : public data_reader_error {
+class MLIO_API Schema_error : public Data_reader_error {
 public:
-    using data_reader_error::data_reader_error;
+    using Data_reader_error::Data_reader_error;
 
-public:
-    schema_error(const schema_error &) = default;
+    Schema_error(const Schema_error &) = default;
 
-    schema_error(schema_error &&) = default;
+    Schema_error &operator=(const Schema_error &) = default;
 
-    ~schema_error() override;
+    Schema_error(Schema_error &&) = default;
 
-public:
-    schema_error &operator=(const schema_error &) = default;
+    Schema_error &operator=(Schema_error &&) = default;
 
-    schema_error &operator=(schema_error &&) = default;
+    ~Schema_error() override;
 };
 
-class MLIO_API invalid_instance_error : public data_reader_error {
+class MLIO_API Invalid_instance_error : public Data_reader_error {
 public:
-    using data_reader_error::data_reader_error;
+    using Data_reader_error::Data_reader_error;
 
-public:
-    invalid_instance_error(const invalid_instance_error &) = default;
+    Invalid_instance_error(const Invalid_instance_error &) = default;
 
-    invalid_instance_error(invalid_instance_error &&) = default;
+    Invalid_instance_error &operator=(const Invalid_instance_error &) = default;
 
-    ~invalid_instance_error() override;
+    Invalid_instance_error(Invalid_instance_error &&) = default;
 
-public:
-    invalid_instance_error &operator=(const invalid_instance_error &) = default;
+    Invalid_instance_error &operator=(Invalid_instance_error &&) = default;
 
-    invalid_instance_error &operator=(invalid_instance_error &&) = default;
+    ~Invalid_instance_error() override;
 };
 
 /// @}

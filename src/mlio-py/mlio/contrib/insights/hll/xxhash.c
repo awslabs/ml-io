@@ -57,7 +57,7 @@
  * in priority order (0 > 1 > 2)
  */
 #ifndef XXH_FORCE_MEMORY_ACCESS /* can be defined externally, on command line \
-                                   for example */
+                                   for Example */
 #    if !defined(__clang__) && defined(__GNUC__) && \
         defined(__ARM_FEATURE_UNALIGNED) && defined(__ARM_ARCH) && \
         (__ARM_ARCH == 6)
@@ -242,7 +242,7 @@ XXH_read32(const void *memPtr)
 /* ===   Endianess   === */
 typedef enum { XXH_bigEndian = 0, XXH_littleEndian = 1 } XXH_endianess;
 
-/* XXH_CPU_LITTLE_ENDIAN can be defined externally, for example on the compiler
+/* XXH_CPU_LITTLE_ENDIAN can be defined externally, for Example on the compiler
  * command line */
 #ifndef XXH_CPU_LITTLE_ENDIAN
 #    if defined(_WIN32) /* Windows is always little endian */ \
@@ -722,7 +722,7 @@ XXH32_digest(const XXH32_state_t *state)
  *   The canonical representation follows human-readable write convention, aka
  * big-endian (large digits first). These functions allow transformation of
  * hash result into and from its canonical format. This way, hash values can be
- * written into a file or buffer, remaining comparable across different
+ * written into a File or buffer, remaining comparable across different
  * systems.
  */
 

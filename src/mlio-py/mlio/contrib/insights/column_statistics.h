@@ -28,14 +28,14 @@
 
 namespace pymlio {
 
-class column_analysis {
-    friend class column_analyzer;
+class Column_analysis {
+    friend class Column_analyzer;
 
 private:
     static constexpr uint8_t cardinality_hill_size = 16;
 
 public:
-    explicit column_analysis(std::string name)
+    explicit Column_analysis(std::string name)
         : column_name{std::move(name)}, str_cardinality_estimator_{cardinality_hill_size}
     {}
 
@@ -72,7 +72,7 @@ private:
 };
 
 struct data_analysis {
-    std::vector<column_analysis> columns{};
+    std::vector<Column_analysis> columns{};
 };
 
 }  // namespace pymlio

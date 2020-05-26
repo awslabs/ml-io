@@ -30,58 +30,84 @@
 #include "mlio/instance_readers/instance_reader.h"
 #include "mlio/record_readers/record_reader.h"
 
-using mlio::detail::instance_batch_reader;
+using mlio::detail::Instance_batch_reader;
 
 namespace mlio {
 inline namespace abi_v1 {
 
 // Used as a message in the TBB flow graph.
-struct batch_msg {
-    std::shared_ptr<instance_batch> batch{};
+struct Batch_msg {
+    std::shared_ptr<Instance_batch> batch{};
 };
 
 // Used as a message in the TBB flow graph.
-struct example_msg {
+struct Example_msg {
     std::size_t idx{};
-    intrusive_ptr<example> exm{};
+    Intrusive_ptr<Example> example{};
 };
 
-// Holds the TBB flow graph objects.
-struct parallel_data_reader::graph_data {
+// Holds the internal TBB flow graph objects.
+struct Parallel_data_reader::Graph_data {
     tbb::task_group_context ctx{};
     tbb::flow::graph obj{ctx};
-    tbb::flow::source_node<batch_msg> *src_node{};
+    tbb::flow::source_node<Batch_msg> *src_node{};
     std::vector<std::unique_ptr<tbb::flow::graph_node>> nodes{};
 };
 
-parallel_data_reader::parallel_data_reader(data_reader_params &&prm)
-    : data_reader_base{std::move(prm)}, graph_{std::make_unique<graph_data>()}
-{
-    reader_ = detail::make_instance_reader(params(), [this](const data_store &ds) {
-        return make_record_reader(ds);
-    });
+Parallel_data_reader::~Parallel_data_reader() = default;
 
-    batch_reader_ = std::make_unique<instance_batch_reader>(params(), *reader_);
+std::size_t Parallel_data_reader::num_bytes_read() const noexcept
+{
+    return num_bytes_read_;
 }
 
-parallel_data_reader::~parallel_data_reader() = default;
+Parallel_data_reader::Parallel_data_reader(Data_reader_params &&params)
+    : Data_reader_base{std::move(params)}, graph_{std::make_unique<Graph_data>()}
+{
+    reader_ = detail::make_instance_reader(this->params(), [this](const Data_store &store) {
+        return make_record_reader(store);
+    });
 
-intrusive_ptr<example> parallel_data_reader::read_example_core()
+    batch_reader_ = std::make_unique<Instance_batch_reader>(this->params(), *reader_);
+}
+
+void Parallel_data_reader::stop()
+{
+    if (state_ == Run_state::not_started) {
+        return;
+    }
+
+    read_queue_.clear();
+
+    {
+        std::unique_lock<std::mutex> queue_lock{queue_mutex_};
+
+        graph_->ctx.cancel_group_execution();
+
+        fill_queue_.clear();
+    }
+
+    fill_condition_.notify_one();
+
+    thread_.join();
+}
+
+Intrusive_ptr<Example> Parallel_data_reader::read_example_core()
 {
     ensure_schema_inferred();
 
-    //                   ┌───< read_example_core() <───┐
-    //                   │                             │
-    //                   │                             │
-    //               Fill Queue                    Read Queue
-    //                   │                             │
-    //                   │                             │
-    //                   └─────> Background Thr. >─────┘
+    //               ┌───< read_example_core() <───┐
+    //               │                             │
+    //               │                             │
+    //           Fill Queue                    Read Queue
+    //               │                             │
+    //               │                             │
+    //               └─────> Background Thr. >─────┘
     //
     //
     // The read_example_core function pops the items available in the
     // read queue and swaps the read and fill queues once the read queue
-    // is empty
+    // is empty.
     //
     // The background thread continuously pushes items returned from the
     // flow graph into the fill queue.
@@ -91,11 +117,11 @@ intrusive_ptr<example> parallel_data_reader::read_example_core()
         {
             std::unique_lock<std::mutex> queue_lock{queue_mutex_};
 
-            read_cond_.wait(queue_lock, [this] {
-                return state_ != run_state::running || !fill_queue_.empty();
+            read_condition_.wait(queue_lock, [this] {
+                return state_ != Run_state::running || !fill_queue_.empty();
             });
 
-            if (state_ == run_state::faulted) {
+            if (state_ == Run_state::faulted) {
                 std::rethrow_exception(exception_ptr_);
             }
 
@@ -104,32 +130,32 @@ intrusive_ptr<example> parallel_data_reader::read_example_core()
             swap(read_queue_, fill_queue_);
         }
 
-        fill_cond_.notify_one();
+        fill_condition_.notify_one();
     }
 
     if (read_queue_.empty()) {
         return {};
     }
 
-    intrusive_ptr<example> exm = std::move(read_queue_.front());
+    Intrusive_ptr<Example> example = std::move(read_queue_.front());
 
     read_queue_.pop_front();
 
-    return exm;
+    return example;
 }
 
-void parallel_data_reader::ensure_pipeline_running()
+void Parallel_data_reader::ensure_pipeline_running()
 {
-    if (state_ != run_state::not_started) {
+    if (state_ != Run_state::not_started) {
         return;
     }
 
-    state_ = run_state::running;
+    state_ = Run_state::running;
 
-    thrd_ = detail::start_thread(&parallel_data_reader::run_pipeline, this);
+    thread_ = detail::start_thread(&Parallel_data_reader::run_pipeline, this);
 }
 
-void parallel_data_reader::run_pipeline()
+void Parallel_data_reader::run_pipeline()
 {
     if (graph_->src_node == nullptr) {
         init_graph();
@@ -148,17 +174,17 @@ void parallel_data_reader::run_pipeline()
         std::unique_lock<std::mutex> queue_lock{queue_mutex_};
 
         if (exception_ptr_) {
-            state_ = run_state::faulted;
+            state_ = Run_state::faulted;
         }
         else {
-            state_ = run_state::stopped;
+            state_ = Run_state::stopped;
         }
     }
 
-    read_cond_.notify_one();
+    read_condition_.notify_one();
 }
 
-void parallel_data_reader::init_graph()
+void Parallel_data_reader::init_graph()
 {
     namespace flw = tbb::flow;
 
@@ -177,33 +203,33 @@ void parallel_data_reader::init_graph()
     flw::graph &g = graph_->obj;
 
     // Source
-    auto src_node = std::make_unique<flw::source_node<batch_msg>>(
+    auto src_node = std::make_unique<flw::source_node<Batch_msg>>(
         g,
         [this](auto &msg) {
-            std::optional<instance_batch> btch = batch_reader_->read_instance_batch();
-            if (btch == std::nullopt) {
+            std::optional<Instance_batch> batch = batch_reader_->read_instance_batch();
+            if (batch == std::nullopt) {
                 return false;
             }
 
-            msg = batch_msg{std::make_shared<instance_batch>(std::move(*btch))};
+            msg = Batch_msg{std::make_shared<Instance_batch>(std::move(*batch))};
 
             return true;
         },
         false);
 
     // Limiter
-    auto limit_node = std::make_unique<flw::limiter_node<batch_msg>>(g, num_parallel_reads);
+    auto limit_node = std::make_unique<flw::limiter_node<Batch_msg>>(g, num_parallel_reads);
 
     // Decode
     auto decode_node =
-        std::make_unique<flw::multifunction_node<batch_msg, std::tuple<example_msg>>>(
+        std::make_unique<flw::multifunction_node<Batch_msg, std::tuple<Example_msg>>>(
             g, flw::unlimited, [this](const auto &msg, auto &ports) {
-                // We send a message to the next node even if the decode()
-                // function fails. This is needed to have correct sequential
-                // ordering of other batches.
-                example_msg out{msg.batch->index(), this->decode(*msg.batch)};
+                // We send a message to the next node even if the decode
+                // function fails. This is needed to have correct
+                // sequential ordering of other batches.
+                Example_msg out{msg.batch->index(), this->decode(*msg.batch)};
 
-                if (out.exm != nullptr) {
+                if (out.example != nullptr) {
                     num_bytes_read_.fetch_add(msg.batch->size_bytes());
                 }
 
@@ -211,23 +237,22 @@ void parallel_data_reader::init_graph()
             });
 
     // Order
-    auto order_node = std::make_unique<flw::sequencer_node<example_msg>>(g, [](const auto &msg) {
+    auto order_node = std::make_unique<flw::sequencer_node<Example_msg>>(g, [](const auto &msg) {
         return msg.idx;
     });
 
     // Queue
-    auto queue_node = std::make_unique<flw::function_node<example_msg, flw::continue_msg>>(
+    auto queue_node = std::make_unique<flw::function_node<Example_msg, flw::continue_msg>>(
         g, flw::serial, [this, num_prefetched_examples](const auto &msg) {
-            // If the decode() function has failed simply discard the
-            // message.
-            if (msg.exm == nullptr) {
+            // If the decode function has failed discard the message.
+            if (msg.example == nullptr) {
                 return;
             }
 
             {
                 std::unique_lock<std::mutex> queue_lock{queue_mutex_};
 
-                fill_cond_.wait(queue_lock, [this, num_prefetched_examples] {
+                fill_condition_.wait(queue_lock, [this, num_prefetched_examples] {
                     return fill_queue_.size() < num_prefetched_examples;
                 });
 
@@ -235,10 +260,10 @@ void parallel_data_reader::init_graph()
                     return;
                 }
 
-                fill_queue_.push_back(msg.exm);
+                fill_queue_.push_back(msg.example);
             }
 
-            read_cond_.notify_one();
+            read_condition_.notify_one();
         });
 
     flw::make_edge(*src_node, *limit_node);
@@ -256,7 +281,7 @@ void parallel_data_reader::init_graph()
     graph_->nodes.emplace_back(std::move(queue_node));
 }
 
-void parallel_data_reader::ensure_schema_inferred()
+void Parallel_data_reader::ensure_schema_inferred()
 {
     if (schema_) {
         return;
@@ -265,18 +290,18 @@ void parallel_data_reader::ensure_schema_inferred()
     schema_ = infer_schema(reader_->peek_instance());
 }
 
-intrusive_ptr<schema const> parallel_data_reader::read_schema()
+Intrusive_ptr<const Schema> Parallel_data_reader::read_schema()
 {
     ensure_schema_inferred();
 
     return schema_;
 }
 
-void parallel_data_reader::reset() noexcept
+void Parallel_data_reader::reset() noexcept
 {
     stop();
 
-    state_ = run_state::not_started;
+    state_ = Run_state::not_started;
 
     batch_reader_->reset();
 
@@ -288,33 +313,7 @@ void parallel_data_reader::reset() noexcept
 
     num_bytes_read_ = 0;
 
-    data_reader_base::reset();
-}
-
-void parallel_data_reader::stop()
-{
-    if (state_ == run_state::not_started) {
-        return;
-    }
-
-    read_queue_.clear();
-
-    {
-        std::unique_lock<std::mutex> queue_lock{queue_mutex_};
-
-        graph_->ctx.cancel_group_execution();
-
-        fill_queue_.clear();
-    }
-
-    fill_cond_.notify_one();
-
-    thrd_.join();
-}
-
-std::size_t parallel_data_reader::num_bytes_read() const noexcept
-{
-    return num_bytes_read_;
+    Data_reader_base::reset();
 }
 
 }  // namespace abi_v1

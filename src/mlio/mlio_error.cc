@@ -18,7 +18,7 @@
 namespace mlio {
 inline namespace abi_v1 {
 
-mlio_error::~mlio_error() = default;
+Mlio_error::~Mlio_error() = default;
 
 }  // namespace abi_v1
 }  // namespace mlio

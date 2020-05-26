@@ -27,25 +27,22 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-class chunk_reader {
+class Chunk_reader {
 public:
-    chunk_reader() noexcept = default;
+    Chunk_reader() noexcept = default;
 
-    chunk_reader(const chunk_reader &) = delete;
+    Chunk_reader(const Chunk_reader &) = delete;
 
-    chunk_reader(chunk_reader &&) = delete;
+    Chunk_reader &operator=(const Chunk_reader &) = delete;
 
-    virtual ~chunk_reader();
+    Chunk_reader(Chunk_reader &&) = delete;
 
-public:
-    chunk_reader &operator=(const chunk_reader &) = delete;
+    Chunk_reader &operator=(Chunk_reader &&) = delete;
 
-    chunk_reader &operator=(chunk_reader &&) = delete;
+    virtual ~Chunk_reader();
 
-public:
-    virtual memory_slice read_chunk(memory_span leftover) = 0;
+    virtual Memory_slice read_chunk(Memory_span leftover) = 0;
 
-public:
     virtual bool eof() const noexcept = 0;
 
     virtual std::size_t chunk_size_hint() const noexcept = 0;
@@ -53,7 +50,7 @@ public:
     virtual void set_chunk_size_hint(std::size_t value) noexcept = 0;
 };
 
-std::unique_ptr<chunk_reader> make_chunk_reader(intrusive_ptr<input_stream> strm);
+std::unique_ptr<Chunk_reader> make_chunk_reader(Intrusive_ptr<Input_stream> stream);
 
 }  // namespace detail
 }  // namespace abi_v1

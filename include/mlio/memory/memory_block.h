@@ -26,7 +26,7 @@ inline namespace abi_v1 {
 /// @addtogroup memory Memory
 /// @{
 
-class MLIO_API memory_block : public intrusive_ref_counter<memory_block> {
+class MLIO_API Memory_block : public Intrusive_ref_counter<Memory_block> {
 public:
     using value_type = std::byte;
     using size_type = std::size_t;
@@ -38,21 +38,18 @@ public:
     using iterator = const std::byte *;
     using const_iterator = const std::byte *;
 
-public:
-    memory_block() noexcept = default;
+    Memory_block() noexcept = default;
 
-    memory_block(const memory_block &) = delete;
+    Memory_block(const Memory_block &) = delete;
 
-    memory_block(memory_block &&) = delete;
+    Memory_block &operator=(const Memory_block &) = delete;
 
-    virtual ~memory_block();
+    Memory_block(Memory_block &&) = delete;
 
-public:
-    memory_block &operator=(const memory_block &) = delete;
+    Memory_block &operator=(Memory_block &&) = delete;
 
-    memory_block &operator=(memory_block &&) = delete;
+    virtual ~Memory_block();
 
-public:
     const_iterator begin() const noexcept
     {
         return data();
@@ -73,33 +70,29 @@ public:
         return end();
     }
 
-public:
     virtual const_pointer data() const noexcept = 0;
 
     virtual size_type size() const noexcept = 0;
 };
 
-class MLIO_API mutable_memory_block : public memory_block {
+class MLIO_API Mutable_memory_block : public Memory_block {
 public:
     using reference = std::byte &;
     using pointer = std::byte *;
     using iterator = std::byte *;
 
-public:
-    mutable_memory_block() noexcept = default;
+    Mutable_memory_block() noexcept = default;
 
-    mutable_memory_block(const mutable_memory_block &) = delete;
+    Mutable_memory_block(const Mutable_memory_block &) = delete;
 
-    mutable_memory_block(mutable_memory_block &&) = delete;
+    Mutable_memory_block &operator=(const Mutable_memory_block &) = delete;
 
-    ~mutable_memory_block() override;
+    Mutable_memory_block(Mutable_memory_block &&) = delete;
 
-public:
-    mutable_memory_block &operator=(const mutable_memory_block &) = delete;
+    Mutable_memory_block &operator=(Mutable_memory_block &&) = delete;
 
-    mutable_memory_block &operator=(mutable_memory_block &&) = delete;
+    ~Mutable_memory_block() override;
 
-public:
     iterator begin() noexcept
     {
         return data();
@@ -112,8 +105,7 @@ public:
 
     virtual void resize(size_type size) = 0;
 
-public:
-    using memory_block::data;
+    using Memory_block::data;
 
     virtual pointer data() noexcept = 0;
 

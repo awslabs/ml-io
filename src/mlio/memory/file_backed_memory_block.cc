@@ -22,7 +22,6 @@
 #include <sys/mman.h>
 #include <unistd.h>
 
-#include "mlio/config.h"
 #include "mlio/detail/error.h"
 
 using mlio::detail::current_error_code;
@@ -30,7 +29,7 @@ using mlio::detail::current_error_code;
 namespace mlio {
 inline namespace abi_v1 {
 
-file_backed_memory_block::file_backed_memory_block(size_type size) : size_{size}
+File_backed_memory_block::File_backed_memory_block(size_type size) : size_{size}
 {
     make_temporary_file();
 
@@ -42,18 +41,18 @@ file_backed_memory_block::file_backed_memory_block(size_type size) : size_{size}
     }
 }
 
-file_backed_memory_block::~file_backed_memory_block()
+File_backed_memory_block::~File_backed_memory_block()
 {
     if (data_ != nullptr) {
         ::munmap(data_, size_);
     }
 }
 
-void file_backed_memory_block::make_temporary_file()
+void File_backed_memory_block::make_temporary_file()
 {
-    std::string pathname{"/tmp/mlio-XXXXXX"};
+    std::string path{"/tmp/mlio-XXXXXX"};
 
-    fd_ = ::mkstemp(&pathname.front());
+    fd_ = ::mkstemp(&path.front());
 
     auto off = static_cast<::off_t>(size_);
     if (fd_ == -1 || ::ftruncate(fd_.get(), off) != 0) {
@@ -61,10 +60,10 @@ void file_backed_memory_block::make_temporary_file()
                                 "The file-backed memory block cannot be allocated."};
     }
 
-    ::unlink(&pathname.front());
+    ::unlink(&path.front());
 }
 
-void file_backed_memory_block::resize(size_type size)
+void File_backed_memory_block::resize(size_type size)
 {
     if (size == size_) {
         return;
@@ -95,7 +94,7 @@ void file_backed_memory_block::resize(size_type size)
         data_ = static_cast<std::byte *>(addr);
         size_ = size;
 #else
-        std::byte *data;
+        std::byte *data{};
         try {
             data = init_memory_map(size);
         }
@@ -120,7 +119,7 @@ void file_backed_memory_block::resize(size_type size)
     }
 }
 
-std::byte *file_backed_memory_block::init_memory_map(std::size_t size)
+std::byte *File_backed_memory_block::init_memory_map(std::size_t size)
 {
     void *addr = ::mmap(/*addr*/ nullptr,
                         size,
@@ -134,7 +133,7 @@ std::byte *file_backed_memory_block::init_memory_map(std::size_t size)
     return static_cast<std::byte *>(addr);
 }
 
-void file_backed_memory_block::validate_mapped_address(void *addr)
+void File_backed_memory_block::validate_mapped_address(void *addr)
 {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
     if (addr != MAP_FAILED) {

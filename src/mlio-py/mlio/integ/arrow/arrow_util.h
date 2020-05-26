@@ -23,7 +23,8 @@
 #include <arrow/result.h>
 #include <arrow/status.h>
 
-#include <mlio.h>
+#include <mlio/not_supported_error.h>
+#include <mlio/streams/stream_error.h>
 
 namespace pymlio {
 namespace detail {
@@ -39,10 +40,10 @@ inline arrow::Status convert_exception()
     catch (const std::invalid_argument &e) {
         return arrow::Status::Invalid(e.what());
     }
-    catch (const mlio::stream_error &e) {
+    catch (const mlio::Stream_error &e) {
         return arrow::Status::IOError(e.what());
     }
-    catch (const mlio::not_supported_error &e) {
+    catch (const mlio::Not_supported_error &e) {
         return arrow::Status::NotImplemented(e.what());
     }
     catch (const std::exception &e) {

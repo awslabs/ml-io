@@ -24,75 +24,75 @@ inline namespace abi_v1 {
 namespace detail {
 namespace {
 
-template<bool B>
-using return_if = std::enable_if_t<B, parser>;
+template<bool cond>
+using Return_if = std::enable_if_t<cond, Parser>;
 
-template<data_type dt>
-decltype(auto) at(device_array_span arr, std::size_t index) noexcept
+template<Data_type dt>
+decltype(auto) at(Device_array_span arr, std::size_t index) noexcept
 {
     return arr.as<data_type_t<dt>>()[index];
 }
 
-template<data_type dt>
-return_if<dt == data_type::size> make_parser_core(const parser_params &)
+template<Data_type dt>
+Return_if<dt == Data_type::size> make_parser_core(const Parser_params &)
 {
-    return [](std::string_view s, device_array_span arr, std::size_t index) {
+    return [](std::string_view s, Device_array_span arr, std::size_t index) {
         return try_parse_size_t(s, at<dt>(arr, index));
     };
 }
 
-template<data_type dt>
-return_if<dt == data_type::float16> make_parser_core(const parser_params &)
+template<Data_type dt>
+Return_if<dt == Data_type::float16> make_parser_core(const Parser_params &)
 {
-    return [](std::string_view, device_array_span, std::size_t) {
-        return parse_result::failed;
+    return [](std::string_view, Device_array_span, std::size_t) {
+        return Parse_result::failed;
     };
 }
 
-template<data_type dt>
-return_if<dt == data_type::float32 || dt == data_type::float64>
-make_parser_core(const parser_params &prm)
+template<Data_type dt>
+Return_if<dt == Data_type::float32 || dt == Data_type::float64>
+make_parser_core(const Parser_params &params)
 {
-    return [&prm](std::string_view s, device_array_span arr, std::size_t index) {
-        return try_parse_float({s, &prm.nan_values}, at<dt>(arr, index));
+    return [&params](std::string_view s, Device_array_span arr, std::size_t index) {
+        return try_parse_float({s, &params.nan_values}, at<dt>(arr, index));
     };
 }
 
-template<data_type dt>
-return_if<dt == data_type::sint8 || dt == data_type::sint16 || dt == data_type::sint32 ||
-          dt == data_type::sint64 || dt == data_type::uint8 || dt == data_type::uint16 ||
-          dt == data_type::uint32 || dt == data_type::uint64>
-make_parser_core(const parser_params &prm)
+template<Data_type dt>
+Return_if<dt == Data_type::int8 || dt == Data_type::int16 || dt == Data_type::int32 ||
+          dt == Data_type::int64 || dt == Data_type::uint8 || dt == Data_type::uint16 ||
+          dt == Data_type::uint32 || dt == Data_type::uint64>
+make_parser_core(const Parser_params &params)
 {
-    return [&prm](std::string_view s, device_array_span arr, std::size_t index) {
-        return try_parse_int({s, prm.base}, at<dt>(arr, index));
+    return [&params](std::string_view s, Device_array_span arr, std::size_t index) {
+        return try_parse_int({s, params.base}, at<dt>(arr, index));
     };
 }
 
-template<data_type dt>
-return_if<dt == data_type::string> make_parser_core(const parser_params &)
+template<Data_type dt>
+Return_if<dt == Data_type::string> make_parser_core(const Parser_params &)
 {
-    return [](std::string_view s, device_array_span arr, std::size_t index) {
+    return [](std::string_view s, Device_array_span arr, std::size_t index) {
         at<dt>(arr, index) = static_cast<std::string>(s);
 
-        return parse_result::ok;
+        return Parse_result::ok;
     };
 }
 
-template<data_type dt>
+template<Data_type dt>
 struct make_parser_op {
-    parser operator()(const parser_params &prm)
+    Parser operator()(const Parser_params &params)
     {
-        return make_parser_core<dt>(prm);
+        return make_parser_core<dt>(params);
     }
 };
 
 }  // namespace
 }  // namespace detail
 
-parser make_parser(data_type dt, const parser_params &prm)
+Parser make_parser(Data_type dt, const Parser_params &params)
 {
-    return dispatch<detail::make_parser_op>(dt, prm);
+    return dispatch<detail::make_parser_op>(dt, params);
 }
 
 }  // namespace abi_v1

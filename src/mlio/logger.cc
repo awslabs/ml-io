@@ -26,55 +26,55 @@ inline namespace abi_v1 {
 namespace logger {
 namespace {
 
-log_message_handler msg_handler_{};
+Log_message_handler msg_handler_{};
 
-log_level level_{log_level::warning};
+Log_level level_{Log_level::warning};
 
 }  // namespace
 
 namespace detail {
 
-void handle_message(log_level lvl, std::string_view msg) noexcept
+void handle_message(Log_level level, std::string_view msg) noexcept
 {
     if (msg_handler_ != nullptr) {
         try {
-            msg_handler_(lvl, msg);
+            msg_handler_(level, msg);
         }
         catch (...) {
         }
     }
 }
 
-void handle_message(log_level lvl, std::string_view fmt, fmt::format_args args) noexcept
+void handle_message(Log_level level, std::string_view format, fmt::format_args args) noexcept
 {
     fmt::memory_buffer buf;
     try {
-        fmt::vformat_to(buf, fmt, args);
+        fmt::vformat_to(buf, format, args);
     }
     catch (...) {
         return;
     }
 
-    handle_message(lvl, std::string_view(buf.data(), buf.size()));
+    handle_message(level, std::string_view(buf.data(), buf.size()));
 }
 
 }  // namespace detail
 
-bool is_enabled_for(log_level lvl) noexcept
+bool is_enabled_for(Log_level level) noexcept
 {
-    return lvl <= level_;
+    return level <= level_;
 }
 
 }  // namespace logger
 
-log_message_handler set_log_message_handler(log_message_handler hdl) noexcept
+Log_message_handler set_log_message_handler(Log_message_handler handler) noexcept
 {
-    return std::exchange(logger::msg_handler_, std::move(hdl));
+    return std::exchange(logger::msg_handler_, std::move(handler));
 }
 
-void set_log_level(log_level lvl) noexcept
+void set_log_level(Log_level level) noexcept
 {
-    logger::level_ = lvl;
+    logger::level_ = level;
 }
 
 }  // namespace abi_v1

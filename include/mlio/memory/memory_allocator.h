@@ -28,32 +28,30 @@ inline namespace abi_v1 {
 /// @addtogroup memory Memory
 /// @{
 
-class MLIO_API memory_allocator {
+class MLIO_API Memory_allocator {
 public:
-    memory_allocator() noexcept = default;
+    Memory_allocator() noexcept = default;
 
-    memory_allocator(const memory_allocator &) = delete;
+    Memory_allocator(const Memory_allocator &) = delete;
 
-    memory_allocator(memory_allocator &&) = delete;
+    Memory_allocator &operator=(const Memory_allocator &) = delete;
 
-    virtual ~memory_allocator();
+    Memory_allocator(Memory_allocator &&) = delete;
 
-public:
-    memory_allocator &operator=(const memory_allocator &) = delete;
+    Memory_allocator &operator=(Memory_allocator &&) = delete;
 
-    memory_allocator &operator=(memory_allocator &&) = delete;
+    virtual ~Memory_allocator();
 
-public:
-    virtual intrusive_ptr<mutable_memory_block> allocate(std::size_t size) = 0;
+    virtual Intrusive_ptr<Mutable_memory_block> allocate(std::size_t size) = 0;
 };
 
 /// Gets the default memory allocator.
 MLIO_API
-memory_allocator &get_memory_allocator() noexcept;
+Memory_allocator &memory_allocator() noexcept;
 
 /// Sets the default memory allocator.
 MLIO_API
-void set_memory_allocator(std::unique_ptr<memory_allocator> &&alloc) noexcept;
+void set_memory_allocator(std::unique_ptr<Memory_allocator> &&allocator) noexcept;
 
 /// @}
 

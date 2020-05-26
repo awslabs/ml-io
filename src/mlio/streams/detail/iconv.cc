@@ -17,7 +17,6 @@
 
 #include <cerrno>
 #include <cstddef>
-#include <string>
 #include <system_error>
 #include <utility>
 
@@ -30,11 +29,11 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-iconv_desc::iconv_desc(text_encoding &&enc) : encoding_{std::move(enc)}
+Iconv_desc::Iconv_desc(Text_encoding &&encoding) : encoding_{std::move(encoding)}
 {
     auto code = encoding_.name().c_str();
 
-    desc_ = ::iconv_open(text_encoding::utf8.name().c_str(), code);
+    desc_ = ::iconv_open(Text_encoding::utf8.name().c_str(), code);
     if (desc_ != reinterpret_cast<::iconv_t>(-1)) {
         return;
     }
@@ -47,26 +46,26 @@ iconv_desc::iconv_desc(text_encoding &&enc) : encoding_{std::move(enc)}
     }
     throw std::system_error{
         err,
-        fmt::format("An unexpected error occured while initializing the {0} converter.",
+        fmt::format("An unexpected error occurred while initializing the {0} converter.",
                     encoding_.name())};
 }
 
-iconv_desc::~iconv_desc()
+Iconv_desc::~Iconv_desc()
 {
     ::iconv_close(desc_);
 }
 
-iconv_status iconv_desc::convert(memory_span &inp, mutable_memory_span &out)
+Iconv_status Iconv_desc::convert(Memory_span &inp, Mutable_memory_span &out)
 {
-    auto i_chrs = as_span<char const>(inp);
-    auto o_chrs = as_span<char>(out);
+    auto i_chars = as_span<const char>(inp);
+    auto o_chars = as_span<char>(out);
 
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
-    auto i_data = const_cast<char *>(i_chrs.data());
-    auto i_left = i_chrs.size();
+    auto i_data = const_cast<char *>(i_chars.data());
+    auto i_left = i_chars.size();
 
-    auto o_data = o_chrs.data();
-    auto o_left = o_chrs.size();
+    auto o_data = o_chars.data();
+    auto o_left = o_chars.size();
 
     std::size_t r = ::iconv(desc_, &i_data, &i_left, &o_data, &o_left);
 
@@ -74,17 +73,17 @@ iconv_status iconv_desc::convert(memory_span &inp, mutable_memory_span &out)
     out = out.last(o_left);
 
     if (static_cast<std::ptrdiff_t>(r) != -1) {
-        return iconv_status::ok;
+        return Iconv_status::ok;
     }
 
     if (errno == EINVAL) {
-        return iconv_status::incomplete_char;
+        return Iconv_status::incomplete_char;
     }
     if (errno == E2BIG) {
-        return iconv_status::leftover;
+        return Iconv_status::leftover;
     }
     if (errno == EILSEQ) {
-        throw stream_error{
+        throw Stream_error{
             fmt::format("An invalid byte sequence encountered while converting from {0} to UTF-8.",
                         encoding_.name())};
     }
@@ -93,7 +92,7 @@ iconv_status iconv_desc::convert(memory_span &inp, mutable_memory_span &out)
     throw std::system_error{
         err,
         fmt::format(
-            "An unexpected error occured while trying to convert a byte sequence from {0} to UTF-8.",
+            "An unexpected error occurred while trying to convert a byte sequence from {0} to UTF-8.",
             encoding_.name())};
 }
 

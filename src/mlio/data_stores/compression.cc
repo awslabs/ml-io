@@ -25,19 +25,20 @@
 namespace mlio {
 inline namespace abi_v1 {
 
-intrusive_ptr<input_stream> make_inflate_stream(intrusive_ptr<input_stream> &&strm, compression cmp)
+Intrusive_ptr<Input_stream>
+make_inflate_stream(Intrusive_ptr<Input_stream> &&stream, Compression compression)
 {
-    switch (cmp) {
-    case compression::none:
-    case compression::infer:
-        return std::move(strm);
+    switch (compression) {
+    case Compression::none:
+    case Compression::infer:
+        return std::move(stream);
 
-    case compression::gzip:
-        return make_intrusive<gzip_inflate_stream>(std::move(strm));
+    case Compression::gzip:
+        return make_intrusive<Gzip_inflate_stream>(std::move(stream));
 
-    case compression::bzip2:
-    case compression::zip:
-        throw not_supported_error{"bzip2 and zip compressions are not supported yet."};
+    case Compression::bzip2:
+    case Compression::zip:
+        throw Not_supported_error{"bzip2 and zip compressions are not supported yet."};
     }
 
     throw std::invalid_argument{"The specified compression is not supported."};

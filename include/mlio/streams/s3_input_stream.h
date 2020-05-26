@@ -28,39 +28,25 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-struct s3_input_stream_access;
+struct S3_input_stream_access;
 
 }  // namespace detail
 
 /// @addtogroup streams Streams
 /// @{
 
-class MLIO_API s3_input_stream final : public input_stream_base {
-    friend struct detail::s3_input_stream_access;
-
-private:
-    explicit s3_input_stream(intrusive_ptr<s3_client const> client,
-                             std::string bucket,
-                             std::string key,
-                             std::string version_id);
+class MLIO_API S3_input_stream final : public Input_stream_base {
+    friend struct detail::S3_input_stream_access;
 
 public:
-    using input_stream_base::read;
+    using Input_stream_base::read;
 
-    std::size_t read(mutable_memory_span dest) final;
+    std::size_t read(Mutable_memory_span destination) final;
 
     void seek(std::size_t position) final;
 
     void close() noexcept final;
 
-private:
-    MLIO_HIDDEN
-    void fetch_size();
-
-    MLIO_HIDDEN
-    void check_if_closed() const;
-
-public:
     std::size_t size() const final
     {
         return size_;
@@ -82,7 +68,18 @@ public:
     }
 
 private:
-    intrusive_ptr<s3_client const> client_;
+    explicit S3_input_stream(Intrusive_ptr<const S3_client> client,
+                             std::string bucket,
+                             std::string key,
+                             std::string version_id);
+
+    MLIO_HIDDEN
+    void fetch_size();
+
+    MLIO_HIDDEN
+    void check_if_closed() const;
+
+    Intrusive_ptr<const S3_client> client_;
     std::string bucket_;
     std::string key_;
     std::string version_id_;
@@ -92,7 +89,7 @@ private:
 };
 
 MLIO_API
-intrusive_ptr<s3_input_stream> make_s3_input_stream(intrusive_ptr<s3_client const> client,
+Intrusive_ptr<S3_input_stream> make_s3_input_stream(Intrusive_ptr<const S3_client> client,
                                                     const std::string &uri,
                                                     std::string version_id = {});
 

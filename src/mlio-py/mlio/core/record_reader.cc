@@ -25,25 +25,31 @@ using namespace pybind11::literals;
 namespace pymlio {
 namespace {
 
-class py_record_iterator {
+class Py_record_iterator {
 public:
-    explicit py_record_iterator(record_reader &rdr, py::object parent)
-        : reader_{&rdr}, parent_{std::move(parent)}
+    explicit Py_record_iterator(Record_reader &reader, py::object parent)
+        : reader_{&reader}, parent_{std::move(parent)}
     {}
 
 public:
-    std::optional<record> next()
+    std::optional<Record> next()
     {
-        std::optional<record> rec = reader_->read_record();
-        if (rec == std::nullopt) {
+        std::optional<Record> record{};
+        {
+            py::gil_scoped_release rel_gil;
+
+            record = reader_->read_record();
+        }
+
+        if (record == std::nullopt) {
             throw py::stop_iteration();
         }
 
-        return rec;
+        return record;
     }
 
 private:
-    record_reader *reader_;
+    Record_reader *reader_;
     py::object parent_;
 };
 
@@ -51,16 +57,16 @@ private:
 
 void register_record_readers(py::module &m)
 {
-    py::enum_<record_kind>(m, "RecordKind")
-        .value("COMPLETE", record_kind::complete)
-        .value("BEGIN", record_kind::begin)
-        .value("MIDDLE", record_kind::middle)
-        .value("END", record_kind::end);
+    py::enum_<Record_kind>(m, "RecordKind")
+        .value("COMPLETE", Record_kind::complete)
+        .value("BEGIN", Record_kind::begin)
+        .value("MIDDLE", Record_kind::middle)
+        .value("END", Record_kind::end);
 
-    py::class_<record>(
-        m, "Record", py::buffer_protocol(), "Represents an encoded record read from a data store.")
-        .def_property_readonly("kind", &record::kind)
-        .def_buffer([](record &r) {
+    py::class_<Record>(
+        m, "Record", py::buffer_protocol(), "Represents an encoded Record read from a data store.")
+        .def_property_readonly("kind", &Record::kind)
+        .def_buffer([](Record &r) {
             // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
             auto *data = const_cast<std::byte *>(r.payload().data());
 
@@ -70,25 +76,25 @@ void register_record_readers(py::module &m)
             return py::buffer_info(data, 1, "B", size);
         });
 
-    py::class_<py_record_iterator>(m, "RecordIterator")
+    py::class_<Py_record_iterator>(m, "RecordIterator")
         .def("__iter__",
-             [](py_record_iterator &it) -> py_record_iterator & {
+             [](Py_record_iterator &it) -> Py_record_iterator & {
                  return it;
              })
-        .def("__next__", &py_record_iterator::next);
+        .def("__next__", &Py_record_iterator::next);
 
-    py::class_<record_reader, intrusive_ptr<record_reader>>(m, "RecordReader")
-        .def("read_record", &record_reader::read_record, py::call_guard<py::gil_scoped_release>())
-        .def("peek_record", &record_reader::peek_record, py::call_guard<py::gil_scoped_release>())
-        .def("__iter__", [](py::object &rdr) {
-            return py_record_iterator(rdr.cast<record_reader &>(), rdr);
+    py::class_<Record_reader, Intrusive_ptr<Record_reader>>(m, "RecordReader")
+        .def("read_record", &Record_reader::read_record, py::call_guard<py::gil_scoped_release>())
+        .def("peek_record", &Record_reader::peek_record, py::call_guard<py::gil_scoped_release>())
+        .def("__iter__", [](py::object &reader) {
+            return Py_record_iterator(reader.cast<Record_reader &>(), reader);
         });
 
-    py::class_<mlio::detail::parquet_record_reader,
-               record_reader,
-               intrusive_ptr<mlio::detail::parquet_record_reader>>(
-        m, "ParquetRecordReader", "Represents a ``record_reader`` for reading Parquet records.")
-        .def(py::init<intrusive_ptr<input_stream>>(), "strm"_a);
+    py::class_<mlio::detail::Parquet_record_reader,
+               Record_reader,
+               Intrusive_ptr<mlio::detail::Parquet_record_reader>>(
+        m, "ParquetRecordReader", "Represents a ``Record_reader`` for reading Parquet records.")
+        .def(py::init<Intrusive_ptr<Input_stream>>(), "stream"_a);
 }
 
 }  // namespace pymlio

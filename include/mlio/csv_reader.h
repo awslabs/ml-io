@@ -35,7 +35,7 @@ namespace mlio {
 inline namespace abi_v1 {
 
 /// Specifies how field limits should be enforced.
-enum class max_field_length_handling {
+enum class Max_field_length_handling {
     treat_as_bad,  ///< Treat the corresponding row as bad.
     truncate,      ///< Truncate the field.
     truncate_warn  ///< Truncate the field and warn.
@@ -44,12 +44,12 @@ enum class max_field_length_handling {
 /// @addtogroup data_readers Data Readers
 /// @{
 
-/// Holds the parameters for @ref csv_reader.
-struct MLIO_API csv_params final {
+/// Holds the parameters for @ref Csv_reader.
+struct MLIO_API Csv_params final {
     /// The index of the row that should be treated as the header of the
     /// dataset. If @ref column_names is empty, the column names will be
     /// inferred from that row.  If neither @ref header_row_index nor
-    //  @ref column_names is specified, the column ordinal positions
+    /// @ref column_names is specified, the column ordinal positions
     /// will be used as column names.
     ///
     /// @note
@@ -82,11 +82,11 @@ struct MLIO_API csv_params final {
     /// specified via @ref column_types or @ref column_types_by_index.
     /// If not specified, the column data types will be inferred from
     /// the dataset.
-    std::optional<data_type> default_data_type{};
+    std::optional<Data_type> default_data_type{};
     /// The mapping between columns and data types by name.
-    std::unordered_map<std::string, data_type> column_types{};
+    std::unordered_map<std::string, Data_type> column_types{};
     /// The mapping between columns and data types by index.
-    std::unordered_map<std::size_t, data_type> column_types_by_index{};
+    std::unordered_map<std::size_t, Data_type> column_types_by_index{};
     /// The delimiter character.
     char delimiter = ',';
     /// The character used for quoting field values.
@@ -103,93 +103,91 @@ struct MLIO_API csv_params final {
     /// The text encoding to use for reading. If not specified, it will
     /// be inferred from the preamble of the text; otherwise falls back
     /// to UTF-8.
-    std::optional<text_encoding> encoding{};
+    std::optional<Text_encoding> encoding{};
     /// The maximum number of characters that will be read in a field.
     /// Any characters beyond this limit will be handled using the
-    /// strategy in @ref max_field_length_hnd.
+    /// strategy in @ref max_field_length_handling.
     std::optional<std::size_t> max_field_length{};
-    /// See @ref max_field_length_handling.
-    max_field_length_handling max_field_length_hnd = max_field_length_handling::treat_as_bad;
+    /// See @ref Max_field_length_handling.
+    Max_field_length_handling max_field_length_handling = Max_field_length_handling::treat_as_bad;
     /// The maximum size of a text line. If a row is longer than the
     /// specified size, an error will be raised.
     std::optional<std::size_t> max_line_length{};
     /// Additional parameters relevant for field parsing.
-    parser_params parser_prm{};
+    Parser_params parser_params{};
 };
 
-/// Represents a @ref data_reader for reading CSV datasets.
-class MLIO_API csv_reader final : public parallel_data_reader {
-    struct decoder_state;
-
-    template<typename ColIt>
-    class decoder;
-
+/// Represents a @ref Data_reader for reading CSV datasets.
+class MLIO_API Csv_reader final : public Parallel_data_reader {
 public:
-    explicit csv_reader(data_reader_params prm, csv_params csv_prm = {});
+    explicit Csv_reader(Data_reader_params params, Csv_params csv_params = {});
 
-    csv_reader(const csv_reader &) = delete;
+    Csv_reader(const Csv_reader &) = delete;
 
-    csv_reader(csv_reader &&) = delete;
+    Csv_reader &operator=(const Csv_reader &) = delete;
 
-    ~csv_reader() final;
+    Csv_reader(Csv_reader &&) = delete;
 
-public:
-    csv_reader &operator=(const csv_reader &) = delete;
+    Csv_reader &operator=(Csv_reader &&) = delete;
 
-    csv_reader &operator=(csv_reader &&) = delete;
+    ~Csv_reader() final;
+
+    void reset() noexcept final;
 
 private:
-    MLIO_HIDDEN
-    intrusive_ptr<record_reader> make_record_reader(const data_store &ds) final;
+    struct Decoder_state;
+
+    template<typename Col_iter>
+    class Decoder;
 
     MLIO_HIDDEN
-    void read_names_from_header(const data_store &ds, record_reader &rdr);
+    Intrusive_ptr<Record_reader> make_record_reader(const Data_store &store) final;
 
     MLIO_HIDDEN
-    void skip_to_header_row(record_reader &rdr);
+    void read_names_from_header(const Data_store &store, Record_reader &reader);
 
     MLIO_HIDDEN
-    intrusive_ptr<schema const> infer_schema(std::optional<instance> const &ins) final;
+    void skip_to_header_row(Record_reader &reader);
 
     MLIO_HIDDEN
-    void infer_column_types(std::optional<instance> const &ins);
+    Intrusive_ptr<const Schema> infer_schema(const std::optional<Instance> &instance) final;
 
     MLIO_HIDDEN
-    void set_or_validate_column_names(std::optional<instance> const &ins);
+    void infer_column_types(const std::optional<Instance> &instance);
+
+    MLIO_HIDDEN
+    void set_or_validate_column_names(const std::optional<Instance> &instance);
 
     MLIO_HIDDEN
     void apply_column_type_overrides();
 
     MLIO_HIDDEN
-    intrusive_ptr<schema const> init_parsers_and_make_schema();
+    Intrusive_ptr<const Schema> init_parsers_and_make_schema();
 
     MLIO_HIDDEN
     bool should_skip(std::size_t index, const std::string &name) const noexcept;
 
     MLIO_HIDDEN
-    intrusive_ptr<example> decode(const instance_batch &batch) const final;
+    Intrusive_ptr<Example> decode(const Instance_batch &batch) const final;
 
     MLIO_HIDDEN
-    std::vector<intrusive_ptr<tensor>> make_tensors(std::size_t batch_size) const;
+    std::vector<Intrusive_ptr<Tensor>> make_tensors(std::size_t batch_size) const;
 
     MLIO_HIDDEN
-    std::optional<std::size_t> decode_ser(decoder_state &state, const instance_batch &batch) const;
+    std::optional<std::size_t> decode_ser(Decoder_state &state, const Instance_batch &batch) const;
 
     MLIO_HIDDEN
-    std::optional<std::size_t> decode_prl(decoder_state &state, const instance_batch &batch) const;
+    std::optional<std::size_t> decode_prl(Decoder_state &state, const Instance_batch &batch) const;
 
     MLIO_HIDDEN
     auto make_column_iterators() const noexcept;
 
-public:
-    void reset() noexcept final;
-
 private:
-    csv_params params_;
+    Csv_params params_;
     std::vector<std::string> column_names_;
-    std::vector<data_type> column_types_{};
+    std::vector<Data_type> column_types_{};
     std::vector<int> column_ignores_{};
-    std::vector<parser> column_parsers_{};
+    std::vector<Parser> column_parsers_{};
     bool should_read_header = true;
 };
 

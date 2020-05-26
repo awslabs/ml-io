@@ -29,25 +29,24 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-class sampled_instance_reader final : public instance_reader_base {
-    static constexpr std::size_t num_instances_to_read_ = 100;
-
+class Sampled_instance_reader final : public Instance_reader_base {
 public:
-    explicit sampled_instance_reader(const data_reader_params &prm,
-                                     std::unique_ptr<instance_reader> &&inner);
+    explicit Sampled_instance_reader(const Data_reader_params &params,
+                                     std::unique_ptr<Instance_reader> &&inner);
 
 private:
-    std::optional<instance> read_instance_core() final;
+    std::optional<Instance> read_instance_core() final;
 
     void fill_buffer_from_inner();
 
     void reset_core() noexcept final;
 
-private:
-    const data_reader_params *params_;
-    std::unique_ptr<instance_reader> inner_;
-    std::vector<std::optional<instance>> buffer_{};
-    std::vector<std::optional<instance>>::iterator buffer_pos_{};
+    static constexpr std::size_t num_instances_to_read_ = 100;
+
+    const Data_reader_params *params_;
+    std::unique_ptr<Instance_reader> inner_;
+    std::vector<std::optional<Instance>> buffer_{};
+    std::vector<std::optional<Instance>>::iterator buffer_pos_{};
 };
 
 }  // namespace detail

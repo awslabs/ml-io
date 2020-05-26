@@ -5,7 +5,7 @@ package aialgs.data;
 option java_package = "com.amazonaws.aialgorithms.proto";
 option java_outer_classname = "RecordProtos";
 
-// A sparse or dense rank-R tensor that stores data as doubles (float64).
+// A sparse or dense rank-R Tensor that stores data as doubles (float64).
 message Float32Tensor   {
     // Each value in the vector. If keys is empty this is treated as a
     // dense vector.
@@ -19,11 +19,11 @@ message Float32Tensor   {
     // e.g. if shape = [ 10, 20 ] then floor(keys[i] / 20) will give the row
     // and keys[i] % 20 will give the column.
     // This also supports n-dimensonal tensors.
-    // NB. this must be specified if the tensor is sparse.
+    // NB. this must be specified if the Tensor is sparse.
     repeated uint64 shape = 3 [packed = true];
 }
 
-// A sparse or dense rank-R tensor that stores data as doubles (float64).
+// A sparse or dense rank-R Tensor that stores data as doubles (float64).
 message Float64Tensor {
     // Each value in the vector. If keys is empty this is treated as a
     // dense vector.
@@ -37,11 +37,11 @@ message Float64Tensor {
     // e.g. if shape = [ 10, 20 ] then floor(keys[i] / 20) will give the row
     // and keys[i] % 20 will give the column.
     // This also supports n-dimensonal tensors.
-    // NB. this must be specified if the tensor is sparse.
+    // NB. this must be specified if the Tensor is sparse.
     repeated uint64 shape = 3 [packed = true];
 }
 
-// A sparse or dense rank-R tensor that stores data as 32-bit ints (int32).
+// A sparse or dense rank-R Tensor that stores data as 32-bit ints (int32).
 message Int32Tensor {
     // Each value in the vector. If keys is empty this is treated as a
     // dense vector.
@@ -55,12 +55,12 @@ message Int32Tensor {
     // e.g. if shape = [ 10, 20 ] then floor(keys[i] / 20) will give the row
     // and keys[i] % 20 will give the column.
     // This also supports n-dimensonal tensors.
-    // NB. this must be specified if the tensor is sparse.
+    // NB. this must be specified if the Tensor is sparse.
     repeated uint64 shape = 3 [packed = true];
 }
 
 // Support for storing binary data for parsing in other ways (such as JPEG/etc).
-// This is an example of another type of value and may not immediately be supported.
+// This is an Example of another type of value and may not immediately be supported.
 message Bytes {
     repeated bytes value = 1;
 
@@ -90,12 +90,12 @@ message Record {
     // should be specified.
     map<string, Value> features = 1;
 
-    // Optional set of labels for this record.
+    // Optional set of labels for this Record.
     // Similar to features field above, the key used for
     // generic scalar / vector labels should ve 'values'
     map<string, Value> label = 2;
 
-    // Unique identifier for this record in the dataset.
+    // Unique identifier for this Record in the dataset.
     //
     // Whilst not necessary, this allows better
     // debugging where there are data issues.
@@ -103,15 +103,15 @@ message Record {
     // This is not used by the algorithm directly.
     optional string uid = 3;
 
-    // Textual metadata describing the record.
+    // Textual metadata describing the Record.
     //
     // This may include JSON-serialized information
-    // about the source of the record.
+    // about the source of the Record.
     //
     // This is not used by the algorithm directly.
     optional string metadata = 4;
 
-    // Optional serialized JSON object that allows per-record
+    // Optional serialized JSON object that allows per-Record
     // hyper-parameters/configuration/other information to be set.
     //
     // The meaning/interpretation of this field is defined by

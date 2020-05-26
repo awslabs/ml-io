@@ -21,7 +21,7 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-void validate_file_pathname(std::string_view pathname);
+void validate_file_path(std::string_view path);
 
 }  // namespace detail
 }  // namespace abi_v1

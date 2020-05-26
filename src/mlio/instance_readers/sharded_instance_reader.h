@@ -27,19 +27,18 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-class sharded_instance_reader final : public instance_reader_base {
+class Sharded_instance_reader final : public Instance_reader_base {
 public:
-    explicit sharded_instance_reader(const data_reader_params &prm,
-                                     std::unique_ptr<instance_reader> &&inner);
+    explicit Sharded_instance_reader(const Data_reader_params &params,
+                                     std::unique_ptr<Instance_reader> &&inner);
 
 private:
-    std::optional<instance> read_instance_core() final;
+    std::optional<Instance> read_instance_core() final;
 
     void reset_core() noexcept final;
 
-private:
-    const data_reader_params *params_;
-    std::unique_ptr<instance_reader> inner_;
+    const Data_reader_params *params_;
+    std::unique_ptr<Instance_reader> inner_;
     bool first_read_ = true;
 };
 

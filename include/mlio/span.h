@@ -26,18 +26,18 @@ inline namespace abi_v1 {
 namespace stdx {
 namespace detail {
 
-using mlio::detail::is_container;
+using mlio::detail::Is_container;
 
-template<typename Container, typename ElementType, typename = void>
-struct is_compatible_container : std::false_type {};
+template<typename Container, typename Element_type, typename = void>
+struct Is_compatible_container : std::false_type {};
 
-template<typename Container, typename ElementType>
-struct is_compatible_container<
+template<typename Container, typename Element_type>
+struct Is_compatible_container<
     Container,
-    ElementType,
+    Element_type,
     std::enable_if_t<
         std::is_convertible<std::remove_pointer_t<decltype(std::declval<Container>().data())> (*)[],
-                            ElementType (*)[]>::value>> : std::true_type {};
+                            Element_type (*)[]>::value>> : std::true_type {};
 
 }  // namespace detail
 
@@ -55,10 +55,19 @@ public:
     using iterator = T *;
     using const_iterator = const T *;
 
-public:
     constexpr span() noexcept = default;
 
     constexpr span(const span &other) noexcept = default;
+
+    constexpr span &operator=(const span &) noexcept = default;
+
+    template<typename U>
+    // NOLINTNEXTLINE(google-explicit-constructor)
+    constexpr span(const span<U> &other) noexcept : data_{other.data()}, size_{other.size()}
+    {
+        static_assert(std::is_convertible<U(*)[], element_type(*)[]>::value,
+                      "The element type of U must be convertible to the element type of the span.");
+    }
 
     // NOLINTNEXTLINE(google-explicit-constructor)
     constexpr span(pointer data, index_type size) noexcept : data_{data}, size_{size}
@@ -70,44 +79,32 @@ public:
 
     template<typename Container>
     // NOLINTNEXTLINE(google-explicit-constructor)
-    constexpr span(Container &cont)
-        : data_{cont.data()}, size_{static_cast<index_type>(cont.size())}
+    constexpr span(Container &container)
+        : data_{container.data()}, size_{static_cast<index_type>(container.size())}
     {
-        static_assert(detail::is_container<Container>::value,
+        static_assert(detail::Is_container<Container>::value,
                       "Container must have data() and size() accessors.");
 
         static_assert(
-            detail::is_compatible_container<Container, element_type>::value,
+            detail::Is_compatible_container<Container, element_type>::value,
             "The element type of Container must be convertible to the element type of the span.");
     }
 
     template<typename Container>
     // NOLINTNEXTLINE(google-explicit-constructor)
-    constexpr span(const Container &cont)
-        : data_{cont.data()}, size_{static_cast<index_type>(cont.size())}
+    constexpr span(const Container &container)
+        : data_{container.data()}, size_{static_cast<index_type>(container.size())}
     {
-        static_assert(detail::is_container<Container>::value,
+        static_assert(detail::Is_container<Container>::value,
                       "Container must have data() and size() accessors.");
 
         static_assert(
-            detail::is_compatible_container<Container const, element_type>::value,
+            detail::Is_compatible_container<Container const, element_type>::value,
             "The element type of Container must be convertible to the element type of the span.");
-    }
-
-    template<typename U>
-    // NOLINTNEXTLINE(google-explicit-constructor)
-    constexpr span(span<U> const &other) noexcept : data_{other.data()}, size_{other.size()}
-    {
-        static_assert(std::is_convertible<U(*)[], element_type(*)[]>::value,
-                      "The element type of U must be convertible to the element type of the span.");
     }
 
     ~span() = default;
 
-public:
-    constexpr span &operator=(const span &) noexcept = default;
-
-public:
     constexpr span<element_type> subspan(index_type offset) const
     {
         return {data_ + offset, size_ - offset};
@@ -128,13 +125,11 @@ public:
         return {data_ + size_ - count, count};
     }
 
-public:
     constexpr reference operator[](index_type index) const
     {
         return data_[index];
     }
 
-public:
     constexpr iterator begin() const noexcept
     {
         return data_;
@@ -155,7 +150,6 @@ public:
         return data_ + size_;
     }
 
-public:
     constexpr pointer data() const noexcept
     {
         return data_;
@@ -183,7 +177,7 @@ private:
 
 template<class T>
 MLIO_API
-inline constexpr span<std::byte const> as_bytes(span<T> s) noexcept
+inline constexpr span<const std::byte> as_bytes(span<T> s) noexcept
 {
     return {reinterpret_cast<const std::byte *>(s.data()), s.size_bytes()};
 }
@@ -212,17 +206,17 @@ inline constexpr stdx::span<T> as_span(stdx::span<U> s) noexcept
 
 template<typename Container>
 MLIO_API
-inline constexpr decltype(auto) make_span(Container &cont) noexcept
+inline constexpr decltype(auto) make_span(Container &container) noexcept
 {
-    static_assert(detail::is_container<Container>::value,
+    static_assert(detail::Is_container<Container>::value,
                   "Container must have data() and size() accessors.");
 
-    return stdx::span<std::remove_pointer_t<decltype(cont.data())>>{cont};
+    return stdx::span<std::remove_pointer_t<decltype(container.data())>>{container};
 }
 
-using memory_span = stdx::span<std::byte const>;
+using Memory_span = stdx::span<const std::byte>;
 
-using mutable_memory_span = stdx::span<std::byte>;
+using Mutable_memory_span = stdx::span<std::byte>;
 
 }  // namespace abi_v1
 }  // namespace mlio

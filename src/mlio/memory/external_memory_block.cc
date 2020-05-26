@@ -18,7 +18,7 @@
 namespace mlio {
 inline namespace abi_v1 {
 
-external_memory_block::~external_memory_block() = default;
+External_memory_block::~External_memory_block() = default;
 
 }  // namespace abi_v1
 }  // namespace mlio

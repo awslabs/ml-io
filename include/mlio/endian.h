@@ -89,7 +89,7 @@ inline std::uint64_t little_to_host_order(std::uint64_t value) noexcept
 
 #endif
 
-enum class byte_order {
+enum class Byte_order {
     little = MLIO_BYTE_ORDER_LITTLE,
     big = MLIO_BYTE_ORDER_BIG,
     host = MLIO_BYTE_ORDER_HOST

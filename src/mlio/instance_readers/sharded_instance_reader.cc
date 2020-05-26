@@ -24,16 +24,16 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-sharded_instance_reader::sharded_instance_reader(const data_reader_params &prm,
-                                                 std::unique_ptr<instance_reader> &&inner)
-    : params_{&prm}, inner_{std::move(inner)}
+Sharded_instance_reader::Sharded_instance_reader(const Data_reader_params &params,
+                                                 std::unique_ptr<Instance_reader> &&inner)
+    : params_{&params}, inner_{std::move(inner)}
 {
     if (params_->shard_index >= params_->num_shards) {
         throw std::invalid_argument{"The shard index must be less than the number of shards."};
     }
 }
 
-std::optional<instance> sharded_instance_reader::read_instance_core()
+std::optional<Instance> Sharded_instance_reader::read_instance_core()
 {
     std::size_t num_instances_to_skip{};
 
@@ -47,8 +47,8 @@ std::optional<instance> sharded_instance_reader::read_instance_core()
     }
 
     for (std::size_t i = 0; i < num_instances_to_skip; i++) {
-        std::optional<instance> ins = inner_->read_instance();
-        if (ins == std::nullopt) {
+        std::optional<Instance> instance = inner_->read_instance();
+        if (instance == std::nullopt) {
             return {};
         }
     }
@@ -56,7 +56,7 @@ std::optional<instance> sharded_instance_reader::read_instance_core()
     return inner_->read_instance();
 }
 
-void sharded_instance_reader::reset_core() noexcept
+void Sharded_instance_reader::reset_core() noexcept
 {
     inner_->reset();
 

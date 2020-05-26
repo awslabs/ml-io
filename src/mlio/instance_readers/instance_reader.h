@@ -27,33 +27,31 @@ inline namespace abi_v1 {
 namespace detail {
 
 // Reads data instances from a dataset.
-class instance_reader {
+class Instance_reader {
 public:
-    instance_reader() noexcept = default;
+    Instance_reader() noexcept = default;
 
-    instance_reader(const instance_reader &) = delete;
+    Instance_reader(const Instance_reader &) = delete;
 
-    instance_reader(instance_reader &&) = delete;
+    Instance_reader &operator=(const Instance_reader &) = delete;
 
-    virtual ~instance_reader();
+    Instance_reader(Instance_reader &&) = delete;
 
-public:
-    instance_reader &operator=(const instance_reader &) = delete;
+    Instance_reader &operator=(Instance_reader &&) = delete;
 
-    instance_reader &operator=(instance_reader &&) = delete;
+    virtual ~Instance_reader();
 
-public:
-    virtual std::optional<instance> read_instance() = 0;
+    virtual std::optional<Instance> read_instance() = 0;
 
-    virtual std::optional<instance> peek_instance() = 0;
+    virtual std::optional<Instance> peek_instance() = 0;
 
     virtual void reset() noexcept = 0;
 };
 
-using record_reader_factory = std::function<intrusive_ptr<record_reader>(const data_store &ds)>;
+using Record_reader_factory = std::function<Intrusive_ptr<Record_reader>(const Data_store &store)>;
 
-std::unique_ptr<instance_reader>
-make_instance_reader(const data_reader_params &prm, record_reader_factory &&fct);
+std::unique_ptr<Instance_reader>
+make_instance_reader(const Data_reader_params &params, Record_reader_factory &&factory);
 
 }  // namespace detail
 }  // namespace abi_v1

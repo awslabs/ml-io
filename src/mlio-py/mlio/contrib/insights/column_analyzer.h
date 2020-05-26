@@ -26,18 +26,18 @@
 
 namespace pymlio {
 
-class column_analyzer {
+class Column_analyzer {
 public:
-    column_analyzer(std::vector<column_analysis> &columns,
-                    std::vector<std::string> const &null_like_values,
-                    std::unordered_set<std::size_t> const &capture_columns,
+    Column_analyzer(std::vector<Column_analysis> &columns,
+                    const std::vector<std::string> &null_like_values,
+                    const std::unordered_set<std::size_t> &capture_columns,
                     std::size_t max_capture_count) noexcept;
 
 public:
-    void analyze(const mlio::example &exm) const;
+    void analyze(const mlio::Example &example) const;
 
 private:
-    std::vector<column_analysis> *columns_;
+    std::vector<Column_analysis> *columns_;
     std::vector<std::string> const *null_like_values_;
     std::unordered_set<std::size_t> const *capture_columns_;
     std::size_t max_capture_count_;

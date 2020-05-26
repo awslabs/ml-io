@@ -28,35 +28,35 @@ inline namespace abi_v1 {
 /// @{
 
 /// Specifies the compression type of a data store.
-enum class compression { none, infer, gzip, bzip2, zip };
+enum class Compression { none, infer, gzip, bzip2, zip };
 
 /// Constructs a new inflate stream by wrapping the specified input
 /// stream.
 MLIO_API
-intrusive_ptr<input_stream>
-make_inflate_stream(intrusive_ptr<input_stream> &&strm, compression cmp);
+Intrusive_ptr<Input_stream>
+make_inflate_stream(Intrusive_ptr<Input_stream> &&stream, Compression compression);
 
 MLIO_API
-inline std::ostream &operator<<(std::ostream &strm, compression cmp)
+inline std::ostream &operator<<(std::ostream &s, Compression compression)
 {
-    switch (cmp) {
-    case compression::none:
-        strm << "none";
+    switch (compression) {
+    case Compression::none:
+        s << "none";
         break;
-    case compression::infer:
-        strm << "infer";
+    case Compression::infer:
+        s << "infer";
         break;
-    case compression::gzip:
-        strm << "gzip";
+    case Compression::gzip:
+        s << "gzip";
         break;
-    case compression::bzip2:
-        strm << "bzip2";
+    case Compression::bzip2:
+        s << "bzip2";
         break;
-    case compression::zip:
-        strm << "zip";
+    case Compression::zip:
+        s << "zip";
         break;
     }
-    return strm;
+    return s;
 }
 
 /// @}

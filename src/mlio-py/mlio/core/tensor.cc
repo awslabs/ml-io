@@ -30,53 +30,53 @@ using namespace pybind11::literals;
 namespace pymlio {
 namespace {
 
-intrusive_ptr<dense_tensor> make_dense_tensor(size_vector shape,
+Intrusive_ptr<Dense_tensor> make_dense_tensor(Size_vector shape,
                                               py::buffer &data,
-                                              std::optional<ssize_vector> strides,
+                                              std::optional<Ssize_vector> strides,
                                               bool cpy)
 {
-    std::unique_ptr<device_array> arr = make_device_array(data, cpy);
+    std::unique_ptr<Device_array> arr = make_device_array(data, cpy);
 
-    ssize_vector strds{};
+    Ssize_vector strds{};
     if (strides) {
         strds = std::move(*strides);
     }
 
-    return make_intrusive<dense_tensor>(std::move(shape), std::move(arr), std::move(strds));
+    return make_intrusive<Dense_tensor>(std::move(shape), std::move(arr), std::move(strds));
 }
 
-intrusive_ptr<coo_tensor>
-make_coo_tensor(size_vector shape, py::buffer &data, std::vector<py::buffer> &coords, bool cpy)
+Intrusive_ptr<Coo_tensor>
+make_coo_tensor(Size_vector shape, py::buffer &data, std::vector<py::buffer> &coords, bool cpy)
 {
-    std::unique_ptr<device_array> arr = make_device_array(data, cpy);
+    std::unique_ptr<Device_array> arr = make_device_array(data, cpy);
 
-    std::vector<std::unique_ptr<device_array>> coordinates{};
+    std::vector<std::unique_ptr<Device_array>> coordinates{};
     coordinates.reserve(coords.size());
 
     for (py::buffer &indices : coords) {
         coordinates.emplace_back(make_device_array(indices, cpy));
     }
 
-    return make_intrusive<coo_tensor>(std::move(shape), std::move(arr), std::move(coordinates));
+    return make_intrusive<Coo_tensor>(std::move(shape), std::move(arr), std::move(coordinates));
 }
 
-py::buffer_info to_py_buffer(dense_tensor &tsr)
+py::buffer_info to_py_buffer(Dense_tensor &tensor)
 {
-    auto buf = py::cast(tsr).attr("data").cast<py::buffer>();
+    auto buf = py::cast(tensor).attr("data").cast<py::buffer>();
 
     py::buffer_info info = buf.request(/*writable*/ true);
 
-    info.ndim = static_cast<py::ssize_t>(tsr.shape().size());
+    info.ndim = static_cast<py::ssize_t>(tensor.shape().size());
 
     info.shape.clear();
-    info.shape.reserve(tsr.shape().size());
-    for (auto dim : tsr.shape()) {
+    info.shape.reserve(tensor.shape().size());
+    for (auto dim : tensor.shape()) {
         info.shape.push_back(static_cast<py::ssize_t>(dim));
     }
 
     info.strides.clear();
-    info.strides.reserve(tsr.strides().size());
-    for (auto stride : tsr.strides()) {
+    info.strides.reserve(tensor.strides().size());
+    for (auto stride : tensor.strides()) {
         info.strides.push_back(info.itemsize * stride);
     }
 
@@ -87,50 +87,50 @@ py::buffer_info to_py_buffer(dense_tensor &tsr)
 
 void register_tensors(py::module &m)
 {
-    py::enum_<data_type>(m, "DataType")
-        .value("SIZE", data_type::size)
-        .value("FLOAT16", data_type::float16)
-        .value("FLOAT32", data_type::float32)
-        .value("FLOAT64", data_type::float64)
-        .value("SINT8", data_type::sint8)
-        .value("SINT16", data_type::sint16)
-        .value("SINT32", data_type::sint32)
-        .value("SINT64", data_type::sint64)
-        .value("UINT8", data_type::uint8)
-        .value("UINT16", data_type::uint16)
-        .value("UINT32", data_type::uint32)
-        .value("UINT64", data_type::uint64)
-        .value("STRING", data_type::string);
+    py::enum_<Data_type>(m, "DataType")
+        .value("SIZE", Data_type::size)
+        .value("FLOAT16", Data_type::float16)
+        .value("FLOAT32", Data_type::float32)
+        .value("FLOAT64", Data_type::float64)
+        .value("INT8", Data_type::int8)
+        .value("INT16", Data_type::int16)
+        .value("INT32", Data_type::int32)
+        .value("INT64", Data_type::int64)
+        .value("UINT8", Data_type::uint8)
+        .value("UINT16", Data_type::uint16)
+        .value("UINT32", Data_type::uint32)
+        .value("UINT64", Data_type::uint64)
+        .value("STRING", Data_type::string);
 
-    py::class_<tensor, intrusive_ptr<tensor>>(m,
+    py::class_<Tensor, Intrusive_ptr<Tensor>>(m,
                                               "Tensor",
                                               R"(
         Represents a multi-dimensional array.
 
         This is an abstract class that only defines the data type and shape
-        of a tensor. Derived types specify how the tensor data is laid out
+        of a Tensor. Derived types specify how the Tensor data is laid out
         in memory.
         )")
-        .def("__repr__", &tensor::repr)
-        .def_property_readonly("dtype", &tensor::dtype, "Gets the data type of the tensor.")
+        .def("__repr__", &Tensor::repr)
+        .def_property_readonly("data_type", &Tensor::data_type, "Gets the data type of the Tensor.")
         .def_property_readonly(
             "shape",
-            [](tensor &self) -> py::tuple {
+            [](Tensor &self) -> py::tuple {
                 return py::cast(self.shape());
             },
-            "Gets the shape of the tensor.")
+            "Gets the shape of the Tensor.")
         .def_property_readonly(
             "strides",
-            [](tensor &self) -> py::tuple {
+            [](Tensor &self) -> py::tuple {
                 return py::cast(self.strides());
             },
-            "Gets the strides of the tensor.");
+            "Gets the strides of the Tensor.");
 
-    py::class_<dense_tensor, tensor, intrusive_ptr<dense_tensor>>(
+    py::class_<Dense_tensor, Tensor, Intrusive_ptr<Dense_tensor>>(
         m,
         "DenseTensor",
         py::buffer_protocol(),
-        "Represents a tensor that stores its data in a contiguous memory "
+        "Represents a Tensor that stores its data in a contiguous memory "
         "block.")
         .def(py::init<>(&make_dense_tensor),
              "shape"_a,
@@ -139,25 +139,25 @@ void register_tensors(py::module &m)
              "copy"_a = true)
         .def_property_readonly(
             "data",
-            [](dense_tensor &self) {
-                return py_device_array{wrap_intrusive(&self), self.data()};
+            [](Dense_tensor &self) {
+                return Py_device_array{wrap_intrusive(&self), self.data()};
             },
-            "Gets the data of the tensor.")
+            "Gets the data of the Tensor.")
         .def_buffer(&to_py_buffer);
 
-    py::class_<coo_tensor, tensor, intrusive_ptr<coo_tensor>>(
-        m, "CooTensor", "Represents a tensor that stores its data in coordinate format.")
+    py::class_<Coo_tensor, Tensor, Intrusive_ptr<Coo_tensor>>(
+        m, "CooTensor", "Represents a Tensor that stores its data in coordinate format.")
         .def(py::init<>(&make_coo_tensor), "shape"_a, "data"_a, "coords"_a, "copy"_a = true)
         .def_property_readonly(
             "data",
-            [](coo_tensor &self) {
-                return py_device_array{wrap_intrusive(&self), self.data()};
+            [](Coo_tensor &self) {
+                return Py_device_array{wrap_intrusive(&self), self.data()};
             },
-            "Gets the data of the tensor.")
+            "Gets the data of the Tensor.")
         .def(
             "indices",
-            [](coo_tensor &self, std::size_t dim) {
-                return py_device_array{wrap_intrusive(&self), self.indices(dim)};
+            [](Coo_tensor &self, std::size_t dim) {
+                return Py_device_array{wrap_intrusive(&self), self.indices(dim)};
             },
             "dim"_a,
             "Gets the indices for the specified dimension.");

@@ -27,8 +27,8 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-std::optional<record>
-text_line_record_reader::decode_text_record(memory_slice &chunk, bool ignore_leftover)
+std::optional<Record>
+text_line_record_reader::decode_text_record(Memory_slice &chunk, bool ignore_leftover)
 {
     if (chunk.empty()) {
         return {};
@@ -36,9 +36,9 @@ text_line_record_reader::decode_text_record(memory_slice &chunk, bool ignore_lef
 
     if (skip_blank_) {
         while (!chunk.empty()) {
-            std::optional<record> rec = read_line(chunk, ignore_leftover);
-            if (rec == std::nullopt || !rec->payload().empty()) {
-                return rec;
+            std::optional<Record> record = read_line(chunk, ignore_leftover);
+            if (record == std::nullopt || !record->payload().empty()) {
+                return record;
             }
         }
 

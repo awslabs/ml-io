@@ -21,28 +21,28 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-compression infer_compression(std::string_view pathname) noexcept
+Compression infer_compression(std::string_view path) noexcept
 {
-    std::size_t len = pathname.size();
+    std::size_t len = path.size();
 
-    if (len > 3 && pathname[len - 3] == '.') {
-        if (pathname[len - 2] == 'g' && pathname[len - 1] == 'z') {
-            return compression::gzip;
+    if (len > 3 && path[len - 3] == '.') {
+        if (path[len - 2] == 'g' && path[len - 1] == 'z') {
+            return Compression::gzip;
         }
-        return compression::none;
+        return Compression::none;
     }
 
-    if (len > 4 && pathname[len - 4] == '.') {
-        if (pathname[len - 3] == 'b' && pathname[len - 2] == 'z' && pathname[len - 1] == '2') {
-            return compression::bzip2;
+    if (len > 4 && path[len - 4] == '.') {
+        if (path[len - 3] == 'b' && path[len - 2] == 'z' && path[len - 1] == '2') {
+            return Compression::bzip2;
         }
 
-        if (pathname[len - 3] == 'z' && pathname[len - 2] == 'i' && pathname[len - 1] == 'p') {
-            return compression::zip;
+        if (path[len - 3] == 'z' && path[len - 2] == 'i' && path[len - 1] == 'p') {
+            return Compression::zip;
         }
     }
 
-    return compression::none;
+    return Compression::none;
 }
 
 }  // namespace detail

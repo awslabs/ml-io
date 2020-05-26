@@ -29,9 +29,7 @@
 #include <fmt/format.h>
 #include <strnatcmp.h>
 
-#include "mlio/config.h"
 #include "mlio/data_stores/data_store.h"
-#include "mlio/data_stores/file.h"
 #include "mlio/detail/error.h"
 #include "mlio/intrusive_ptr.h"
 
@@ -42,7 +40,7 @@ inline namespace abi_v1 {
 namespace detail {
 namespace {
 
-struct FTS_deleter {
+struct Fts_deleter {
     void operator()(::FTS *fts)
     {
         if (fts != nullptr) {
@@ -51,13 +49,13 @@ struct FTS_deleter {
     }
 };
 
-std::vector<const char *> get_pathname_c_strs(stdx::span<std::string const> pathnames)
+std::vector<const char *> get_path_c_strs(stdx::span<const std::string> paths)
 {
     std::vector<const char *> c_strs{};
 
     std::transform(
-        pathnames.begin(), pathnames.end(), std::back_inserter(c_strs), [](const std::string &pth) {
-            return pth.c_str();
+        paths.begin(), paths.end(), std::back_inserter(c_strs), [](const std::string &path) {
+            return path.c_str();
         });
 
     c_strs.push_back(nullptr);
@@ -65,35 +63,34 @@ std::vector<const char *> get_pathname_c_strs(stdx::span<std::string const> path
     return c_strs;
 }
 
-inline int ver_sort(const ::FTSENT **a, const ::FTSENT **b)
+inline int natural_sort(const ::FTSENT **a, const ::FTSENT **b)
 {
     return ::strnatcmp((*a)->fts_name, (*b)->fts_name);
 }
 
-auto make_fts(stdx::span<std::string const> pathnames)
+auto make_fts(stdx::span<const std::string> paths)
 {
-    std::vector<const char *> c_strs = get_pathname_c_strs(pathnames);
+    std::vector<const char *> c_strs = get_path_c_strs(paths);
 
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
     auto path_argv = const_cast<char *const *>(c_strs.data());
 
-    ::FTS *fts = ::fts_open(path_argv, FTS_LOGICAL | FTS_NOCHDIR, ver_sort);
+    ::FTS *fts = ::fts_open(path_argv, FTS_LOGICAL | FTS_NOCHDIR, natural_sort);
     if (fts == nullptr) {
-        throw std::system_error{current_error_code(),
-                                "The specified pathnames cannot be traversed."};
+        throw std::system_error{current_error_code(), "The specified paths cannot be traversed."};
     }
 
-    return std::unique_ptr<::FTS, detail::FTS_deleter>(fts);
+    return std::unique_ptr<::FTS, detail::Fts_deleter>(fts);
 }
 
 }  // namespace
 }  // namespace detail
 
-std::vector<intrusive_ptr<data_store>> list_files(const list_files_params &prm)
+std::vector<Intrusive_ptr<Data_store>> list_files(const List_files_params &params)
 {
-    auto fts = detail::make_fts(prm.pathnames);
+    auto fts = detail::make_fts(params.paths);
 
-    std::vector<intrusive_ptr<data_store>> lst{};
+    std::vector<Intrusive_ptr<Data_store>> result{};
 
     ::FTSENT *e{};
     while ((e = ::fts_read(fts.get())) != nullptr) {
@@ -113,7 +110,7 @@ std::vector<intrusive_ptr<data_store>> list_files(const list_files_params &prm)
         }
 
         // Pattern match.
-        const std::string *pattern = prm.pattern;
+        const std::string *pattern = params.pattern;
         if (pattern != nullptr && !pattern->empty()) {
             int r = ::fnmatch(pattern->c_str(), e->fts_accpath, 0);
             if (r == FNM_NOMATCH) {
@@ -125,30 +122,31 @@ std::vector<intrusive_ptr<data_store>> list_files(const list_files_params &prm)
         }
 
         // Predicate match.
-        const auto *predicate = prm.predicate;
+        const auto *predicate = params.predicate;
         if (predicate != nullptr && *predicate != nullptr) {
             if (!(*predicate)(e->fts_accpath)) {
                 continue;
             }
         }
 
-        lst.emplace_back(make_intrusive<file>(e->fts_accpath, prm.mmap, prm.cmp));
+        auto file = make_intrusive<File>(e->fts_accpath, params.memory_map, params.compression);
+
+        result.emplace_back(std::move(file));
     }
 
     if (errno != 0) {
-        throw std::system_error{current_error_code(),
-                                "The specified pathnames cannot be traversed."};
+        throw std::system_error{current_error_code(), "The specified paths cannot be traversed."};
     }
 
-    return lst;
+    return result;
 }
 
-std::vector<intrusive_ptr<data_store>>
-list_files(const std::string &pathname, const std::string &pattern)
+std::vector<Intrusive_ptr<Data_store>>
+list_files(const std::string &path, const std::string &pattern)
 {
-    stdx::span<std::string const> pathnames{&pathname, 1};
+    stdx::span<const std::string> paths{&path, 1};
 
-    return list_files({pathnames, &pattern});
+    return list_files({paths, &pattern});
 }
 
 }  // namespace abi_v1

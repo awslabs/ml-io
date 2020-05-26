@@ -1,3 +1,18 @@
+/*
+ * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"). You
+ * may not use this file except in compliance with the License. A copy of
+ * the License is located at
+ *
+ *      http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is
+ * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
+ * ANY KIND, either express or implied. See the License for the specific
+ * language governing permissions and limitations under the License.
+ */
+
 #pragma once
 
 #include <cstddef>
@@ -11,10 +26,10 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace stdx {
 
-template<typename Cont>
-inline constexpr std::ptrdiff_t ssize(const Cont &cont) noexcept
+template<typename Container>
+inline constexpr std::ptrdiff_t ssize(const Container &container) noexcept
 {
-    return static_cast<std::ptrdiff_t>(cont.size());
+    return static_cast<std::ptrdiff_t>(container.size());
 }
 
 }  // namespace stdx
@@ -22,7 +37,7 @@ inline constexpr std::ptrdiff_t ssize(const Cont &cont) noexcept
 namespace detail {
 
 template<typename T, typename U>
-struct is_same_signedness
+struct Is_same_signedness
     : public std::bool_constant<std::is_signed<T>::value == std::is_signed<U>::value> {};
 
 }  // namespace detail
@@ -55,7 +70,7 @@ inline constexpr bool try_narrow(U u, T &t) noexcept
     if (static_cast<U>(t) != u) {
         return false;
     }
-    if (!detail::is_same_signedness<T, U>::value && ((t < T{}) != (u < U{}))) {
+    if (!detail::Is_same_signedness<T, U>::value && ((t < T{}) != (u < U{}))) {
         return false;
     }
     return true;

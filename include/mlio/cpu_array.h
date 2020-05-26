@@ -36,30 +36,22 @@ inline namespace abi_v1 {
 
 namespace detail {
 
-struct cpu_array_access;
+struct Cpu_array_access;
 
 }  // namespace detail
 
 /// Represents a memory region allocated in the main memory of the host
 /// system.
 template<typename Container>
-class MLIO_API cpu_array final : public device_array {
+class MLIO_API Cpu_array final : public Device_array {
     template<typename>
-    friend class cpu_array;
+    friend class Cpu_array;
 
-    friend struct detail::cpu_array_access;
-
-private:
-    explicit cpu_array(data_type dt, const Container &cont) : data_type_{dt}, container_{cont}
-    {}
-
-    explicit cpu_array(data_type dt, Container &&cont) : data_type_{dt}, container_{std::move(cont)}
-    {}
+    friend struct detail::Cpu_array_access;
 
 public:
-    std::unique_ptr<device_array> clone() const final;
+    std::unique_ptr<Device_array> clone() const final;
 
-public:
     void *data() noexcept final
     {
         return container_.data();
@@ -80,41 +72,49 @@ public:
         return container_.empty();
     }
 
-    data_type dtype() const noexcept final
+    Data_type data_type() const noexcept final
     {
         return data_type_;
     }
 
-    device get_device() const noexcept final
+    Device device() const noexcept final
     {
-        return device{device_kind::cpu()};
+        return Device{Device_kind::cpu()};
     }
 
 private:
-    data_type data_type_;
+    explicit Cpu_array(Data_type dt, const Container &container)
+        : data_type_{dt}, container_{container}
+    {}
+
+    explicit Cpu_array(Data_type dt, Container &&container)
+        : data_type_{dt}, container_{std::move(container)}
+    {}
+
+    Data_type data_type_;
     Container container_;
 };
 
 template<typename Container>
-std::unique_ptr<device_array> cpu_array<Container>::clone() const
+std::unique_ptr<Device_array> Cpu_array<Container>::clone() const
 {
     using T = typename Container::value_type;
 
     std::vector<T> c{container_.begin(), container_.end()};
 
-    auto *ptr = new cpu_array<std::vector<T>>{data_type_, std::move(c)};
+    auto *ptr = new Cpu_array<std::vector<T>>{data_type_, std::move(c)};
 
     return wrap_unique(ptr);
 }
 
 namespace detail {
 
-struct cpu_array_access {
+struct Cpu_array_access {
     template<typename Container>
     MLIO_API
-    static inline auto wrap(data_type dt, Container &&cont)
+    static inline auto wrap(Data_type dt, Container &&container)
     {
-        auto *ptr = new cpu_array<Container>{dt, std::forward<Container>(cont)};
+        auto *ptr = new Cpu_array<Container>{dt, std::forward<Container>(container)};
 
         return wrap_unique(ptr);
     }
@@ -123,29 +123,29 @@ struct cpu_array_access {
 }  // namespace detail
 
 /// Copies or moves a container object into a newly constructed
-/// @ref cpu_array instance.
+/// @ref Cpu_array Instance.
 ///
-/// @param cont
+/// @param container
 ///     An object that conforms with the STL sequence container API.
-template<data_type dt, typename Container>
+template<Data_type dt, typename Container>
 MLIO_API
-inline std::unique_ptr<device_array> wrap_cpu_array(Container &&cont)
+inline std::unique_ptr<Device_array> wrap_cpu_array(Container &&container)
 {
     using T = typename Container::value_type;
 
-    static_assert(detail::is_container<Container>::value,
+    static_assert(detail::Is_container<Container>::value,
                   "Container must have data() and size() accessors.");
 
     static_assert(std::is_same<T, data_type_t<dt>>::value,
                   "The value type of Container must match the specified data type.");
 
-    return detail::cpu_array_access::wrap(dt, std::forward<Container>(cont));
+    return detail::Cpu_array_access::wrap(dt, std::forward<Container>(container));
 }
 
-/// Allocates a new @ref cpu_array with the specified data type and
+/// Allocates a new @ref Cpu_array with the specified data type and
 /// size.
 MLIO_API
-std::unique_ptr<device_array> make_cpu_array(data_type dt, std::size_t size);
+std::unique_ptr<Device_array> make_cpu_array(Data_type dt, std::size_t size);
 
 /// @}
 

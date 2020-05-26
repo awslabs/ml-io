@@ -28,9 +28,9 @@
 namespace mlio {
 inline namespace abi_v1 {
 
-enum class parse_result { ok, failed, overflowed };
+enum class Parse_result { ok, failed, overflowed };
 
-struct MLIO_API parser_params {
+struct MLIO_API Parser_params {
     /// For a floating-point parse operation holds the list of strings
     /// that should be treated as NaN.
     std::unordered_set<std::string> nan_values{};
@@ -39,26 +39,26 @@ struct MLIO_API parser_params {
     int base = 10;
 };
 
-/// Acts as a parser for a specific data type.
+/// Acts as a Parser for a specific data type.
 ///
 /// @param s
 ///     The string to parse.
 /// @param arr
 ///     The destination array into which to write the output of the
 ///     parse operation. The data type of the array must match the
-///     data type of the parser.
+///     data type of the Parser.
 /// @param index
 ///     The index in the destination array at which to write the
 ///     output.
-using parser =
-    std::function<parse_result(std::string_view s, device_array_span arr, std::size_t index)>;
+using Parser =
+    std::function<Parse_result(std::string_view s, Device_array_span arr, std::size_t index)>;
 
-/// Constructs a parser function object.
+/// Constructs a Parser function object.
 ///
 /// @param dt
-///     The data type for which to construct a parser.
+///     The data type for which to construct a Parser.
 MLIO_API
-parser make_parser(data_type dt, const parser_params &prm);
+Parser make_parser(Data_type dt, const Parser_params &params);
 
 }  // namespace abi_v1
 }  // namespace mlio

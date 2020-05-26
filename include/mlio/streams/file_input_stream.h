@@ -29,24 +29,18 @@ inline namespace abi_v1 {
 /// @addtogroup streams Streams
 /// @{
 
-class MLIO_API file_input_stream final : public input_stream_base {
+class MLIO_API File_input_stream final : public Input_stream_base {
 public:
-    explicit file_input_stream(std::string pathname);
+    explicit File_input_stream(std::string path);
 
-public:
-    using input_stream_base::read;
+    using Input_stream_base::read;
 
-    std::size_t read(mutable_memory_span dest) final;
+    std::size_t read(Mutable_memory_span destination) final;
 
     void seek(std::size_t position) final;
 
     void close() noexcept final;
 
-private:
-    MLIO_HIDDEN
-    void check_if_closed() const;
-
-public:
     std::size_t size() const final;
 
     std::size_t position() const final;
@@ -62,8 +56,11 @@ public:
     }
 
 private:
-    std::string pathname_;
-    detail::file_descriptor fd_{};
+    MLIO_HIDDEN
+    void check_if_closed() const;
+
+    std::string path_;
+    detail::File_descriptor fd_{};
     mutable std::size_t size_{};
 };
 
