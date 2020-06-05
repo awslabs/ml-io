@@ -17,6 +17,7 @@
 
 #include <functional>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include "mlio/config.h"
@@ -61,13 +62,11 @@ private:
     Compression compression_;
 };
 
-struct MLIO_API List_files_params {
+struct MLIO_API File_list_options {
     using Predicate_callback = std::function<bool(const std::string &)>;
 
-    /// The list of paths to traverse.
-    stdx::span<const std::string> paths{};
     /// The pattern to match the filenames against.
-    const std::string *pattern{};
+    std::string_view pattern{};
     /// The callback function for user-specific filtering.
     const Predicate_callback *predicate{};
     /// A boolean value indicating whether the files should be
@@ -80,11 +79,12 @@ struct MLIO_API List_files_params {
 
 /// Recursively lists all files residing under the specified paths.
 MLIO_API
-std::vector<Intrusive_ptr<Data_store>> list_files(const List_files_params &params);
+std::vector<Intrusive_ptr<Data_store>>
+list_files(stdx::span<const std::string> paths, const File_list_options &opts = {});
 
 MLIO_API
 std::vector<Intrusive_ptr<Data_store>>
-list_files(const std::string &path, const std::string &pattern = {});
+list_files(const std::string &path, const std::string_view pattern = {});
 
 /// @}
 

@@ -113,8 +113,8 @@ struct MLIO_API Csv_params final {
     /// The maximum size of a text line. If a row is longer than the
     /// specified size, an error will be raised.
     std::optional<std::size_t> max_line_length{};
-    /// Additional parameters relevant for field parsing.
-    Parser_params parser_params{};
+    /// Additional options relevant for field parsing.
+    Parser_options parser_options{};
 };
 
 /// Represents a @ref Data_reader for reading CSV datasets.

@@ -31,13 +31,10 @@ Attribute make_attribute(std::string name,
                          std::optional<Ssize_vector> strides,
                          bool sparse)
 {
-    Attribute_builder bld{std::move(name), dt, std::move(shape)};
-
     if (strides) {
-        bld.with_strides(std::move(*strides));
+        return Attribute{std::move(name), dt, std::move(shape), std::move(*strides), sparse};
     }
-
-    return bld.with_sparsity(sparse).build();
+    return Attribute{std::move(name), dt, std::move(shape), {}, sparse};
 }
 
 }  // namespace
@@ -46,7 +43,7 @@ void register_schema(py::module &m)
 {
     py::class_<Attribute>(m,
                           "Attribute",
-                          "Describes an Attribute which defines a measurable "
+                          "Describes an attribute which defines a measurable "
                           "property of a dataset.")
         .def(py::init(&make_attribute),
              "name"_a,

@@ -360,7 +360,7 @@ Intrusive_ptr<const Schema> Csv_reader::init_parsers_and_make_schema()
         Data_type dt = std::get<2>(*col_pos);
 
         column_ignores_.emplace_back(0);
-        column_parsers_.emplace_back(make_parser(dt, params_.parser_params));
+        column_parsers_.emplace_back(make_parser(dt, params_.parser_options));
 
         if (params_.dedupe_column_names) {
             // Keep count of column names. If the key already exists,

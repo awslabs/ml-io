@@ -54,7 +54,6 @@ std::unordered_map<std::string, std::atomic_ptrdiff_t> fifo_ids_{};
 }  // namespace
 }  // namespace detail
 
-
 Sagemaker_pipe_input_stream::~Sagemaker_pipe_input_stream()
 {
     close();

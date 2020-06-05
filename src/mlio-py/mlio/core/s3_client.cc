@@ -25,21 +25,15 @@ using namespace pybind11::literals;
 namespace pymlio {
 namespace {
 
-Intrusive_ptr<S3_client> py_make_s3_client(std::string access_key_id,
-                                           std::string secret_key,
-                                           std::string session_token,
-                                           std::string profile,
-                                           std::string region,
+Intrusive_ptr<S3_client> py_make_s3_client(const std::string &access_key_id,
+                                           const std::string &secret_key,
+                                           const std::string &session_token,
+                                           const std::string &profile,
+                                           const std::string &region,
                                            bool use_https)
 {
-    return S3_client_builder{}
-        .with_access_key_id(std::move(access_key_id))
-        .with_secret_key(std::move(secret_key))
-        .with_session_token(std::move(session_token))
-        .with_profile(std::move(profile))
-        .with_region(std::move(region))
-        .use_https(use_https)
-        .build();
+    S3_client_options opts{access_key_id, secret_key, session_token, profile, region, use_https};
+    return make_s3_client(opts);
 }
 
 }  // namespace

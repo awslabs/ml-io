@@ -57,17 +57,13 @@ private:
     mutable std::string id_{};
 };
 
-struct MLIO_API List_s3_objects_params {
-    using predicate_callback = std::function<bool(const std::string &)>;
+struct MLIO_API S3_object_list_options {
+    using Predicate_callback = std::function<bool(const std::string &)>;
 
-    /// The S3 client to use.
-    const S3_client *client{};
-    /// The list of URIs to traverse.
-    stdx::span<const std::string> uris{};
     /// The pattern to match the S3 objects against.
-    const std::string *pattern{};
+    std::string_view pattern{};
     /// The callback function for user-specific filtering.
-    const predicate_callback *predicate{};
+    const Predicate_callback *predicate{};
     /// The Compression type of the S3 objects. If set to @c infer, the
     /// Compression will be inferred from the URIs.
     Compression compression = Compression::infer;
@@ -75,11 +71,13 @@ struct MLIO_API List_s3_objects_params {
 
 /// Lists all S3 objects residing under the specified URIs.
 MLIO_API
-std::vector<Intrusive_ptr<Data_store>> list_s3_objects(const List_s3_objects_params &params);
+std::vector<Intrusive_ptr<Data_store>> list_s3_objects(const S3_client &client,
+                                                       stdx::span<const std::string> uris,
+                                                       const S3_object_list_options &opts);
 
 MLIO_API
 std::vector<Intrusive_ptr<Data_store>>
-list_s3_objects(const S3_client &client, const std::string &uri, const std::string &pattern = {});
+list_s3_objects(const S3_client &client, const std::string &uri, std::string_view pattern = {});
 
 /// @}
 

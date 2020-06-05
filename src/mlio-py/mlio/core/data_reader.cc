@@ -167,7 +167,7 @@ Csv_params make_csv_reader_params(std::vector<std::string> column_names,
                                   std::optional<std::size_t> max_field_length,
                                   Max_field_length_handling max_field_length_handling,
                                   std::optional<std::size_t> max_line_length,
-                                  std::optional<Parser_params> parser_params)
+                                  std::optional<Parser_options> parser_options)
 {
     Csv_params csv_params{};
 
@@ -192,8 +192,8 @@ Csv_params make_csv_reader_params(std::vector<std::string> column_names,
     csv_params.max_field_length = max_field_length;
     csv_params.max_field_length_handling = max_field_length_handling;
     csv_params.max_line_length = max_line_length;
-    if (parser_params) {
-        csv_params.parser_params = std::move(parser_params.value());
+    if (parser_options) {
+        csv_params.parser_options = std::move(parser_options.value());
     }
 
     return csv_params;
@@ -212,14 +212,14 @@ Image_reader_params make_image_reader_params(Image_frame image_frame,
     return img_params;
 }
 
-Parser_params make_parser_params(std::unordered_set<std::string> nan_values, int base)
+Parser_options make_parser_options(std::unordered_set<std::string> nan_values, int base)
 {
-    Parser_params parser_params{};
+    Parser_options parser_options{};
 
-    parser_params.nan_values = std::move(nan_values);
-    parser_params.base = base;
+    parser_options.nan_values = std::move(nan_values);
+    parser_options.base = base;
 
-    return parser_params;
+    return parser_options;
 }
 
 Intrusive_ptr<Csv_reader>
@@ -425,7 +425,7 @@ void register_data_readers(py::module &m)
              "max_field_length"_a = std::nullopt,
              "max_field_length_handling"_a = Max_field_length_handling::treat_as_bad,
              "max_line_length"_a = std::nullopt,
-             "Parser_params"_a = std::nullopt,
+             "parser_options"_a = std::nullopt,
              R"(
             Parameters
             ----------
@@ -514,7 +514,7 @@ void register_data_readers(py::module &m)
             max_line_length : int, optional
                 The maximum size of a text line. If a row is longer than the
                 specified size, an error will be raised.
-            Parser_params : ParserParams, optional
+            parser_options : ParserParams, optional
                 See ``ParserParams``.
             )")
         .def_readwrite("column_names", &Csv_params::column_names)
@@ -536,7 +536,7 @@ void register_data_readers(py::module &m)
         .def_readwrite("max_field_length", &Csv_params::max_field_length)
         .def_readwrite("max_field_length_handling", &Csv_params::max_field_length_handling)
         .def_readwrite("max_line_length", &Csv_params::max_line_length)
-        .def_readwrite("Parser_params", &Csv_params::parser_params);
+        .def_readwrite("parser_options", &Csv_params::parser_options);
 
     py::class_<Image_reader_params>(
         m, "ImageReaderParams", "Represents the optional parameters of an ``ImageReader`` object.")
@@ -565,8 +565,8 @@ void register_data_readers(py::module &m)
         .def_readwrite("image_dimensions", &Image_reader_params::image_dimensions)
         .def_readwrite("to_rgb", &Image_reader_params::to_rgb);
 
-    py::class_<Parser_params>(m, "ParserParams")
-        .def(py::init(&make_parser_params),
+    py::class_<Parser_options>(m, "ParserParams")
+        .def(py::init(&make_parser_options),
              "nan_values"_a = std::unordered_set<std::string>{},
              "number_base"_a = 10,
              R"(
@@ -583,8 +583,8 @@ void register_data_readers(py::module &m)
                 For a number parse operation specifies the base of the number
                 in its string representation.
              )")
-        .def_readwrite("nan_values", &Parser_params::nan_values)
-        .def_readwrite("number_base", &Parser_params::base);
+        .def_readwrite("nan_values", &Parser_options::nan_values)
+        .def_readwrite("number_base", &Parser_options::base);
 
     py::class_<Data_reader, Py_data_reader, Intrusive_ptr<Data_reader>>(
         m,
@@ -628,12 +628,12 @@ void register_data_readers(py::module &m)
     py::class_<Csv_reader, Data_reader, Intrusive_ptr<Csv_reader>>(
         m, "CsvReader", "Represents a ``Data_reader`` for reading CSV datasets.")
         .def(py::init<>(&make_csv_reader),
-             "Data_reader_params"_a,
-             "Csv_params"_a = std::nullopt,
+             "data_reader_params"_a,
+             "csv_params"_a = std::nullopt,
              R"(
             Parameters
             ----------
-            Data_reader_params : DataReaderParams
+            data_reader_params : DataReaderParams
                 See ``DataReaderParams``.
             csv_reader_params : CsvReaderParams, optional
                 See ``CsvReaderParams``.
@@ -642,35 +642,35 @@ void register_data_readers(py::module &m)
     py::class_<Image_reader, Data_reader, Intrusive_ptr<Image_reader>>(
         m, "ImageReader", "Represents a ``Data_reader`` for reading Image datasets.")
         .def(py::init<>(&make_image_reader),
-             "Data_reader_params"_a,
-             "Image_reader_params"_a = std::nullopt,
+             "data_reader_params"_a,
+             "image_reader_params"_a = std::nullopt,
              R"(
             Parameters
             ----------
-            Data_reader_params : DataReaderParams
+            data_reader_params : DataReaderParams
                 See ``DataReaderParams``.
-            Image_reader_params : ImageReaderParams
+            image_reader_params : ImageReaderParams
                 See ``ImageReaderParams``.
             )");
 
     py::class_<Recordio_protobuf_reader, Data_reader, Intrusive_ptr<Recordio_protobuf_reader>>(
         m, "RecordIOProtobufReader")
         .def(py::init<>(&make_recordio_protobuf_reader),
-             "Data_reader_params"_a,
+             "data_reader_params"_a,
              R"(
             Parameters
             ----------
-            Data_reader_params : DataReaderParams
+            data_reader_params : DataReaderParams
                 See ``DataReaderParams``.
             )");
 
     py::class_<Text_line_reader, Data_reader, Intrusive_ptr<Text_line_reader>>(m, "TextLineReader")
         .def(py::init<>(&make_text_line_reader),
-             "Data_reader_params"_a,
+             "data_reader_params"_a,
              R"(
             Parameters
             ----------
-            Data_reader_params : DataReaderParams
+            data_reader_params : DataReaderParams
                 See ``DataReaderParams``.
             )");
 }

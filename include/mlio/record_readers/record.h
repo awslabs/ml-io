@@ -64,7 +64,7 @@ public:
         return payload_;
     }
 
-    Memory_slice &&payload() && noexcept
+    Memory_slice &&payload() &&noexcept
     {
         return std::move(payload_);
     }

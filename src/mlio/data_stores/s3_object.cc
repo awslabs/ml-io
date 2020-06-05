@@ -85,17 +85,18 @@ std::string S3_object::repr() const
 namespace detail {
 namespace {
 
-void list_s3_objects(const List_s3_objects_params &params,
+void list_s3_objects(const S3_client &client,
                      const std::string &uri,
+                     const S3_object_list_options &opts,
                      std::vector<std::string> &object_uris)
 {
     auto [bucket, prefix] = detail::split_s3_uri_to_bucket_and_key(uri);
 
-    params.client->list_objects(bucket, prefix, [&](std::string object_uri) {
+    client.list_objects(bucket, prefix, [&](std::string object_uri) {
         // Pattern match.
-        const std::string *pattern = params.pattern;
-        if (pattern != nullptr && !pattern->empty()) {
-            int r = ::fnmatch(pattern->c_str(), object_uri.c_str(), 0);
+        std::string pattern{opts.pattern};
+        if (!pattern.empty()) {
+            int r = ::fnmatch(pattern.c_str(), object_uri.c_str(), 0);
             if (r == FNM_NOMATCH) {
                 return;
             }
@@ -105,7 +106,7 @@ void list_s3_objects(const List_s3_objects_params &params,
         }
 
         // Predicate match.
-        const auto *predicate = params.predicate;
+        const auto *predicate = opts.predicate;
         if (predicate != nullptr && *predicate != nullptr) {
             if (!(*predicate)(object_uri)) {
                 return;
@@ -119,36 +120,38 @@ void list_s3_objects(const List_s3_objects_params &params,
 }  // namespace
 }  // namespace detail
 
-std::vector<Intrusive_ptr<Data_store>> list_s3_objects(const List_s3_objects_params &params)
+std::vector<Intrusive_ptr<Data_store>> list_s3_objects(const S3_client &client,
+                                                       stdx::span<const std::string> uris,
+                                                       const S3_object_list_options &opts)
 {
     std::vector<std::string> object_uris{};
 
-    for (const std::string &uri : params.uris) {
-        detail::list_s3_objects(params, uri, object_uris);
+    for (const std::string &uri : uris) {
+        detail::list_s3_objects(client, uri, opts, object_uris);
     }
 
     std::sort(object_uris.begin(), object_uris.end(), [](const auto &a, const auto &b) {
         return ::strnatcmp(a.c_str(), b.c_str()) < 0;
     });
 
-    auto clt = wrap_intrusive(params.client);
+    auto clt = wrap_intrusive(&client);
 
     std::vector<Intrusive_ptr<Data_store>> stores{};
     stores.reserve(object_uris.size());
 
     for (const std::string &uri : object_uris) {
-        stores.emplace_back(make_intrusive<S3_object>(clt, uri, std::string{}, params.compression));
+        stores.emplace_back(make_intrusive<S3_object>(clt, uri, std::string{}, opts.compression));
     }
 
     return stores;
 }
 
 std::vector<Intrusive_ptr<Data_store>>
-list_s3_objects(const S3_client &client, const std::string &uri, const std::string &pattern)
+list_s3_objects(const S3_client &client, const std::string &uri, std::string_view pattern)
 {
     stdx::span<const std::string> uris{&uri, 1};
 
-    return list_s3_objects({&client, uris, &pattern});
+    return list_s3_objects(client, uris, {pattern});
 }
 
 }  // namespace abi_v1

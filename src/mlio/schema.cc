@@ -16,6 +16,7 @@
 #include "mlio/schema.h"
 
 #include <stdexcept>
+#include <utility>
 
 #include <fmt/format.h>
 #include <fmt/ostream.h>
@@ -29,10 +30,24 @@ struct fmt::formatter<mlio::Attribute, Char>
 namespace mlio {
 inline namespace abi_v1 {
 
-Attribute::Attribute(std::string &&name, Data_type dt, Size_vector &&shape)
-    : name_{std::move(name)}, data_type_{dt}, shape_{std::move(shape)}
+Attribute::Attribute(std::string name,
+                     Data_type dt,
+                     Size_vector shape,
+                     Ssize_vector strides,
+                     bool sparse)
+    : name_{std::move(name)}
+    , data_type_{dt}
+    , shape_{std::move(shape)}
+    , strides_{std::move(strides)}
+    , sparse_{sparse}
 {
-    init();
+    if (strides_.empty()) {
+        strides_ = Tensor::default_strides(shape_);
+    }
+    else if (strides_.size() != shape_.size()) {
+        throw std::invalid_argument{
+            "The number of strides does not match the number of dimensions."};
+    }
 }
 
 std::string Attribute::repr() const
@@ -44,17 +59,6 @@ std::string Attribute::repr() const
         fmt::join(shape_, ", "),
         fmt::join(strides_, ", "),
         sparse_);
-}
-
-void Attribute::init()
-{
-    if (strides_.empty()) {
-        strides_ = Tensor::default_strides(shape_);
-    }
-    else if (strides_.size() != shape_.size()) {
-        throw std::invalid_argument{
-            "The number of strides does not match the number of dimensions."};
-    }
 }
 
 bool operator==(const Attribute &lhs, const Attribute &rhs) noexcept

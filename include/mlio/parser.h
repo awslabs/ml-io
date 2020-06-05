@@ -30,7 +30,7 @@ inline namespace abi_v1 {
 
 enum class Parse_result { ok, failed, overflowed };
 
-struct MLIO_API Parser_params {
+struct MLIO_API Parser_options {
     /// For a floating-point parse operation holds the list of strings
     /// that should be treated as NaN.
     std::unordered_set<std::string> nan_values{};
@@ -58,7 +58,7 @@ using Parser =
 /// @param dt
 ///     The data type for which to construct a Parser.
 MLIO_API
-Parser make_parser(Data_type dt, const Parser_params &params);
+Parser make_parser(Data_type dt, const Parser_options &opts);
 
 }  // namespace abi_v1
 }  // namespace mlio

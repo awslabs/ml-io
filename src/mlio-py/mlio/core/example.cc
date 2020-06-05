@@ -29,7 +29,7 @@ Intrusive_ptr<Tensor> get_feature(Example &example, const std::string &name)
 {
     Intrusive_ptr<Tensor> tensor = example.find_feature(name);
     if (tensor == nullptr) {
-        throw py::key_error{"The Example does not contain a feature with the specified name."};
+        throw py::key_error{"The example does not contain a feature with the specified name."};
     }
 
     return tensor;
@@ -49,18 +49,18 @@ Intrusive_ptr<Tensor> get_feature(Example &example, std::size_t index)
 void register_example(py::module &m)
 {
     py::class_<Example, Intrusive_ptr<Example>>(
-        m, "Example", "Represents an Example that holds a ``Schema`` and a set of features.")
+        m, "Example", "Represents an example that holds a ``Schema`` and a set of features.")
         .def(py::init<Intrusive_ptr<const Schema>, std::vector<Intrusive_ptr<Tensor>>>(),
-             "Schema"_a,
+             "schema"_a,
              "features"_a,
              R"(
             Parameters
             ----------
-            Schema : Schema
-                The Schema that describes the `features` container in the
-                Example.
+            schema : schema
+                The schema that describes the `features` container in the
+                example.
             features : list of tensors.
-                The features of the Example.
+                The features of the example.
             )")
         .def("__len__",
              [](Example &self) {
@@ -81,7 +81,7 @@ void register_example(py::module &m)
                  return py::make_iterator(self.features().begin(), self.features().end());
              })
         .def("__repr__", &Example::repr)
-        .def_property_readonly("Schema", &Example::schema, "Gets the Schema of the Example.")
+        .def_property_readonly("schema", &Example::schema, "Gets the schema of the example.")
         .def_readwrite("padding",
                        &Example::padding,
                        R"(

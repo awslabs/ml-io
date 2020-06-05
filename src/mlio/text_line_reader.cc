@@ -27,7 +27,7 @@
 #include "mlio/tensor.h"
 #include "mlio/util/string.h"
 
-using mlio::detail::text_line_record_reader;
+using mlio::detail::Text_line_record_reader;
 
 namespace mlio {
 inline namespace abi_v1 {
@@ -44,7 +44,7 @@ Text_line_reader::~Text_line_reader()
 Intrusive_ptr<Record_reader> Text_line_reader::make_record_reader(const Data_store &store)
 {
     auto stream = make_utf8_stream(store.open_read());
-    return make_intrusive<text_line_record_reader>(std::move(stream), false);
+    return make_intrusive<Text_line_record_reader>(std::move(stream), false);
 }
 
 Intrusive_ptr<const Schema> Text_line_reader::infer_schema(const std::optional<Instance> &)

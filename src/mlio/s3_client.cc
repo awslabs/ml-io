@@ -97,13 +97,6 @@ inline void check_s3_error(const Outcome &outcome)
 }  // namespace
 }  // namespace detail
 
-S3_client::S3_client() : native_client_{}
-{
-    Aws::Auth::AWSCredentials credentials = detail::get_default_aws_credentials();
-
-    native_client_ = std::make_unique<Aws::S3::S3Client>(credentials);
-}
-
 S3_client::S3_client(std::unique_ptr<Aws::S3::S3Client> native_client) noexcept
     : native_client_{std::move(native_client)}
 {}
@@ -188,25 +181,26 @@ std::size_t S3_client::read_object_size(std::string_view bucket,
     return as_size(outcome.GetResult().GetContentLength());
 }
 
-Intrusive_ptr<S3_client> S3_client_builder::build()
+Intrusive_ptr<S3_client> make_s3_client(const S3_client_options &opts)
 {
     Aws::Auth::AWSCredentials credentials{};
-    if (access_key_id_.empty() && secret_key_.empty()) {
+    if (opts.access_key_id.empty() && opts.secret_key.empty()) {
         credentials = detail::get_default_aws_credentials();
     }
     else {
-        credentials = Aws::Auth::AWSCredentials{
-            Aws::String{access_key_id_}, Aws::String{secret_key_}, Aws::String{session_token_}};
+        credentials = Aws::Auth::AWSCredentials{Aws::String{opts.access_key_id},
+                                                Aws::String{opts.secret_key},
+                                                Aws::String{opts.session_token}};
     }
 
     Aws::Client::ClientConfiguration config{};
-    if (!profile_.empty()) {
-        config = Aws::Client::ClientConfiguration{profile_.c_str()};
+    if (!opts.profile.empty()) {
+        config = Aws::Client::ClientConfiguration{std::string{opts.profile}.c_str()};
     }
-    if (!region_.empty()) {
-        config.region = region_;
+    if (!opts.region.empty()) {
+        config.region = opts.region;
     }
-    if (!use_https_) {
+    if (!opts.use_https) {
         config.scheme = Aws::Http::Scheme::HTTP;
     }
 

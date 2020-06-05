@@ -21,7 +21,6 @@
 #include <optional>
 #include <string>
 #include <unordered_map>
-#include <utility>
 #include <vector>
 
 #include "mlio/config.h"
@@ -39,10 +38,12 @@ inline namespace abi_v1 {
 /// Describes an Attribute which defines a measurable property of a
 /// dataset.
 class MLIO_API Attribute {
-    friend class Attribute_builder;
-
 public:
-    explicit Attribute(std::string &&name, Data_type dt, Size_vector &&shape);
+    explicit Attribute(std::string name,
+                       Data_type dt,
+                       Size_vector shape,
+                       Ssize_vector strides = {},
+                       bool sparse = {});
 
     std::string repr() const;
 
@@ -74,8 +75,6 @@ public:
 private:
     explicit Attribute() noexcept = default;
 
-    void init();
-
     std::string name_{};
     Data_type data_type_{};
     Size_vector shape_{};
@@ -97,47 +96,6 @@ inline std::ostream &operator<<(std::ostream &s, const Attribute &attr)
 {
     return s << attr.repr();
 }
-
-/// Builds a @ref Attribute Instance.
-class MLIO_API Attribute_builder {
-public:
-    explicit Attribute_builder(std::string name, Data_type dt, Size_vector shape) noexcept
-    {
-        attr_.name_ = std::move(name);
-        attr_.data_type_ = dt;
-        attr_.shape_ = std::move(shape);
-    }
-
-    Attribute_builder &with_sparsity(bool value) noexcept
-    {
-        attr_.sparse_ = value;
-
-        return *this;
-    }
-
-    Attribute_builder &with_strides(Ssize_vector strides) noexcept
-    {
-        attr_.strides_ = std::move(strides);
-
-        return *this;
-    }
-
-    Attribute &&build()
-    {
-        attr_.init();
-
-        return std::move(attr_);
-    }
-
-    // NOLINTNEXTLINE(google-explicit-constructor)
-    operator Attribute &&()
-    {
-        return build();
-    }
-
-private:
-    Attribute attr_{};
-};
 
 /// Represents a Schema that contains the descriptions of all the
 /// features contained in a particular dataset.

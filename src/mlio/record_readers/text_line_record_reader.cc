@@ -28,7 +28,7 @@ inline namespace abi_v1 {
 namespace detail {
 
 std::optional<Record>
-text_line_record_reader::decode_text_record(Memory_slice &chunk, bool ignore_leftover)
+Text_line_record_reader::decode_text_record(Memory_slice &chunk, bool ignore_leftover)
 {
     if (chunk.empty()) {
         return {};

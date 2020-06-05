@@ -72,28 +72,28 @@ Intrusive_ptr<In_memory_store> make_in_memory_store(const py::buffer &buf, Compr
 std::vector<Intrusive_ptr<Data_store>>
 py_list_files(const std::vector<std::string> &paths,
               const std::string &pattern,
-              List_files_params::Predicate_callback &predicate,
+              File_list_options::Predicate_callback &predicate,
               bool memory_map,
               Compression compression)
 {
-    return list_files({paths, &pattern, &predicate, memory_map, compression});
+    return list_files(paths, {pattern, &predicate, memory_map, compression});
 }
 
 std::vector<Intrusive_ptr<Data_store>>
 py_list_s3_objects(const S3_client &client,
                    const std::vector<std::string> &uris,
                    const std::string &pattern,
-                   List_files_params::Predicate_callback &predicate,
+                   S3_object_list_options::Predicate_callback &predicate,
                    Compression compression)
 {
-    return list_s3_objects({&client, uris, &pattern, &predicate, compression});
+    return list_s3_objects(client, uris, {pattern, &predicate, compression});
 }
 
 }  // namespace
 
 void register_data_stores(py::module &m)
 {
-    py::enum_<Compression>(m, "Compression", "Specifies the Compression type of a data store.")
+    py::enum_<Compression>(m, "Compression", "Specifies the compression type of a data store.")
         .value("NONE", Compression::none)
         .value("INFER", Compression::infer)
         .value("GZIP", Compression::gzip)
@@ -124,7 +124,7 @@ void register_data_stores(py::module &m)
         .def(py::init<std::string, bool, Compression>(),
              "path"_a,
              "memory_map"_a = true,
-             "Compression"_a = Compression::infer,
+             "compression"_a = Compression::infer,
              R"(
             Parameters
             ----------
@@ -133,23 +133,23 @@ void register_data_stores(py::module &m)
             memory_map : bool
                 A boolean value indicating whether the File should be
                 memory-mapped.
-            Compression : Compression
-                The Compression type of the File. If set to `INFER`, the
-                Compression will be inferred from the filename.
+            compression : compression
+                The compression type of the File. If set to `INFER`, the
+                compression will be inferred from the filename.
             )");
 
     py::class_<In_memory_store, Data_store, Intrusive_ptr<In_memory_store>>(
         m, "InMemoryStore", "Represents a memory block as a ``Data_store``.")
         .def(py::init(&make_in_memory_store),
              "buf"_a,
-             "Compression"_a = Compression::none,
+             "compression"_a = Compression::none,
              R"(
             Parameters
             ----------
             buf : buffer
                 The Python buffer to wrap as a data store.
-            Compression : Compression
-                The Compression type of the data.
+            compression : compression
+                The compression type of the data.
             )");
 
     py::class_<S3_object, Data_store, Intrusive_ptr<S3_object>>(
@@ -158,7 +158,7 @@ void register_data_stores(py::module &m)
              "client"_a,
              "uri"_a,
              "version_id"_a = "",
-             "Compression"_a = Compression::infer,
+             "compression"_a = Compression::infer,
              R"(
             Parameters
             ----------
@@ -168,9 +168,9 @@ void register_data_stores(py::module &m)
                 The URI of the S3 object.
             version_id : str
                 The version of the S3 object to read.
-            Compression : Compression
-                The Compression type of the S3 object. If set to `INFER`, the
-                Compression will be inferred from the URI.
+            compression : compression
+                The compression type of the S3 object. If set to `INFER`, the
+                compression will be inferred from the URI.
             )");
 
     py::class_<Sagemaker_pipe, Data_store, Intrusive_ptr<Sagemaker_pipe>>(
@@ -179,7 +179,7 @@ void register_data_stores(py::module &m)
              "path"_a,
              "timeout"_a = sagemaker_pipe_default_timeout,
              "fifo_id"_a = std::nullopt,
-             "Compression"_a = Compression::none,
+             "compression"_a = Compression::none,
              R"(
             Parameters
             ----------
@@ -190,8 +190,8 @@ void register_data_stores(py::module &m)
                 channel.
             fifo_id : int, optional
                 The FIFO suffix of the SageMaker pipe channel.
-            Compression : Compression, optional
-                The Compression type of the data.
+            compression : compression, optional
+                The compression type of the data.
             )");
 
     m.def("list_files",
@@ -200,7 +200,7 @@ void register_data_stores(py::module &m)
           "pattern"_a = "",
           "predicate"_a = nullptr,
           "memory_map"_a = true,
-          "Compression"_a = Compression::infer,
+          "compression"_a = Compression::infer,
           R"(
         Recursively list all files residing under the specified paths.
 
@@ -215,13 +215,13 @@ void register_data_stores(py::module &m)
         memory_map : bool
             A boolean value indicating whether the files should be
             memory-mapped.
-        Compression : Compression
-            The Compression type of the files. If set to `INFER`, the
-            Compression will be inferred from the filenames.
+        compression : compression
+            The compression type of the files. If set to `INFER`, the
+            compression will be inferred from the filenames.
         )");
 
     m.def("list_files",
-          py::overload_cast<const std::string &, const std::string &>(&list_files),
+          py::overload_cast<const std::string &, std::string_view>(&list_files),
           "path"_a,
           "pattern"_a = "",
           R"(
@@ -241,7 +241,7 @@ void register_data_stores(py::module &m)
           "uris"_a,
           "pattern"_a = "",
           "predicate"_a = nullptr,
-          "Compression"_a = Compression::infer,
+          "compression"_a = Compression::infer,
           R"(
         List all S3 objects residing under the specified URIs.
 
@@ -255,13 +255,13 @@ void register_data_stores(py::module &m)
             The pattern to match the S3 objects against.
         predicate : callable
             The callback function for user-specific filtering.
-        Compression : Compression
-            The Compression type of the S3 objects. If set to `INFER`, the
-            Compression will be inferred from the URIs.
+        compression : compression
+            The compression type of the S3 objects. If set to `INFER`, the
+            compression will be inferred from the URIs.
         )");
 
     m.def("list_s3_objects",
-          py::overload_cast<const S3_client &, const std::string &, const std::string &>(
+          py::overload_cast<const S3_client &, const std::string &, std::string_view>(
               &list_s3_objects),
           "client"_a,
           "uri"_a,

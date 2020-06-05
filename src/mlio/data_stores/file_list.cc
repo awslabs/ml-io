@@ -86,9 +86,12 @@ auto make_fts(stdx::span<const std::string> paths)
 }  // namespace
 }  // namespace detail
 
-std::vector<Intrusive_ptr<Data_store>> list_files(const List_files_params &params)
+std::vector<Intrusive_ptr<Data_store>>
+list_files(stdx::span<const std::string> paths, const File_list_options &opts)
 {
-    auto fts = detail::make_fts(params.paths);
+    auto fts = detail::make_fts(paths);
+
+    std::string pattern{opts.pattern};
 
     std::vector<Intrusive_ptr<Data_store>> result{};
 
@@ -110,9 +113,8 @@ std::vector<Intrusive_ptr<Data_store>> list_files(const List_files_params &param
         }
 
         // Pattern match.
-        const std::string *pattern = params.pattern;
-        if (pattern != nullptr && !pattern->empty()) {
-            int r = ::fnmatch(pattern->c_str(), e->fts_accpath, 0);
+        if (!pattern.empty()) {
+            int r = ::fnmatch(pattern.c_str(), e->fts_accpath, 0);
             if (r == FNM_NOMATCH) {
                 continue;
             }
@@ -122,14 +124,14 @@ std::vector<Intrusive_ptr<Data_store>> list_files(const List_files_params &param
         }
 
         // Predicate match.
-        const auto *predicate = params.predicate;
+        const auto *predicate = opts.predicate;
         if (predicate != nullptr && *predicate != nullptr) {
             if (!(*predicate)(e->fts_accpath)) {
                 continue;
             }
         }
 
-        auto file = make_intrusive<File>(e->fts_accpath, params.memory_map, params.compression);
+        auto file = make_intrusive<File>(e->fts_accpath, opts.memory_map, opts.compression);
 
         result.emplace_back(std::move(file));
     }
@@ -141,12 +143,11 @@ std::vector<Intrusive_ptr<Data_store>> list_files(const List_files_params &param
     return result;
 }
 
-std::vector<Intrusive_ptr<Data_store>>
-list_files(const std::string &path, const std::string &pattern)
+std::vector<Intrusive_ptr<Data_store>> list_files(const std::string &path, std::string_view pattern)
 {
     stdx::span<const std::string> paths{&path, 1};
 
-    return list_files({paths, &pattern});
+    return list_files(paths, {pattern});
 }
 
 }  // namespace abi_v1

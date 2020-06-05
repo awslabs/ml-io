@@ -84,10 +84,12 @@ private:
     Intrusive_ptr<Example> decode(const Instance_batch &batch) const final;
 
     MLIO_HIDDEN
-    std::optional<std::size_t> decode_serial(Decoder_state &state, const Instance_batch &batch) const;
+    std::optional<std::size_t>
+    decode_serial(Decoder_state &state, const Instance_batch &batch) const;
 
     MLIO_HIDDEN
-    std::optional<std::size_t> decode_parallel(Decoder_state &state, const Instance_batch &batch) const;
+    std::optional<std::size_t>
+    decode_parallel(Decoder_state &state, const Instance_batch &batch) const;
 
     MLIO_HIDDEN
     static const aialgs::data::Record *parse_proto(const Instance &instance);

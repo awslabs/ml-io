@@ -27,9 +27,9 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-class text_line_record_reader final : public Text_record_reader {
+class Text_line_record_reader final : public Text_record_reader {
 public:
-    explicit text_line_record_reader(Intrusive_ptr<Input_stream> stream, bool skip_blank)
+    explicit Text_line_record_reader(Intrusive_ptr<Input_stream> stream, bool skip_blank)
         : Text_record_reader{std::move(stream)}, skip_blank_{skip_blank}
     {}
 

@@ -38,8 +38,6 @@ inline namespace abi_v1 {
 /// Represents a client to access Amazon S3.
 class MLIO_API S3_client : public Intrusive_ref_counter<S3_client> {
 public:
-    explicit S3_client();
-
     explicit S3_client(std::unique_ptr<Aws::S3::S3Client> native_client) noexcept;
 
     S3_client(const S3_client &) = delete;
@@ -70,60 +68,16 @@ private:
     std::unique_ptr<Aws::S3::S3Client> native_client_;
 };
 
-class MLIO_API S3_client_builder {
-public:
-    S3_client_builder &with_access_key_id(std::string value) noexcept
-    {
-        access_key_id_ = std::move(value);
-
-        return *this;
-    }
-
-    S3_client_builder &with_secret_key(std::string value) noexcept
-    {
-        secret_key_ = std::move(value);
-
-        return *this;
-    }
-
-    S3_client_builder &with_session_token(std::string value) noexcept
-    {
-        session_token_ = std::move(value);
-
-        return *this;
-    }
-
-    S3_client_builder &with_profile(std::string value) noexcept
-    {
-        profile_ = std::move(value);
-
-        return *this;
-    }
-
-    S3_client_builder &with_region(std::string value) noexcept
-    {
-        region_ = std::move(value);
-
-        return *this;
-    }
-
-    S3_client_builder &use_https(bool value) noexcept
-    {
-        use_https_ = value;
-
-        return *this;
-    }
-
-    Intrusive_ptr<S3_client> build();
-
-private:
-    std::string access_key_id_{};
-    std::string secret_key_{};
-    std::string session_token_{};
-    std::string profile_{};
-    std::string region_{};
-    bool use_https_{true};
+struct MLIO_API S3_client_options {
+    std::string_view access_key_id{};
+    std::string_view secret_key{};
+    std::string_view session_token{};
+    std::string_view profile{};
+    std::string_view region{};
+    bool use_https{true};
 };
+
+Intrusive_ptr<S3_client> make_s3_client(const S3_client_options &opts = {});
 
 }  // namespace abi_v1
 }  // namespace mlio

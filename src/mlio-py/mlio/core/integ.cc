@@ -50,7 +50,7 @@ void register_integ(py::module &m)
 {
     m.def("as_dlpack",
           &to_dlpack_capsule,
-          "Tensor"_a,
+          "tensor"_a,
           "version"_a,
           "Wraps the specified ``Tensor`` as a DLManagedTensor.");
 }

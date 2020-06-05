@@ -57,6 +57,7 @@ public:
     {
         return eof_;
     }
+
 private:
     enum class Parser_state { new_field, in_field, in_quoted_field, quote_in_quoted_field };
 
