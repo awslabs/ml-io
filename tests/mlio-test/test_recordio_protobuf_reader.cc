@@ -56,21 +56,21 @@ TEST_F(Test_recordio_protobuf_reader, test_split_records_path)
 TEST_F(Test_recordio_protobuf_reader, test_corrupt_split_records_patH)
 {
     mlio::initialize();
-    // Check that the third Record is corrupt.
+    // Check that the third record is corrupt.
     mlio::Data_reader_params prm{};
     prm.dataset.emplace_back(mlio::make_intrusive<mlio::File>(corrupt_split_records_path_));
     prm.batch_size = 10;
     prm.num_prefetched_examples = 1;
 
-    std::string error_substring = "The Record #13 in the data store";
+    std::string error_substring = "The record #13 in the data store";
 
     auto reader = mlio::make_intrusive<mlio::Recordio_protobuf_reader>(prm);
     mlio::Intrusive_ptr<mlio::Example> exm;
 
-    // Try to read batch, should fail due to corrupt Record
+    // Try to read batch, should fail due to corrupt record
     try {
         exm = reader->read_example();
-        FAIL() << "Expected corrupt error exception on 3rd Record.";
+        FAIL() << "Expected corrupt error exception on 3rd record.";
     }
     catch (Data_reader_error const &corrupt_record_err) {
         EXPECT_TRUE(std::string(corrupt_record_err.what()).find(error_substring) !=
@@ -84,7 +84,7 @@ TEST_F(Test_recordio_protobuf_reader, test_corrupt_split_records_patH)
     // Try to read batch, should fail again
     try {
         exm = reader->read_example();
-        FAIL() << "Expected corrupt error exception on 3rd Record.";
+        FAIL() << "Expected corrupt error exception on 3rd record.";
     }
     catch (Data_reader_error const &corrupt_record_err) {
         EXPECT_TRUE(std::string(corrupt_record_err.what()).find(error_substring) !=
@@ -101,7 +101,7 @@ TEST_F(Test_recordio_protobuf_reader, test_corrupt_split_records_patH)
     // Try to read batch, should fail again
     try {
         exm = reader->read_example();
-        FAIL() << "Expected corrupt error exception on 3rd Record.";
+        FAIL() << "Expected corrupt error exception on 3rd record.";
     }
     catch (Data_reader_error const &corrupt_record_err) {
         EXPECT_TRUE(std::string(corrupt_record_err.what()).find(error_substring) !=

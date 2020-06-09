@@ -17,7 +17,7 @@ def test_image_reader_jpeg():
     dataset = [mlio.File(filename)]
     rdr_prm = mlio.DataReaderParams(dataset=dataset,
                                     batch_size=1)
-    img_prm = mlio.ImageReaderParams(img_frame=mlio.ImageFrame.NONE, resize=100, image_dimensions=[3,100,100], to_rgb=1)
+    img_prm = mlio.ImageReaderParams(image_frame=mlio.ImageFrame.NONE, resize=100, image_dimensions=[3,100,100], to_rgb=1)
 
     reader = mlio.ImageReader(rdr_prm, img_prm)
     example = reader.read_example()
@@ -31,7 +31,7 @@ def test_image_reader_jpeg_no_resize():
     dataset = [mlio.File(filename)]
     rdr_prm = mlio.DataReaderParams(dataset=dataset,
                                     batch_size=1)
-    img_prm = mlio.ImageReaderParams(img_frame=mlio.ImageFrame.NONE, image_dimensions=[3,50,50], to_rgb=1)
+    img_prm = mlio.ImageReaderParams(image_frame=mlio.ImageFrame.NONE, image_dimensions=[3,50,50], to_rgb=1)
 
     reader = mlio.ImageReader(rdr_prm, img_prm)
     example = reader.read_example()
@@ -46,7 +46,7 @@ def test_image_reader_png():
     dataset = [mlio.File(filename)]
     rdr_prm = mlio.DataReaderParams(dataset=dataset,
                                     batch_size=1)
-    img_prm = mlio.ImageReaderParams(img_frame=mlio.ImageFrame.NONE, resize=100, image_dimensions=[3,100,100], to_rgb=1)
+    img_prm = mlio.ImageReaderParams(image_frame=mlio.ImageFrame.NONE, resize=100, image_dimensions=[3,100,100], to_rgb=1)
 
     reader = mlio.ImageReader(rdr_prm, img_prm)
     example = reader.read_example()
@@ -61,7 +61,7 @@ def test_image_reader_recordio():
     dataset = [mlio.File(filename)]
     rdr_prm = mlio.DataReaderParams(dataset=dataset,
                                     batch_size=1)
-    img_prm = mlio.ImageReaderParams(img_frame=mlio.ImageFrame.RECORDIO, resize=100, image_dimensions=[3,100,100],
+    img_prm = mlio.ImageReaderParams(image_frame=mlio.ImageFrame.RECORDIO, resize=100, image_dimensions=[3,100,100],
                                      to_rgb=1)
 
     reader = mlio.ImageReader(rdr_prm, img_prm)
