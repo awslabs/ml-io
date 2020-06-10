@@ -214,7 +214,7 @@ Intrusive_ptr<S3_client> make_s3_client(const S3_client_options &opts)
 
 #else
 
-#include "mlio/Not_supported_error.h"
+#include "mlio/not_supported_error.h"
 
 namespace Aws::S3 {
 
@@ -227,11 +227,6 @@ inline namespace abi_v1 {
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmissing-noreturn"
-
-S3_client::S3_client() : native_client_{}
-{
-    throw Not_supported_error{"MLIO was not built with S3 support."};
-}
 
 S3_client::S3_client(std::unique_ptr<Aws::S3::S3Client>) noexcept : native_client_{}
 {}
@@ -260,8 +255,7 @@ std::size_t S3_client::read_object_size(std::string_view, std::string_view, std:
     return 0;
 }
 
-// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
-Intrusive_ptr<S3_client> S3_client_builder::build()
+Intrusive_ptr<S3_client> make_s3_client(const S3_client_options &)
 {
     throw Not_supported_error{"MLIO was not built with S3 support."};
 }

@@ -394,8 +394,8 @@ bool Image_reader::crop(cv::Mat &src, cv::Mat &dst, const Instance &instance) co
 
 #else
 
-#include "mlio/Not_supported_error.h"
-#include "mlio/record_readers/Record_reader.h"
+#include "mlio/not_supported_error.h"
+#include "mlio/record_readers/record_reader.h"
 
 namespace cv {
 

@@ -77,6 +77,7 @@ struct MLIO_API S3_client_options {
     bool use_https{true};
 };
 
+MLIO_API
 Intrusive_ptr<S3_client> make_s3_client(const S3_client_options &opts = {});
 
 }  // namespace abi_v1

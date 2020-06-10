@@ -58,7 +58,7 @@ void deallocate_aws_sdk()
 
 #else
 
-#include "mlio/Not_supported_error.h"
+#include "mlio/not_supported_error.h"
 
 namespace mlio {
 inline namespace abi_v1 {
