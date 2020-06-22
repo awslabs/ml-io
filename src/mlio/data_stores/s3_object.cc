@@ -42,7 +42,7 @@ S3_object::S3_object(Intrusive_ptr<const S3_client> client,
     , version_id_{std::move(version_id)}
     , compression_{compression}
 {
-    detail::validate_s3_uri(uri_);
+    detail::validate_s3_object_uri(uri_);
 
     if (compression_ == Compression::infer) {
         compression_ = detail::infer_compression(uri_);
@@ -90,7 +90,7 @@ void list_s3_objects(const S3_client &client,
                      const S3_object_list_options &opts,
                      std::vector<std::string> &object_uris)
 {
-    auto [bucket, prefix] = detail::split_s3_uri_to_bucket_and_key(uri);
+    auto [bucket, prefix] = detail::split_s3_uri_to_bucket_and_prefix(uri);
 
     client.list_objects(bucket, prefix, [&](std::string object_uri) {
         // Pattern match.

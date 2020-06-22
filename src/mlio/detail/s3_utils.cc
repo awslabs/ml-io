@@ -21,7 +21,8 @@ namespace mlio {
 inline namespace abi_v1 {
 namespace detail {
 
-std::pair<std::string_view, std::string_view> split_s3_uri_to_bucket_and_key(std::string_view uri)
+std::pair<std::string_view, std::string_view>
+split_s3_uri_to_bucket_and_prefix(std::string_view uri)
 {
     if (uri.empty()) {
         throw std::invalid_argument{"The URI cannot be an empty string."};
@@ -33,21 +34,33 @@ std::pair<std::string_view, std::string_view> split_s3_uri_to_bucket_and_key(std
 
     uri = uri.substr(5);
 
+    if (uri.empty()) {
+        throw std::invalid_argument{"The URI cannot be an empty string."};
+    }
+
     auto pos = uri.find_first_of('/');
     if (pos == std::string_view::npos) {
-        throw std::invalid_argument{"The URI must consists of a bucket name and a key/prefix."};
+        return std::make_pair(uri, std::string_view{});
     }
     if (pos == 0) {
         throw std::invalid_argument{"The URI does not contain a bucket name."};
-    }
-    if (pos == uri.size() - 1) {
-        throw std::invalid_argument{"The URI does not contain a key/prefix."};
     }
 
     return std::make_pair(uri.substr(0, pos), uri.substr(pos + 1));
 }
 
-void validate_s3_uri(std::string_view uri)
+std::pair<std::string_view, std::string_view> split_s3_uri_to_bucket_and_key(std::string_view uri)
+{
+    auto bp = split_s3_uri_to_bucket_and_prefix(uri);
+
+    if (bp.second.empty()) {
+        throw std::invalid_argument{"The URI does not contain a key."};
+    }
+
+    return bp;
+}
+
+void validate_s3_object_uri(std::string_view uri)
 {
     split_s3_uri_to_bucket_and_key(uri);
 }
