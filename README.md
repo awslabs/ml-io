@@ -202,7 +202,7 @@ from mlio.integ.arrow import as_arrow_file
 
 # Get a handle to the SageMaker Pipe channel that streams a Parquet
 # dataset.
-pipe = mlio.SageMakerPipe('/opt/ml/train')
+pipe = mlio.SageMakerPipe('/opt/ml/input/data/train')
 
 with pipe.open_read() as strm:
     # Construct an ``mlio.ParquetRecordReader`` that extracts each
@@ -226,6 +226,9 @@ Below we show the same [`CsvReader`](doc/python/data_reader.md#CsvReader) sample
 
 int main(int argc, char *argv[])
 {
+    // Initialize the library.
+    mlio::initialize();
+
     auto dataset = mlio::list_files("/path/to/csv_data", /*pattern=*/"*.csv");
 
     // csv_reader supports an extensive set of constructor parameters.

@@ -84,7 +84,7 @@ PYBIND11_MODULE(arrow, m)
 {
     m.def("as_arrow_file", py::overload_cast<const Data_store &>(&as_arrow_file), "store"_a);
 
-    m.def("as_arrow_file", py::overload_cast<const Record &>(&as_arrow_file), "Record"_a);
+    m.def("as_arrow_file", py::overload_cast<const Record &>(&as_arrow_file), "record"_a);
 }
 
 }  // namespace pymlio

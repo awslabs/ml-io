@@ -29,6 +29,7 @@
 #include <aws/s3/model/GetObjectRequest.h>
 #include <aws/s3/model/HeadObjectRequest.h>
 #include <aws/s3/model/ListObjectsV2Request.h>
+#include <fmt/format.h>
 
 #include "mlio/util/cast.h"
 
@@ -140,8 +141,7 @@ std::size_t S3_client::read_object(std::string_view bucket,
                                    std::size_t offset,
                                    Mutable_memory_span destination) const
 {
-    std::string range_str =
-        "bytes=" + std::to_string(offset) + "-" + std::to_string(offset + destination.size());
+    std::string range_str = fmt::format("bytes={0}-{1}", offset, offset + destination.size());
 
     Aws::S3::Model::GetObjectRequest request{};
     request.SetBucket(Aws::String{bucket});
