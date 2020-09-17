@@ -87,7 +87,7 @@ void Column_analyzer::analyze(const mlio::Example &example) const
 
             // Numeric analyzers
             double as_float{};
-            if (mlio::try_parse_float(cell, as_float) != mlio::Parse_result::ok) {
+            if (mlio::try_parse_float(cell, as_float) != mlio::Parse_result::ok || std::isnan(as_float)) {
                 stats.numeric_nan_count++;
             }
             else {
