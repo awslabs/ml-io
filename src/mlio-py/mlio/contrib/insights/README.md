@@ -49,21 +49,23 @@ Each column in this Example will print a dictionary like the following:
 
 ```
 {
-    'rows_seen': '2305812', 
-    'numeric_count': '2305761', 
-    'numeric_nan_count': '51', 
-    'string_empty_count': '0', 
-    'string_min_length': '2', 
-    'string_min_length_not_empty': '2', 
-    'string_max_length': '2', 
-    'string_only_whitespace_count': '0', 
-    'string_null_like_count': '0', 
-    'numeric_mean': '40.936210', 
-    'numeric_min': '18.000000', 
-    'numeric_max': '95.000000', 
-    'example_value': '', 
-    'string_cardinality': 78, 
-    'string_captured_unique_values': {'70', '38', '80', '30', '84', '82', '42', '53', '73', '75', '95', 'V1', '35', '74', '64', '36', '39', '60', '61', '44', '33', '85', '90', '66', '41', '56', '67', '79', '22', '54', '46', '37', '51', '81', '62', '65', '93', '28', '24', '88', '68', '57', '59', '21', '71', '72', '76', '78', '34', '29', '19', '48', '23', '94', '83', '92', '87', '58', '18', '32', '45', '63', '69', '86', '27', '89', '20', '55', '77', '31', '47', '26', '49', '43', '52', '50', '40', '25'}, 
+    'rows_seen': '109435',
+    'numeric_count': '109435',
+    'numeric_finite_count': '109435',
+    'numeric_nan_count': '0',
+    'numeric_int_count': '5760',
+    'string_empty_count': '0',
+    'string_min_length': '1',
+    'string_min_length_not_empty': '1',
+    'string_max_length': '3',
+    'string_only_whitespace_count': '0',
+    'string_null_like_count': '0',
+    'numeric_finite_mean': '5.863193',
+    'numeric_finite_min': '4.600000',
+    'numeric_finite_max': '7.700000',
+    'example_value': '5.1',
+    'string_cardinality': 16,
+    'string_captured_unique_values': {'6.5': 5760, '6.4': 5760, '5.7': 5760, '6.1': 5760, '5': 5760, '5.6': 11520, '6.7': 5760, '4.6': 5760, '5.9': 5760, '7.7': 11520, '6.2': 5760, '5.8': 11520, '5.4': 5760, '4.7': 5760, '4.9': 5760, '5.1': 5755},
     'string_captured_unique_values_overflowed': False
 }
 ```
@@ -82,6 +84,7 @@ The following information on each column is available:
 - `numeric_count`: the count of values that could be parsed as a float/double.
 - `numeric_nan_count`: the number of values that could not be parsed as a float/double.
 - `numeric_finite_count`: the number of non-infinity/non-NaN values.
+- `numeric_int_count`: the number of values that could be parsed as an integer.
 - `numeric_finite_mean`: the average of finite (non-infinite) numeric values seen.
 - `numeric_finite_min`: the minimum finite numeric value seen.
 - `numeric_finite_max`: the maximum finite numeric value seen.
@@ -98,5 +101,5 @@ The following information on each column is available:
 
 **Captured Values**
 - `example_value`: a value of the column sampled from the dataset.
-- `string_captured_unique_values`: if the column was specified in `capture_columns`; the first `max_capture_count` unique string values will be saved.
+- `string_captured_unique_values`: if the column was specified in `capture_columns`; the first `max_capture_count` unique string values and frequencies will be saved.
 - `string_captured_unique_values_overflowed`: if the column has more unique string values than `max_capture_count` this will be set to true.

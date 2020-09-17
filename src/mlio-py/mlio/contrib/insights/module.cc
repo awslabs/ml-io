@@ -100,6 +100,7 @@ PYBIND11_MODULE(insights, m)
         {"numeric_count", &Column_analysis::numeric_count},
         {"numeric_finite_count", &Column_analysis::numeric_count},
         {"numeric_nan_count", &Column_analysis::numeric_nan_count},
+        {"numeric_int_count", &Column_analysis::numeric_int_count},
         {"string_empty_count", &Column_analysis::str_empty_count},
         {"string_min_length", &Column_analysis::str_min_length},
         {"string_min_length_not_empty", &Column_analysis::str_min_length_not_empty},
