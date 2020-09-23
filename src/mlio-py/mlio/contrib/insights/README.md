@@ -58,6 +58,7 @@ Each column in this Example will print a dictionary like the following:
     'string_min_length': '1',
     'string_min_length_not_empty': '1',
     'string_max_length': '3',
+    'string_avg_length': '2.250000',
     'string_only_whitespace_count': '0',
     'string_null_like_count': '0',
     'numeric_finite_mean': '5.863193',
@@ -66,6 +67,7 @@ Each column in this Example will print a dictionary like the following:
     'numeric_finite_median_approx': '6.0',
     'example_value': '5.1',
     'string_cardinality': 16,
+    `string_vocab_cardinality`: 16,
     'string_captured_unique_values': {'6.5': 5760, '6.4': 5760, '5.7': 5760, '6.1': 5760, '5': 5760, '5.6': 11520, '6.7': 5760, '4.6': 5760, '5.9': 5760, '7.7': 11520, '6.2': 5760, '5.8': 11520, '5.4': 5760, '4.7': 5760, '4.9': 5760, '5.1': 5755},
     'string_captured_unique_values_overflowed': False
 }
@@ -94,12 +96,15 @@ The following information on each column is available:
 **String Analysis**
 
 - `string_cardinality`: an approximation for the cardinality for values as strings (e.g. `1.0` and `1` are considered different).
+- `string_vocab_cardinality`: an approximation for the number of unique words seen across all values (delimited by space).
 - `string_min_length`: the minimum length of a string encountered in this column.
 - `string_min_length_not_empty`: the minimum length of a string encountered in this column that was not empty.
 - `string_max_length`: the minimum length of a string encountered in this column.
+- `string_avg_length`: the average length of a string across the entire column.
 - `string_empty_count`: the number of values without any characters.
 - `string_only_whitespace_count`: the number of values with only whitespace characters.
 - `string_null_like_count`: the number of values that match the `null_like_values` option in a case-insensitive manner.
+
 
 **Captured Values**
 - `example_value`: a value of the column sampled from the dataset.
