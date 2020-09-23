@@ -87,7 +87,7 @@ void Column_analyzer::analyze(const mlio::Example &example) const
 
             // Numeric analyzers
             double as_float{};
-            if (mlio::try_parse_float(cell, as_float) != mlio::Parse_result::ok) {
+            if (mlio::try_parse_float(cell, as_float) != mlio::Parse_result::ok || std::isnan(as_float)) {
                 stats.numeric_nan_count++;
             }
             else {
@@ -97,6 +97,10 @@ void Column_analyzer::analyze(const mlio::Example &example) const
 
                     numeric_column_sum += as_float;
                     numeric_column_count++;
+
+                    if ((std::abs(std::round(as_float) - as_float) <= 1.0e-5)) {
+                        stats.numeric_int_count++;
+                    }
 
                     if (std::isnan(stats.numeric_finite_min) ||
                         as_float < stats.numeric_finite_min) {
@@ -114,7 +118,7 @@ void Column_analyzer::analyze(const mlio::Example &example) const
             // Capture the values if specified.
             if (should_capture && !stats.str_captured_unique_values_overflowed) {
                 if (stats.str_captured_unique_values.size() < max_capture_count_) {
-                    stats.str_captured_unique_values.emplace(cell);
+                    ++stats.str_captured_unique_values[cell];
                 }
                 else if (stats.str_captured_unique_values.find(cell) ==
                          stats.str_captured_unique_values.end()) {

@@ -52,6 +52,7 @@ public:
     std::size_t numeric_count{};
     std::size_t numeric_nan_count{};
     std::size_t numeric_finite_count{};
+    std::size_t numeric_int_count{};
     double numeric_finite_mean{};
     double numeric_finite_min = std::numeric_limits<double>::quiet_NaN();
     double numeric_finite_max = std::numeric_limits<double>::quiet_NaN();
@@ -62,7 +63,7 @@ public:
     std::size_t str_empty_count{};
     std::size_t str_only_whitespace_count{};
     std::size_t str_null_like_count{};
-    std::unordered_set<std::string> str_captured_unique_values{};
+    std::unordered_map<std::string, int> str_captured_unique_values{};
     bool str_captured_unique_values_overflowed{};
 
     std::string example_value{};
