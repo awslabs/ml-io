@@ -46,6 +46,18 @@ public:
     }
 
 public:
+    double estimate_median_approx() const
+    {
+        if (numeric_column_sample.empty()) {
+            return std::nan("");
+        }
+        size_t n = numeric_column_sample.size() / 2;
+        std::nth_element(numeric_column_sample.begin(), numeric_column_sample.begin() + n, 
+            numeric_column_sample.end());
+        return numeric_column_sample[n];
+    }
+
+public:
     std::string column_name;
 
     std::size_t rows_seen{};
@@ -70,6 +82,7 @@ public:
 
 private:
     hll::HyperLogLog str_cardinality_estimator_;
+    mutable std::vector<double> numeric_column_sample{};
 };
 
 struct data_analysis {
