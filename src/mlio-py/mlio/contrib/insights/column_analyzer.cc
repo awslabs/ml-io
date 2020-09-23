@@ -98,7 +98,7 @@ void Column_analyzer::analyze(const mlio::Example &example) const
                     numeric_column_sum += as_float;
                     numeric_column_count++;
 
-                    if (std::fmod(as_float, 1.0) == 0.0) {
+                    if ((std::abs(std::round(as_float) - as_float) <= 1.0e-5)) {
                         stats.numeric_int_count++;
                     }
 
