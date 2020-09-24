@@ -36,7 +36,8 @@ private:
 
 public:
     explicit Column_analysis(std::string name)
-        : column_name{std::move(name)}, str_cardinality_estimator_{cardinality_hill_size}
+        : column_name{std::move(name)}, str_cardinality_estimator_{cardinality_hill_size},
+        str_vocab_cardinality_estimator_{cardinality_hill_size}
     {}
 
 public:
@@ -58,6 +59,12 @@ public:
     }
 
 public:
+    std::size_t estimate_string_vocab_cardinality() const
+    {
+        return static_cast<std::size_t>(std::round(str_vocab_cardinality_estimator_.estimate()));
+    }
+
+public:
     std::string column_name;
 
     std::size_t rows_seen{};
@@ -75,6 +82,8 @@ public:
     std::size_t str_empty_count{};
     std::size_t str_only_whitespace_count{};
     std::size_t str_null_like_count{};
+    std::size_t str_num_words{};
+    double str_avg_length{};
     std::unordered_map<std::string, int> str_captured_unique_values{};
     bool str_captured_unique_values_overflowed{};
 
@@ -82,6 +91,7 @@ public:
 
 private:
     hll::HyperLogLog str_cardinality_estimator_;
+    hll::HyperLogLog str_vocab_cardinality_estimator_;
     mutable std::vector<double> numeric_column_sample{};
 };
 

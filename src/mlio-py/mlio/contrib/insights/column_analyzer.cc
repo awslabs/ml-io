@@ -16,6 +16,9 @@
 #include "column_analyzer.h"
 
 #include <cmath>
+#include <iostream>
+#include <sstream>
+#include <string>
 #include <string_view>
 
 #include "utils.h"
@@ -52,6 +55,8 @@ void Column_analyzer::analyze(const mlio::Example &example) const
         // time.
         double numeric_column_sum = 0.0;
         std::size_t numeric_column_count = 0.0;
+        long string_column_length_sum = 0;
+        std::size_t string_column_count = 0.0;
 
         for (const std::string &cell : cells) {
             // Capture the first Example.
@@ -74,7 +79,17 @@ void Column_analyzer::analyze(const mlio::Example &example) const
 
             stats.str_min_length_not_empty = std::min(stats.str_min_length_not_empty, cell.size());
 
+            string_column_length_sum += cell.size();
+            string_column_count++;
+
             stats.str_cardinality_estimator_.add(cell);
+
+            std::istringstream iss(cell);
+            std::string token;
+            while (std::getline(iss, token, ' ')) {
+                stats.str_vocab_cardinality_estimator_.add(token);
+                stats.str_num_words++;
+            }
 
             if (mlio::is_whitespace_only(cell)) {
                 stats.str_only_whitespace_count++;
@@ -136,14 +151,17 @@ void Column_analyzer::analyze(const mlio::Example &example) const
             }
         }
 
-        // Update the mean of numeric values based on the entire range of
-        // values.
+        // Update the mean of numeric values based on the entire range of values.
         auto ncc = static_cast<double>(numeric_column_count);
         auto nfc = static_cast<double>(stats.numeric_finite_count);
-
         double numeric_column_mean = numeric_column_sum / ncc;
-
         stats.numeric_finite_mean += (numeric_column_mean - stats.numeric_finite_mean) * ncc / nfc;
+
+        // Update average length of string values baseed on entire range of values.
+        auto scc = static_cast<double>(string_column_count);
+        auto rows_seen = static_cast<double>(stats.rows_seen);
+        double string_column_avg_length = string_column_length_sum / scc;
+        stats.str_avg_length += (string_column_avg_length - stats.str_avg_length) * scc / rows_seen;
     }
 };
 

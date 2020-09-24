@@ -93,6 +93,7 @@ PYBIND11_MODULE(insights, m)
         {"numeric_finite_mean", &Column_analysis::numeric_finite_mean},
         {"numeric_finite_min", &Column_analysis::numeric_finite_min},
         {"numeric_finite_max", &Column_analysis::numeric_finite_max},
+        {"string_avg_length", &Column_analysis::str_avg_length},
     };
 
     std::vector<std::pair<const char *, size_t Column_analysis::*>> long_stat_names = {
@@ -107,6 +108,7 @@ PYBIND11_MODULE(insights, m)
         {"string_max_length", &Column_analysis::str_max_length},
         {"string_only_whitespace_count", &Column_analysis::str_only_whitespace_count},
         {"string_null_like_count", &Column_analysis::str_null_like_count},
+        {"string_num_words", &Column_analysis::str_num_words},
     };
 
     std::vector<std::pair<const char *, std::string Column_analysis::*>> str_stat_names = {
@@ -131,7 +133,10 @@ PYBIND11_MODULE(insights, m)
         ca_class.def_readwrite(name, method);
     }
 
-    ca_class.def("estimate_string_cardinality", &Column_analysis::estimate_string_cardinality);
+    ca_class.def("estimate_string_cardinality", 
+                 &Column_analysis::estimate_string_cardinality);
+    ca_class.def("estimate_string_vocab_cardinality", 
+                 &Column_analysis::estimate_string_vocab_cardinality);
 
     ca_class.def("to_dict", [=](const Column_analysis &self) {
         py::dict result{};
@@ -149,6 +154,7 @@ PYBIND11_MODULE(insights, m)
         }
 
         result["string_cardinality"] = self.estimate_string_cardinality();
+        result["string_vocab_cardinality"] = self.estimate_string_vocab_cardinality();
         result["string_captured_unique_values"] = self.str_captured_unique_values;
         result["string_captured_unique_values_overflowed"] =
             self.str_captured_unique_values_overflowed;
