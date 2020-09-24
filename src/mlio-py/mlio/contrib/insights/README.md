@@ -61,6 +61,7 @@ Each column in this Example will print a dictionary like the following:
     'string_avg_length': '2.250000',
     'string_only_whitespace_count': '0',
     'string_null_like_count': '0',
+    'string_num_words': 16,
     'numeric_finite_mean': '5.863193',
     'numeric_finite_min': '4.600000',
     'numeric_finite_max': '7.700000',
