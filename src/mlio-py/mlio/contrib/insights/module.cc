@@ -108,6 +108,7 @@ PYBIND11_MODULE(insights, m)
         {"string_max_length", &Column_analysis::str_max_length},
         {"string_only_whitespace_count", &Column_analysis::str_only_whitespace_count},
         {"string_null_like_count", &Column_analysis::str_null_like_count},
+        {"string_num_words", &Column_analysis::str_num_words},
     };
 
     std::vector<std::pair<const char *, std::string Column_analysis::*>> str_stat_names = {

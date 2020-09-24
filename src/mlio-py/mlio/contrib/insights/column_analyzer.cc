@@ -88,6 +88,7 @@ void Column_analyzer::analyze(const mlio::Example &example) const
             std::string token;
             while (std::getline(iss, token, ' ')) {
                 stats.str_vocab_cardinality_estimator_.add(token);
+                stats.str_num_words++;
             }
 
             if (mlio::is_whitespace_only(cell)) {

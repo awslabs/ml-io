@@ -82,6 +82,7 @@ public:
     std::size_t str_empty_count{};
     std::size_t str_only_whitespace_count{};
     std::size_t str_null_like_count{};
+    std::size_t str_num_words{};
     double str_avg_length{};
     std::unordered_map<std::string, int> str_captured_unique_values{};
     bool str_captured_unique_values_overflowed{};

@@ -96,7 +96,7 @@ The following information on each column is available:
 **String Analysis**
 
 - `string_cardinality`: an approximation for the cardinality for values as strings (e.g. `1.0` and `1` are considered different).
-- `string_vocab_cardinality`: an approximation for the number of unique words seen across all values (delimited by space).
+- `string_vocab_cardinality`: an approximation for the number of unique words seen across all values (words are delimited by space).
 - `string_min_length`: the minimum length of a string encountered in this column.
 - `string_min_length_not_empty`: the minimum length of a string encountered in this column that was not empty.
 - `string_max_length`: the minimum length of a string encountered in this column.
@@ -104,6 +104,7 @@ The following information on each column is available:
 - `string_empty_count`: the number of values without any characters.
 - `string_only_whitespace_count`: the number of values with only whitespace characters.
 - `string_null_like_count`: the number of values that match the `null_like_values` option in a case-insensitive manner.
+- `string_num_words`: the number of total words seen in this column (words are delimited by space).
 
 
 **Captured Values**
