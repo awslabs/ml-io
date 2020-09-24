@@ -63,6 +63,7 @@ Each column in this Example will print a dictionary like the following:
     'numeric_finite_mean': '5.863193',
     'numeric_finite_min': '4.600000',
     'numeric_finite_max': '7.700000',
+    'numeric_finite_median_approx': '6.0',
     'example_value': '5.1',
     'string_cardinality': 16,
     'string_captured_unique_values': {'6.5': 5760, '6.4': 5760, '5.7': 5760, '6.1': 5760, '5': 5760, '5.6': 11520, '6.7': 5760, '4.6': 5760, '5.9': 5760, '7.7': 11520, '6.2': 5760, '5.8': 11520, '5.4': 5760, '4.7': 5760, '4.9': 5760, '5.1': 5755},
@@ -88,6 +89,7 @@ The following information on each column is available:
 - `numeric_finite_mean`: the average of finite (non-infinite) numeric values seen.
 - `numeric_finite_min`: the minimum finite numeric value seen.
 - `numeric_finite_max`: the maximum finite numeric value seen.
+- `numeric_finite_median_approx`: the approximate median of up to a sample of 10000 finite numeric values seen
 
 **String Analysis**
 

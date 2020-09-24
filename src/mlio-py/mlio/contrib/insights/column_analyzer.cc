@@ -22,6 +22,8 @@
 
 namespace pymlio {
 
+static constexpr int MAX_SAMPLE_SIZE = 10000;
+
 Column_analyzer::Column_analyzer(std::vector<Column_analysis> &columns,
                                  const std::vector<std::string> &null_like_values,
                                  const std::unordered_set<std::size_t> &capture_columns,
@@ -97,6 +99,10 @@ void Column_analyzer::analyze(const mlio::Example &example) const
 
                     numeric_column_sum += as_float;
                     numeric_column_count++;
+
+                    if (stats.numeric_column_sample.size() < MAX_SAMPLE_SIZE) {
+                        stats.numeric_column_sample.push_back(as_float);
+                    }
 
                     if ((std::abs(std::round(as_float) - as_float) <= 1.0e-5)) {
                         stats.numeric_int_count++;

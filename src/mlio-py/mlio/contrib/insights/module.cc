@@ -152,6 +152,7 @@ PYBIND11_MODULE(insights, m)
         result["string_captured_unique_values"] = self.str_captured_unique_values;
         result["string_captured_unique_values_overflowed"] =
             self.str_captured_unique_values_overflowed;
+        result["numeric_finite_median_approx"] = self.estimate_median_approx();
 
         return result;
     });
