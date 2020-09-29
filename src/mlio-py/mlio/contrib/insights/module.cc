@@ -133,9 +133,8 @@ PYBIND11_MODULE(insights, m)
         ca_class.def_readwrite(name, method);
     }
 
-    ca_class.def("estimate_string_cardinality", 
-                 &Column_analysis::estimate_string_cardinality);
-    ca_class.def("estimate_string_vocab_cardinality", 
+    ca_class.def("estimate_string_cardinality", &Column_analysis::estimate_string_cardinality);
+    ca_class.def("estimate_string_vocab_cardinality",
                  &Column_analysis::estimate_string_vocab_cardinality);
 
     ca_class.def("to_dict", [=](const Column_analysis &self) {

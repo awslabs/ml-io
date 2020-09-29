@@ -36,35 +36,34 @@ private:
 
 public:
     explicit Column_analysis(std::string name)
-        : column_name{std::move(name)}, str_cardinality_estimator_{cardinality_hill_size},
-        str_vocab_cardinality_estimator_{cardinality_hill_size}
+        : column_name{std::move(name)}
+        , str_cardinality_estimator_{cardinality_hill_size}
+        , str_vocab_cardinality_estimator_{cardinality_hill_size}
     {}
 
-public:
     std::size_t estimate_string_cardinality() const
     {
         return static_cast<std::size_t>(std::round(str_cardinality_estimator_.estimate()));
     }
 
-public:
     double estimate_median_approx() const
     {
-        if (numeric_column_sample.empty()) {
-            return std::nan("");
+        if (numeric_column_sample_.empty()) {
+            return std::numeric_limits<double>::quiet_NaN();
         }
-        size_t n = numeric_column_sample.size() / 2;
-        std::nth_element(numeric_column_sample.begin(), numeric_column_sample.begin() + n, 
-            numeric_column_sample.end());
-        return numeric_column_sample[n];
+
+        std::size_t n = numeric_column_sample_.size() / 2;
+        std::nth_element(numeric_column_sample_.begin(),
+                         numeric_column_sample_.begin() + static_cast<std::ptrdiff_t>(n),
+                         numeric_column_sample_.end());
+        return numeric_column_sample_[n];
     }
 
-public:
     std::size_t estimate_string_vocab_cardinality() const
     {
         return static_cast<std::size_t>(std::round(str_vocab_cardinality_estimator_.estimate()));
     }
 
-public:
     std::string column_name;
 
     std::size_t rows_seen{};
@@ -92,7 +91,7 @@ public:
 private:
     hll::HyperLogLog str_cardinality_estimator_;
     hll::HyperLogLog str_vocab_cardinality_estimator_;
-    mutable std::vector<double> numeric_column_sample{};
+    mutable std::vector<double> numeric_column_sample_{};
 };
 
 struct data_analysis {

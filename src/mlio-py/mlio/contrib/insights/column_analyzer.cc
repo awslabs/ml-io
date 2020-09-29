@@ -25,7 +25,7 @@
 
 namespace pymlio {
 
-static constexpr int MAX_SAMPLE_SIZE = 10000;
+static constexpr int max_sample_size = 10000;
 
 Column_analyzer::Column_analyzer(std::vector<Column_analysis> &columns,
                                  const std::vector<std::string> &null_like_values,
@@ -55,8 +55,8 @@ void Column_analyzer::analyze(const mlio::Example &example) const
         // time.
         double numeric_column_sum = 0.0;
         std::size_t numeric_column_count = 0.0;
-        long string_column_length_sum = 0;
         std::size_t string_column_count = 0.0;
+        std::size_t string_column_length_sum = 0;
 
         for (const std::string &cell : cells) {
             // Capture the first Example.
@@ -104,7 +104,8 @@ void Column_analyzer::analyze(const mlio::Example &example) const
 
             // Numeric analyzers
             double as_float{};
-            if (mlio::try_parse_float(cell, as_float) != mlio::Parse_result::ok || std::isnan(as_float)) {
+            if (mlio::try_parse_float(cell, as_float) != mlio::Parse_result::ok ||
+                std::isnan(as_float)) {
                 stats.numeric_nan_count++;
             }
             else {
@@ -115,8 +116,8 @@ void Column_analyzer::analyze(const mlio::Example &example) const
                     numeric_column_sum += as_float;
                     numeric_column_count++;
 
-                    if (stats.numeric_column_sample.size() < MAX_SAMPLE_SIZE) {
-                        stats.numeric_column_sample.push_back(as_float);
+                    if (stats.numeric_column_sample_.size() < max_sample_size) {
+                        stats.numeric_column_sample_.push_back(as_float);
                     }
 
                     if ((std::abs(std::round(as_float) - as_float) <= 1.0e-5)) {
@@ -160,7 +161,7 @@ void Column_analyzer::analyze(const mlio::Example &example) const
         // Update average length of string values baseed on entire range of values.
         auto scc = static_cast<double>(string_column_count);
         auto rows_seen = static_cast<double>(stats.rows_seen);
-        double string_column_avg_length = string_column_length_sum / scc;
+        double string_column_avg_length = static_cast<double>(string_column_length_sum) / scc;
         stats.str_avg_length += (string_column_avg_length - stats.str_avg_length) * scc / rows_seen;
     }
 };
