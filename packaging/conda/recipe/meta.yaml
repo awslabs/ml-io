@@ -13,7 +13,7 @@ source:
 
 build:
   number: 0
-  # At the moment we do not support Windows.
+  # We do not support Windows.
   skip: True  # [not unix]
 
 outputs:
@@ -38,9 +38,6 @@ outputs:
         - libprotobuf
         - tbb-devel
         - zlib
-      run:
-        # aws-sdk-cpp does not have a run_exports directive.
-        - aws-sdk-cpp
     test:
       commands:
         - test -f "$PREFIX/lib/libmlio.so"     # [linux]
@@ -87,6 +84,8 @@ outputs:
     script: build-mlio-py.sh
     build:
       ignore_run_exports:
+        # Apache Arrow is an optional component, so we avoid putting it
+        # to the 'run' closure.
         - arrow-cpp
     requirements:
       build:
@@ -108,9 +107,7 @@ outputs:
         # runtime constraint of libmlio here.
         - {{ pin_subpackage('libmlio', max_pin='x.x') }}
       run_constrained:
-        # Arrow does not offer ABI compatibility; therefore we pin to
-        # the exact version we built against.
-        - {{ pin_compatible('arrow-cpp', exact=True) }}
+        - arrow-cpp
     test:
       imports:
         - mlio

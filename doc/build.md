@@ -19,7 +19,7 @@
 * Intel TBB 2019.0 or higher
 * Python 3.6 or higher
 * AWS C++ SDK 1.7 or higher (optional)
-* Apache Arrow 0.16.0 (optional)
+* Apache Arrow 1.0 (optional)
 
 ## Build Requirements
 * A C++17-enabled compiler. On Linux gcc 7.0 or higher; on macOS clang 6 or higher should be sufficient.

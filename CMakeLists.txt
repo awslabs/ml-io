@@ -309,7 +309,7 @@ if(MLIO_INCLUDE_PYTHON_EXTENSION)
     endif()
 
     if(MLIO_INCLUDE_ARROW_INTEGRATION)
-        find_package(Arrow 0.16.0 REQUIRED CONFIG)
+        find_package(Arrow 1.0 REQUIRED CONFIG)
     endif()
 
     include(PythonExtension)

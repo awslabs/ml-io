@@ -3,20 +3,20 @@ channels:
   - conda-forge
   - pytorch
 dependencies:
-  - arrow-cpp=0.16.0
-  - aws-sdk-cpp=1.7.164
-  - boto3=1.14.0
+  - arrow-cpp=1.0
+  - aws-sdk-cpp=1.8
+  - boto3=1.14
   - cmake=3.15
   - compilers
-  - doxygen=1.8.18
-  - flake8=3.8.1
+  - doxygen=1.8
+  - flake8=3.8
   - libiconv=1.15
-  - libopencv=4.2.0
-  - libprotobuf=3.11.0
-  - ninja=1.9.0
-  - pytest=5.4.1
+  - libopencv=4.2
+  - libprotobuf=3.13
+  - ninja=1.10
+  - pytest=5.4
   - python=3.7
-  - pytorch=1.5.0
+  - pytorch=1.5
   - tbb-devel=2019.8
-  - torchvision=0.6.0
-  - zlib=1.2.11
+  - torchvision=0.6
+  - zlib=1.2
