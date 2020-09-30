@@ -55,7 +55,7 @@ setup(distclass=Distribution,
 
       # Metadata
       name='mlio',
-      version=stamp_dev_version('0.6.1.dev'),
+      version=stamp_dev_version('0.7.0'),
       description='A high performance data access library for machine learning tasks',  # noqa: E501
       long_description=long_description,
       long_description_content_type='text/markdown',
