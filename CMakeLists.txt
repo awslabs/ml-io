@@ -282,7 +282,7 @@ if(MLIO_INCLUDE_LIB)
     find_package(Iconv REQUIRED)
     find_package(natsort REQUIRED CONFIG)
     find_package(Protobuf 3.8 REQUIRED)
-    find_package(TBB 2019.0 REQUIRED CONFIG COMPONENTS tbb)
+    find_package(TBB REQUIRED CONFIG COMPONENTS tbb)
     find_package(Threads REQUIRED)
     find_package(ZLIB REQUIRED)
 
