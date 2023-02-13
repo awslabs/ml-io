@@ -17,7 +17,7 @@ ExternalProject_Add(
     GIT_REPOSITORY
         https://github.com/abseil/abseil-cpp.git
     GIT_TAG
-        20190808
+        20210324.2
     CMAKE_ARGS
         -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
         -DCMAKE_BUILD_TYPE=Release
@@ -168,25 +168,20 @@ ExternalProject_Add(
         -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
 )
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    set(TIO_TBB_URL "https://github.com/intel/tbb/releases/download/2019_U8/tbb2019_20190605oss_lin.tgz")
-elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-    set(TIO_TBB_URL "https://github.com/intel/tbb/releases/download/2019_U8/tbb2019_20190605oss_mac.tgz")
-else()
-    message(FATAL_ERROR "Intel TBB is only supported on Linux and macOS.")
-endif()
-
 ExternalProject_Add(
     #NAME
         tbb
     PREFIX
         ${CMAKE_CURRENT_BINARY_DIR}
-    URL
-        ${TIO_TBB_URL}
-    CONFIGURE_COMMAND
-        ""
-    BUILD_COMMAND
-        ""
-    INSTALL_COMMAND
-        cmake -E copy_directory <SOURCE_DIR>/tbb2019_20190605oss <INSTALL_DIR>
+    GIT_REPOSITORY
+        https://github.com/wjakob/tbb.git
+    GIT_TAG
+        ddbe45cd3ad89df9a84cd77013d5898fc48b8e89
+    CMAKE_ARGS
+        -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
+        -DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+        -DBUILD_SHARED_LIBS=OFF
+        -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
 )
