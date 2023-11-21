@@ -19,7 +19,7 @@
 * Intel TBB 2019.0 or higher
 * Python 3.6 or higher
 * AWS C++ SDK 1.7 or higher (optional)
-* Apache Arrow 10.0.1 (optional)
+* Apache Arrow 14.0.1 (optional)
 
 ## Build Requirements
 * A C++17-enabled compiler. On Linux gcc 7.0 or higher; on macOS clang 6 or higher should be sufficient.
@@ -158,10 +158,10 @@ $ pip install -e .
 With this mode changes made in Python files will be immediately reflected when the `mlio` package gets imported.
 
 ## Building the Apache Arrow Integration
-Please refer to Arrow's official install instructions [here](https://arrow.apache.org/install/) first. As Arrow does not guarantee API compatibility (yet) you have to make sure that your environment has the right version. As of today MLIO works with Arrow v10.0.1. Once you have it installed, turn on the `MLIO_INCLUDE_ARROW_INTEGRATION` flag as follows:
+Please refer to Arrow's official install instructions [here](https://arrow.apache.org/install/) first. As Arrow does not guarantee API compatibility (yet) you have to make sure that your environment has the right version. As of today MLIO works with Arrow v14.0.1. Once you have it installed, turn on the `MLIO_INCLUDE_ARROW_INTEGRATION` flag as follows:
 
 ```bash
-$ conda install pyarrow=10.0.1
+$ conda install pyarrow=14.0.1
 $ cmake DMLIO_INCLUDE_PYTHON_EXTENSION=ON -DMLIO_INCLUDE_ARROW_INTEGRATION=ON ../..
 $ cmake --build . --target mlio-py
 $ cmake --build . --target mlio-arrow

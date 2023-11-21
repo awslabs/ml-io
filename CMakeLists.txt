@@ -19,7 +19,7 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 # Project
 # ------------------------------------------------------------
 
-project(MLIO VERSION 0.8.0 LANGUAGES C CXX)
+project(MLIO VERSION 0.9.0 LANGUAGES C CXX)
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     set_property(CACHE CMAKE_BUILD_TYPE PROPERTY VALUE RelWithDebInfo)
@@ -309,7 +309,7 @@ if(MLIO_INCLUDE_PYTHON_EXTENSION)
     endif()
 
     if(MLIO_INCLUDE_ARROW_INTEGRATION)
-        find_package(Arrow 10.0.1 REQUIRED CONFIG)
+        find_package(Arrow 14.0.1 REQUIRED CONFIG)
     endif()
 
     include(PythonExtension)
