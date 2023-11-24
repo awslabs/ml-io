@@ -87,7 +87,7 @@ setup(distclass=Distribution,
           'tensorflow': ['tensorflow>=1.9.0'],
           'torch': ['torch>=1.0.0'],
           'mxnet': ['mxnet>=1.4.1'],
-          'pyarrow': ['pyarrow==1440.1'],
+          'pyarrow': ['pyarrow==14.0.1'],
       },
 
       # Add our externally-built extension modules to the package.
