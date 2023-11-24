@@ -1,4 +1,4 @@
-{% set version = '0.8.0' %}
+{% set version = '0.9.0' %}
 
 {% if version.endswith('.dev') %}
     {% set version = version + os.getenv('MLIO_BUILD_NUMBER', '0') %}
